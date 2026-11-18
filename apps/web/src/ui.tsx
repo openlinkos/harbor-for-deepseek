@@ -448,7 +448,13 @@ export const Shell = () => {
     <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''}`}>
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
-          <span className="brand-name"><Mark /> Harbor</span>
+          <span className="brand-name">
+            <Mark />
+            <span className="wordmark">
+              <span className="wordmark-main">Harbor</span>
+              <span className="wordmark-for">for DeepSeek</span>
+            </span>
+          </span>
           <span className="sider-icons">
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />

@@ -1,5 +1,5 @@
 {
-  "name": "Harbor",
+  "name": "Harbor for DeepSeek",
   "short_name": "Harbor",
   "description": "Unofficial community chat client for the official DeepSeek API. The key and chats stay on this device.",
   "start_url": "/",

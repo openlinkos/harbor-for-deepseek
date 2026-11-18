@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3 — 2026-11-18
+
+The sidebar mark is followed by Harbor, with “for DeepSeek” in smaller secondary type on the next line. The document title and the install name match. Launcher labels stay Harbor.
+
 ## 0.5.2 — 2026-11-18
 
 The lightweight footer says 本地模式 / Local mode. A nickname replaces that label and leaves 本地模式 as the subtitle. Server accounts show 服务器模式 / Server mode.
