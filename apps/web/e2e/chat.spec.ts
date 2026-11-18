@@ -94,7 +94,6 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
 
   await page.getByTestId('suggestion-math').click()
   await expect(page.getByTestId('assistant-text')).toContainText('8')
-  await page.getByRole('button', { name: '展开思考' }).click()
   await expect(page.getByTestId('thinking')).toContainText('3+5=8')
   await expect(page.getByTestId('usage-line')).toContainText('41')
   await expect(page.getByTestId('sidebar')).toContainText('简单加法')
@@ -104,13 +103,19 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await expect(page.getByTestId('balance')).toContainText('317.22')
   await expect(page.getByTestId('safety-select')).toHaveValue('high')
   await page.screenshot({ path: join(shots, '04-settings.png') })
-  await page.getByRole('button', { name: '关闭' }).click()
+  await page.getByRole('button', { name: '深色' }).click()
+  await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
+  await page.screenshot({ path: join(shots, '13-dark.png') })
+  await page.getByTestId('settings-open').click()
+  await page.getByRole('button', { name: '浅色' }).click()
+  await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
 
   await page.getByTestId('new-chat').click()
   await page.getByTestId('toggle-thinking').click()
   await page.getByTestId('toggle-search').click()
   await page.getByTestId('suggestion-search').click()
-  await expect(page.getByTestId('search-results')).toContainText('Iceland population')
+  await page.getByTestId('search-results').getByRole('button').click()
+  await expect(page.getByTestId('search-panel')).toContainText('Iceland population')
   await expect(page.getByTestId('assistant-text')).toContainText('394,000')
   await page.screenshot({ path: join(shots, '05-search.png') })
 
@@ -140,6 +145,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
   await page.getByTestId('import-toast').getByRole('button', { name: '关闭' }).click()
 
+  await page.getByTestId('search-panel').getByRole('button', { name: '关闭' }).click()
   await page.setViewportSize({ width: 390, height: 844 })
   await page.getByTestId('menu').click()
   await expect(page.getByTestId('sidebar')).toBeVisible()

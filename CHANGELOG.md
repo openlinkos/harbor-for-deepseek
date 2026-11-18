@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 — 2026-11-18
+
+The chat screen follows the layout of the official DeepSeek chat: a light sidebar, a centered column, pale-blue user bubbles, pill chips, and light, dark, and system themes. The Harbor mark replaces any other logo. Color tokens and several component styles are adapted from the MIT chat-demo.
+
 ## 0.2.1 — 2026-11-18
 
 Fixes from a live test of the self-hosted server.

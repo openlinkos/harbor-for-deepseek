@@ -78,11 +78,41 @@ const Mermaid = ({ chart }: { chart: string }) => {
 
 const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
   const html = highlight(language, value)
+  const [copied, setCopied] = useState(false)
+  const download = () => {
+    const blob = new Blob([value], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `harbor.${language || 'txt'}`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
   return (
-    <pre className="code-block">
-      {language ? <span className="code-lang">{language}</span> : null}
-      <code dangerouslySetInnerHTML={{ __html: html }} />
-    </pre>
+    <div className="code-card">
+      <div className="code-head">
+        <span>{(language || 'text').toLowerCase()}</span>
+        <span>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard.writeText(value).then(() => {
+                setCopied(true)
+                window.setTimeout(() => setCopied(false), 1200)
+              })
+            }}
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+          <button type="button" onClick={download}>
+            Download
+          </button>
+        </span>
+      </div>
+      <pre>
+        <code dangerouslySetInnerHTML={{ __html: html }} />
+      </pre>
+    </div>
   )
 }
 

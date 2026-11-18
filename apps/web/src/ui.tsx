@@ -1,22 +1,28 @@
 import { translate, type Locale } from '@harbor/i18n'
 import { presentBlocks } from './blocks.js'
-import { estimateCost, formatCny, sumUsage } from '@harbor/pricing'
+import { estimateCost, formatCny } from '@harbor/pricing'
 import { activePath, siblingIds } from '@harbor/types'
 import type { ContentBlock, Conversation, Message } from '@harbor/types'
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
 import { conversationCost, useHarbor, type HarborState } from './store.js'
 
 const Mark = () => (
-  <svg className="mark" viewBox="0 0 64 64" aria-hidden="true">
-    <rect width="64" height="64" rx="16" fill="#F3EFE6" />
-    <path d="M6 46c7 5 14 5 21 0s14-5 21 0 10 5 14 2v8H6z" fill="#1F6A64" />
-    <rect x="10" y="40" width="28" height="4.5" rx="2" fill="#142226" />
-    <rect x="34" y="22" width="6" height="22" rx="1.5" fill="#142226" />
-    <circle cx="37" cy="17" r="4.2" fill="#E08A3C" />
-    <path d="M42 17h12" stroke="#E08A3C" strokeWidth="2.2" strokeLinecap="round" />
+  <svg className="mark" viewBox="0 0 32 32" aria-hidden="true">
+    <rect width="32" height="32" rx="9" fill="#3964FE" />
+    <path d="M9 8v16M23 8v16M9 16h14" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
   </svg>
 )
+
+const Icon = ({ d }: { d: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d={d} />
+  </svg>
+)
+
+type SourceItem = { url: string; title: string; snippet: string; site: string }
+const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
 
 const useT = () => {
   const locale = useHarbor((state) => state.settings.locale)
@@ -134,6 +140,28 @@ export const KeyGate = () => {
   )
 }
 
+const ThemeSwitch = () => {
+  const t = useT()
+  const [theme, setTheme] = useState<ThemeChoice>(readTheme())
+  return (
+    <div className="chips">
+      {(['system', 'light', 'dark'] as ThemeChoice[]).map((choice) => (
+        <button
+          key={choice}
+          type="button"
+          className={theme === choice ? 'chip on' : 'chip'}
+          onClick={() => {
+            saveTheme(choice)
+            setTheme(choice)
+          }}
+        >
+          {choice === 'system' ? t('themeSystem') : choice === 'light' ? t('themeLight') : t('themeDark')}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 const LanguageSwitch = ({ locale, onChange }: { locale: Locale; onChange: (locale: Locale) => void }) => (
   <div className="lang" role="group" aria-label="language">
     <button type="button" className={locale === 'zh' ? 'on' : ''} onClick={() => onChange('zh')}>
@@ -154,17 +182,15 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     return (
       <div className="prose" data-testid={testId}>
         <Markdown text={block.text} />
-        {block.citations?.length ? (
-          <ol className="citations">
-            {block.citations.map((citation) => (
-              <li key={citation.url}>
-                <a href={citation.url} target="_blank" rel="noreferrer noopener">
-                  {citation.title || citation.url}
-                </a>
-              </li>
-            ))}
-          </ol>
-        ) : null}
+        {block.citations?.map((citation, index) => (
+          <span className="cite" key={citation.url}>
+            {index + 1}
+            <span className="hover-card">
+              <strong>{citation.title || citation.url}</strong>
+              <p>{citation.cited_text}</p>
+            </span>
+          </span>
+        ))}
       </div>
     )
   }
@@ -193,28 +219,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     return null
   }
   if (block.type === 'web_search_tool_result') {
-    const results = block.content.filter((item) => item.type === 'web_search_result')
-    if (!results.length) {
-      return null
-    }
-    return (
-      <details className="sources" data-testid="search-results">
-        <summary>
-          {t('sources')} · {results.length}
-        </summary>
-        <ul>
-          {results.map((result) => (
-            <li key={result.url}>
-              <a href={result.url} target="_blank" rel="noreferrer noopener">
-                <strong>{result.title}</strong>
-                <span>{result.site_name || result.url}</span>
-              </a>
-              {result.snippet ? <p>{result.snippet}</p> : null}
-            </li>
-          ))}
-        </ul>
-      </details>
-    )
+    return <SearchResults block={block} />
   }
   if (block.type === 'web_fetch_tool_result') {
     if (block.content.type === 'web_fetch_tool_result_error') {
@@ -240,24 +245,61 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
   return null
 }
 
+const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_search_tool_result' }> }) => {
+  const t = useT()
+  const openPanel = useContext(SourcesPanel)
+  const results = block.content.filter((item) => item.type === 'web_search_result')
+  if (!results.length) {
+    return null
+  }
+  const items = results.map((result) => ({
+    url: result.url,
+    title: result.title,
+    snippet: result.snippet ?? '',
+    site: result.site_name || result.url,
+  }))
+  return (
+    <div data-testid="search-results">
+      <p className="found-line">
+        <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+        {t('foundPages', { count: results.length })}
+        <span className="favicons">
+          {results.slice(0, 4).map((result) => (
+            <i key={result.url}>{result.title.slice(0, 1)}</i>
+          ))}
+        </span>
+      </p>
+      <button className="sources-pill" type="button" onClick={() => openPanel(items)}>
+        {t('pagesPill', { count: results.length })}
+      </button>
+    </div>
+  )
+}
+
 const Thinking = ({ text }: { text: string }) => {
   const t = useT()
   const streaming = useHarbor((state) => state.streaming)
+  const started = useRef(Date.now())
   const [open, setOpen] = useState(true)
+  const [seconds, setSeconds] = useState(1)
   useEffect(() => {
-    if (!streaming && text) {
-      setOpen(false)
+    if (streaming) {
+      const timer = window.setInterval(() => setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000))), 500)
+      return () => window.clearInterval(timer)
     }
-  }, [streaming, text])
+    setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000)))
+    return undefined
+  }, [streaming])
   if (!text) {
     return null
   }
   return (
     <section className="thinking" data-testid="thinking">
       <button type="button" onClick={() => setOpen((value) => !value)}>
-        {open ? t('hideReasoning') : t('showReasoning')}
+        <Icon d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+        {t('thoughtFor', { seconds })}
       </button>
-      {open ? <Markdown text={text} /> : <p className="thinking-preview">{text.slice(0, 140)}</p>}
+      {open ? <div className="thinking-body">{text}</div> : null}
     </section>
   )
 }
@@ -271,57 +313,50 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
   const siblings = siblingIds(messages, message.id)
   const index = siblings.indexOf(message.id)
   const cost = message.usage ? estimateCost(message.usage, new Date(message.updatedAt)) : null
+  const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
+  const [copied, setCopied] = useState(false)
+  const [vote, setVote] = useState<'up' | 'down' | null>(null)
   return (
-    <article className={`row ${message.role}`} data-testid={`message-${message.role}`}>
-      <header>
-        <span>{message.role === 'user' ? t('you') : t('assistant')}</span>
-        {siblings.length > 1 ? (
+    <article className={`turn ${message.role}`} data-testid={`message-${message.role}`}>
+      {siblings.length > 1 ? (
+        <header>
           <span className="branch">
-            <button
-              type="button"
-              disabled={index <= 0}
-              onClick={() => index > 0 && void selectSibling(message.id, siblings[index - 1] ?? message.id)}
-            >
-              ‹
-            </button>
-            <span>
-              {t('branch')} {index + 1}/{siblings.length}
-            </span>
-            <button
-              type="button"
-              disabled={index >= siblings.length - 1}
-              onClick={() =>
-                index < siblings.length - 1 && void selectSibling(message.id, siblings[index + 1] ?? message.id)
-              }
-            >
-              ›
-            </button>
+            <button type="button" disabled={index <= 0} onClick={() => index > 0 && void selectSibling(message.id, siblings[index - 1] ?? message.id)}>‹</button>
+            <span>{t('branch')} {index + 1}/{siblings.length}</span>
+            <button type="button" disabled={index >= siblings.length - 1} onClick={() => index < siblings.length - 1 && void selectSibling(message.id, siblings[index + 1] ?? message.id)}>›</button>
           </span>
-        ) : null}
-      </header>
+        </header>
+      ) : null}
+      {message.role === 'user' ? <div className="bubble">{textOf}</div> : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
-      {presentBlocks(message.blocks).map((block, blockIndex) => (
-        <BlockView
-          key={`${message.id}-${blockIndex}`}
-          block={block}
-          testId={message.role === 'assistant' && block.type === 'text' ? 'assistant-text' : undefined}
-        />
-      ))}
+      {message.role === 'assistant'
+        ? presentBlocks(message.blocks).map((block, blockIndex) => (
+            <BlockView key={`${message.id}-${blockIndex}`} block={block} testId={block.type === 'text' ? 'assistant-text' : undefined} />
+          ))
+        : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
+            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
+          ))}
       {message.status === 'error' ? <p className="form-error">{message.errorMessage || t('error')}</p> : null}
       {message.status === 'aborted' ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.usage ? (
         <p className="usage" data-testid="usage-line">
           {message.usage.input_tokens} {t('input')} · {message.usage.output_tokens} {t('output')}
-          {message.usage.output_tokens_details?.thinking_tokens
-            ? ` · ${t('thinkingTokens')} ${message.usage.output_tokens_details.thinking_tokens}`
-            : ''}
+          {message.usage.output_tokens_details?.thinking_tokens ? ` · ${t('thinkingTokens')} ${message.usage.output_tokens_details.thinking_tokens}` : ''}
           {cost ? ` · ${formatCny(cost.totalCny)} ${t('cny')} · ${cost.peak ? t('peak') : t('offPeak')}` : ''}
         </p>
       ) : null}
-      {message.role === 'assistant' && message.status !== 'streaming' && conversation.activeLeafId === message.id ? (
-        <button type="button" className="ghost" data-testid="regenerate" disabled={streaming} onClick={() => void regenerate(message.id)}>
-          {t('regenerate')}
-        </button>
+      {message.role === 'assistant' && message.status !== 'streaming' ? (
+        <div className="action-row">
+          <button type="button" aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => setCopied(true))}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          {conversation.activeLeafId === message.id ? (
+            <button type="button" data-testid="regenerate" aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+              <Icon d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+            </button>
+          ) : null}
+          <button type="button" className={vote === 'up' ? 'on' : ''} aria-label="like" onClick={() => setVote('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" className={vote === 'down' ? 'on' : ''} aria-label="dislike" onClick={() => setVote('down')}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ text: textOf }) : navigator.clipboard.writeText(textOf))}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+        </div>
       ) : null}
     </article>
   )
@@ -342,26 +377,46 @@ export const Shell = () => {
 
   const chatUsage = conversationCost(state.messages)
   const total = estimateCost(state.totals, new Date())
+  const [collapsed, setCollapsed] = useState(false)
+  const [panel, setPanel] = useState<SourceItem[] | null>(null)
+  const groups = useMemo(() => {
+    const buckets = new Map<string, typeof state.conversations>()
+    const startOfDay = new Date()
+    startOfDay.setHours(0, 0, 0, 0)
+    for (const item of state.conversations) {
+      const when = new Date(item.updatedAt)
+      const days = (startOfDay.getTime() - new Date(when).setHours(0, 0, 0, 0)) / 86_400_000
+      const label = days < 1 ? t('groupToday') : days < 7 ? t('group7') : days < 30 ? t('group30') : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
+      buckets.set(label, [...(buckets.get(label) ?? []), item])
+    }
+    return [...buckets.entries()]
+  }, [state.conversations, t])
+  const who = state.serverUser?.username ?? t('thisDevice')
 
   return (
-    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''}`}>
+    <SourcesPanel.Provider value={setPanel}>
+    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''}`}>
       <aside className="sidebar" data-testid="sidebar">
-        <div className="brand">
-          <Mark />
-          <div>
-            <strong>{t('product')}</strong>
-            <small>{t('taglineSub')}</small>
-          </div>
+        <div className="sider-top">
+          <span className="brand-name"><Mark /> Harbor</span>
+          <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(true)}>
+            <Icon d="M15 6H5m0 0 4-4M5 6l4 4M9 18h10m0 0-4-4m4 4-4 4" />
+          </button>
         </div>
-        <button className="primary" data-testid="new-chat" type="button" onClick={() => void state.newChat()}>
-          {t('newChat')}
+        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => void state.newChat()}>
+          <Icon d="M12 5v14M5 12h14" /> {t('newChat')}
         </button>
-        <nav>
+        <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
-          {state.conversations.map((item) => (
-            <ChatLink key={item.id} conversation={item} active={item.id === state.activeId} />
+          {groups.map(([label, items]) => (
+            <div key={label}>
+              <p className="group-label">{label}</p>
+              {items.map((item) => (
+                <ChatLink key={item.id} conversation={item} active={item.id === state.activeId} />
+              ))}
+            </div>
           ))}
-        </nav>
+        </div>
         <div className="side-usage" data-testid="total-usage">
           <span>{t('allChats')}</span>
           <strong>
@@ -371,52 +426,68 @@ export const Shell = () => {
               cny: formatCny(total.totalCny),
             })}
           </strong>
-          {state.balance ? (
-            <span data-testid="balance-side">
-              {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}
-            </span>
-          ) : null}
+          {state.balance ? <span data-testid="balance-side">{t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
         </div>
+        <button className="user-row" type="button" data-testid="settings-open" onClick={() => state.setSettingsOpen(true)}>
+          <span className="avatar">{who.slice(0, 1).toUpperCase()}</span>
+          <span>{who}<small>{state.serverMode ? t('serverChat') : t('tagline')}</small></span>
+        </button>
       </aside>
+      {collapsed ? (
+        <div className="float-pill">
+          <button className="icon-btn" type="button" aria-label={t('menu')} onClick={() => setCollapsed(false)}><Mark /></button>
+          <button className="icon-btn" type="button" onClick={() => void state.newChat()}><Icon d="M12 5v14M5 12h14" /></button>
+        </div>
+      ) : null}
       <section className="stage">
         <header className="topbar">
-          <button className="ghost menu" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
-            {t('menu')}
+          <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
+            <Icon d="M4 7h16M4 12h16M4 17h16" />
           </button>
-          <h2>{conversation?.title || t('newChat')}</h2>
+          <h2>{conversation?.title || ''}</h2>
           {state.serverMode ? <span data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
-            <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>
-              {t('adminTitle')}
-            </button>
+            <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
-          <button className="ghost" data-testid="settings-open" type="button" onClick={() => state.setSettingsOpen(true)}>
-            {t('settings')}
-          </button>
         </header>
-        <div className="transcript" data-testid="message-list">
-          {path.length === 0 ? <Empty /> : null}
-          {path.map((message) =>
-            conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null,
-          )}
-          <div ref={endRef} />
-        </div>
-        {conversation ? (
-          <p className="chat-usage">
-            {t('thisChat')} · {formatCny(chatUsage.totalCny)} {t('cny')} · {sumUsage(state.messages.map((message) => message.usage)).output_tokens}{' '}
-            {t('tokens')}
-          </p>
-        ) : null}
-        <Composer />
-        <footer className="legal bar">
-          <p>{t('disclaimer')}</p>
-          <p>{t('riskFooter')}</p>
-        </footer>
+        {path.length === 0 ? (
+          <div className="transcript" data-testid="message-list"><Empty /></div>
+        ) : (
+          <>
+            <div className="transcript" data-testid="message-list">
+              {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
+              <div ref={endRef} />
+            </div>
+            {conversation ? <p className="chat-usage">{t('thisChat')} · {formatCny(chatUsage.totalCny)} {t('cny')}</p> : null}
+            <div className="composer-wrap">
+              <Composer />
+              <p className="footnote">{t('disclaimer')}</p>
+            </div>
+          </>
+        )}
       </section>
+      {panel ? (
+        <aside className="search-panel" data-testid="search-panel">
+          <header>
+            <strong>{t('searchPanel')}</strong>
+            <button className="icon-btn" type="button" onClick={() => setPanel(null)}>{t('close')}</button>
+          </header>
+          <ol>
+            {panel.map((item, index) => (
+              <li key={item.url}>
+                <small>{index + 1} · {item.site}</small>
+                <a href={item.url} target="_blank" rel="noreferrer noopener"><strong>{item.title}</strong></a>
+                <p>{item.snippet}</p>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      ) : null}
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
     </div>
+    </SourcesPanel.Provider>
   )
 }
 
@@ -426,39 +497,24 @@ const ChatLink = ({ conversation, active }: { conversation: Conversation; active
   const rename = useHarbor((state) => state.rename)
   const removeChat = useHarbor((state) => state.removeChat)
   const [editing, setEditing] = useState(false)
+  const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
   return (
-    <div className={`chat-link ${active ? 'active' : ''}`}>
+    <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`}>
       {editing ? (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            void rename(conversation.id, title)
-            setEditing(false)
-          }}
-        >
+        <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
-        <button type="button" onClick={() => void openChat(conversation.id)}>
-          {conversation.title || t('newChat')}
-        </button>
+        <button type="button" onClick={() => void openChat(conversation.id)}>{conversation.title || t('newChat')}</button>
       )}
-      <span className="link-actions">
-        <button type="button" onClick={() => setEditing(true)}>
-          {t('rename')}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            if (window.confirm(t('deleteConfirm'))) {
-              void removeChat(conversation.id)
-            }
-          }}
-        >
-          {t('delete')}
-        </button>
-      </span>
+      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => setOpen((value) => !value)}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
+      {open ? (
+        <div className="menu">
+          <button type="button" onClick={() => { setEditing(true); setOpen(false) }}>{t('rename')}</button>
+          <button className="danger" type="button" onClick={() => { if (window.confirm(t('deleteConfirm'))) void removeChat(conversation.id) }}>{t('delete')}</button>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -473,10 +529,10 @@ const Empty = () => {
     ['suggestion-link', t('suggestionLink')],
   ] as const
   return (
-    <div className="empty">
-      <Mark />
-      <h2>{t('emptyTitle')}</h2>
-      <p>{t('emptyBody')}</p>
+    <div className="home">
+      <h2 className="greeting"><Mark /> {t('emptyTitle')}</h2>
+      <Composer />
+      <p className="footnote">{t('disclaimer')}</p>
       <div className="suggestions">
         {prompts.map(([id, prompt]) => (
           <button key={id} data-testid={id} type="button" disabled={streaming} onClick={() => void send(prompt)}>
@@ -533,80 +589,42 @@ const Composer = () => {
           }
         }}
       />
-      <div className="composer-bar">
-        <label>
-          {t('model')}
-          <select
-            data-testid="model-select"
-            value={prefs.model}
-            onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}
-          >
-            <option value="deepseek-flash">{t('flash')} — {t('flashHint')}</option>
-            <option value="deepseek-v4-pro">{t('pro')} — {t('proHint')}</option>
-          </select>
-        </label>
-        <label>
-          {t('effort')}
-          <select
-            data-testid="effort-select"
-            value={prefs.effort}
-            onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}
-          >
-            <option value="low">low</option>
-            <option value="high">high</option>
-            <option value="max">max</option>
-          </select>
-        </label>
-        <button
-          type="button"
-          data-testid="toggle-thinking"
-          className={prefs.thinking ? 'chip on' : 'chip'}
-          onClick={() => void setPrefs({ thinking: !prefs.thinking })}
-        >
-          {t('thinking')}
-        </button>
-        <button
-          type="button"
-          data-testid="toggle-search"
-          className={prefs.search ? 'chip on' : 'chip'}
-          disabled={!flash}
-          onClick={() => void setPrefs({ search: !prefs.search })}
-        >
-          {t('search')}
-        </button>
-        <button
-          type="button"
-          data-testid="toggle-read"
-          className={prefs.readLink ? 'chip on' : 'chip'}
-          disabled={!flash}
-          onClick={() => void setPrefs({ readLink: !prefs.readLink })}
-        >
-          {t('readLink')}
-        </button>
-        <label className={`attach ${flash ? '' : 'off'}`}>
-          {t('attach')}
-          <input
-            data-testid="file-input"
-            type="file"
-            disabled={!flash}
-            onChange={(event) => {
-              const list = event.target.files ? [...event.target.files] : []
-              event.target.value = ''
-              void addFiles(list)
-            }}
-          />
-        </label>
-        {streaming ? (
-          <button className="primary stop" data-testid="stop" type="button" onClick={stop}>
-            {t('stop')}
+      <div className="composer-tools">
+        <div className="chips">
+          <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+            <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
           </button>
-        ) : (
-          <button className="primary" data-testid="send" type="button" onClick={submit}>
-            {t('send')}
+          <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
+            <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
           </button>
-        )}
+          <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
+            {t('readLink')}
+          </button>
+        </div>
+        <div className="tool-right">
+          <label className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')}>
+            <Icon d="M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8" />
+            <input data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
+          </label>
+          {streaming ? (
+            <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon d="M8 8h8v8H8z" /></button>
+          ) : (
+            <button className={`send ${text.trim() ? 'ready' : ''}`} data-testid="send" type="button" onClick={submit}><Icon d="M12 19V5M6 11l6-6 6 6" /></button>
+          )}
+        </div>
       </div>
-      {!flash ? <p className="hint">{t('toolsFlashOnly')}</p> : <p className="hint">{t('filesExpire')}</p>}
+      <div className="model-row">
+        <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
+          <option value="deepseek-flash">DeepSeek {t('flash')}</option>
+          <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
+        </select>
+        <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
+          <option value="low">low</option>
+          <option value="high">high</option>
+          <option value="max">max</option>
+        </select>
+        {!flash ? <span className="hint">{t('toolsFlashOnly')}</span> : null}
+      </div>
     </div>
   )
 }
@@ -652,6 +670,10 @@ const Settings = () => {
           </button>
         </header>
         <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
+        <section>
+          <h3>{t('theme')}</h3>
+          <ThemeSwitch />
+        </section>
         <section>
           <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
           {serverMode ? (
