@@ -52,6 +52,23 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker build -f deploy/Dockerfile -t harbor:ci .
 
+  web-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f deploy/web/Dockerfile -t harbor-web:ci .
+      - run: docker run -d --name harbor-web -p 8080:8080 harbor-web:ci
+      - run: |
+          for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+            if curl -fsS http://127.0.0.1:8080/healthz >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          sh deploy/web/smoke.sh http://127.0.0.1:8080
+      - if: always()
+        run: docker rm -f harbor-web
+
   android:
     runs-on: ubuntu-latest
     steps:
