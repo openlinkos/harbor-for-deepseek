@@ -1,9 +1,9 @@
 # Contributing
 
-Harbor is an unofficial community client for the official DeepSeek API. Issues and pull requests are welcome. Please keep the project easy to trust:
+Harbor for DeepSeek is a chat client for the DeepSeek API. Issues and pull requests are welcome. Please keep the project easy to trust:
 
 - Do not open an issue or pull request that contains an API key, a passphrase, or a private conversation. If a key leaked, revoke it on the DeepSeek platform first, then use the private security flow in [SECURITY.md](SECURITY.md).
-- The visible product name is **Harbor**. Describe the API as the official DeepSeek API. Do not claim that Harbor is official, partnered, authorized, or certified, and do not use the word 平替.
+- The visible product name is **Harbor for DeepSeek**. Do not claim that it is official, partnered, authorized, or certified, and do not use the word 平替. The short launcher label may stay Harbor.
 - Do not add the DeepSeek whale, the DeepSeek logo, or a domain that contains `deepseek`.
 - `safety_check` stays on (`high`) by default.
 - Tests and CI must keep using mocked API responses. Do not put a real key in a workflow.

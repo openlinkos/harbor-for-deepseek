@@ -2,6 +2,7 @@ import { translate } from '@harbor/i18n'
 import { useEffect, useState } from 'react'
 import { api } from './remote.js'
 import { useHarbor } from './store.js'
+import { SiteFooter } from './ui.js'
 
 const useT = () => {
   const locale = useHarbor((state) => state.settings.locale)
@@ -25,7 +26,7 @@ export const SetupWizard = () => {
           void setupAdmin(username, password).catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
         }}
       >
-        <p className="eyebrow">Harbor</p>
+        <p className="eyebrow">{t('product')}</p>
         <h1>{t('setupTitle')}</h1>
         <p className="risk">{t('setupBody')}</p>
         <label>
@@ -43,9 +44,7 @@ export const SetupWizard = () => {
         <button className="ghost" type="button" onClick={() => enterLocalMode().then(() => useHarbor.setState({ setupRequired: false }))}>
           {t('useLocal')}
         </button>
-        <footer className="legal">
-          <p>{t('disclaimer')}</p>
-        </footer>
+        <SiteFooter />
       </form>
     </main>
   )
@@ -97,9 +96,7 @@ export const ServerLogin = () => {
             {t('registerSubmit')}
           </button>
         </form>
-        <footer className="legal">
-          <p>{t('disclaimer')}</p>
-        </footer>
+        <SiteFooter />
       </div>
     </main>
   )
@@ -329,9 +326,7 @@ const settingsBody = await api<{ lowBalanceCny: number }>('/api/admin/settings')
           </form>
         ))}
         {error ? <p className="form-error">{error}</p> : null}
-        <footer className="legal">
-          <p>{t('disclaimer')}</p>
-        </footer>
+        <SiteFooter />
       </div>
     </main>
   )

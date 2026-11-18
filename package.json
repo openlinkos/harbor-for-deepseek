@@ -2,7 +2,7 @@
   "name": "harbor",
   "private": true,
   "version": "0.1.0",
-  "description": "Harbor — unofficial community chat client for the official DeepSeek API.",
+  "description": "Harbor for DeepSeek — a chat client for the DeepSeek API. The key and messages stay on the device.",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.33.4",

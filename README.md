@@ -1,12 +1,25 @@
-# Harbor
+# Harbor for DeepSeek
 
-Unofficial community project, not affiliated with DeepSeek.
+[中文](README.zh-CN.md)
 
-Harbor is an open-source (MIT) chat client for the [official DeepSeek API](https://platform.deepseek.com/). You bring your own key. The key and the conversations stay in this browser. The page is static: it does not send them to Harbor, and `https://hfd.linkos.org` does not run a chat backend.
+![Harbor for DeepSeek](brand/logo-128.png)
 
-Harbor is an unofficial open-source community project by openlinkos. It is not affiliated with, endorsed by, or sponsored by DeepSeek. DeepSeek is a trademark of its owner and is used here only to describe API compatibility.
+Harbor for DeepSeek is an open-source (MIT) chat client for the [DeepSeek API](https://platform.deepseek.com/). You bring your own key. The key and the conversations stay in this browser. The page is static: it does not send them to Harbor for DeepSeek, and `https://hfd.linkos.org` does not run a chat backend.
 
 ![Harbor, with reasoning open](docs/screenshots/03-reasoning.png)
+
+## Two modes
+
+**Lightweight.** Open [hfd.linkos.org](https://hfd.linkos.org), or build the static page yourself. The key and the conversations stay on this device. You can export and import them. There is no server in this mode.
+
+**Server.** Optional. `docker compose up` starts PostgreSQL and one app container you run yourself. An admin adds a pool of API keys, sees balance, and invites accounts. People who log in there can sync chats across devices. Details: [docs/self-hosting.md](docs/self-hosting.md).
+
+## Add a key
+
+1. Open <https://hfd.linkos.org>.
+2. Create a key at <https://platform.deepseek.com/api_keys>. A dedicated key with a spending limit is the practical choice.
+3. Paste it, confirm the notice on the page, and save it on this device.
+4. Send a message. The browser calls `https://api.deepseek.com` directly.
 
 ## What it does
 
@@ -19,7 +32,7 @@ Harbor is an unofficial open-source community project by openlinkos. It is not a
 - `safety_check` is `high` by default.
 - Export and import a versioned JSON archive. Import merges by conversation id and does not replace chats you already have. A v3 ZIP follows the official archive shape for the fields it can represent.
 
-A self-hosted server is described in [docs/self-host.md](docs/self-host.md). Android and iOS are Capacitor shells of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md) and [docs/ios.md](docs/ios.md).
+A self-hosted server is described in [docs/self-hosting.md](docs/self-hosting.md). Android and iOS are Capacitor shells of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md) and [docs/ios.md](docs/ios.md).
 
 ## Privacy
 
@@ -58,7 +71,7 @@ The app is the same interface. Chat still goes to `https://api.deepseek.com` unl
 
 ## Self-hosting
 
-`docker compose pull && docker compose up -d` pulls `ghcr.io/openlinkos/harbor-for-deepseek` and starts Postgres plus one app container. Nothing has to be set in the environment. The first page creates an admin, who adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details, the optional variables, and backup steps: [docs/self-host.md](docs/self-host.md).
+Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD`, `KEY_ENCRYPTION_SECRET`, and the first admin. `docker compose up -d` then starts Postgres and one app container from `ghcr.io/openlinkos/harbor-for-deepseek`. The admin adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details: [docs/self-hosting.md](docs/self-hosting.md).
 
 If the official API later stops sending CORS headers, the static page will stop working. A proxy is not included. Do not add one on the public host without saying so.
 
@@ -73,8 +86,18 @@ pnpm e2e
 
 Tests mock the API. They use the redacted response shapes from the design notes. Do not commit a key.
 
-The interface is new. Protocol behavior and the v3 archive follow the public API and the layout documented by [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo) (MIT, `Copyright (c) 2026 DeepSeek`). That license is in [NOTICE](NOTICE). MIT does not grant trademark rights.
+The interface is new. Protocol behavior and the v3 archive follow the public API and the archive documented by deepseek-ai/chat-demo. See the license section.
 
 ## License
 
 [MIT](LICENSE) © 2026 OpenLinkOS
+
+`pnpm build` copies [LICENSE](LICENSE) and [NOTICE](NOTICE) into `apps/web/dist`. Protocol behavior and the v3 archive follow the public API and the layout documented by [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo) (MIT, `Copyright (c) 2026 DeepSeek`). That copyright and license are in NOTICE. Harbor for DeepSeek does not use that project's name, logo, or wordmark. MIT does not grant trademark rights.
+
+---
+
+Harbor for DeepSeek · Open source by [OpenLinkOS](https://openlinkos.com/)
+
+[GitHub](https://github.com/openlinkos/harbor-for-deepseek) · [License](LICENSE) · [OpenLinkOS](https://openlinkos.com/)
+
+DeepSeek is a trademark of its owner. This project is not affiliated with DeepSeek.

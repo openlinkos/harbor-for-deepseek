@@ -49,7 +49,7 @@ Node.js 22. No environment variables. After a deploy, the response for `/` shoul
 
 ## Check a deploy
 
-1. Open the site. The footer must say: 非官方社区项目，与深度求索无隶属或合作关系 / Unofficial community project, not affiliated with DeepSeek.
+1. Open the site. The chat column has no disclaimer under the composer. The small print is at the bottom of the sidebar: OpenLinkOS attribution, links, and “DeepSeek is a trademark of its owner. This project is not affiliated with DeepSeek.”
 2. Save a key. In the network panel, the chat request goes to `https://api.deepseek.com/anthropic/v1/messages` and not to the site host.
 3. Confirm the request JSON contains `"safety_check":{"level":"high"}`.
 4. Export JSON and confirm the file has no key.

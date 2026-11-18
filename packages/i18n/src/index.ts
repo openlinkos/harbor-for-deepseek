@@ -2,12 +2,8 @@ export const locales = ['zh', 'en'] as const
 export type Locale = (typeof locales)[number]
 
 const zh = {
-  product: 'Harbor',
+  product: 'Harbor for DeepSeek',
   tagline: '密钥只留在本机。',
-  taglineSub: 'for the official DeepSeek API',
-  disclaimer: '非官方社区项目，与深度求索无隶属或合作关系',
-  disclaimerLong:
-    'Harbor 是 openlinkos 社区开发的非官方开源项目，与杭州深度求索人工智能基础技术研究有限公司（DeepSeek）无隶属、合作或授权关系。DeepSeek 是其所有者的商标，本项目仅用以说明所兼容的 API。',
   keyTitle: '填入你自己的 API Key',
   keyBody:
     'Key 只写在这台浏览器的 IndexedDB 里，请求直接发往 api.deepseek.com，不会发给 Harbor 或 hfd.linkos.org。公开页面上的 Key 仍可能被恶意扩展或 XSS 读到。开放平台协议要求不要把 Key 放进浏览器；继续使用即表示你自行承担费用与账号风险。建议使用设了额度的专用 Key。',
@@ -25,7 +21,7 @@ const zh = {
   rename: '重命名',
   delete: '删除',
   deleteConfirm: '从本机删除这个对话？',
-  composerPlaceholder: '给 Harbor 发送消息',
+  composerPlaceholder: '发送消息',
   send: '发送',
   stop: '停止',
   regenerate: '重新生成',
@@ -40,7 +36,7 @@ const zh = {
   proHint: '仅文本',
   toolsFlashOnly: '搜索、打开网页和文件只在 Flash 上可用。',
   emptyTitle: '从这里开始？',
-  emptyBody: '思考、搜索和文件都直接走官方 API。',
+  emptyBody: '思考、搜索和文件直接走 DeepSeek API。',
   suggestionMath: '3 加 5 等于几？',
   suggestionSearch: '冰岛现在大约多少人口？',
   suggestionLink: '用一句话概括 https://example.com/',
@@ -181,7 +177,7 @@ const zh = {
   riskFooter: '对话会发送到 DeepSeek 并由其生成。Harbor 不运营对话后端，也不代替你完成备案或内容标识。',
   menu: '菜单',
   you: '你',
-  assistant: 'Harbor',
+  assistant: 'Harbor for DeepSeek',
   filesExpire: '文件默认 7 天后在官方侧过期。',
   examples: '试试',
   renameTitle: '对话标题',
@@ -205,15 +201,14 @@ const zh = {
   edit: '编辑',
   help: '帮助',
   scrollDown: '回到底部',
+  footerAbout: 'OpenLinkOS 发起的开源项目',
+  footerLicense: '许可证',
+  footerMark: 'DeepSeek 是其所有者的商标。本项目与深度求索没有隶属关系。',
 } as const
 
 const en: { [K in keyof typeof zh]: string } = {
-  product: 'Harbor',
+  product: 'Harbor for DeepSeek',
   tagline: 'Your key stays on this device.',
-  taglineSub: 'for the official DeepSeek API',
-  disclaimer: 'Unofficial community project, not affiliated with DeepSeek.',
-  disclaimerLong:
-    'Harbor is an unofficial open-source community project by openlinkos. It is not affiliated with, endorsed by, or sponsored by DeepSeek. DeepSeek is a trademark of its owner and is used here only to describe API compatibility.',
   keyTitle: 'Use your own API key',
   keyBody:
     'The key is stored in IndexedDB on this browser. Requests go straight to api.deepseek.com and are not sent to Harbor or hfd.linkos.org. A key in a browser can still be read by a malicious extension or by XSS. The platform terms say not to put a key in a browser; continuing means you accept the charges and account risk. Prefer a dedicated key with a spending limit.',
@@ -231,7 +226,7 @@ const en: { [K in keyof typeof zh]: string } = {
   rename: 'Rename',
   delete: 'Delete',
   deleteConfirm: 'Delete this chat from this device?',
-  composerPlaceholder: 'Message Harbor',
+  composerPlaceholder: 'Send a message',
   send: 'Send',
   stop: 'Stop',
   regenerate: 'Regenerate',
@@ -246,7 +241,7 @@ const en: { [K in keyof typeof zh]: string } = {
   proHint: 'Text only',
   toolsFlashOnly: 'Search, pages, and files are available on Flash.',
   emptyTitle: 'Where would you like to begin?',
-  emptyBody: 'Thinking, search, and files go straight to the official API.',
+  emptyBody: 'Thinking, search, and files go straight to the DeepSeek API.',
   suggestionMath: 'What is 3 + 5?',
   suggestionSearch: 'About how many people live in Iceland right now?',
   suggestionLink: 'Summarize https://example.com/ in one sentence.',
@@ -392,7 +387,7 @@ const en: { [K in keyof typeof zh]: string } = {
     'Messages are sent to DeepSeek, which generates the reply. Harbor does not run a chat backend and does not file or label on your behalf.',
   menu: 'Menu',
   you: 'You',
-  assistant: 'Harbor',
+  assistant: 'Harbor for DeepSeek',
   filesExpire: 'Files expire on the official side after 7 days by default.',
   examples: 'Try',
   renameTitle: 'Chat title',
@@ -416,6 +411,9 @@ const en: { [K in keyof typeof zh]: string } = {
   edit: 'Edit',
   help: 'Help',
   scrollDown: 'Scroll to latest',
+  footerAbout: 'Open source by OpenLinkOS',
+  footerLicense: 'License',
+  footerMark: 'DeepSeek is a trademark of its owner. This project is not affiliated with DeepSeek.',
 }
 
 const catalogs = { zh, en }

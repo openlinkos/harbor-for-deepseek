@@ -20,11 +20,29 @@ const useProfile = () => {
 }
 
 const Mark = () => (
-  <svg className="mark" viewBox="0 0 32 32" aria-hidden="true">
-    <rect width="32" height="32" rx="9" fill="#3964FE" />
-    <path d="M9 8v16M23 8v16M9 16h14" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+  <svg className="mark" viewBox="0 0 48 48" aria-hidden="true">
+    <path className="ink" d="M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z" />
+    <path className="accent" d="M16 15.5h16a2.6 2.6 0 0 1 0 5.2H16a2.6 2.6 0 0 1 0-5.2Z" />
   </svg>
 )
+
+export const SiteFooter = () => {
+  const t = useT()
+  const locale = useHarbor((state) => state.settings.locale)
+  return (
+    <footer className="site-footer" data-testid="site-footer">
+      <p>{t('footerAbout')}</p>
+      <p>
+        <a href="https://github.com/openlinkos/harbor-for-deepseek">GitHub</a>
+        <span aria-hidden="true"> · </span>
+        <a href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE">{t('footerLicense')}</a>
+        <span aria-hidden="true"> · </span>
+        <a href={locale === 'zh' ? 'https://openlinkos.com/zh/' : 'https://openlinkos.com/'}>OpenLinkOS</a>
+      </p>
+      <p>{t('footerMark')}</p>
+    </footer>
+  )
+}
 
 const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={size >= 24 ? 2 : 1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -77,7 +95,6 @@ export const KeyGate = () => {
     <main className="gate">
       <div className="gate-card">
         <Mark />
-        <p className="eyebrow">{t('taglineSub')}</p>
         <h1>{t('product')}</h1>
         <p className="lede">{t('tagline')}</p>
         <LanguageSwitch locale={locale} onChange={setLocale} />
@@ -146,10 +163,7 @@ export const KeyGate = () => {
             {t('loginTitle')}
           </button>
         ) : null}
-        <footer className="legal">
-          <p>{t('disclaimer')}</p>
-          <p>{t('disclaimerLong')}</p>
-        </footer>
+        <SiteFooter />
       </div>
     </main>
   )
@@ -450,10 +464,7 @@ export const Shell = () => {
         <div className="sider-top">
           <span className="brand-name">
             <Mark />
-            <span className="wordmark">
-              <span className="wordmark-main">Harbor</span>
-              <span className="wordmark-for">for DeepSeek</span>
-            </span>
+            <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
           </span>
           <span className="sider-icons">
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
@@ -509,6 +520,7 @@ export const Shell = () => {
             </div>
           ) : null}
         </div>
+        <SiteFooter />
       </aside>
       {collapsed ? (
         <div className="float-pill">
@@ -531,7 +543,7 @@ export const Shell = () => {
               <Icon d="M12 5v14M5 12h14" />
             </button>
             {path.length > 0 ? (
-              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
+              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor for DeepSeek', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
                 <Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
               </button>
             ) : null}
@@ -563,7 +575,6 @@ export const Shell = () => {
             ) : null}
             <div className="composer-wrap">
               <Composer />
-              <p className="footnote">{t('disclaimer')}</p>
             </div>
           </>
         )}
@@ -638,7 +649,6 @@ const Empty = () => {
     <div className="home">
       <h2 className="greeting"><Mark /> {t('emptyTitle')}</h2>
       <Composer />
-      <p className="footnote">{t('disclaimer')}</p>
     </div>
   )
 }
@@ -1083,7 +1093,7 @@ const Settings = () => {
         </section>
         <section className="settings-general">
           <h3>{t('about')}</h3>
-          <p>{t('disclaimerLong')}</p>
+          <SiteFooter />
           <p className="hint">
             <a href="https://github.com/openlinkos/harbor-for-deepseek">openlinkos/harbor-for-deepseek</a>
             {' · '}
