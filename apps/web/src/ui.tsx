@@ -290,20 +290,20 @@ const ThemeSwitch = () => {
 const LANGUAGES = ['简体中文', 'English', '跟随系统', 'Afrikaans', 'አማርኛ', 'العربية', 'Azərbaycan', 'Беларуская', 'Български', 'বাংলা', 'Català', 'Čeština', 'Dansk']
 const VOICES = ['贝壳', '白浪', '海星', '暗潮']
 
-const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string }) => {
+const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
   const [box, setBox] = useState({ top: 0, right: 0 })
   const show = () => {
     const rect = trigger.current?.getBoundingClientRect()
-    if (rect) setBox({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    if (rect) setBox({ top: rect.bottom + 6, right: window.innerWidth - rect.right - shiftRight })
     setOpen((value) => !value)
   }
   return (
     <div className="pill-menu">
       <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}</button>
       {open ? createPortal(
-        <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right }}>
+        <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, minHeight: menuClass === 'lang-menu' ? Math.max(240, window.innerHeight - box.top - 8) : undefined }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
@@ -1031,8 +1031,10 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [editing, setEditing] = useState(false)
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
+  const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
+  const row = useRef<HTMLDivElement>(null)
   return (
-    <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`}>
+    <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`} ref={row}>
       {picking ? <input type="checkbox" aria-label={conversation.title || t('newChat')} checked={picked} onChange={() => onPick?.()} /> : null}
       {editing ? (
         <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
@@ -1041,11 +1043,15 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       ) : (
         <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id) }}>{conversation.title || t('newChat')}</button>
       )}
-      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => setOpen((value) => !value)}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
-      {open ? (
-        <div className="menu">
-          <button type="button" onClick={() => { setEditing(true); setOpen(false) }}>{t('rename')}</button>
-          <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}>{conversation.pinned ? t('unpin') : t('pin')}</button>
+      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => {
+        const rect = row.current?.getBoundingClientRect()
+        if (rect) setMenuBox({ top: rect.top, left: rect.right - 28 })
+        setOpen((value) => !value)
+      }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
+      {open ? createPortal(
+        <div className="menu item-menu" style={{ top: menuBox.top, left: menuBox.left }}>
+          <button type="button" onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" />{t('rename')}</button>
+          <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />{conversation.pinned ? t('unpin') : t('pin')}</button>
           <button type="button" onClick={() => {
             setOpen(false)
             const body = messages.map((message) => {
@@ -1053,10 +1059,11 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
               return `**${message.role}**\n\n${text}`
             }).join('\n\n')
             downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
-          }}>{t('share')}</button>
-          <button type="button" onClick={() => { setOpen(false); onMulti?.() }}>{t('multiSelect')}</button>
-          <button className="danger" type="button" onClick={() => { if (window.confirm(t('deleteConfirm'))) void removeChat(conversation.id) }}>{t('delete')}</button>
-        </div>
+          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
+          <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
+          <button className="danger" type="button" onClick={() => { if (window.confirm(t('deleteConfirm'))) void removeChat(conversation.id) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
+        </div>,
+        document.body,
       ) : null}
     </div>
   )
@@ -1132,7 +1139,8 @@ const Composer = () => {
         <div className="chips">
           <span className="chip-wrap">
             <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-              <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
+              <svg className="chip-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2 13.7 8 19.5 9.7 13.7 11.4 12 17.2 10.3 11.4 4.5 9.7 10.3 8 12 2.2Zm6.1 10.3.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2ZM6.3 14.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6.6-1.5Z" /></svg>
+              {t('thinking')}
             </button>
           </span>
           <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
@@ -1238,6 +1246,7 @@ const Settings = () => {
               selected={settings.locale === 'en' ? 'English' : '简体中文'}
               options={LANGUAGES}
               dividerAfter={2}
+              shiftRight={88}
               onPick={(value) => {
                 if (value === 'English') void setLocale('en')
                 else if (value === '简体中文' || value === '跟随系统') void setLocale('zh')

@@ -180,6 +180,18 @@ body[data-ds-dark-theme] .chat-link.active > button { color: var(--dsw-alias-lab
   box-shadow: var(--dsw-shadow-lv3);
   border: 1px solid var(--dsw-alias-border-l2);
 }
+.item-menu {
+  position: fixed;
+  right: auto;
+  top: auto;
+  z-index: 30;
+  width: 148px;
+  min-width: 148px;
+  padding: 6px;
+  border-radius: 12px;
+}
+.item-menu svg { flex: none; }
+.item-menu .danger { color: #f25a5a; }
 .menu button, .menu a, .menu-item {
   display: flex;
   align-items: center;
@@ -571,12 +583,23 @@ body[data-ds-dark-theme] .composer {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 .chip:hover:not(:disabled):not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
+.composer .chip.on,
 .chip.on {
-  background: var(--dsw-alias-button-ghost-active-fill);
-  color: var(--dsw-alias-brand-text);
-  border-color: var(--dsw-alias-button-ghost-active-border);
+  background: #e4edfd;
+  color: #3964fe;
+  border: 1px solid #b7c8fe;
+  box-shadow: none;
 }
-.chip.on:hover:not(:disabled) { background: var(--dsw-alias-button-ghost-active-hover); }
+body[data-ds-dark-theme] .composer .chip.on,
+body[data-ds-dark-theme] .chip.on {
+  background: rgb(40, 49, 66);
+  color: #8eb7fe;
+  border: 1px solid #5c8af5;
+  box-shadow: none;
+}
+.chip.on:hover:not(:disabled) { background: #d3e2ff; }
+body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: #34415b; }
+.chip-icon { display: block; flex: none; }
 .chip:disabled { opacity: 0.45; }
 .send, .tool-right .icon-btn { width: 32px; height: 32px; }
 .send {
@@ -984,7 +1007,7 @@ body[data-ds-dark-theme] .anchored-menu { background: rgb(53, 54, 56); color: #f
 }
 .anchored-menu button:hover { background: rgba(127, 127, 127, 0.12); }
 .anchored-menu hr { border: 0; border-top: 1px solid rgba(127, 127, 127, 0.25); margin: 4px 6px; }
-.lang-menu { width: 198px; }
+.lang-menu { width: 200px; min-width: 200px; max-height: none; }
 .voice-menu { min-width: 128px; width: 128px; }
 .lang { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--dsw-static-neutral-bluish-75); }
 body[data-ds-dark-theme] .lang { background: var(--dsw-static-neutral-bluish-800); }
