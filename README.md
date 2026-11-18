@@ -12,7 +12,7 @@ Harbor for DeepSeek is an open-source (MIT) chat client for the [DeepSeek API](h
 
 **Lightweight.** Open [hfd.linkos.org](https://hfd.linkos.org), or build the static page yourself. The key and the conversations stay on this device. You can export and import them. There is no server in this mode.
 
-**Server.** Optional. `docker compose up` starts PostgreSQL and one app container you run yourself. An admin adds a pool of API keys, sees balance, and invites accounts. People who log in there can sync chats across devices. Details: [docs/self-host.md](docs/self-host.md).
+**Server.** Optional. `docker compose up` starts PostgreSQL and one app container you run yourself. An admin adds a pool of API keys, sees balance, and invites accounts. People who log in there can sync chats across devices. Details: [docs/self-hosting.md](docs/self-hosting.md).
 
 ## Add a key
 
@@ -32,7 +32,7 @@ Harbor for DeepSeek is an open-source (MIT) chat client for the [DeepSeek API](h
 - `safety_check` is `high` by default.
 - Export and import a versioned JSON archive. Import merges by conversation id and does not replace chats you already have. A v3 ZIP follows the official archive shape for the fields it can represent.
 
-A self-hosted server is described in [docs/self-host.md](docs/self-host.md). Android and iOS are Capacitor shells of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md) and [docs/ios.md](docs/ios.md).
+A self-hosted server is described in [docs/self-hosting.md](docs/self-hosting.md). Android and iOS are Capacitor shells of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md) and [docs/ios.md](docs/ios.md).
 
 ## Privacy
 
@@ -71,7 +71,7 @@ The app is the same interface. Chat still goes to `https://api.deepseek.com` unl
 
 ## Self-hosting
 
-`docker compose pull && docker compose up -d` pulls `ghcr.io/openlinkos/harbor-for-deepseek` and starts Postgres plus one app container. Nothing has to be set in the environment. The first page creates an admin, who adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details, the optional variables, and backup steps: [docs/self-host.md](docs/self-host.md).
+Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD`, `KEY_ENCRYPTION_SECRET`, and the first admin. `docker compose up -d` then starts Postgres and one app container from `ghcr.io/openlinkos/harbor-for-deepseek`. The admin adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details: [docs/self-hosting.md](docs/self-hosting.md).
 
 If the official API later stops sending CORS headers, the static page will stop working. A proxy is not included. Do not add one on the public host without saying so.
 
