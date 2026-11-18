@@ -26,13 +26,17 @@ const Mark = () => (
   </svg>
 )
 
-const Icon = ({ d }: { d: string }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={size >= 24 ? 2 : 1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={d} />
   </svg>
 )
 
-type SourceItem = { url: string; title: string; snippet: string; site: string }
+const Favicon = ({ label }: { label: string }) => (
+  <i className="favicon" aria-hidden="true">{(label.trim().slice(0, 1) || '?').toUpperCase()}</i>
+)
+
+type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string }
 const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
 
 const useT = () => {
@@ -254,11 +258,12 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     title: result.title,
     snippet: result.snippet ?? '',
     site: result.site_name || result.url,
+    date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
   }))
   const marks = (
     <span className="favicons">
       {results.slice(0, 3).map((result) => (
-        <i key={result.url}>{result.title.slice(0, 1)}</i>
+        <Favicon key={result.url} label={result.site_name || result.title} />
       ))}
     </span>
   )
@@ -270,7 +275,11 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
         {marks}
       </p>
       <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
-        {marks}
+        <span className="favicons">
+          {results.slice(0, 3).map((result) => (
+            <Favicon key={result.url} label={result.site_name || result.title} />
+          ))}
+        </span>
         {t('pagesPill', { count: results.length })}
       </button>
     </div>
@@ -508,7 +517,7 @@ export const Shell = () => {
       <section className="stage">
         <header className="topbar">
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
-            <Icon d="M4 8h8M4 14h14" />
+            <Icon size={24} d="M3 8h18M3 16h11" />
           </button>
           <h2>{conversation?.title || ''}</h2>
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
@@ -568,9 +577,16 @@ export const Shell = () => {
           <ol>
             {panel.map((item, index) => (
               <li key={item.url}>
-                <small>{index + 1} · {item.site}</small>
-                <a href={item.url} target="_blank" rel="noreferrer noopener"><strong>{item.title}</strong></a>
-                <p>{item.snippet}</p>
+                <a className="source-card" href={item.url} target="_blank" rel="noreferrer noopener">
+                  <span className="source-meta">
+                    <Favicon label={item.site} />
+                    <span className="source-site">{item.site}</span>
+                    {item.date ? <span>{item.date}</span> : null}
+                    <span className="source-index">{index + 1}</span>
+                  </span>
+                  <strong>{item.title}</strong>
+                  {item.snippet ? <p>{item.snippet}</p> : null}
+                </a>
               </li>
             ))}
           </ol>

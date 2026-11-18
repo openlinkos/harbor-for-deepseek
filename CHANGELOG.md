@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-11-18
+
+Phone menu icon is a 24px mark in a 44px target. Search result cards use a letter-circle favicon, a muted site row, and a plain dark title.
+
 ## 0.5.0 — 2026-11-18
 
 Phone layout. Below 768px the chat matches the official phone screen: a short top bar, a docked input, a left drawer, and bottom sheets for sources and settings. Local mode calls the signed-out row 本地港湾 / Local Harbor. A nickname in Settings replaces that label.
