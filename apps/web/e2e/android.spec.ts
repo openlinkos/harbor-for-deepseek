@@ -63,6 +63,7 @@ test('native shell keeps the key on device and offers a server address', async (
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('8')
   await page.screenshot({ path: join(shots, '11-android-byok.png') })
+  await page.getByTestId('menu').click()
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await expect(page.getByTestId('server-url')).toBeVisible()
