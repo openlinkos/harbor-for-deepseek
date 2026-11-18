@@ -24,9 +24,18 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
-      - name: Install the Android SDK
-        run: yes | sdkmanager --licenses >/dev/null && sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+      - name: Use the preinstalled Android SDK
+        run: |
+          sdk="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "$sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$sdk/cmdline-tools/16.0/bin" >> "$GITHUB_PATH"
+          echo "$sdk/platform-tools" >> "$GITHUB_PATH"
+      - name: Install the Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs
