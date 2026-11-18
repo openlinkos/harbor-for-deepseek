@@ -131,6 +131,8 @@ const Mermaid = ({ chart }: { chart: string }) => {
 const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
   const html = highlight(language, value)
   const [copied, setCopied] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const long = value.split('\n').length > 18
   const download = () => {
     const blob = new Blob([value], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -161,9 +163,14 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
           </button>
         </span>
       </div>
-      <pre>
+      <pre className={long && !expanded ? 'collapsed' : ''}>
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
+      {long ? (
+        <button type="button" className="code-fold" onClick={() => setExpanded((open) => !open)}>
+          {expanded ? label('收起', 'Collapse') : label('展开', 'Expand')}
+        </button>
+      ) : null}
     </div>
   )
 }

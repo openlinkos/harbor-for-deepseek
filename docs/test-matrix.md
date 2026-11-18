@@ -70,3 +70,8 @@ The composer addresses Harbor, not DeepSeek. That is the product name. Everythin
 | 60 | Search dialog | Centered 「搜索对话内容...」 filters titles | `keyboard and search` |
 | 61 | Stop aftermath | Stop leaves 已停止 and the composer usable | `stream and stop` |
 | 62 | Groups | 置顶 / 今天 / 昨天 / 30 天内 / YYYY-MM | `date groups` |
+| 63 | Mobile drawer | At 390px the sidebar is a 261px drawer over a scrim; sheets use the 768px and 440px rules | `mobile drawer` |
+| 64 | Offline | An offline banner uses the toast tokens | `offline banner` |
+| 65 | Long code | A block longer than 18 lines collapses until 展开 | `long code` |
+| 66 | Delete confirm | The item menu opens an in-app confirm instead of a native dialog | `delete confirm` |
+| 67 | Stop aftermath | Stop hides the stop control, keeps the user turn, and leaves the composer ready | `stream and stop` |

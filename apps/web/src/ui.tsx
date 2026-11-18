@@ -58,6 +58,22 @@ const Favicon = ({ label }: { label: string }) => (
 type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string }
 const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
 
+const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
+  const t = useT()
+  return createPortal(
+    <div className="modal confirm-modal" role="dialog" aria-modal="true" aria-label={label} data-testid="confirm-dialog">
+      <div className="confirm-card">
+        <h2>{label}</h2>
+        <div className="edit-actions">
+          <button type="button" onClick={onCancel}>{t('cancel')}</button>
+          <button type="button" className="danger outline" data-testid="confirm-delete" onClick={onConfirm}>{t('delete')}</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
 const useT = () => {
   const locale = useHarbor((state) => state.settings.locale)
   return (key: Parameters<typeof translate>[1], vars?: Record<string, string | number>) =>
@@ -726,6 +742,17 @@ export const Shell = () => {
   const listRef = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
   const [away, setAway] = useState(false)
+  const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && !navigator.onLine)
+  useEffect(() => {
+    const down = () => setOffline(true)
+    const up = () => setOffline(false)
+    window.addEventListener('offline', down)
+    window.addEventListener('online', up)
+    return () => {
+      window.removeEventListener('offline', down)
+      window.removeEventListener('online', up)
+    }
+  }, [])
   useEffect(() => {
     if (!stick.current) {
       return
@@ -819,6 +846,7 @@ export const Shell = () => {
   return (
     <SourcesPanel.Provider value={setPanel}>
     <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''}`}>
+      {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
           <span className="brand-name">
@@ -1032,6 +1060,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
+  const [confirming, setConfirming] = useState(false)
   const row = useRef<HTMLDivElement>(null)
   return (
     <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`} ref={row}>
@@ -1061,9 +1090,16 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
             downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
           }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
           <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
-          <button className="danger" type="button" onClick={() => { if (window.confirm(t('deleteConfirm'))) void removeChat(conversation.id) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
+          <button className="danger" type="button" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
         </div>,
         document.body,
+      ) : null}
+      {confirming ? (
+        <ConfirmDialog
+          label={t('deleteConfirm')}
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => { setConfirming(false); void removeChat(conversation.id) }}
+        />
       ) : null}
     </div>
   )
@@ -1208,6 +1244,7 @@ const Settings = () => {
   const [exporting, setExporting] = useState(false)
   const [improve, setImprove] = useState(() => localStorage.getItem('harbor-improve') !== 'off')
   const [sharedNote, setSharedNote] = useState(false)
+  const [confirmAll, setConfirmAll] = useState(false)
   const profile = useProfile()
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
@@ -1356,11 +1393,18 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('deleteAll')}</span>
-            <button type="button" className="danger outline" onClick={() => {
-              if (!window.confirm(t('deleteConfirm'))) return
-              const { conversations: rows, removeChat: drop } = useHarbor.getState()
-              for (const item of rows) void drop(item.id)
-            }}>{t('delete')}</button>
+            <button type="button" className="danger outline" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
+            {confirmAll ? (
+              <ConfirmDialog
+                label={t('deleteConfirm')}
+                onCancel={() => setConfirmAll(false)}
+                onConfirm={() => {
+                  setConfirmAll(false)
+                  const { conversations: rows, removeChat: drop } = useHarbor.getState()
+                  for (const item of rows) void drop(item.id)
+                }}
+              />
+            ) : null}
           </div>
         </section>
         <details className="settings-more settings-data" data-testid="settings-more-data">

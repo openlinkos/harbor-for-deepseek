@@ -1049,6 +1049,49 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
 .ai-note { margin: 8px 0 0; font-size: 12px; color: var(--dsw-alias-label-tertiary); text-align: center; }
 .thinking-body .found-line { display: flex; align-items: center; gap: 6px; margin: 8px 0; }
 
+.offline-banner {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--dsw-alias-toast-bg);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: var(--dsw-shadow-lv3);
+}
+.confirm-modal { z-index: 40; }
+.confirm-card {
+  width: min(400px, calc(100vw - 32px));
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+  border-radius: 24px;
+  padding: 22px 22px 16px;
+  box-shadow: var(--dsw-shadow-lv3);
+}
+.confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 560; }
+.confirm-card .danger.outline {
+  background: transparent;
+  color: #f25a5a;
+  box-shadow: inset 0 0 0 1px #f25a5a;
+  border-radius: 999px;
+  height: 36px;
+  padding: 0 14px;
+}
+.code-card pre.collapsed { max-height: 220px; overflow: hidden; }
+.code-fold {
+  display: block;
+  width: 100%;
+  height: 36px;
+  border: 0;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+}
 @media (max-width: 767px) {
   .shell { min-height: 100dvh; }
   .stage { min-height: 100dvh; }
@@ -1056,8 +1099,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     display: none;
     position: fixed;
     inset: 0 auto 0 0;
-    width: min(260px, 72vw);
-    flex-basis: min(260px, 72vw);
+    width: min(261px, 78vw);
+    flex-basis: min(261px, 78vw);
     z-index: 8;
     padding-top: calc(12px + env(safe-area-inset-top));
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
@@ -1187,6 +1230,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .theme-cards .chip.on { background: var(--dsw-alias-bg-layer-3); border-color: var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); }
 }
 
+@media (max-width: 440px) {
+  .greeting { font-size: 20px; font-weight: 500; line-height: 28px; }
+  .offline-banner { width: calc(100vw - 32px); text-align: center; box-sizing: border-box; }
+  .bubble { max-width: calc(100% - 68px); }
+}
 @keyframes harbor-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes harbor-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 .modal { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in); backdrop-filter: blur(2px); }
