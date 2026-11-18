@@ -1,0 +1,56 @@
+import { createHash } from 'node:crypto'
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+const dist = join(root, 'apps/web/dist')
+const indexPath = join(dist, 'index.html')
+
+const hashFile = (path) => createHash('sha256').update(readFileSync(path)).digest('base64')
+
+let html = readFileSync(indexPath, 'utf8')
+html = html.replace(/<(script|link)\b([^>]*?)>/g, (full) => {
+  const attr = /\b(?:src|href)="([^"]+)"/.exec(full)
+  if (!attr || attr[1].startsWith('http') || attr[1].startsWith('data:') || full.includes('integrity=')) {
+    return full
+  }
+  const file = join(dist, attr[1].replace(/^\//, '').split('?')[0])
+  const integrity = `sha256-${hashFile(file)}`
+  const selfClosing = /\/\s*>$/.test(full)
+  const core = full.replace(/\s*\/?>$/, '')
+  const cross = full.includes('crossorigin') ? '' : ' crossorigin="anonymous"'
+  return `${core} integrity="${integrity}"${cross}${selfClosing ? ' />' : '>'}`
+})
+
+if (!html.includes('https://api.deepseek.com') || html.includes('unsafe-eval')) {
+  throw new Error('dist/index.html is missing the Harbor CSP')
+}
+if (html.includes('__HARBOR_CSP__')) {
+  throw new Error('CSP placeholder was not replaced')
+}
+
+writeFileSync(indexPath, html)
+writeFileSync(join(dist, '404.html'), html)
+copyFileSync(join(root, 'LICENSE'), join(dist, 'LICENSE'))
+copyFileSync(join(root, 'NOTICE'), join(dist, 'NOTICE'))
+
+const files = []
+const walk = (dir) => {
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name)
+    if (statSync(path).isDirectory()) {
+      walk(path)
+    } else if (name !== 'SHA256SUMS') {
+      files.push(path)
+    }
+  }
+}
+walk(dist)
+const sums = files
+  .sort()
+  .map((path) => `${createHash('sha256').update(readFileSync(path)).digest('hex')}  ${relative(dist, path)}`)
+  .join('\n')
+writeFileSync(join(dist, 'SHA256SUMS'), `${sums}\n`)
+mkdirSync(join(dist, 'icons'), { recursive: true })
+console.log(`static site ready: ${files.length} files, sha256 written`)

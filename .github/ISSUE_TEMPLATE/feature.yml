@@ -1,0 +1,15 @@
+name: Feature
+description: A change that fits the milestone plan
+labels: ["enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: What should Harbor do
+      description: M1 is the on-device web app. Server, Android, and iOS are later milestones.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Why this belongs in Harbor
+    validations:
+      required: true

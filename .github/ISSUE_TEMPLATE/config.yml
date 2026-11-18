@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security
+    url: https://github.com/openlinkos/harbor-for-deepseek/security
+    about: Report a vulnerability privately. Do not open a public issue for a leaked key.

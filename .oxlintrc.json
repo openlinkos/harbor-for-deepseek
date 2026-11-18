@@ -1,0 +1,14 @@
+{
+  "plugins": ["typescript", "react", "oxc"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "typescript/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ]
+  },
+  "ignorePatterns": ["dist", "coverage", "playwright-report", "pnpm-lock.yaml"]
+}
