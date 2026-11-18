@@ -1,0 +1,117 @@
+import 'fake-indexeddb/auto'
+import { describe, expect, it } from 'vitest'
+import type { Conversation, Message } from '@harbor/types'
+import { openIndexedRepository } from './indexeddb.js'
+import { mergeSnapshot } from './merge.js'
+import { createMemoryRepository } from './memory.js'
+import { openSecret, sealSecret } from './secret.js'
+
+const conversation = (id: string, rev: number, title: string): Conversation => ({
+  id,
+  title,
+  titleSource: 'user',
+  model: 'deepseek-flash',
+  thinking: true,
+  search: false,
+  readLink: false,
+  effort: 'high',
+  pinned: false,
+  archived: false,
+  activeLeafId: null,
+  createdAt: '2026-11-18T00:00:00.000Z',
+  updatedAt: '2026-11-18T00:00:00.000Z',
+  rev,
+  deletedAt: null,
+})
+
+const message = (id: string, text: string): Message => ({
+  id,
+  conversationId: 'c1',
+  parentId: null,
+  role: 'user',
+  status: 'complete',
+  blocks: [{ type: 'text', text }],
+  usage: null,
+  errorMessage: null,
+  createdAt: '2026-11-18T00:00:00.000Z',
+  updatedAt: '2026-11-18T00:00:00.000Z',
+  rev: 1,
+  deletedAt: null,
+})
+
+describe('mergeSnapshot', () => {
+  it('lets a higher conversation rev win and refuses to replace a message id', () => {
+    const merged = mergeSnapshot(
+      {
+        conversations: [conversation('c1', 1, 'local')],
+        messages: [message('m1', 'local text')],
+        tombstones: [],
+      },
+      {
+        conversations: [conversation('c1', 4, 'cloud')],
+        messages: [message('m1', 'cloud text'), message('m2', 'new')],
+        tombstones: [],
+      },
+    )
+    expect(merged.conversations[0]?.title).toBe('cloud')
+    expect(merged.messages.find((item) => item.id === 'm1')?.blocks).toEqual([
+      { type: 'text', text: 'local text' },
+    ])
+    expect(merged.messages.map((item) => item.id).sort()).toEqual(['m1', 'm2'])
+  })
+
+  it('applies a tombstone without keeping the message body', () => {
+    const merged = mergeSnapshot(
+      {
+        conversations: [conversation('c1', 2, 'kept')],
+        messages: [message('m1', 'secret conversation text')],
+        tombstones: [],
+      },
+      {
+        conversations: [],
+        messages: [],
+        tombstones: [
+          { key: 'message:m1', entity: 'message', id: 'm1', rev: 5, deletedAt: '2026-11-18T01:00:00.000Z' },
+        ],
+      },
+    )
+    expect(merged.messages).toHaveLength(0)
+    expect(JSON.stringify(merged.messages)).not.toContain('secret conversation text')
+    expect(merged.tombstones[0]?.id).toBe('m1')
+  })
+})
+
+describe('secrets', () => {
+  it('round-trips a passphrase and rejects the wrong one', async () => {
+    const sealed = await sealSecret('demo-local-key', 'correct horse')
+    expect(sealed.enc).toBe(true)
+    expect(JSON.stringify(sealed)).not.toContain('demo-local-key')
+    await expect(openSecret(sealed, 'correct horse')).resolves.toBe('demo-local-key')
+    await expect(openSecret(sealed, 'nope')).rejects.toThrow(/passphrase/)
+  })
+
+  it('stores an unencrypted key only when the user skips a passphrase', async () => {
+    const sealed = await sealSecret('demo-local-key', null)
+    expect(sealed).toEqual({ v: 1, enc: false, value: 'demo-local-key' })
+  })
+})
+
+describe('indexeddb repository', () => {
+  it('keeps the key out of the conversation database and deletes by tombstone', async () => {
+    const repo = await openIndexedRepository()
+    const settings = await repo.loadSettings()
+    expect(settings.safetyLevel).toBe('high')
+    await repo.writeSecret(await sealSecret('demo-local-key', 'phrase'))
+    await repo.saveConversation(conversation('c1', 1, 'Hello'))
+    await repo.saveMessage(message('m1', 'hello'))
+    await repo.deleteConversation('c1')
+    expect(await repo.listConversations()).toEqual([])
+    expect(await repo.listMessages('c1')).toEqual([])
+    const tombstones = await repo.listTombstones()
+    expect(tombstones.some((item) => item.id === 'm1')).toBe(true)
+    const opened = await openSecret((await repo.readSecret())!, 'phrase')
+    expect(opened).toBe('demo-local-key')
+    const memory = createMemoryRepository()
+    expect(await memory.listConversations()).toEqual([])
+  })
+})

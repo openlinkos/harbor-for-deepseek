@@ -1,0 +1,17 @@
+# Example for the static M1 site. DNS and the host are left to the maintainers.
+# Do not add a reverse proxy to api.deepseek.com on this host.
+
+hfd.linkos.org {
+	root * /srv/harbor
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://cdn.deepseek.com; font-src 'self' data:; connect-src 'self' https://api.deepseek.com; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'; frame-ancestors 'none'"
+		-Server
+	}
+	file_server
+}

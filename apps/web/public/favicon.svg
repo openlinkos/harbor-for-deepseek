@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Harbor">
+  <rect width="64" height="64" rx="16" fill="#F3EFE6"/>
+  <path d="M6 46c7 5 14 5 21 0s14-5 21 0 10 5 14 2v8H6z" fill="#1F6A64"/>
+  <rect x="10" y="40" width="28" height="4.5" rx="2" fill="#142226"/>
+  <rect x="34" y="22" width="6" height="22" rx="1.5" fill="#142226"/>
+  <circle cx="37" cy="17" r="4.2" fill="#E08A3C"/>
+  <path d="M42 17h12" stroke="#E08A3C" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

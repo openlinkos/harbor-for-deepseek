@@ -1,0 +1,25 @@
+name: Bug
+description: Something in Harbor broke
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: What happened
+      description: Do not paste an API key or a private conversation.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Where
+      options:
+        - Static web (BYOK)
+        - Import or export
+        - Build or CI
+  - type: input
+    attributes:
+      label: Browser

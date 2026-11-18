@@ -1,0 +1,23 @@
+{
+  "name": "@harbor/storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "oxlint src"
+  },
+  "dependencies": {
+    "@harbor/types": "workspace:*",
+    "idb": "8.0.3"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "6.0.1",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  }
+}
