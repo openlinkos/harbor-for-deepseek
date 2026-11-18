@@ -12,7 +12,7 @@ RUN cp LICENSE NOTICE apps/web/dist/
 
 FROM nginxinc/nginx-unprivileged:1.27-alpine
 LABEL org.opencontainers.image.title="Harbor web" \
-      org.opencontainers.image.description="Unofficial community static client for the official DeepSeek API" \
+      org.opencontainers.image.description="Harbor for DeepSeek static web client" \
       org.opencontainers.image.source="https://github.com/openlinkos/harbor-for-deepseek" \
       org.opencontainers.image.url="https://hfd.linkos.org" \
       org.opencontainers.image.licenses="MIT" \

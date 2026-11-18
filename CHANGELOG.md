@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.5 — 2026-11-18
+
+The first screen follows the DeepSeek landing: a light gradient, a centered line, and a rounded input card. The API key step is a card, not a full-page form. Dark surfaces are neutral grey. The web image label is Harbor for DeepSeek.
+
 ## 0.5.4 — 2026-11-18
 
 The sidebar wordmark is one line: Harbor for DeepSeek. The mark is a speech form with a calm blue line. Buttons, links, and chips use the OpenLinkOS blue. A small footer sits under the user row. The chat column does not carry a disclaimer.
