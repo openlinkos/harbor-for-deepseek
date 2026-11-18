@@ -387,7 +387,7 @@ export const Shell = () => {
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>
             <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(true)}>
-              <Icon d="M15 6H5m0 0 4-4M5 6l4 4" />
+              <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
           </span>
         </div>
