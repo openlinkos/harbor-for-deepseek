@@ -260,7 +260,7 @@ const ThemeSwitch = () => {
   const [theme, setTheme] = useState<ThemeChoice>(readTheme())
   return (
     <div className="chips theme-cards">
-      {(['system', 'light', 'dark'] as ThemeChoice[]).map((choice) => (
+      {(['light', 'dark', 'system'] as ThemeChoice[]).map((choice) => (
         <button
           key={choice}
           type="button"
@@ -270,6 +270,15 @@ const ThemeSwitch = () => {
             setTheme(choice)
           }}
         >
+          <Icon
+            d={
+              choice === 'light'
+                ? 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'
+                : choice === 'dark'
+                  ? 'M16 14.5A6.5 6.5 0 1 1 9.5 6 5 5 0 0 0 16 14.5Z'
+                  : 'M4 5h16v10H4zM8 19h8'
+            }
+          />
           {choice === 'system' ? t('themeSystem') : choice === 'light' ? t('themeLight') : t('themeDark')}
         </button>
       ))}
@@ -415,6 +424,121 @@ const Thinking = ({ text }: { text: string }) => {
   )
 }
 
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}
+
+const AssistantTurn = ({ message }: { message: Message }) => {
+  const t = useT()
+  const openPanel = useContext(SourcesPanel)
+  const streaming = useHarbor((state) => state.streaming)
+  const started = useRef(Date.now())
+  const [open, setOpen] = useState(true)
+  const [seconds, setSeconds] = useState(1)
+  useEffect(() => {
+    if (!streaming) {
+      setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000)))
+      return undefined
+    }
+    const timer = window.setInterval(() => setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000))), 500)
+    return () => window.clearInterval(timer)
+  }, [streaming])
+  const steps: Array<
+    | { type: 'think'; text: string }
+    | { type: 'search'; items: SourceItem[] }
+    | { type: 'browse'; items: { title: string; url: string }[] }
+  > = []
+  const texts: Extract<ContentBlock, { type: 'text' }>[] = []
+  let browse: { title: string; url: string }[] = []
+  const flush = () => {
+    if (browse.length) {
+      steps.push({ type: 'browse', items: browse })
+      browse = []
+    }
+  }
+  const sources: SourceItem[] = []
+  for (const block of presentBlocks(message.blocks)) {
+    if (block.type === 'thinking') {
+      flush()
+      if (block.thinking.trim()) steps.push({ type: 'think', text: block.thinking })
+    } else if (block.type === 'web_search_tool_result') {
+      flush()
+      const items = block.content.filter((item) => item.type === 'web_search_result').map((result) => ({
+        url: result.url,
+        title: result.title,
+        snippet: result.snippet ?? '',
+        site: result.site_name || result.url,
+        date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
+      }))
+      sources.push(...items)
+      if (items.length) steps.push({ type: 'search', items })
+    } else if (block.type === 'web_fetch_tool_result' && block.content.type !== 'web_fetch_tool_result_error') {
+      browse.push({ title: block.content.content?.title || hostOf(block.content.url), url: block.content.url })
+    } else if (block.type === 'server_tool_use') {
+      const action = block.input.action
+      if ((action === 'open_page' || action === 'read_link') && 'url' in block.input && typeof block.input.url === 'string') {
+        browse.push({ title: hostOf(block.input.url), url: block.input.url })
+      }
+    } else if (block.type === 'text') {
+      flush()
+      texts.push(block)
+    } else {
+      flush()
+    }
+  }
+  flush()
+  return (
+    <>
+      {steps.length ? (
+        <section className="thinking" data-testid="thinking">
+          <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+            <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" />
+            {t('thoughtFor', { seconds })}
+            <span className={`chev ${open ? 'open' : ''}`}><Icon d="M9 6l6 6-6 6" /></span>
+          </button>
+          <div className={`thinking-collapse ${open ? 'open' : ''}`}>
+            <div className="thinking-body">
+              {steps.map((step, index) => step.type === 'think' ? (
+                <p key={index} className="timeline-step">{step.text}</p>
+              ) : step.type === 'search' ? (
+                <p key={index} className="timeline-step found-line">
+                  <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+                  {t('foundPages', { count: step.items.length })}
+                  <span className="favicons">{step.items.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+                </p>
+              ) : (
+                <div key={index} className="timeline-step">
+                  <p className="found-line">{t('browsedPages', { count: step.items.length })}</p>
+                  <div className="browse-chips">
+                    {step.items.map((item) => (
+                      <a key={item.url} href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+      {texts.map((block, index) => (
+        <div className="prose" data-testid={index === 0 ? 'assistant-text' : undefined} key={index}>
+          <Markdown text={block.text} citations={block.citations} />
+        </div>
+      ))}
+      {sources.length ? (
+        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
+          <span className="favicons">{sources.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+          {t('pagesPill', { count: sources.length })}
+        </button>
+      ) : null}
+    </>
+  )
+}
+
 const MessageRow = ({ message, conversation }: { message: Message; conversation: Conversation }) => {
   const t = useT()
   const messages = useHarbor((state) => state.messages)
@@ -423,12 +547,21 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
   const streaming = useHarbor((state) => state.streaming)
   const siblings = siblingIds(messages, message.id)
   const index = siblings.indexOf(message.id)
-  const cost = message.usage ? estimateCost(message.usage, new Date(message.updatedAt)) : null
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const [copied, setCopied] = useState(false)
-  const [vote, setVote] = useState<'up' | 'down' | null>(null)
+  const voteKey = `harbor-vote:${message.id}`
+  const [vote, setVote] = useState<'up' | 'down' | null>(() => {
+    const saved = localStorage.getItem(voteKey)
+    return saved === 'up' || saved === 'down' ? saved : null
+  })
+  const choose = (next: 'up' | 'down') => {
+    const value = vote === next ? null : next
+    setVote(value)
+    if (value) localStorage.setItem(voteKey, value)
+    else localStorage.removeItem(voteKey)
+  }
   return (
-    <article className={`turn ${message.role}`} data-testid={`message-${message.role}`}>
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''}`} data-testid={`message-${message.role}`} aria-busy={message.status === 'streaming'}>
       {siblings.length > 1 ? (
         <header>
           <span className="branch">
@@ -442,43 +575,38 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
         <>
           <div className="bubble">{textOf}</div>
           <div className="user-actions">
-            <button type="button" aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
+            <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
               <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
             </button>
-            <button type="button" aria-label={t('edit')} onClick={() => window.dispatchEvent(new CustomEvent('harbor-prefill', { detail: textOf }))}>
+            <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => window.dispatchEvent(new CustomEvent('harbor-prefill', { detail: textOf }))}>
               <Icon d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
             </button>
           </div>
         </>
       ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
-      {message.role === 'assistant'
-        ? presentBlocks(message.blocks).map((block, blockIndex) => (
-            <BlockView key={`${message.id}-${blockIndex}`} block={block} testId={block.type === 'text' ? 'assistant-text' : undefined} />
-          ))
-        : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
+      {message.role === 'assistant' ? <AssistantTurn message={message} /> : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
             <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
           ))}
-      {message.status === 'error' ? <p className="form-error">{message.errorMessage || t('error')}</p> : null}
-      {message.status === 'aborted' ? <p className="hint">{t('stopped')}</p> : null}
-      {message.role === 'assistant' && message.usage ? (
-        <p className="usage" data-testid="usage-line">
-          {message.usage.input_tokens} {t('input')} · {message.usage.output_tokens} {t('output')}
-          {message.usage.output_tokens_details?.thinking_tokens ? ` · ${t('thinkingTokens')} ${message.usage.output_tokens_details.thinking_tokens}` : ''}
-          {cost ? ` · ${formatCny(cost.totalCny)} ${t('cny')} · ${cost.peak ? t('peak') : t('offPeak')}` : ''}
+      {message.status === 'error' ? (
+        <p className="form-error">
+          {message.errorMessage || t('error')}
+          <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
         </p>
       ) : null}
+      {message.status === 'aborted' ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
-          <button type="button" aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => setCopied(true))}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
-            <button type="button" data-testid="regenerate" aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
               <Icon d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
-          <button type="button" className={vote === 'up' ? 'on' : ''} aria-label="like" onClick={() => setVote('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" className={vote === 'down' ? 'on' : ''} aria-label="dislike" onClick={() => setVote('down')}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
-          <button type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ text: textOf }) : navigator.clipboard.writeText(textOf))}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => choose('down')}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { if (textOf && 'speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(textOf)) } }}><Icon d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" /></button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
     </article>
@@ -495,10 +623,13 @@ export const Shell = () => {
   )
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const stick = useRef(true)
   const [away, setAway] = useState(false)
   useEffect(() => {
+    if (!stick.current) {
+      return
+    }
     endRef.current?.scrollIntoView({ block: 'end' })
-    setAway(false)
   }, [path.length, state.streaming, state.messages])
   useEffect(() => {
     const viewport = window.visualViewport
@@ -525,17 +656,60 @@ export const Shell = () => {
   const [filter, setFilter] = useState('')
   const [userMenu, setUserMenu] = useState(false)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
+  const [selecting, setSelecting] = useState(false)
+  const [picked, setPicked] = useState<string[]>([])
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const meta = event.metaKey || event.ctrlKey
+      const target = event.target as HTMLElement | null
+      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      if (meta && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setFiltering(true)
+      } else if (meta && event.key.toLowerCase() === 'n' && !typing) {
+        event.preventDefault()
+        void state.newChat()
+      } else if (event.key === 'Escape') {
+        setPanel(null)
+        setUserMenu(false)
+        setFiltering(false)
+        if (state.settingsOpen) {
+          state.setSettingsOpen(false)
+        }
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [state])
   const groups = useMemo(() => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
+    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group7'), t('group30')]
     for (const item of state.conversations.filter((chat) => !filter || (chat.title || t('newChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
-      const days = (startOfDay.getTime() - new Date(when).setHours(0, 0, 0, 0)) / 86_400_000
-      const label = days < 1 ? t('groupToday') : days < 7 ? t('group7') : days < 30 ? t('group30') : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
+      const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
+      const label = item.pinned
+        ? t('groupPinned')
+        : days < 1
+          ? t('groupToday')
+          : days < 2
+            ? t('groupYesterday')
+            : days < 7
+              ? t('group7')
+              : days < 30
+                ? t('group30')
+                : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
       buckets.set(label, [...(buckets.get(label) ?? []), item])
     }
-    return [...buckets.entries()]
+    return [...buckets.entries()].sort((a, b) => {
+      const ia = order.indexOf(a[0])
+      const ib = order.indexOf(b[0])
+      if (ia !== -1 || ib !== -1) {
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
+      }
+      return a[0] < b[0] ? 1 : -1
+    })
   }, [state.conversations, filter, t])
   const serverName = state.serverUser?.username
   const who = serverName || profile.nickname || t('localMode')
@@ -565,15 +739,33 @@ export const Shell = () => {
           <input className="side-filter" value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
         ) : null}
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
-          <Icon d="M12 5v14M5 12h14" /> {t('newChat')}
+          <Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}
         </button>
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
-          {groups.map(([label, items]) => (
+          {selecting && picked.length ? (
+            <button className="chip" type="button" onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('deleteSelected')}</button>
+          ) : null}
+          {groups.map(([label, items], groupIndex) => (
             <div key={label}>
-              <p className="group-label">{label}</p>
+              <p className="group-label">
+                <span>{label}</span>
+                {groupIndex === 0 ? (
+                  <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
+                    <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
+                  </button>
+                ) : null}
+              </p>
               {items.map((item) => (
-                <ChatLink key={item.id} conversation={item} active={item.id === state.activeId} />
+                <ChatLink
+                  key={item.id}
+                  conversation={item}
+                  active={item.id === state.activeId}
+                  picking={selecting}
+                  picked={picked.includes(item.id)}
+                  onPick={() => setPicked((ids) => ids.includes(item.id) ? ids.filter((id) => id !== item.id) : [...ids, item.id])}
+                  onMulti={() => { setSelecting(true); setPicked([]) }}
+                />
               ))}
             </div>
           ))}
@@ -600,13 +792,17 @@ export const Shell = () => {
                 })}
                 {state.balance ? <span data-testid="balance-side"> {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
               </p>
-              <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('settings')}</button>
-              <button type="button" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('help')}</button>
-              {state.serverUser ? <button type="button" onClick={() => void state.logoutServer()}>{t('logout')}</button> : null}
+              <a href="https://github.com/openlinkos/harbor-for-deepseek/releases" target="_blank" rel="noreferrer noopener">{t('downloadApp')}</a>
+              <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</button>
+              <a href="https://github.com/openlinkos/harbor-for-deepseek/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
+              {state.serverUser ? (
+                <button type="button" onClick={() => void state.logoutServer()}>{t('logout')}</button>
+              ) : (
+                <button type="button" onClick={() => { setUserMenu(false); void state.clearKey() }}>{t('clearKey')}</button>
+              )}
             </div>
           ) : null}
         </div>
-        <SiteFooter />
       </aside>
       {collapsed ? (
         <div className="float-pill">
@@ -648,19 +844,22 @@ export const Shell = () => {
                 if (!list) {
                   return
                 }
-                setAway(list.scrollHeight - list.scrollTop - list.clientHeight > 96)
+                const distance = list.scrollHeight - list.scrollTop - list.clientHeight
+                stick.current = distance < 96
+                setAway(distance > 96)
               }}
             >
               {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
               <div ref={endRef} />
             </div>
             {away ? (
-              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })}>
+              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }}>
                 <Icon d="M6 9l6 6 6-6" />
               </button>
             ) : null}
             <div className="composer-wrap">
               <Composer />
+              <p className="footnote ai-note">{t('aiNote')}</p>
             </div>
           </>
         )}
@@ -700,17 +899,30 @@ export const Shell = () => {
   )
 }
 
-const ChatLink = ({ conversation, active }: { conversation: Conversation; active: boolean }) => {
+const downloadText = (filename: string, text: string) => {
+  const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { conversation: Conversation; active: boolean; picking?: boolean; picked?: boolean; onPick?: () => void; onMulti?: () => void }) => {
   const t = useT()
   const openChat = useHarbor((state) => state.openChat)
   const setSidebarOpen = useHarbor((state) => state.setSidebarOpen)
   const rename = useHarbor((state) => state.rename)
+  const pin = useHarbor((state) => state.pin)
   const removeChat = useHarbor((state) => state.removeChat)
+  const messages = useHarbor((state) => (state.activeId === conversation.id ? state.messages : []))
   const [editing, setEditing] = useState(false)
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
   return (
     <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`}>
+      {picking ? <input type="checkbox" aria-label={conversation.title || t('newChat')} checked={picked} onChange={() => onPick?.()} /> : null}
       {editing ? (
         <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -722,6 +934,16 @@ const ChatLink = ({ conversation, active }: { conversation: Conversation; active
       {open ? (
         <div className="menu">
           <button type="button" onClick={() => { setEditing(true); setOpen(false) }}>{t('rename')}</button>
+          <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}>{conversation.pinned ? t('unpin') : t('pin')}</button>
+          <button type="button" onClick={() => {
+            setOpen(false)
+            const body = messages.map((message) => {
+              const text = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
+              return `**${message.role}**\n\n${text}`
+            }).join('\n\n')
+            downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
+          }}>{t('share')}</button>
+          <button type="button" onClick={() => { setOpen(false); onMulti?.() }}>{t('multiSelect')}</button>
           <button className="danger" type="button" onClick={() => { if (window.confirm(t('deleteConfirm'))) void removeChat(conversation.id) }}>{t('delete')}</button>
         </div>
       ) : null}
@@ -731,9 +953,10 @@ const ChatLink = ({ conversation, active }: { conversation: Conversation; active
 
 const Empty = () => {
   const t = useT()
+  const hasHistory = useHarbor((state) => state.conversations.length > 0)
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /> {t('emptyTitle')}</h2>
+      <h2 className="greeting"><Mark /> {hasHistory ? t('welcomeBack') : t('emptyTitle')}</h2>
       <Composer />
     </div>
   )
@@ -751,7 +974,6 @@ const Composer = () => {
   const removeDraft = useHarbor((state) => state.removeDraft)
   const [text, setText] = useState('')
   const box = useRef<HTMLTextAreaElement>(null)
-  const [effortOpen, setEffortOpen] = useState(false)
   useEffect(() => {
     const onPrefill = (event: Event) => {
       setText((event as CustomEvent<string>).detail)
@@ -801,18 +1023,6 @@ const Composer = () => {
             <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
               <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
             </button>
-            <button className="chip-more" type="button" aria-label={t('effort')} onClick={() => setEffortOpen((value) => !value)}>
-              <Icon d="M6 9l6 6 6-6" />
-            </button>
-            {effortOpen ? (
-              <div className="menu effort-menu">
-                {(['low', 'high', 'max'] as const).map((level) => (
-                  <button key={level} type="button" onClick={() => { void setPrefs({ effort: level }); setEffortOpen(false) }}>
-                    {level}{prefs.effort === level ? ' ·' : ''}
-                  </button>
-                ))}
-              </div>
-            ) : null}
           </span>
           <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
@@ -875,7 +1085,7 @@ const Settings = () => {
   const [asCopy, setAsCopy] = useState(false)
   const [nextKey, setNextKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [tab, setTab] = useState<'general' | 'profile' | 'data'>('general')
+  const [tab, setTab] = useState<'general' | 'account' | 'data' | 'legal'>('general')
   const profile = useProfile()
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
@@ -883,22 +1093,26 @@ const Settings = () => {
   const info = balance?.balance_infos[0]
   const cost = estimateCost(totals, new Date())
   return (
-    <div className="modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
-      <div className="modal-card" data-tab={tab}>
+    <div className="modal settings-modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
+      <div className="settings-shell" data-tab={tab}>
         <header className="settings-head">
-          <h2>{t('settings')}</h2>
-          <button type="button" className="ghost settings-x" aria-label={t('close')} onClick={() => setSettingsOpen(false)}>
-            <span className="settings-close-word">{t('close')}</span>
+          <h2>{t('systemSettings')}</h2>
+          <button type="button" className="settings-x" aria-label={t('close')} onClick={() => {
+            const modal = document.querySelector('.settings-modal')
+            modal?.classList.add('closing')
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            window.setTimeout(() => setSettingsOpen(false), reduce ? 0 : 100)
+          }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
         </header>
-        <nav className="settings-tabs" aria-label={t('settings')}>
-          {(['general', 'profile', 'data'] as const).map((item) => (
-            <button key={item} type="button" className={tab === item ? 'on' : ''} onClick={() => setTab(item)}>
-              {item === 'general' ? t('tabGeneral') : item === 'profile' ? t('tabProfile') : t('tabData')}
-            </button>
-          ))}
+        <nav className="settings-nav" aria-label={t('systemSettings')}>
+          <button type="button" className={tab === 'general' ? 'on' : ''} onClick={() => setTab('general')}><Icon d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2" />{t('navGeneral')}</button>
+          <button type="button" className={tab === 'account' ? 'on' : ''} onClick={() => setTab('account')}><Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />{t('navAccount')}</button>
+          <button type="button" className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}><Icon d="M4 7h16v12H4zM4 11h16M9 7v12" />{t('navData')}</button>
+          <button type="button" className={tab === 'legal' ? 'on' : ''} onClick={() => setTab('legal')}><Icon d="M7 3h8l4 4v14H7zM11 13h6M11 17h6" />{t('navLegal')}</button>
         </nav>
+        <div className="settings-main">
         <section className="settings-general">
           <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
         </section>
@@ -906,7 +1120,7 @@ const Settings = () => {
           <h3>{t('theme')}</h3>
           <ThemeSwitch />
         </section>
-        <section className="settings-profile">
+        <section className="settings-account">
           <h3>{t('tabProfile')}</h3>
           <p className="hint">{t('localStay')}</p>
           <label>
@@ -1177,8 +1391,8 @@ const Settings = () => {
             </button>
           ) : null}
         </section>
-        <section className="settings-general">
-          <h3>{t('about')}</h3>
+        <section className="settings-legal">
+          <h3>{t('navLegal')}</h3>
           <SiteFooter />
           <p className="hint">
             <a href="https://github.com/openlinkos/harbor-for-deepseek">openlinkos/harbor-for-deepseek</a>
@@ -1186,6 +1400,7 @@ const Settings = () => {
             <a href="https://platform.deepseek.com/">platform.deepseek.com</a>
           </p>
         </section>
+        </div>
       </div>
     </div>
   )

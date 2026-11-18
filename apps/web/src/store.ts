@@ -107,6 +107,7 @@ export type HarborState = {
   newChat: () => Promise<void>
   openChat: (id: string) => Promise<void>
   rename: (id: string, title: string) => Promise<void>
+  pin: (id: string) => Promise<void>
   removeChat: (id: string) => Promise<void>
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
@@ -416,6 +417,19 @@ export const useHarbor = create<HarborState>((set, get) => ({
     }
     const next = stamp({ ...current, title: title.trim(), titleSource: 'user' as const })
     await store.saveConversation(next)
+    set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
+  },
+
+  async pin(id) {
+    const current = get().conversations.find((item) => item.id === id)
+    if (!current) {
+      return
+    }
+    const next = stamp({ ...current, pinned: !current.pinned })
+    if (!get().serverMode) {
+      const store = await repository()
+      await store.saveConversation(next)
+    }
     set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
   },
 
