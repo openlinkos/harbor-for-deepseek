@@ -19,7 +19,7 @@ Harbor 是 openlinkos 社区开发的非官方开源项目，与杭州深度求�
 - `safety_check` 默认 `high`。
 - 导出自有 JSON（带版本号）。导入按对话 id 合并，不覆盖已有对话。v3 ZIP 按官方归档的形状交换它能表达的字段。
 
-自部署服务器见 [docs/self-host.zh-CN.md](docs/self-host.zh-CN.md)。Android 是同一页面的 Capacitor 壳：Key 留在设备上，服务器地址可选。见 [docs/android.zh-CN.md](docs/android.zh-CN.md)。iOS 是下一个里程碑。
+自部署服务器见 [docs/self-host.zh-CN.md](docs/self-host.zh-CN.md)。Android 和 iOS 是同一页面的 Capacitor 壳：Key 留在设备上，服务器地址可选。见 [docs/android.zh-CN.md](docs/android.zh-CN.md) 和 [docs/ios.zh-CN.md](docs/ios.zh-CN.md)。
 
 ## 隐私
 
@@ -54,7 +54,7 @@ pnpm preview
 
 ## Android
 
-应用是同一套界面。不填写你自己的 Harbor 服务器时，对话仍然直接发往 `https://api.deepseek.com`。导出和导入使用系统分享。每个拉取请求会构建调试 APK。打上 `v*` 标签时，把 APK 附到 GitHub Release；只有密钥库密钥都配置了才会签正式包。说明见 [docs/android.zh-CN.md](docs/android.zh-CN.md)。
+应用是同一套界面。不填写你自己的 Harbor 服务器时，对话仍然直接发往 `https://api.deepseek.com`。导出和导入使用系统分享。每个拉取请求会构建调试 APK。打上 `v*` 标签时，把 APK 附到 GitHub Release；只有密钥库密钥都配置了才会签正式包。说明见 [docs/android.zh-CN.md](docs/android.zh-CN.md)。iOS 是同一个应用。拉取请求会构建未签名的模拟器应用。TestFlight 只写在文档里，CI 不签名：见 [docs/ios.zh-CN.md](docs/ios.zh-CN.md)。
 
 ## 自托管
 

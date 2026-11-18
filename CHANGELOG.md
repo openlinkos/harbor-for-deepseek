@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 — 2026-11-18
+
+iOS shell. The same Capacitor app builds an unsigned simulator binary on a macOS runner. TestFlight stays a manual archive from a maintainer’s Apple Developer account. No signing secret is stored in the repo.
+
 ## 0.3.0 — 2026-11-18
 
 Android shell. Capacitor wraps the same web app. The key and chats stay on the device, and chat goes to `https://api.deepseek.com` until you type a self-hosted Harbor address and log in with a bearer token. Sync stays opt-in. Pull requests upload a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets are set.

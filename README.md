@@ -19,7 +19,7 @@ Harbor is an unofficial open-source community project by openlinkos. It is not a
 - `safety_check` is `high` by default.
 - Export and import a versioned JSON archive. Import merges by conversation id and does not replace chats you already have. A v3 ZIP follows the official archive shape for the fields it can represent.
 
-A self-hosted server is described in [docs/self-host.md](docs/self-host.md). The Android app is a Capacitor shell of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md). iOS is the next milestone.
+A self-hosted server is described in [docs/self-host.md](docs/self-host.md). Android and iOS are Capacitor shells of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md) and [docs/ios.md](docs/ios.md).
 
 ## Privacy
 
@@ -54,7 +54,7 @@ Deployment of the static site, including Cloudflare Pages: [docs/deploy.md](docs
 
 ## Android
 
-The app is the same interface. Chat still goes to `https://api.deepseek.com` unless you type a Harbor server you run and log in. Export and import use the share sheet. Pull requests build a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets exist. Details: [docs/android.md](docs/android.md).
+The app is the same interface. Chat still goes to `https://api.deepseek.com` unless you type a Harbor server you run and log in. Export and import use the share sheet. Pull requests build a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets exist. Details: [docs/android.md](docs/android.md). The iOS shell is the same app. Pull requests build an unsigned simulator app. TestFlight is documented and is not signed in CI: [docs/ios.md](docs/ios.md).
 
 ## Self-hosting
 
