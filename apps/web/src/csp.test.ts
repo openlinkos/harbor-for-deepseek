@@ -12,6 +12,8 @@ describe('content security policy', () => {
     expect(CONTENT_SECURITY_POLICY).not.toContain("script-src 'self' 'unsafe-inline'")
     expect(CONTENT_SECURITY_POLICY).not.toContain("style-src 'self' 'unsafe-inline'")
     expect(CONTENT_SECURITY_POLICY).not.toContain("script-src 'self' https")
+    expect(CONTENT_SECURITY_POLICY).not.toContain('capacitor:')
+    expect(CONTENT_SECURITY_POLICY).not.toMatch(/connect-src[^;]*\shttps:(?:\s|;)/)
     expect(CONTENT_SECURITY_POLICY.startsWith("default-src 'self'")).toBe(true)
     expect(SERVER_CSP).toBe(CONTENT_SECURITY_POLICY)
   })

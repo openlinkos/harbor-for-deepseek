@@ -399,6 +399,52 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     expect(payload.conversations.some((item: { title: string }) => item.title === 'from this device')).toBe(true)
   })
 
+  it('allows Capacitor origins with a bearer token and refuses other origins', async () => {
+    await harbor.sql`
+      insert into app_settings (key, value)
+      values ('cors_origins', '["capacitor://localhost","https://localhost","http://localhost"]'::jsonb)
+      on conflict (key) do update set value = excluded.value
+    `
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { token: string; csrf: string }
+    expect(created.token.length).toBeGreaterThan(20)
+    const preflight = await harbor.app.request('/api/me', {
+      method: 'OPTIONS',
+      headers: { origin: 'https://localhost', 'access-control-request-method': 'GET' },
+    })
+    expect(preflight.headers.get('access-control-allow-origin')).toBe('https://localhost')
+    const me = await harbor.app.request('/api/me', {
+      headers: { origin: 'capacitor://localhost', authorization: `Bearer ${created.token}` },
+    })
+    expect(me.status).toBe(200)
+    expect(me.headers.get('access-control-allow-origin')).toBe('capacitor://localhost')
+    const blocked = await harbor.app.request('/api/me', {
+      headers: { origin: 'https://evil.example', authorization: `Bearer ${created.token}` },
+    })
+    expect(blocked.status).toBe(200)
+    expect(blocked.headers.get('access-control-allow-origin')).toBeNull()
+    const session = sessionOf(setup)
+    const updated = await harbor.app.request('/api/admin/cors', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json', ...authed(session, created.csrf, true) },
+      body: JSON.stringify({ origins: ['https://localhost', 'https://evil.example'] }),
+    })
+    expect(updated.status).toBe(200)
+    const nowAllowed = await harbor.app.request('/api/me', {
+      headers: { origin: 'https://evil.example', authorization: `Bearer ${created.token}` },
+    })
+    expect(nowAllowed.headers.get('access-control-allow-origin')).toBe('https://evil.example')
+    await harbor.sql`
+      insert into app_settings (key, value)
+      values ('cors_origins', '["capacitor://localhost","https://localhost","http://localhost"]'::jsonb)
+      on conflict (key) do update set value = excluded.value
+    `
+  })
+
   it('rejects a cookie write without the csrf header and uploads files with a 7 day expiry', async () => {
     const setup = await harbor.app.request('/api/setup/admin', {
       method: 'POST',

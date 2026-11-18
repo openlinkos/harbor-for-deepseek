@@ -130,8 +130,9 @@ export const AdminScreen = () => {
   const [secret, setSecret] = useState('')
   const [accountGroup, setAccountGroup] = useState('')
   const [invite, setInvite] = useState('')
-  const [threshold, setThreshold] = useState('50')
+const [threshold, setThreshold] = useState('50')
   const [usage, setUsage] = useState<UsageRow[]>([])
+  const [origins, setOrigins] = useState('')
   const [error, setError] = useState('')
 
   const statusLabel = (status: string) => {
@@ -146,13 +147,15 @@ export const AdminScreen = () => {
     const keyBody = await api<{ keys: KeyInfo[] }>('/api/admin/keys')
     const alertBody = await api<{ alerts: AlertInfo[] }>('/api/admin/alerts')
     const userBody = await api<{ users: UserInfo[] }>('/api/admin/users')
-    const settingsBody = await api<{ lowBalanceCny: number }>('/api/admin/settings')
+const settingsBody = await api<{ lowBalanceCny: number }>('/api/admin/settings')
     const usageBody = await api<{ daily: UsageRow[] }>('/api/admin/usage')
+    const corsBody = await api<{ origins: string[] }>('/api/admin/cors')
     setKeys(keyBody.keys)
     setAlerts(alertBody.alerts)
     setUsers(userBody.users)
     setThreshold(String(settingsBody.lowBalanceCny))
     setUsage(usageBody.daily)
+    setOrigins(corsBody.origins.join('\n'))
   }
 
   useEffect(() => {
@@ -254,7 +257,7 @@ export const AdminScreen = () => {
           {t('inviteCreate')}
         </button>
         {invite ? <p data-testid="invite-code">{invite}</p> : null}
-        <h2>{t('usageLedger')}</h2>
+<h2>{t('usageLedger')}</h2>
         <table className="ledger" data-testid="admin-usage">
           <thead>
             <tr>
@@ -279,6 +282,19 @@ export const AdminScreen = () => {
             ))}
           </tbody>
         </table>
+        <h2>{t('corsOrigins')}</h2>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            const next = origins.split('\n').map((item) => item.trim()).filter(Boolean)
+            void api('/api/admin/cors', { method: 'PATCH', body: JSON.stringify({ origins: next }) })
+              .then(() => reload())
+              .catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+          }}
+        >
+          <textarea data-testid="cors-origins" rows={4} value={origins} onChange={(event) => setOrigins(event.target.value)} />
+          <button type="submit">{t('corsSave')}</button>
+        </form>
         <h2>{t('quotaHeading')}</h2>
         {users.map((user) => (
           <form

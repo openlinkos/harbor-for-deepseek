@@ -17,6 +17,8 @@ Create an invite code and give it to a friend. They register on the same address
 
 Two browsers logged in as the same user can use “Sync from the server”. Copying chats that already live on a device is a separate button and does not run by itself.
 
+The Android app can type this server’s address and log in with the bearer token returned by login. The server sends CORS headers only for an admin-edited origin list (default `capacitor://localhost`, `https://localhost`, `http://localhost`). The public static site never calls an arbitrary server. See [android.md](android.md).
+
 Uploaded files expire on the official side after 7 days.
 
 ## Optional environment variables

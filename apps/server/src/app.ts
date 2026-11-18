@@ -313,11 +313,20 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     return { token, csrf, sessionId: id }
   }
 
+  const allowedOrigins = async (): Promise<string[]> => {
+    const rows = await sql<{ value: unknown }[]>`select value from app_settings where key = 'cors_origins'`
+    const value = rows[0]?.value
+    if (Array.isArray(value) && value.every((item) => typeof item === 'string')) {
+      return value
+    }
+    return ['capacitor://localhost', 'https://localhost', 'http://localhost']
+  }
+
   const app = new Hono()
 
   app.use('*', async (c, next) => {
     const origin = c.req.header('origin')
-    if (origin) {
+    if (origin && (await allowedOrigins()).includes(origin)) {
       c.header('Access-Control-Allow-Origin', origin)
       c.header('Vary', 'Origin')
       c.header('Access-Control-Allow-Credentials', 'true')
@@ -447,7 +456,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     await sql`insert into user_counters (user_id, next_rev) values (${id}, 0)`
     const session = await issueSession(id, c.req.header('user-agent') ?? 'web')
     writeSessionCookie(c, session.token)
-    return c.json({ user: { id, username, role: 'admin' }, csrf: session.csrf })
+    return c.json({ user: { id, username, role: 'admin' }, csrf: session.csrf, token: session.token })
   })
 
   app.post('/api/auth/register', async (c) => {
@@ -481,7 +490,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     await sql`update invite_codes set used_count = used_count + 1 where id = ${invite.id}`
     const session = await issueSession(id, c.req.header('user-agent') ?? 'web')
     writeSessionCookie(c, session.token)
-    return c.json({ user: { id, username, role: 'member' }, csrf: session.csrf })
+    return c.json({ user: { id, username, role: 'member' }, csrf: session.csrf, token: session.token })
   })
 
   app.post('/api/auth/login', async (c) => {
@@ -498,7 +507,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     }
     const session = await issueSession(row.id, c.req.header('user-agent') ?? 'web')
     writeSessionCookie(c, session.token)
-    return c.json({ user: { id: row.id, username: row.username, role: row.role }, csrf: session.csrf })
+    return c.json({ user: { id: row.id, username: row.username, role: row.role }, csrf: session.csrf, token: session.token })
   })
 
   app.post('/api/auth/logout', async (c) => {
@@ -1451,7 +1460,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     })
   })
 
-  app.get('/api/admin/settings', async (c) => {
+app.get('/api/admin/settings', async (c) => {
     const user = await requireUser(c, false)
     if (user instanceof Response) {
       return user
@@ -1460,6 +1469,37 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       return c.json({ error: { message: 'forbidden' } }, 403)
     }
     return c.json({ lowBalanceCny: await threshold() })
+  })
+
+  app.get('/api/admin/cors', async (c) => {
+    const user = await requireUser(c, false)
+    if (user instanceof Response) {
+      return user
+    }
+    if (user.role !== 'admin') {
+      return c.json({ error: { message: 'forbidden' } }, 403)
+    }
+    return c.json({ origins: await allowedOrigins() })
+  })
+
+  app.patch('/api/admin/cors', async (c) => {
+    const user = await requireUser(c, true)
+    if (user instanceof Response) {
+      return user
+    }
+    if (user.role !== 'admin') {
+      return c.json({ error: { message: 'forbidden' } }, 403)
+    }
+    const body = await readBody<{ origins?: string[] }>(c)
+    const origins = (body.origins ?? []).map((item) => item.trim()).filter(Boolean)
+    if (origins.some((item) => item === '*' || /\s/.test(item))) {
+      return c.json({ error: { message: 'origins must be explicit' } }, 400)
+    }
+    await sql`
+      insert into app_settings (key, value) values ('cors_origins', ${sql.json(origins)})
+      on conflict (key) do update set value = excluded.value
+    `
+    return c.json({ origins })
   })
 
   app.patch('/api/admin/settings', async (c) => {

@@ -17,6 +17,8 @@ Compose 会拉取 `ghcr.io/openlinkos/harbor-for-deepseek` 和 Postgres。不加
 
 同一个账号在两台浏览器上登录后，用「从服务器同步」。把已经在本机的对话复制上去是另一个按钮，不会自动发生。
 
+Android 应用可以填写这台服务器的地址，并用登录返回的 bearer 令牌登录。服务器只对管理员维护的来源名单返回 CORS 头（默认 `capacitor://localhost`、`https://localhost`、`http://localhost`）。公开静态站不会去连任意服务器。见 [android.zh-CN.md](android.zh-CN.md)。
+
 上传的文件默认 7 天后在官方侧过期。
 
 ## 可选环境变量

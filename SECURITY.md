@@ -14,7 +14,8 @@ Harbor's default mode is bring-your-own-key, entirely in the browser.
 - An optional passphrase encrypts it with PBKDF2-SHA-256 (600,000 iterations) and AES-256-GCM. The passphrase is not stored. Without a passphrase, the key sits in IndexedDB in a form any script on this origin can read.
 - Exports (JSON and the v3 ZIP) do not include the key. Import ignores a key if one was stuffed into a file.
 - Requests use `credentials: "omit"` and go to `https://api.deepseek.com`. The page on `hfd.linkos.org` has no account and no request log of its own.
-- The DeepSeek platform terms tell users not to put a key in a browser. Using the web app means accepting that risk: a malicious extension or an XSS bug can read an unencrypted key. A dedicated key with a spending limit is safer. A future native app can use the system keystore; that is not this release.
+- The DeepSeek platform terms tell users not to put a key in a browser. Using the web app means accepting that risk: a malicious extension or an XSS bug can read an unencrypted key. A dedicated key with a spending limit is safer.
+- The Android app uses the same IndexedDB inside the app WebView. Other apps cannot read it. It is not wrapped by the Android Keystore in this release. Export still omits the key. See [docs/android.md](docs/android.md).
 
 ## Why the static site is strict
 

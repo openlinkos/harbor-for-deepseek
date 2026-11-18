@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 — 2026-11-18
+
+Android shell. Capacitor wraps the same web app. The key and chats stay on the device, and chat goes to `https://api.deepseek.com` until you type a self-hosted Harbor address and log in with a bearer token. Sync stays opt-in. Pull requests upload a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets are set.
+
 ## 0.2.2 — 2026-11-18
 
 The chat screen follows the layout of the official DeepSeek chat: a light sidebar, a centered column, pale-blue user bubbles, pill chips, and light, dark, and system themes. The Harbor mark replaces any other logo. Color tokens and several component styles are adapted from the MIT chat-demo.

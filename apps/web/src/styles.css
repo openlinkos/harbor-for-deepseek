@@ -25,7 +25,7 @@ a { color: var(--dsw-alias-brand-text); }
   flex-direction: column;
   background: var(--dsw-specific-sidebar-fill);
   border-right: 1px solid var(--dsw-alias-border-l1);
-  padding: 8px 10px 8px;
+  padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
   min-height: 100vh;
 }
 .shell.sider-collapsed .sidebar { display: none; }
@@ -172,8 +172,8 @@ body[data-ds-dark-theme] .chat-link.active > button { color: #f2f3f5; }
 
 .stage { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; position: relative; }
 .topbar {
-  height: 52px;
-  padding: 0 16px;
+  height: calc(52px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 16px 0;
   justify-content: space-between;
 }
 .topbar h2 { margin: 0; font-size: 16px; font-weight: 560; flex: 1; }
@@ -349,7 +349,7 @@ body[data-ds-dark-theme] .thinking-body { border-left-color: #3e4044; }
   font-weight: 600;
   margin: 0 0 22px;
 }
-.composer-wrap { width: min(760px, calc(100% - 32px)); margin: 0 auto 8px; }
+.composer-wrap { width: min(760px, calc(100% - 32px)); margin: 0 auto 8px; padding-bottom: env(safe-area-inset-bottom); }
 .home .composer-wrap { width: 100%; }
 .composer {
   border: 1px solid #e5e5e5;

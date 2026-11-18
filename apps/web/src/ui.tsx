@@ -637,6 +637,17 @@ const Settings = () => {
   const enterServerMode = useHarbor((state) => state.enterServerMode)
   const logoutServer = useHarbor((state) => state.logoutServer)
   const openLogin = useHarbor((state) => state.openLogin)
+  const native = useHarbor((state) => state.native)
+  const serverBase = useHarbor((state) => state.serverBase)
+  const allowLanHttp = useHarbor((state) => state.allowLanHttp)
+  const setAllowLanHttp = useHarbor((state) => state.setAllowLanHttp)
+  const connectRemote = useHarbor((state) => state.connectRemote)
+  const registerRemote = useHarbor((state) => state.registerRemote)
+  const [remoteUrl, setRemoteUrl] = useState('')
+  const [remoteUser, setRemoteUser] = useState('')
+  const [remotePassword, setRemotePassword] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
+  const [remoteError, setRemoteError] = useState('')
   const totals = useHarbor((state) => state.totals)
   const quota = useHarbor((state) => state.quota)
   const [asCopy, setAsCopy] = useState(false)
@@ -841,8 +852,61 @@ const Settings = () => {
         )}
         <section>
           <h3>{t('serverTitle')}</h3>
-          <p>{t('serverBody')}</p>
+          <p>{native ? t('nativeServerBody') : t('serverBody')}</p>
+          {native && !serverUser ? (
+            <form
+              className="stack"
+              onSubmit={(event) => {
+                event.preventDefault()
+                setRemoteError('')
+                const action = inviteCode.trim()
+                  ? registerRemote(remoteUrl, inviteCode.trim(), remoteUser, remotePassword)
+                  : connectRemote(remoteUrl, remoteUser, remotePassword)
+                void action.catch((error: unknown) => {
+                  setRemoteError(error instanceof Error ? error.message : 'login failed')
+                })
+              }}
+            >
+              <label>
+                {t('serverUrl')}
+                <input data-testid="server-url" value={remoteUrl} autoComplete="off" onChange={(event) => setRemoteUrl(event.target.value)} />
+              </label>
+              <label className="check">
+                <input
+                  data-testid="allow-lan"
+                  type="checkbox"
+                  checked={allowLanHttp}
+                  onChange={(event) => setAllowLanHttp(event.target.checked)}
+                />
+                {t('allowLanHttp')}
+              </label>
+              <label>
+                {t('loginUser')}
+                <input data-testid="remote-user" value={remoteUser} autoComplete="username" onChange={(event) => setRemoteUser(event.target.value)} />
+              </label>
+              <label>
+                {t('loginPassword')}
+                <input
+                  data-testid="remote-password"
+                  type="password"
+                  value={remotePassword}
+                  autoComplete="current-password"
+                  onChange={(event) => setRemotePassword(event.target.value)}
+                />
+              </label>
+              <label>
+                {t('registerCode')}
+                <input data-testid="remote-invite" value={inviteCode} autoComplete="off" onChange={(event) => setInviteCode(event.target.value)} />
+              </label>
+              <button type="submit" data-testid="remote-login">
+                {inviteCode.trim() ? t('registerSubmit') : t('connectServer')}
+              </button>
+              {remoteError ? <p className="error">{remoteError}</p> : null}
+            </form>
+          ) : null}
           {serverUser ? (
+            <>
+              {serverBase ? <p className="hint" data-testid="connected-server">{t('connectedServer')}: {serverBase}</p> : null}
             <div className="button-row">
               <button type="button" data-testid="server-sync" onClick={() => void syncServer()}>
                 {t('syncNow')}
@@ -857,6 +921,7 @@ const Settings = () => {
                 {t('logout')}
               </button>
             </div>
+            </>
           ) : hosted ? (
             <button type="button" data-testid="open-login" onClick={openLogin}>
               {t('loginTitle')}
