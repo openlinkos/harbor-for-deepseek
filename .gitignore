@@ -13,6 +13,7 @@ blob-report
 *.tsbuildinfo
 .idea
 .vscode
+.tmp-e2e
 apps/web/dist
 apps/web/playwright-report
 apps/web/test-results

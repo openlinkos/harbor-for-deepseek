@@ -1,0 +1,53 @@
+# No environment variable is required.
+# `docker compose up` creates the database password and the key-encryption key on the data volume.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: harbor
+      POSTGRES_DB: harbor
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - harbor_data:/data
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        umask 077
+        if [ -n "$${POSTGRES_PASSWORD:-}" ]; then
+          printf '%s' "$$POSTGRES_PASSWORD" > /data/db-password
+        elif [ ! -s /data/db-password ]; then
+          tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 > /data/db-password
+        fi
+        chmod 600 /data/db-password
+        export POSTGRES_PASSWORD="$$(cat /data/db-password)"
+        exec docker-entrypoint.sh postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harbor -d harbor"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  harbor:
+    image: ghcr.io/openlinkos/harbor-for-deepseek:latest
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - harbor_data:/data
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      DB_HOST: db
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  harbor_data:

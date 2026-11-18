@@ -12,3 +12,6 @@ The design notes and the ecosystem notes disagree in a few places. The ecosystem
 8. **Key storage.** Unencrypted keys live in IndexedDB, not `localStorage`. A passphrase uses PBKDF2-SHA-256 (600,000 rounds) and AES-256-GCM. Deleting a chat removes the rows and writes a tombstone so a later sync can propagate the delete without keeping the text.
 9. **CSP.** `script-src` and `style-src` are `'self'`. `style-src-attr 'unsafe-inline'` remains so style attributes work. `unsafe-eval` is not enabled. Mermaid runs with `securityLevel: 'strict'`.
 10. **Replay.** Completed turns are sent back with their stored blocks, including thinking signatures and tool blocks, so a read-link signature is not dropped. Refused and failed turns are not replayed. A refusal clears the streamed text.
+11. **Server mode and the public CSP.** The Pages `_headers` file only allows connections to this origin and `api.deepseek.com`. Logging into a server you host is done by opening that server’s own address. The public static site does not call it. On that address, on-device mode still does not call the server.
+12. **Database.** Postgres is the only server database. There is no SQLite path.
+13. **Proxied safety review.** Every chat the server sends upstream uses `safety_check` level `high`.

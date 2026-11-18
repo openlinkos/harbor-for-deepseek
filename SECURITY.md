@@ -27,6 +27,6 @@ XSS on the public page is equivalent to losing a visitor's key. The build theref
 
 `style-src-attr 'unsafe-inline'` is the one deliberate relaxation. It does not allow inline event handlers or remote scripts.
 
-## Self-hosting later
+## Self-hosting
 
-M2 will store pooled API keys on the operator's server, encrypted at rest. That code is not in this release. When it arrives, backups of the data volume must be treated as copies of those keys, and logs must not record keys or message text.
+The optional server stores pooled API keys with AES-256-GCM. The master key is `DATA_DIR/master.key` (mode 0600) unless `KEY_ENCRYPTION_SECRET` is set. A backup of that file plus the database is a backup of every key. Passwords are scrypt hashes. Session tokens are stored as SHA-256. Logs drop fields whose names look like keys, passwords, or tokens, and they do not record message bodies. Cookie writes require the CSRF value returned at login. Login and registration are rate limited per address.

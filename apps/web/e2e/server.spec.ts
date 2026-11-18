@@ -1,0 +1,58 @@
+import { expect, test } from '@playwright/test'
+import { mkdirSync } from 'node:fs'
+import { join } from 'node:path'
+
+const shots = join(process.cwd(), '../../docs/screenshots')
+mkdirSync(shots, { recursive: true })
+
+test('wizard, admin pool, login, and sync across two profiles', async ({ browser }) => {
+  const adminContext = await browser.newContext()
+  const otherContext = await browser.newContext()
+  const admin = await adminContext.newPage()
+  const other = await otherContext.newPage()
+
+  await admin.goto('/')
+  await expect(admin.getByTestId('setup-wizard')).toBeVisible()
+  await admin.screenshot({ path: join(shots, '08-wizard.png') })
+  await admin.getByTestId('setup-username').fill('ada')
+  await admin.getByTestId('setup-password').fill('correct-horse')
+  await admin.getByTestId('setup-submit').click()
+  await expect(admin.getByTestId('admin')).toBeVisible()
+
+  await admin.getByTestId('admin-key-label').fill('low')
+  await admin.getByTestId('admin-key-secret').fill('low-balance-key')
+  await admin.getByTestId('admin-account-group').fill('low-account')
+  await admin.getByTestId('admin-key-save').click()
+  await expect(admin.getByTestId('admin-key-list')).toContainText('10.00')
+  await expect(admin.getByTestId('admin-alerts')).toContainText('below 50 CNY')
+
+  await admin.getByTestId('admin-key-label').fill('good')
+  await admin.getByTestId('admin-key-secret').fill('good-pool-key')
+  await admin.getByTestId('admin-account-group').fill('healthy')
+  await admin.getByTestId('admin-key-save').click()
+  await expect(admin.getByTestId('admin-key-list')).toContainText('317.22')
+  await admin.screenshot({ path: join(shots, '09-admin.png') })
+  await admin.getByTestId('admin-invite').click()
+  await expect(admin.getByTestId('invite-code')).not.toBeEmpty()
+  await admin.getByRole('button', { name: '关闭' }).click()
+
+  await admin.getByTestId('composer').fill('3加5等于几？')
+  await admin.getByTestId('send').click()
+  await expect(admin.getByTestId('assistant-text')).toContainText('8')
+  await expect(admin.getByTestId('sidebar')).toContainText('简单加法')
+
+  await other.goto('/')
+  await other.getByTestId('open-login').click()
+  await expect(other.getByTestId('server-login')).toBeVisible()
+  await other.screenshot({ path: join(shots, '10-server-login.png') })
+  await other.getByTestId('login-username').fill('ada')
+  await other.getByTestId('login-password').fill('correct-horse')
+  await other.getByTestId('login-submit').click()
+  await expect(other.getByTestId('server-mode')).toBeVisible()
+  await other.getByTestId('settings-open').click()
+  await other.getByTestId('server-sync').click()
+  await expect(other.getByTestId('sidebar')).toContainText('简单加法')
+
+  await adminContext.close()
+  await otherContext.close()
+})

@@ -1,7 +1,7 @@
 /* Harbor shell cache.
  * Same-origin static files only. Never cache or intercept api.deepseek.com.
  */
-const CACHE = 'harbor-shell-v1'
+const CACHE = 'harbor-shell-v2'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting())
@@ -23,6 +23,9 @@ self.addEventListener('fetch', (event) => {
     return
   }
   if (url.hostname === 'api.deepseek.com') {
+    return
+  }
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/anthropic/')) {
     return
   }
   if (event.request.method !== 'GET') {

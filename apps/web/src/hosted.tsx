@@ -1,0 +1,244 @@
+import { translate } from '@harbor/i18n'
+import { useEffect, useState } from 'react'
+import { api } from './remote.js'
+import { useHarbor } from './store.js'
+
+const useT = () => {
+  const locale = useHarbor((state) => state.settings.locale)
+  return (key: Parameters<typeof translate>[1]) => translate(locale, key)
+}
+
+export const SetupWizard = () => {
+  const t = useT()
+  const setupAdmin = useHarbor((state) => state.setupAdmin)
+  const enterLocalMode = useHarbor((state) => state.enterLocalMode)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  return (
+    <main className="gate">
+      <form
+        className="gate-card"
+        data-testid="setup-wizard"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void setupAdmin(username, password).catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+        }}
+      >
+        <p className="eyebrow">Harbor</p>
+        <h1>{t('setupTitle')}</h1>
+        <p className="risk">{t('setupBody')}</p>
+        <label>
+          {t('setupUser')}
+          <input data-testid="setup-username" value={username} onChange={(event) => setUsername(event.target.value)} />
+        </label>
+        <label>
+          {t('setupPassword')}
+          <input data-testid="setup-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+        </label>
+        {error ? <p className="form-error">{error}</p> : null}
+        <button className="primary" data-testid="setup-submit" type="submit">
+          {t('setupSubmit')}
+        </button>
+        <button className="ghost" type="button" onClick={() => enterLocalMode().then(() => useHarbor.setState({ setupRequired: false }))}>
+          {t('useLocal')}
+        </button>
+        <footer className="legal">
+          <p>{t('disclaimer')}</p>
+        </footer>
+      </form>
+    </main>
+  )
+}
+
+export const ServerLogin = () => {
+  const t = useT()
+  const loginServer = useHarbor((state) => state.loginServer)
+  const registerServer = useHarbor((state) => state.registerServer)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
+  const [error, setError] = useState('')
+  return (
+    <main className="gate">
+      <div className="gate-card" data-testid="server-login">
+        <h1>{t('loginTitle')}</h1>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            void loginServer(username, password).catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+          }}
+        >
+          <label>
+            {t('loginUser')}
+            <input data-testid="login-username" value={username} onChange={(event) => setUsername(event.target.value)} />
+          </label>
+          <label>
+            {t('loginPassword')}
+            <input data-testid="login-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          </label>
+          {error ? <p className="form-error">{error}</p> : null}
+          <button className="primary" data-testid="login-submit" type="submit">
+            {t('loginSubmit')}
+          </button>
+        </form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            void registerServer(code, username, password).catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+          }}
+        >
+          <h2>{t('registerTitle')}</h2>
+          <label>
+            {t('registerCode')}
+            <input data-testid="register-code" value={code} onChange={(event) => setCode(event.target.value)} />
+          </label>
+          <button className="ghost" data-testid="register-submit" type="submit">
+            {t('registerSubmit')}
+          </button>
+        </form>
+        <footer className="legal">
+          <p>{t('disclaimer')}</p>
+        </footer>
+      </div>
+    </main>
+  )
+}
+
+type KeyInfo = { id: string; label: string; last4: string; balanceCny: string | null; status: string; accountGroup: string }
+type AlertInfo = { id: string; message: string }
+type UserInfo = { id: string; username: string; role: string; tokenQuota: number; searchQuota: number; pageQuota: number }
+
+export const AdminScreen = () => {
+  const t = useT()
+  const openAdmin = useHarbor((state) => state.openAdmin)
+  const [keys, setKeys] = useState<KeyInfo[]>([])
+  const [alerts, setAlerts] = useState<AlertInfo[]>([])
+  const [users, setUsers] = useState<UserInfo[]>([])
+  const [label, setLabel] = useState('primary')
+  const [secret, setSecret] = useState('')
+  const [accountGroup, setAccountGroup] = useState('')
+  const [invite, setInvite] = useState('')
+  const [error, setError] = useState('')
+
+  const reload = async () => {
+    const keyBody = await api<{ keys: KeyInfo[] }>('/api/admin/keys')
+    const alertBody = await api<{ alerts: AlertInfo[] }>('/api/admin/alerts')
+    const userBody = await api<{ users: UserInfo[] }>('/api/admin/users')
+    setKeys(keyBody.keys)
+    setAlerts(alertBody.alerts)
+    setUsers(userBody.users)
+  }
+
+  useEffect(() => {
+    void reload().catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+  }, [])
+
+  return (
+    <main className="gate">
+      <div className="gate-card admin-card" data-testid="admin">
+        <header className="topbar">
+          <h1>{t('adminTitle')}</h1>
+          <button className="ghost" type="button" onClick={() => openAdmin(false)}>
+            {t('close')}
+          </button>
+        </header>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            void api('/api/admin/keys', {
+              method: 'POST',
+              body: JSON.stringify({ label, secret, accountGroup: accountGroup || undefined }),
+            })
+              .then(() => {
+                setSecret('')
+                return reload()
+              })
+              .catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+          }}
+        >
+          <h2>{t('addKey')}</h2>
+          <label>
+            {t('keyLabel')}
+            <input data-testid="admin-key-label" value={label} onChange={(event) => setLabel(event.target.value)} />
+          </label>
+          <label>
+            {t('keySecret')}
+            <input data-testid="admin-key-secret" type="password" value={secret} onChange={(event) => setSecret(event.target.value)} />
+          </label>
+          <label>
+            {t('accountGroup')}
+            <input data-testid="admin-account-group" value={accountGroup} onChange={(event) => setAccountGroup(event.target.value)} />
+          </label>
+          <button className="primary" data-testid="admin-key-save" type="submit">
+            {t('addKey')}
+          </button>
+        </form>
+        <ul className="usage-grid" data-testid="admin-key-list">
+          {keys.map((key) => (
+            <li key={key.id}>
+              {key.label} ····{key.last4} · {t('keyBalance')} {key.balanceCny ?? '—'} · {key.status}
+              {key.accountGroup ? ` · ${key.accountGroup}` : ''}
+            </li>
+          ))}
+        </ul>
+        <h2>{t('alerts')}</h2>
+        <ul data-testid="admin-alerts">
+          {alerts.map((alert) => (
+            <li key={alert.id}>{alert.message}</li>
+          ))}
+        </ul>
+        <button
+          className="ghost"
+          type="button"
+          data-testid="admin-invite"
+          onClick={() => {
+            void api<{ code: string }>('/api/admin/invites', { method: 'POST', body: JSON.stringify({ maxUses: 5 }) }).then((result) =>
+              setInvite(result.code),
+            )
+          }}
+        >
+          {t('inviteCreate')}
+        </button>
+        {invite ? <p data-testid="invite-code">{invite}</p> : null}
+        <h2>{t('quotaSave')}</h2>
+        {users.map((user) => (
+          <form
+            key={user.id}
+            onSubmit={(event) => {
+              event.preventDefault()
+              const data = new FormData(event.currentTarget)
+              void api(`/api/admin/users/${user.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                  tokenQuota: Number(data.get('tokens')),
+                  searchQuota: Number(data.get('searches')),
+                  pageQuota: Number(data.get('pages')),
+                }),
+              }).then(() => reload())
+            }}
+          >
+            <strong>{user.username}</strong> ({user.role})
+            <label>
+              tokens
+              <input name="tokens" defaultValue={user.tokenQuota} />
+            </label>
+            <label>
+              searches
+              <input name="searches" defaultValue={user.searchQuota} />
+            </label>
+            <label>
+              pages
+              <input name="pages" defaultValue={user.pageQuota} />
+            </label>
+            <button type="submit">{t('quotaSave')}</button>
+          </form>
+        ))}
+        {error ? <p className="form-error">{error}</p> : null}
+        <footer className="legal">
+          <p>{t('disclaimer')}</p>
+        </footer>
+      </div>
+    </main>
+  )
+}

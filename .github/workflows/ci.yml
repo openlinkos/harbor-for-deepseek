@@ -9,6 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TURBO_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgres://harbor:harbor@localhost:5432/harbor
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: harbor
+          POSTGRES_PASSWORD: harbor
+          POSTGRES_DB: harbor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U harbor -d harbor"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -26,3 +41,11 @@ jobs:
       - run: pnpm build
       - run: pnpm --filter @harbor/web exec playwright install --with-deps chromium
       - run: pnpm e2e
+      - run: pnpm --filter @harbor/server build
+      - run: pnpm e2e:server
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f deploy/Dockerfile -t harbor:ci .

@@ -1,0 +1,9 @@
+.git
+node_modules
+**/node_modules
+**/dist
+**/.turbo
+docs/screenshots
+playwright-report
+test-results
+*.log

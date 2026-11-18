@@ -26,6 +26,8 @@ const useT = () => {
 export const KeyGate = () => {
   const t = useT()
   const locked = useHarbor((state) => state.locked)
+  const hosted = useHarbor((state) => state.hosted)
+  const openLogin = useHarbor((state) => state.openLogin)
   const saveKey = useHarbor((state) => state.saveKey)
   const unlock = useHarbor((state) => state.unlock)
   const setLocale = useHarbor((state) => state.setLocale)
@@ -117,6 +119,11 @@ export const KeyGate = () => {
             </button>
           </form>
         )}
+        {hosted ? (
+          <button className="ghost" type="button" data-testid="open-login" onClick={openLogin}>
+            {t('loginTitle')}
+          </button>
+        ) : null}
         <footer className="legal">
           <p>{t('disclaimer')}</p>
           <p>{t('disclaimerLong')}</p>
@@ -371,6 +378,12 @@ export const Shell = () => {
             {t('menu')}
           </button>
           <h2>{conversation?.title || t('newChat')}</h2>
+          {state.serverMode ? <span data-testid="server-mode">{t('serverChat')}</span> : null}
+          {state.serverUser?.role === 'admin' ? (
+            <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>
+              {t('adminTitle')}
+            </button>
+          ) : null}
           <button className="ghost" data-testid="settings-open" type="button" onClick={() => state.setSettingsOpen(true)}>
             {t('settings')}
           </button>
@@ -606,6 +619,15 @@ const Settings = () => {
   const importZip = useHarbor((state) => state.importZip)
   const clearKey = useHarbor((state) => state.clearKey)
   const setSettingsOpen = useHarbor((state) => state.setSettingsOpen)
+  const hosted = useHarbor((state) => state.hosted)
+  const serverUser = useHarbor((state) => state.serverUser)
+  const serverMode = useHarbor((state) => state.serverMode)
+  const syncServer = useHarbor((state) => state.syncServer)
+  const copyLocalToServer = useHarbor((state) => state.copyLocalToServer)
+  const enterLocalMode = useHarbor((state) => state.enterLocalMode)
+  const enterServerMode = useHarbor((state) => state.enterServerMode)
+  const logoutServer = useHarbor((state) => state.logoutServer)
+  const openLogin = useHarbor((state) => state.openLogin)
   const totals = useHarbor((state) => state.totals)
   const [asCopy, setAsCopy] = useState(false)
   const [nextKey, setNextKey] = useState('')
@@ -765,6 +787,26 @@ const Settings = () => {
         <section>
           <h3>{t('serverTitle')}</h3>
           <p>{t('serverBody')}</p>
+          {serverUser ? (
+            <div className="button-row">
+              <button type="button" data-testid="server-sync" onClick={() => void syncServer()}>
+                {t('syncNow')}
+              </button>
+              <button type="button" data-testid="copy-local" onClick={() => void copyLocalToServer()}>
+                {t('copyLocal')}
+              </button>
+              <button type="button" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>
+                {serverMode ? t('useLocal') : t('useServer')}
+              </button>
+              <button type="button" onClick={() => void logoutServer()}>
+                {t('logout')}
+              </button>
+            </div>
+          ) : hosted ? (
+            <button type="button" data-testid="open-login" onClick={openLogin}>
+              {t('loginTitle')}
+            </button>
+          ) : null}
         </section>
         <section>
           <h3>{t('about')}</h3>

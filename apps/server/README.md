@@ -1,7 +1,11 @@
-# apps/server
+# Harbor server
 
-Reserved for milestone M2. Not implemented.
+Optional self-hosted backend. Postgres is the only database.
 
-M2 is a self-hosted backend the operator runs for themselves and people they invite: Docker Compose, PostgreSQL, a first-run admin wizard, an admin-held key pool, invite accounts, quotas, and incremental sync. There is no public Harbor chat backend. The static site does not point at one.
+```bash
+docker compose up
+```
 
-The browser storage in `packages/storage` already keeps `rev`, `updatedAt`, and tombstones so that backend can sync later without a second local schema. See `mergeSnapshot`.
+No environment variable is required. The wizard, key pool, invites, quotas, and sync are described in [docs/self-host.md](../../docs/self-host.md) and [docs/self-host.zh-CN.md](../../docs/self-host.zh-CN.md).
+
+The image listens on port 8080 and serves the web app plus `/api`. Upstream keys stay on the server.
