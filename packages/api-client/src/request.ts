@@ -26,7 +26,42 @@ export const clampExpireSeconds = (days: number): number => {
 
 export const HARBOR_SYSTEM_PROMPT =
   'You are a helpful assistant inside Harbor, an unofficial community client. ' +
-  'Reply in the language the user writes in. Do not claim to be an official product, a partner, or a support agent.'
+  'Reply in the language the user writes in, and reason in that same language. ' +
+  'Do not claim to be an official product, a partner, or a support agent.'
+
+const ZH_SYSTEM_PROMPT =
+  '你是 Harbor 里的助手。Harbor 是非官方社区客户端，与深度求索无隶属或合作关系。' +
+  '请使用用户书写的语言回答，思考过程也使用同一种语言。' +
+  '不要声称自己是官方产品、合作伙伴或客服。'
+
+const timeZoneOrDefault = (timeZone: string | undefined): string => {
+  if (!timeZone) {
+    return 'Asia/Shanghai'
+  }
+  try {
+    new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date())
+    return timeZone
+  } catch {
+    return 'Asia/Shanghai'
+  }
+}
+
+/** Date and time go in the system prompt so “today” is not a guess. Chinese UI gets a Chinese prompt. */
+export const harborSystemPrompt = (input: { locale?: string; timeZone?: string; now?: Date } = {}): string => {
+  const timeZone = timeZoneOrDefault(input.timeZone)
+  const now = input.now ?? new Date()
+  const stamp = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(now)
+  const base = input.locale === 'zh' ? ZH_SYSTEM_PROMPT : HARBOR_SYSTEM_PROMPT
+  return `${base} Current date and time: ${stamp} (${timeZone}). Use this when the user says today or now.`
+}
 
 export type TurnOptions = {
   model: ChatModel
@@ -37,6 +72,9 @@ export type TurnOptions = {
   safetyLevel: SafetyLevel
   requestTitle: boolean
   messages: Message[]
+  locale?: 'zh' | 'en'
+  timeZone?: string
+  now?: Date
 }
 
 const replayAssistant = (message: Message): ApiContentBlock[] => {
@@ -123,7 +161,7 @@ export const buildRequest = (options: TurnOptions): CreateMessageBody => {
   return {
     model: options.model,
     stream: true,
-    system: HARBOR_SYSTEM_PROMPT,
+    system: harborSystemPrompt({ locale: options.locale, timeZone: options.timeZone, now: options.now }),
     messages: toApiMessages(options.messages),
     thinking: { type: options.thinking ? 'enabled' : 'disabled' },
     ...(tools.length ? { tools } : {}),

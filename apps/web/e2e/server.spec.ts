@@ -40,6 +40,11 @@ test('wizard, admin pool, login, and sync across two profiles', async ({ browser
   await admin.getByTestId('send').click()
   await expect(admin.getByTestId('assistant-text')).toContainText('8')
   await expect(admin.getByTestId('sidebar')).toContainText('简单加法')
+  await expect(admin.getByTestId('total-usage')).toContainText('41')
+  await admin.getByTestId('settings-open').click()
+  await expect(admin.getByTestId('quota')).toContainText('74')
+  await expect(admin.getByTestId('settings-dialog')).not.toContainText('当前 Key 只保存在本机')
+  await admin.getByRole('button', { name: '关闭' }).click()
 
   await other.goto('/')
   await other.getByTestId('open-login').click()

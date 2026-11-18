@@ -1,3 +1,4 @@
+export { CONTENT_SECURITY_POLICY } from './csp.js'
 export { ApiClientError, createClient } from './client.js'
 export type { ClientOptions, FetchLike, HarborClient } from './client.js'
 export {
@@ -9,6 +10,7 @@ export {
   FILE_EXPIRE_MIN_SECONDS,
   FILES_BETA,
   HARBOR_SYSTEM_PROMPT,
+  harborSystemPrompt,
   purposeForFile,
   toApiMessages,
 } from './request.js'

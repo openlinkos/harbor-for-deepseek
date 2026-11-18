@@ -7,10 +7,11 @@ Harbor’s public site is only the static on-device app. This server is optional
 From the repository:
 
 ```bash
+docker compose pull
 docker compose up -d
 ```
 
-No environment variable is required. The first start writes a database password and a 32-byte encryption key into the `harbor_data` volume. Open <http://localhost:8080>. The first page creates the admin account. Then add one or more DeepSeek API keys in the admin screen. Keys are encrypted at rest and are never sent back to the browser.
+Compose pulls `ghcr.io/openlinkos/harbor-for-deepseek` (and Postgres). It does not build the image unless you pass `--build`. No environment variable is required. The first start writes a database password and a 32-byte encryption key into the `harbor_data` volume. Open <http://localhost:8080>. The first page creates the admin account. Then add one or more DeepSeek API keys in the admin screen. Keys are encrypted at rest and are never sent back to the browser.
 
 Create an invite code and give it to a friend. They register on the same address. Chat from a logged-in browser uses the key pool. The on-device mode is still available from “Use a key on this device” and does not call the server.
 
@@ -31,7 +32,8 @@ Uploaded files expire on the official side after 7 days.
 | `DEEPSEEK_API_ORIGIN` | Upstream API origin. Default `https://api.deepseek.com`. |
 | `STATIC_DIR` | Built web files. The image sets `/app/public`. |
 | `PUBLIC_URL` | The address you tell people to open. Not required for cookies on the same host. |
-| `TRUST_PROXY` | Set to `1` behind a TLS proxy so the session cookie is marked Secure. |
+| `TRUST_PROXY` | Set to `1` behind a TLS proxy so the session cookie is marked Secure, and so HSTS is sent when `X-Forwarded-Proto` is `https`. |
+| `HARBOR_HSTS` | Set to `1` to send HSTS on every response, including plain HTTP. Otherwise HSTS is sent only for HTTPS requests. |
 | `LOG_LEVEL` | Accepted for operators. Logs never include keys, passwords, or session tokens. |
 
 ## Quotas, balance, and failover
@@ -40,7 +42,9 @@ Each person defaults to 2,000,000 tokens, 100 billed searches (`tool_search` plu
 
 The pool prefers active keys with a lower priority number, then the one least recently used. A 401 marks that key as an error. A 402 or an unavailable balance marks it exhausted. A 429 tries a key in a different account group. Keys from the same DeepSeek account share a balance, so give them the same account group or failover will not help. A balance under 50 CNY raises an in-app alert. The admin can change that threshold.
 
-`safety_check` is `high` on every proxied chat.
+`safety_check` is `high` on every proxied chat. The system prompt includes the current date and time (Asia/Shanghai unless the browser sends another zone) so questions about today are not a guess.
+
+The server sends the same security headers as the public site: `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, and the Content-Security-Policy as a real header (`frame-ancestors` is not left only in a meta tag). HSTS is included when the request is HTTPS, when `TRUST_PROXY=1` and `X-Forwarded-Proto` is `https`, or when `HARBOR_HSTS=1`.
 
 ## Backup and upgrade
 

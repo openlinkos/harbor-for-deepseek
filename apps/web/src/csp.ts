@@ -1,4 +1,4 @@
-/** Single source for the meta CSP. Hosting headers should repeat this policy. */
+/** Single source for the meta CSP. Hosting headers and the self-hosted server should repeat this policy. */
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self'",

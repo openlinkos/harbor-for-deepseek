@@ -138,8 +138,14 @@ textarea { resize: vertical; min-height: 64px; }
 }
 .thinking button { background: none; border: 0; color: var(--amber); padding: 0 0 6px; }
 .thinking-preview { color: var(--muted); margin: 0; }
-.sources { list-style: none; padding: 0; display: grid; gap: 8px; }
-.sources li { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.sources { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; }
+.sources summary { cursor: pointer; color: var(--muted); }
+.sources ul { list-style: none; padding: 8px 0 0; display: grid; gap: 8px; }
+.sources li { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.key-list { list-style: none; padding: 0; display: grid; gap: 8px; }
+.key-row { display: grid; grid-template-columns: minmax(5rem, 1.2fr) auto auto auto minmax(5rem, 1fr); gap: 8px 14px; align-items: center; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.ledger { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ledger th, .ledger td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 .sources a { display: grid; text-decoration: none; }
 .sources span, .tool-line { color: var(--muted); font-size: 13px; }
 .citations { font-size: 13px; }

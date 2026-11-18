@@ -7,10 +7,11 @@
 在仓库目录：
 
 ```bash
+docker compose pull
 docker compose up -d
 ```
 
-不需要任何环境变量。第一次启动会在 `harbor_data` 卷里写入数据库口令和 32 字节加密主密钥。打开 <http://localhost:8080>，首页创建管理员，然后在管理页添加一把或多把 DeepSeek API Key。Key 加密后落库，不会再发给浏览器。
+Compose 会拉取 `ghcr.io/openlinkos/harbor-for-deepseek` 和 Postgres。不加 `--build` 就不会在本地构建。不需要任何环境变量。第一次启动会在 `harbor_data` 卷里写入数据库口令和 32 字节加密主密钥。打开 <http://localhost:8080>，首页创建管理员，然后在管理页添加一把或多把 DeepSeek API Key。Key 加密后落库，不会再发给浏览器。
 
 生成邀请码给朋友。他们在同一个地址注册。登录后的对话使用 Key 池。仍然可以选「改用本机 Key」，那条路径不访问这台服务器。
 
@@ -31,7 +32,8 @@ docker compose up -d
 | `DEEPSEEK_API_ORIGIN` | 上游 API 地址，默认 `https://api.deepseek.com`。 |
 | `STATIC_DIR` | 网页构建目录。镜像里是 `/app/public`。 |
 | `PUBLIC_URL` | 你告诉别人打开的地址。同一台主机上的 Cookie 不依赖它。 |
-| `TRUST_PROXY` | 设为 `1` 时，在 TLS 反向代理后面把会话 Cookie 标成 Secure。 |
+| `TRUST_PROXY` | 设为 `1` 时，在 TLS 反向代理后面把会话 Cookie 标成 Secure；并且当 `X-Forwarded-Proto` 为 `https` 时发送 HSTS。 |
+| `HARBOR_HSTS` | 设为 `1` 时，包括明文 HTTP 在内的每个响应都带 HSTS。否则只有 HTTPS 请求才带。 |
 | `LOG_LEVEL` | 供运维使用。日志不记录 Key、密码或会话令牌。 |
 
 ## 额度、余额和切换
@@ -40,7 +42,9 @@ docker compose up -d
 
 Key 池先取优先级数字更小、且状态正常的，再取最久没用的。401 标成错误。402 或余额不可用标成耗尽。429 会换一个不同账户分组的 Key。同一个 DeepSeek 账户下的多把 Key 共用余额，所以它们应该填同一个账户分组，否则切换没有意义。余额低于 50 元会在管理页提醒。这个阈值可以改。
 
-经服务器转发的对话一律带 `safety_check: high`。
+经服务器转发的对话一律带 `safety_check: high`。系统提示里带有当前日期和时间（默认 Asia/Shanghai，浏览器也可以带上自己的时区），这样问“今天”不会猜错日子。
+
+服务器会发出和公开站一样的安全头：`nosniff`、`Referrer-Policy`、`X-Frame-Options`、`Permissions-Policy`，以及作为真正响应头的内容安全策略（`frame-ancestors` 不再只放在 meta 里）。请求本身是 HTTPS、或 `TRUST_PROXY=1` 且 `X-Forwarded-Proto` 为 `https`、或设置了 `HARBOR_HSTS=1` 时，才会带 HSTS。
 
 ## 备份和升级
 

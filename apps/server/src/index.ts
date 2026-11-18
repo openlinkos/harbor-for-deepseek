@@ -47,6 +47,13 @@ const databaseUrl = async (): Promise<string> => {
   throw new Error('database password was not ready')
 }
 
+process.on('uncaughtException', (error) => {
+  log('error', 'uncaught exception', { name: error instanceof Error ? error.name : 'error' })
+})
+process.on('unhandledRejection', (reason) => {
+  log('error', 'unhandled rejection', { name: reason instanceof Error ? reason.name : 'error' })
+})
+
 const main = async () => {
   const server = await createServer({
     databaseUrl: await databaseUrl(),
@@ -54,6 +61,7 @@ const main = async () => {
     upstream: process.env.DEEPSEEK_API_ORIGIN,
     staticDir: process.env.STATIC_DIR,
     trustProxy: process.env.TRUST_PROXY === '1',
+    hsts: process.env.HARBOR_HSTS === '1',
   })
   if (process.env.E2E_RESET === '1') {
     await server.sql.unsafe(`
