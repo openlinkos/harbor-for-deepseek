@@ -57,6 +57,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<'chart' | 'code'>('chart')
   const [zoom, setZoom] = useState(1)
+  const [menu, setMenu] = useState(false)
   useEffect(() => {
     let cancelled = false
     setFailed(false)
@@ -100,9 +101,21 @@ const Mermaid = ({ chart }: { chart: string }) => {
           <button type="button" role="tab" aria-selected={tab === 'code'} className={tab === 'code' ? 'on' : ''} onClick={() => setTab('code')}>{label('代码', 'Code')}</button>
         </div>
         <div className="diagram-tools">
-          <button type="button" aria-label={label('缩小', 'Zoom out')} onClick={() => setZoom((value) => Math.max(0.5, Number((value - 0.1).toFixed(2))))}>−</button>
-          <button type="button" aria-label={label('放大', 'Zoom in')} onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}>+</button>
-          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>{label('下载', 'Download')}</button>
+          {tab === 'chart' ? (
+            <>
+              <button type="button" aria-label={label('缩小', 'Zoom out')} onClick={() => setZoom((value) => Math.max(0.5, Number((value - 0.1).toFixed(2))))}>−</button>
+              <button type="button" aria-label={label('放大', 'Zoom in')} onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}>+</button>
+            </>
+          ) : (
+            <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>{label('复制', 'Copy')}</button>
+          )}
+          <button type="button" aria-label={label('下载', 'Download')} onClick={() => setMenu((value) => !value)}>{label('下载', 'Download')}</button>
+          {menu ? (
+            <div className="menu diagram-menu">
+              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 SVG', 'Download SVG')}</button>
+              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 PNG', 'Download PNG')}</button>
+            </div>
+          ) : null}
           <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => void card.current?.requestFullscreen?.()}>{label('全屏', 'Full screen')}</button>
         </div>
       </div>
@@ -141,10 +154,10 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
               })
             }}
           >
-            {copied ? label('已复制', 'Copied') : label('复制', 'Copy')}
+            {copied ? '✓ ' : ''}{label('复制', 'Copy')}
           </button>
-          <button type="button" onClick={download}>
-            {label('下载', 'Download')}
+          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
+            ↓
           </button>
         </span>
       </div>

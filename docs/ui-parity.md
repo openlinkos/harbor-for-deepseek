@@ -1,37 +1,27 @@
-# UI parity audit
+# UI parity
 
-Source of sizes and tokens: `hfd-ref/official-dump/home_files/main.dc093a796f.css` (logged-in chat.deepseek.com). Brand stays the Harbor mark, the “Harbor for DeepSeek” wordmark, and accent `#3964fe` (the same blue the official sheet names `--dsw-static-deepseek-500`). No whale, no DeepSeek wordmark font.
+Sizes and motion come from `official-dump/home_files/main.dc093a796f.css`. Brand stays the Harbor mark, the “Harbor for DeepSeek” wordmark, and accent `#3964fe` (`--dsw-static-deepseek-500`). No whale, no DeepSeek wordmark font.
 
-Official component dump HTML was not in the folder yet. States below that are not in the provided screenshots are marked **need capture**.
+Side-by-side frames for the logged-in stills are in `docs/parity/compare/`. Ours are `docs/parity/ours/<state>.png`. Behavior details follow `official-dump/behavior-spec.md`: sidebar 261px and a 0.3s collapse, Ctrl+J on 开启新对话, inline user edit, `n / m` beside the six actions, a 反馈 dialog, 朗读 busy state, code header 复制, mermaid 下载 SVG/PNG, and 已选择 N 个对话. Mobile, offline, and the stop aftermath use the same tokens where the spec says the live site was not observed.
 
-| Surface | Official | Ours before | Fix |
-| --- | --- | --- | --- |
-| Empty home | Mark + 「你好，有什么我能帮你的吗？」 | 「从这里开始？」 | Greeting string updated |
-| Composer defaults | 深度思考 and 智能搜索 both on, blue outline pills, height 34px | Search off, extra effort chevron, filled chips | Both default on and persisted; chevron removed; 34px outline chips |
-| Placeholder | 「给 DeepSeek 发送消息」 | 「发送消息」 | Official wording; brand stays in the wordmark |
-| Composer focus | No inner blue rectangle | Browser outline possible | Textarea focus outline removed |
-| Card radius | Large radius, soft shadow | 24px | Kept 24px to match prior official close-up |
-| Attachment + send | Paperclip,  round send, pale when empty | Present | Unchanged geometry |
-| Conversation footnote | 「内容由 AI 生成，请仔细甄别」 under the composer only | Missing | Added; legal footer unchanged |
-| Thinking | One 「已思考（用时 N 秒）」 timeline: reasoning, 「搜索到 N 个网页」, 「浏览 N 个页面」 chips | Several thinking blocks and raw 「打开了页面」 lines | One timeline per turn |
-| Citations | Small gray circles in the sentence | `〔n〕` appended, breaking lists into empty bullets | Inline `(n)` / `[n]` / `〔n〕` become circles; nothing appended |
-| Answer actions | Copy, regenerate, like, dislike, read aloud, share, plus 「N 个网页」 | No read-aloud; usage line visible on hover | Read aloud added; usage moved into an info tooltip; pill kept |
-| User bubble | Rounded, right aligned, gray in dark (`#2c2c2e`) | Token bubble, actions hidden on desktop | Actions shown; dark bubble already `#2c2c2e` |
-| Stop | Square stop while streaming | Present | Unchanged |
-| Scroll to bottom | Round chevron above the composer | Present on mobile | Unchanged |
-| Title bar | Title left, share right | Share only on small screens | Share shown on desktop |
-| Sidebar new chat | 「开启新对话」, plus in a circle, 40px pill | 「新对话」 | Label and icon updated |
-| Groups | 今天 / 30 天内 / YYYY-MM | Also a 7-day group | 7-day group removed |
-| Row hover menu | Rename, delete, pin | Rename, delete | Pin **need capture** of the menu |
-| Search dialog | Command-style search | Filter field in the sidebar | **need capture** |
-| Settings | Centered 「系统设置」, ~860px, radius 24px, left nav, theme tiles, pill rows, X | Tall stacked panel, native buttons | Rebuilt: 通用设置 / 账号管理 / 数据管理 / 服务协议 |
-| User menu | Settings and account actions | Present | Unchanged structure |
-| Light / dark | Page `#fff` / `#151517`, brand `#3964fe`, bubble `#edf3fe` / `#2c2c2e`, sidebar `#f9fafb` / `#1b1b1c` | Navy page and Tailwind blue | Tokens now follow `main.dc093a796f.css` (no brand font) |
-| Mobile drawer | Same chrome, bottom sheets | Present | Unchanged shell; chips and copy follow desktop |
-| Toasts / empty / skeletons | Official toast radius 12px | Basic toast | **need capture** of empty, error, and skeleton |
-| Error and retry | Retry on the failed turn | Error text only | **need capture** |
-| Regenerate versions | ‹ n/m › | Present when siblings exist | **need capture** |
-| Code, tables, math | Code radius 12px, table 15px/25px | Present | **need capture** of a code block and a table |
-| Loading | Skeleton heights from control tokens | None | **need capture** |
+| State | Official | Harbor |
+| --- | --- | --- |
+| Home, dark, both tools on | Centered mark and greeting, grey composer, outlined chips, round send | Same layout. Empty history says 「你好，有什么我能帮你的吗？」. Returning to a new chat says 「欢迎回来，随时开始吧」 |
+| Home, light | White page, pale composer, blue selected chips | Same tokens: bubble `#edf3fe`, page white, sidebar `#f9fafb` |
+| Composer focus | No inner blue rectangle | Textarea outline removed |
+| Settings general | Centered ~860px, radius 24px, left nav, three theme tiles, language and voice pills | Same shell. Language is 简体中文 / English. Voice is 默认 plus the Web Speech voices |
+| Settings account / data / agreement | Left nav switches the pane | 账号管理, 数据管理, 服务协议. Legal footer lives here and on the key gate, not in the sidebar |
+| User menu | 下载手机应用, 系统设置, 帮助与反馈, 退出登录 | 下载应用 (GitHub releases), 系统设置, 帮助与反馈 (GitHub issues). Local mode uses 从本机移除 Key instead of 退出登录. Server mode keeps 退出登录 |
+| Search | Centered pill 「搜索对话内容...」 | Same pill, opened from the sidebar search icon or Ctrl/Cmd+K |
+| Sidebar item menu | 重命名, 置顶, 分享, 多选, 删除 | Same five. Share downloads Markdown. Multi-select deletes the checked rows |
+| Streaming | Square stop in the send slot | Stop button while the request is in flight |
+| Thinking | One timeline, chevron, 0.2s grid collapse | Same. Search and browse steps sit inside it |
+| User bubble | Grey in dark (`#2c2c2e`), radius 22px. Copy and edit on hover | Same. Touch layout keeps the icons visible |
+| Table, math, code | Table 15px/25px, KaTeX, code radius 12px, 13px/22px, copy and download | Same. Box-drawing stays in a pre with letter-spacing normal/0 |
+| Mermaid | 图表 / 代码, zoom, 下载, 全屏 | Lazy-loaded card with those controls |
+| Action row | Six 28×28 icons on a 38px pitch. Tooltips after a short delay | 复制, 重新生成, 喜欢, 不喜欢, 朗读, 分享. Pitch is 38px. Likes stay in `localStorage`. Read-aloud uses the chosen voice. Share downloads Markdown |
+| Sources | 「N 个网页」 pill opens the results panel | Same pill and panel |
+| Motion | 0.1s / 0.2s / 0.3s, dialog scale 0.8, sidebar flex-basis 0.2s | Matched. `prefers-reduced-motion` collapses durations to 0.01ms |
+| Scroll | Follows the stream until you move up, then a round jump button | Same |
 
-Official screenshots still needed: sidebar item menu (pin), chat search dialog, a failed send with retry, a code block, a table, an empty sidebar, and the light-theme user bubble.
+Native `<select>` menus are the platform dropdown. The closed control is the pill from the stylesheet.

@@ -56,3 +56,17 @@ The composer addresses Harbor, not DeepSeek. That is the product name. Everythin
 | 46 | Action row | Six icons and no token line under the answer | `action row` |
 | 47 | Disclaimer | Conversations show 「内容由 AI 生成，请仔细甄别」 | `disclaimer` |
 | 48 | Reduced motion | The stylesheet short-circuits animation when requested | `reduced motion` |
+| 49 | Returning home | 「欢迎回来，想从哪里开始？」 when history exists | `welcome back` |
+| 50 | New-chat hint | The button shows Ctrl J and Ctrl/Cmd+J starts a chat | `keyboard and search` |
+| 51 | Sidebar width and collapse | 261px, collapse over 0.3s | `sidebar motion` |
+| 52 | Inline edit | The user bubble becomes an editor with 取消 and 发送 | `edit and copy` |
+| 53 | Version label | `n / m` sits with the six actions | `versions` |
+| 54 | Dislike feedback | 不喜欢 opens 反馈 with the four chips | `feedback` |
+| 55 | Read aloud loading | 朗读 sets aria-busy while speaking | `read aloud` |
+| 56 | Code header | 复制 stays labeled and download is an icon | `markdown surfaces` |
+| 57 | Mermaid download | 图表 tab can open 下载 SVG / 下载 PNG; 代码 tab hides zoom | `mermaid card` |
+| 58 | Multi-select count | Header reads 已选择 N 个对话 | `sidebar` |
+| 59 | Data settings | 导出所有历史对话, 删除所有对话, and the local improve toggle | `data settings` |
+| 60 | Search dialog | Centered 「搜索对话内容...」 filters titles | `keyboard and search` |
+| 61 | Stop aftermath | Stop leaves 已停止 and the composer usable | `stream and stop` |
+| 62 | Groups | 置顶 / 今天 / 昨天 / 30 天内 / YYYY-MM | `date groups` |

@@ -112,6 +112,7 @@ export type HarborState = {
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
   regenerate: (assistantId: string) => Promise<void>
+  editUser: (messageId: string, text: string) => Promise<void>
   stop: () => void
   refreshBalance: () => Promise<void>
   addFiles: (files: File[]) => Promise<void>
@@ -519,6 +520,22 @@ export const useHarbor = create<HarborState>((set, get) => ({
     await runTurn('', assistant.parentId)
   },
 
+  async editUser(messageId, text) {
+    const message = get().messages.find((item) => item.id === messageId)
+    const trimmed = text.trim()
+    if (!message || message.role !== 'user' || !trimmed || get().streaming) {
+      return
+    }
+    if (get().serverMode) {
+      await runServerTurn(trimmed, message.parentId)
+      return
+    }
+    if (!get().key) {
+      return
+    }
+    await runTurn(trimmed, undefined, message.parentId)
+  },
+
   stop() {
     abort?.abort()
     serverAbort?.abort()
@@ -827,7 +844,7 @@ const applyImport = async (
   useHarbor.setState({ notice: `${plan.added}:${plan.skipped}`, booted: true })
 }
 
-const runTurn = async (text: string, regenerateParent?: string | null) => {
+const runTurn = async (text: string, regenerateParent?: string | null, branchFrom?: string | null) => {
   const state = useHarbor.getState()
   const key = state.key
   if (!key) {
@@ -846,6 +863,9 @@ const runTurn = async (text: string, regenerateParent?: string | null) => {
   if (regenerateParent !== undefined) {
     parentId = regenerateParent
   } else {
+    if (branchFrom !== undefined) {
+      parentId = branchFrom
+    }
     const user: Message = {
       id: nid(),
       conversationId: conversation.id,

@@ -286,6 +286,34 @@ const ThemeSwitch = () => {
   )
 }
 
+const VoiceSelect = () => {
+  const t = useT()
+  const [name, setName] = useState(() => localStorage.getItem('harbor-voice') || '')
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  useEffect(() => {
+    const load = () => setVoices(window.speechSynthesis?.getVoices?.() ?? [])
+    load()
+    window.speechSynthesis?.addEventListener?.('voiceschanged', load)
+    return () => window.speechSynthesis?.removeEventListener?.('voiceschanged', load)
+  }, [])
+  return (
+    <select
+      data-testid="voice-select"
+      aria-label={t('voice')}
+      value={name}
+      onChange={(event) => {
+        setName(event.target.value)
+        localStorage.setItem('harbor-voice', event.target.value)
+      }}
+    >
+      <option value="">{t('voiceDefault')}</option>
+      {voices.map((voice) => (
+        <option key={voice.name} value={voice.name}>{voice.name}</option>
+      ))}
+    </select>
+  )
+}
+
 const LanguageSwitch = ({ locale, onChange }: { locale: Locale; onChange: (locale: Locale) => void }) => (
   <div className="lang" role="group" aria-label="language">
     <button type="button" className={locale === 'zh' ? 'on' : ''} aria-pressed={locale === 'zh'} onClick={() => onChange('zh')}>
@@ -544,9 +572,14 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
   const messages = useHarbor((state) => state.messages)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
+  const editUser = useHarbor((state) => state.editUser)
   const streaming = useHarbor((state) => state.streaming)
   const siblings = siblingIds(messages, message.id)
-  const index = siblings.indexOf(message.id)
+  const parent = messages.find((item) => item.id === message.parentId && item.role === 'user')
+  const userSiblings = parent ? siblingIds(messages, parent.id) : []
+  const versionIds = siblings.length > 1 ? siblings : userSiblings.length > 1 ? userSiblings : []
+  const versionCurrent = siblings.length > 1 ? message.id : parent?.id ?? ''
+  const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const [copied, setCopied] = useState(false)
   const voteKey = `harbor-vote:${message.id}`
@@ -554,35 +587,44 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
     const saved = localStorage.getItem(voteKey)
     return saved === 'up' || saved === 'down' ? saved : null
   })
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(textOf)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
   const choose = (next: 'up' | 'down') => {
     const value = vote === next ? null : next
     setVote(value)
     if (value) localStorage.setItem(voteKey, value)
     else localStorage.removeItem(voteKey)
   }
+  const stepVersion = (dir: -1 | 1) => {
+    const next = versionIds[versionIndex + dir]
+    if (next && versionCurrent) void selectSibling(versionCurrent, next)
+  }
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''}`} data-testid={`message-${message.role}`} aria-busy={message.status === 'streaming'}>
-      {siblings.length > 1 ? (
-        <header>
-          <span className="branch">
-            <button type="button" disabled={index <= 0} onClick={() => index > 0 && void selectSibling(message.id, siblings[index - 1] ?? message.id)}>‹</button>
-            <span>{t('branch')} {index + 1}/{siblings.length}</span>
-            <button type="button" disabled={index >= siblings.length - 1} onClick={() => index < siblings.length - 1 && void selectSibling(message.id, siblings[index + 1] ?? message.id)}>›</button>
-          </span>
-        </header>
-      ) : null}
       {message.role === 'user' ? (
+        editing ? (
+          <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
+            <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
+            <div className="edit-actions">
+              <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
+              <button className="primary" type="submit">{t('send')}</button>
+            </div>
+          </form>
+        ) : (
         <>
           <div className="bubble">{textOf}</div>
           <div className="user-actions">
             <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
               <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
             </button>
-            <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => window.dispatchEvent(new CustomEvent('harbor-prefill', { detail: textOf }))}>
+            <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
               <Icon d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
             </button>
           </div>
         </>
+        )
       ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
       {message.role === 'assistant' ? <AssistantTurn message={message} /> : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
@@ -597,6 +639,13 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
       {message.status === 'aborted' ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
+          {versionIds.length > 1 ? (
+            <span className="branch" data-testid="versions">
+              <button type="button" aria-label="‹" disabled={versionIndex <= 0} onClick={() => stepVersion(-1)}>‹</button>
+              <span>{versionIndex + 1} / {versionIds.length}</span>
+              <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
+            </span>
+          ) : null}
           <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
@@ -604,9 +653,38 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             </button>
           ) : null}
           <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => choose('down')}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
-          <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { if (textOf && 'speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(textOf)) } }}><Icon d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
+            if (!textOf || !('speechSynthesis' in window)) return
+            const utterance = new SpeechSynthesisUtterance(textOf)
+            const chosen = localStorage.getItem('harbor-voice')
+            const voice = window.speechSynthesis.getVoices().find((item) => item.name === chosen)
+            if (voice) utterance.voice = voice
+            utterance.onstart = () => setSpeaking(true)
+            utterance.onend = () => setSpeaking(false)
+            utterance.onerror = () => setSpeaking(false)
+            window.speechSynthesis.cancel()
+            setSpeaking(true)
+            window.speechSynthesis.speak(utterance)
+          }}>{speaking ? <Icon d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
           <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+        </div>
+      ) : null}
+      {feedbackOpen ? (
+        <div className="modal" role="dialog" aria-label={t('feedbackTitle')}>
+          <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`harbor-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>
+            <h2>{t('feedbackTitle')}</h2>
+            <div className="feedback-chips">
+              {[t('feedbackHarm'), t('feedbackFake'), t('feedbackUseless'), t('feedbackOther')].map((label) => (
+                <button key={label} type="button" className="chip">{label}</button>
+              ))}
+            </div>
+            <textarea placeholder={t('feedbackPlaceholder')} />
+            <div className="edit-actions">
+              <button type="button" onClick={() => setFeedbackOpen(false)}>{t('cancel')}</button>
+              <button className="primary" type="submit">{t('submit')}</button>
+            </div>
+          </form>
         </div>
       ) : null}
     </article>
@@ -666,7 +744,7 @@ export const Shell = () => {
       if (meta && event.key.toLowerCase() === 'k') {
         event.preventDefault()
         setFiltering(true)
-      } else if (meta && event.key.toLowerCase() === 'n' && !typing) {
+      } else if (meta && event.key.toLowerCase() === 'j' && !typing) {
         event.preventDefault()
         void state.newChat()
       } else if (event.key === 'Escape') {
@@ -685,7 +763,7 @@ export const Shell = () => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
-    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group7'), t('group30')]
+    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group30')]
     for (const item of state.conversations.filter((chat) => !filter || (chat.title || t('newChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
@@ -695,10 +773,8 @@ export const Shell = () => {
           ? t('groupToday')
           : days < 2
             ? t('groupYesterday')
-            : days < 7
-              ? t('group7')
-              : days < 30
-                ? t('group30')
+            : days < 30
+              ? t('group30')
                 : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
       buckets.set(label, [...(buckets.get(label) ?? []), item])
     }
@@ -735,16 +811,18 @@ export const Shell = () => {
             </button>
           </span>
         </div>
-        {filtering ? (
-          <input className="side-filter" value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
-        ) : null}
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
-          <Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}
+          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}</span>
+          <kbd className="kbd">Ctrl J</kbd>
         </button>
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
-          {selecting && picked.length ? (
-            <button className="chip" type="button" onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('deleteSelected')}</button>
+          {selecting ? (
+            <div className="select-bar">
+              <button type="button" aria-label={t('close')} onClick={() => { setSelecting(false); setPicked([]) }}>×</button>
+              <span>{t('selectedCount', { count: picked.length })}</span>
+              <button type="button" className="danger" disabled={!picked.length} onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('delete')}</button>
+            </div>
           ) : null}
           {groups.map(([label, items], groupIndex) => (
             <div key={label}>
@@ -809,6 +887,13 @@ export const Shell = () => {
           <button className="icon-btn" type="button" aria-label={t('menu')} onClick={() => setCollapsed(false)}><Mark /></button>
           <button className="icon-btn" type="button" onClick={() => void state.newChat()}><Icon d="M12 5v14M5 12h14" /></button>
         </div>
+      ) : null}
+      {filtering ? (
+        <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
+          <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+          <input className="side-filter" autoFocus placeholder={t('searchChats')} value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>×</button>
+        </form>
       ) : null}
       <section className="stage">
         <header className="topbar">
@@ -899,6 +984,8 @@ export const Shell = () => {
   )
 }
 
+const EMPTY_MESSAGES: Message[] = []
+
 const downloadText = (filename: string, text: string) => {
   const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
   const url = URL.createObjectURL(blob)
@@ -916,7 +1003,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const rename = useHarbor((state) => state.rename)
   const pin = useHarbor((state) => state.pin)
   const removeChat = useHarbor((state) => state.removeChat)
-  const messages = useHarbor((state) => (state.activeId === conversation.id ? state.messages : []))
+  const messages = useHarbor((state) => (state.activeId === conversation.id ? state.messages : EMPTY_MESSAGES))
   const [editing, setEditing] = useState(false)
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
@@ -1086,6 +1173,9 @@ const Settings = () => {
   const [nextKey, setNextKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [tab, setTab] = useState<'general' | 'account' | 'data' | 'legal'>('general')
+  const [exporting, setExporting] = useState(false)
+  const [improve, setImprove] = useState(() => localStorage.getItem('harbor-improve') !== 'off')
+  const [sharedNote, setSharedNote] = useState(false)
   const profile = useProfile()
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
@@ -1114,7 +1204,17 @@ const Settings = () => {
         </nav>
         <div className="settings-main">
         <section className="settings-general">
-          <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
+          <label className="settings-line">
+            {t('language')}
+            <select aria-label={t('language')} value={settings.locale} onChange={(event) => void setLocale(event.target.value === 'en' ? 'en' : 'zh')}>
+              <option value="zh">简体中文</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+          <label className="settings-line">
+            {t('voice')}
+            <VoiceSelect />
+          </label>
         </section>
         <section className="settings-general">
           <h3>{t('theme')}</h3>
@@ -1132,6 +1232,35 @@ const Settings = () => {
             <input data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
           </label>
           <button type="button" className="primary" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
+        </section>
+        <section className="settings-data">
+          <div className="settings-line">
+            <div>
+              <strong>{t('improveToggle')}</strong>
+              <p className="hint">{t('improveBody')}</p>
+            </div>
+            <button type="button" className={improve ? 'chip on' : 'chip'} aria-pressed={improve} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }}>{improve ? 'ON' : 'OFF'}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('sharedLinks')}</span>
+            <button type="button" onClick={() => setSharedNote(true)}>{t('manage')}</button>
+          </div>
+          {sharedNote ? <p className="hint">{t('noShared')}</p> : null}
+          <div className="settings-line">
+            <div>
+              <strong>{t('exportAll')}</strong>
+              <p className="hint">{t('exportAllBody')}</p>
+            </div>
+            <button type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('exportJson')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('deleteAll')}</span>
+            <button type="button" className="danger" onClick={() => {
+              if (!window.confirm(t('deleteConfirm'))) return
+              const { conversations: rows, removeChat: drop } = useHarbor.getState()
+              for (const item of rows) void drop(item.id)
+            }}>{t('delete')}</button>
+          </div>
         </section>
         <section className="settings-data">
           <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
