@@ -4,6 +4,7 @@ import { estimateCost, formatCny } from '@harbor/pricing'
 import { activePath, siblingIds } from '@harbor/types'
 import type { ContentBlock, Conversation, Message } from '@harbor/types'
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
@@ -286,31 +287,53 @@ const ThemeSwitch = () => {
   )
 }
 
-const VoiceSelect = () => {
-  const t = useT()
-  const [name, setName] = useState(() => localStorage.getItem('harbor-voice') || '')
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
-  useEffect(() => {
-    const load = () => setVoices(window.speechSynthesis?.getVoices?.() ?? [])
-    load()
-    window.speechSynthesis?.addEventListener?.('voiceschanged', load)
-    return () => window.speechSynthesis?.removeEventListener?.('voiceschanged', load)
-  }, [])
+const LANGUAGES = ['简体中文', 'English', '跟随系统', 'Afrikaans', 'አማርኛ', 'العربية', 'Azərbaycan', 'Беларуская', 'Български', 'বাংলা', 'Català', 'Čeština', 'Dansk']
+const VOICES = ['贝壳', '白浪', '海星', '暗潮']
+
+const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string }) => {
+  const [open, setOpen] = useState(false)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const [box, setBox] = useState({ top: 0, right: 0 })
+  const show = () => {
+    const rect = trigger.current?.getBoundingClientRect()
+    if (rect) setBox({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    setOpen((value) => !value)
+  }
   return (
-    <select
-      data-testid="voice-select"
-      aria-label={t('voice')}
-      value={name}
-      onChange={(event) => {
-        setName(event.target.value)
-        localStorage.setItem('harbor-voice', event.target.value)
+    <div className="pill-menu">
+      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}</button>
+      {open ? createPortal(
+        <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right }}>
+          {options.map((option, index) => (
+            <div key={option}>
+              {dividerAfter === index - 1 ? <hr /> : null}
+              <button type="button" role="option" aria-selected={option === selected} onClick={() => { onPick(option); setOpen(false) }}>
+                <span>{option}</span>
+                {option === selected ? <Icon d="M5 12.5 9.2 17 19 7" /> : null}
+              </button>
+            </div>
+          ))}
+        </div>,
+        document.body,
+      ) : null}
+    </div>
+  )
+}
+
+const VoiceSelect = () => {
+  const [name, setName] = useState(() => localStorage.getItem('harbor-voice') || '贝壳')
+  return (
+    <AnchoredMenu
+      testId="voice-select"
+      menuClass="voice-menu"
+      label={name || '贝壳'}
+      selected={name || '贝壳'}
+      options={VOICES}
+      onPick={(value) => {
+        setName(value)
+        localStorage.setItem('harbor-voice', value)
       }}
-    >
-      <option value="">{t('voiceDefault')}</option>
-      {voices.map((voice) => (
-        <option key={voice.name} value={voice.name}>{voice.name}</option>
-      ))}
-    </select>
+    />
   )
 }
 
@@ -824,11 +847,11 @@ export const Shell = () => {
               <button type="button" className="danger" disabled={!picked.length} onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('delete')}</button>
             </div>
           ) : null}
-          {groups.map(([label, items], groupIndex) => (
+          {groups.map(([label, items]) => (
             <div key={label}>
               <p className="group-label">
                 <span>{label}</span>
-                {groupIndex === 0 ? (
+                {label === t('groupToday') ? (
                   <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
                     <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
                   </button>
@@ -888,6 +911,7 @@ export const Shell = () => {
           <button className="icon-btn" type="button" onClick={() => void state.newChat()}><Icon d="M12 5v14M5 12h14" /></button>
         </div>
       ) : null}
+      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }} /> : null}
       {filtering ? (
         <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
           <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
@@ -1204,22 +1228,90 @@ const Settings = () => {
         </nav>
         <div className="settings-main">
         <section className="settings-general">
-          <label className="settings-line">
-            {t('language')}
-            <select aria-label={t('language')} value={settings.locale} onChange={(event) => void setLocale(event.target.value === 'en' ? 'en' : 'zh')}>
-              <option value="zh">简体中文</option>
-              <option value="en">English</option>
-            </select>
-          </label>
-          <label className="settings-line">
-            {t('voice')}
-            <VoiceSelect />
-          </label>
-        </section>
-        <section className="settings-general">
           <h3>{t('theme')}</h3>
           <ThemeSwitch />
+          <div className="settings-line">
+            <span>{t('language')}</span>
+            <AnchoredMenu
+              menuClass="lang-menu"
+              label={settings.locale === 'en' ? 'English' : '简体中文'}
+              selected={settings.locale === 'en' ? 'English' : '简体中文'}
+              options={LANGUAGES}
+              dividerAfter={2}
+              onPick={(value) => {
+                if (value === 'English') void setLocale('en')
+                else if (value === '简体中文' || value === '跟随系统') void setLocale('zh')
+              }}
+            />
+          </div>
+          <div className="settings-line">
+            <span>{t('voice')}</span>
+            <VoiceSelect />
+          </div>
         </section>
+        <details className="settings-more settings-general" data-testid="settings-more-general">
+          <summary>{t('more')}</summary>
+          <section className="settings-general">
+            <h3>{t('model')}</h3>
+            <label>
+              {t('model')}
+              <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
+                <option value="deepseek-flash">DeepSeek {t('flash')}</option>
+                <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
+              </select>
+            </label>
+            <label>
+              {t('effort')}
+              <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
+                <option value="low">low</option>
+                <option value="high">high</option>
+                <option value="max">max</option>
+              </select>
+            </label>
+            <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={prefs.model !== 'deepseek-flash'} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
+              {t('readLink')}
+            </button>
+            {prefs.model !== 'deepseek-flash' ? <p className="hint">{t('toolsFlashOnly')}</p> : null}
+          </section>
+          <section className="settings-general">
+            <h3>{t('safety')}</h3>
+            <label>
+              <select
+                data-testid="safety-select"
+                value={settings.safetyLevel}
+                onChange={(event) => void patchSettings({ safetyLevel: event.target.value === 'low' ? 'low' : 'high' })}
+              >
+                <option value="high">{t('safetyHigh')}</option>
+                <option value="low">{t('safetyLow')}</option>
+              </select>
+            </label>
+            <p className="hint">{t('safetyWarn')}</p>
+            <label>
+              {t('fileExpiry')}
+              <input
+                type="number"
+                min={1}
+                max={30}
+                value={settings.fileExpireDays}
+                onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
+              />
+            </label>
+            <label>
+              {t('filePurpose')}
+              <select
+                value={settings.documentPurpose}
+                onChange={(event) =>
+                  void patchSettings({
+                    documentPurpose: event.target.value === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition',
+                  })
+                }
+              >
+                <option value="rich_layout_recognition">{t('richLayout')}</option>
+                <option value="text_recognition">{t('textRecognition')}</option>
+              </select>
+            </label>
+          </section>
+        </details>
         <section className="settings-account">
           <h3>{t('tabProfile')}</h3>
           <p className="hint">{t('localStay')}</p>
@@ -1239,7 +1331,7 @@ const Settings = () => {
               <strong>{t('improveToggle')}</strong>
               <p className="hint">{t('improveBody')}</p>
             </div>
-            <button type="button" className={improve ? 'chip on' : 'chip'} aria-pressed={improve} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }}>{improve ? 'ON' : 'OFF'}</button>
+            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }} />
           </div>
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
@@ -1251,17 +1343,19 @@ const Settings = () => {
               <strong>{t('exportAll')}</strong>
               <p className="hint">{t('exportAllBody')}</p>
             </div>
-            <button type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('exportJson')}</button>
+            <button type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
           </div>
           <div className="settings-line">
             <span>{t('deleteAll')}</span>
-            <button type="button" className="danger" onClick={() => {
+            <button type="button" className="danger outline" onClick={() => {
               if (!window.confirm(t('deleteConfirm'))) return
               const { conversations: rows, removeChat: drop } = useHarbor.getState()
               for (const item of rows) void drop(item.id)
             }}>{t('delete')}</button>
           </div>
         </section>
+        <details className="settings-more settings-data" data-testid="settings-more-data">
+          <summary>{t('more')}</summary>
         <section className="settings-data">
           <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
           {serverMode ? (
@@ -1312,66 +1406,6 @@ const Settings = () => {
               {t('estimated')}: {formatCny(cost.totalCny)} {t('cny')} ({cost.peak ? t('peak') : t('offPeak')})
             </li>
           </ul>
-        </section>
-        <section className="settings-general">
-          <h3>{t('model')}</h3>
-          <label>
-            {t('model')}
-            <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
-              <option value="deepseek-flash">DeepSeek {t('flash')}</option>
-              <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
-            </select>
-          </label>
-          <label>
-            {t('effort')}
-            <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
-              <option value="low">low</option>
-              <option value="high">high</option>
-              <option value="max">max</option>
-            </select>
-          </label>
-          <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={prefs.model !== 'deepseek-flash'} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
-            {t('readLink')}
-          </button>
-          {prefs.model !== 'deepseek-flash' ? <p className="hint">{t('toolsFlashOnly')}</p> : null}
-        </section>
-        <section className="settings-general">
-          <h3>{t('safety')}</h3>
-          <label>
-            <select
-              data-testid="safety-select"
-              value={settings.safetyLevel}
-              onChange={(event) => void patchSettings({ safetyLevel: event.target.value === 'low' ? 'low' : 'high' })}
-            >
-              <option value="high">{t('safetyHigh')}</option>
-              <option value="low">{t('safetyLow')}</option>
-            </select>
-          </label>
-          <p className="hint">{t('safetyWarn')}</p>
-          <label>
-            {t('fileExpiry')}
-            <input
-              type="number"
-              min={1}
-              max={30}
-              value={settings.fileExpireDays}
-              onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
-            />
-          </label>
-          <label>
-            {t('filePurpose')}
-            <select
-              value={settings.documentPurpose}
-              onChange={(event) =>
-                void patchSettings({
-                  documentPurpose: event.target.value === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition',
-                })
-              }
-            >
-              <option value="rich_layout_recognition">{t('richLayout')}</option>
-              <option value="text_recognition">{t('textRecognition')}</option>
-            </select>
-          </label>
         </section>
         <section className="settings-data">
           <h3>{serverMode ? t('serverPrivacyTitle') : t('privacyTitle')}</h3>
@@ -1520,8 +1554,16 @@ const Settings = () => {
             </button>
           ) : null}
         </section>
+        </details>
         <section className="settings-legal">
-          <h3>{t('navLegal')}</h3>
+          <div className="settings-line">
+            <span>{t('terms')}</span>
+            <a href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE">{t('view')}</a>
+          </div>
+          <div className="settings-line">
+            <span>{t('privacyPolicy')}</span>
+            <a href="https://github.com/openlinkos/harbor-for-deepseek">{t('view')}</a>
+          </div>
           <SiteFooter />
           <p className="hint">
             <a href="https://github.com/openlinkos/harbor-for-deepseek">openlinkos/harbor-for-deepseek</a>

@@ -125,6 +125,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '数据管理' }).click()
+  await page.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
   await expect(page.getByTestId('balance')).toContainText('317.22')
   await expect(page.locator('.usage-grid')).toContainText('41')
   await expect(page.getByTestId('safety-select')).toHaveValue('high')
@@ -155,6 +156,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '通用设置' }).click()
+  await page.getByTestId('settings-more-general').evaluate((el: HTMLDetailsElement) => { el.open = true })
   await page.getByTestId('model-select').selectOption('deepseek-v4-pro')
   await expect(page.getByTestId('toggle-search')).toBeDisabled()
   await expect(page.getByTestId('toggle-read')).toBeDisabled()
@@ -163,6 +165,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '数据管理' }).click()
+  await page.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByTestId('export-json').click(),
