@@ -25,12 +25,12 @@ export const clampExpireSeconds = (days: number): number => {
 }
 
 export const HARBOR_SYSTEM_PROMPT =
-  'You are a helpful assistant inside Harbor, an unofficial community client. ' +
+  'You are a helpful assistant inside Harbor for DeepSeek. ' +
   'Reply in the language the user writes in, and reason in that same language. ' +
   'Do not claim to be an official product, a partner, or a support agent.'
 
 const ZH_SYSTEM_PROMPT =
-  '你是 Harbor 里的助手。Harbor 是非官方社区客户端，与深度求索无隶属或合作关系。' +
+  '你是 Harbor for DeepSeek 里的助手。' +
   '请使用用户书写的语言回答，思考过程也使用同一种语言。' +
   '不要声称自己是官方产品、合作伙伴或客服。'
 

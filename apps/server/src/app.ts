@@ -428,7 +428,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
   app.get('/api/config', async (c) => {
     const rows = await sql`select id from users where role = 'admin' limit 1`
     return c.json({
-      product_name: 'Harbor',
+      product_name: 'Harbor for DeepSeek',
       setup_required: rows.length === 0,
       mode: 'server',
     })

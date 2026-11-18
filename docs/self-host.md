@@ -1,6 +1,6 @@
 # Self-hosting Harbor
 
-Harbor’s public site is only the static on-device app. This server is optional. Run it for yourself and people you invite. It is not a public proxy, and it is not affiliated with DeepSeek.
+Harbor for DeepSeek’s public site is only the static on-device app. This server is optional. Run it for yourself and people you invite. It is not a public proxy.
 
 ## Start
 

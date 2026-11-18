@@ -1,12 +1,25 @@
-# Harbor
+# Harbor for DeepSeek
 
-非官方社区项目，与深度求索无隶属或合作关系。
+[English](README.md)
 
-Harbor 是面向 [DeepSeek 官方 API](https://platform.deepseek.com/) 的开源（MIT）对话客户端。你使用自己的 Key。Key 和对话都留在这台浏览器里。页面是静态的：它们不会发给 Harbor，`https://hfd.linkos.org` 也不运行对话后端。
+![Harbor for DeepSeek](brand/logo-128.png)
 
-Harbor 是 openlinkos 社区开发的非官方开源项目，与杭州深度求索人工智能基础技术研究有限公司（DeepSeek）无隶属、合作或授权关系。DeepSeek 是其所有者的商标，本项目仅用以说明所兼容的 API。
+Harbor for DeepSeek 是面向 [DeepSeek API](https://platform.deepseek.com/) 的开源（MIT）对话客户端。你使用自己的 Key。Key 和对话都留在这台浏览器里。页面是静态的：它们不会发给 Harbor for DeepSeek，`https://hfd.linkos.org` 也不运行对话后端。
 
 ![Harbor，思考过程展开](docs/screenshots/03-reasoning.png)
+
+## 两种用法
+
+**轻量。** 打开 [hfd.linkos.org](https://hfd.linkos.org)，或自己构建静态页。Key 和对话留在这台设备上，可以导出和导入。这种用法没有服务器。
+
+**服务器。** 可选。`docker compose up` 会在你自己的机器上启动 PostgreSQL 和一个应用容器。管理员添加 Key 池、查看余额、发出邀请账号。登录的人可以在多台设备上同步对话。见 [docs/self-host.zh-CN.md](docs/self-host.zh-CN.md)。
+
+## 填入 Key
+
+1. 打开 <https://hfd.linkos.org>。
+2. 在 <https://platform.deepseek.com/api_keys> 创建一个 Key。实际使用时，用设了额度的专用 Key。
+3. 粘贴到页面里，确认页面上的说明，保存在这台设备上。
+4. 发送一条消息。浏览器直接请求 `https://api.deepseek.com`。
 
 ## 功能
 
@@ -73,8 +86,18 @@ pnpm e2e
 
 测试使用模拟的 API 响应，结构来自设计说明里脱敏后的样例。不要把 Key 提交进仓库。
 
-界面是重新做的。协议行为和 v3 归档参照公开 API，以及 [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo)（MIT，`Copyright (c) 2026 DeepSeek`）文档中的归档结构。该许可证在 [NOTICE](NOTICE)。MIT 不授予商标权。
+界面是重新做的。协议行为和 v3 归档参照公开 API，以及 deepseek-ai/chat-demo 文档中的归档结构。见许可证一节。
 
 ## 许可证
 
 [MIT](LICENSE) © 2026 OpenLinkOS
+
+`pnpm build` 会把 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 复制到 `apps/web/dist`。协议行为和 v3 归档参照公开 API，以及 [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo)（MIT，`Copyright (c) 2026 DeepSeek`）文档中的归档结构。该版权和许可证在 NOTICE。Harbor for DeepSeek 不使用该项目的名称、标志或字标。MIT 不授予商标权。
+
+---
+
+Harbor for DeepSeek · [OpenLinkOS](https://openlinkos.com/zh/) 发起的开源项目
+
+[GitHub](https://github.com/openlinkos/harbor-for-deepseek) · [许可证](LICENSE) · [OpenLinkOS](https://openlinkos.com/zh/)
+
+DeepSeek 是其所有者的商标。本项目与深度求索没有隶属关系。
