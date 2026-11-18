@@ -13,6 +13,7 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/inter": "5.2.5",
     "@harbor/api-client": "workspace:*",
     "@harbor/archive-native": "workspace:*",
     "@harbor/archive-v3": "workspace:*",

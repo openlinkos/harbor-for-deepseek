@@ -5,9 +5,10 @@ Harbor is an independent community client. It is not affiliated with, endorsed b
 or sponsored by DeepSeek. DeepSeek is a trademark of its owner. The MIT License
 does not grant any trademark rights.
 
-This project does not copy the DeepSeek chat-demo user interface. The Messages
-API shapes and the version-3 history archive follow the public API and the
-archive layout documented by deepseek-ai/chat-demo:
+The chat layout, color tokens, and several component styles are adapted from
+deepseek-ai/chat-demo (MIT). Harbor does not use that project's name, logo, or
+wordmark. The Messages API shapes and the version-3 history archive also follow
+the public API and the archive layout documented by that repository:
 
   https://github.com/deepseek-ai/chat-demo
   commit 5d5dd754ebc1948e977ddb880a9eb5aa25f37b4c (v0.1.1)

@@ -13,7 +13,8 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
-import { Component, useEffect, useRef, useState, type ReactNode } from 'react'
+import type { TextCitation } from '@harbor/types'
+import { Children, Component, useEffect, useRef, useState, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -78,11 +79,41 @@ const Mermaid = ({ chart }: { chart: string }) => {
 
 const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
   const html = highlight(language, value)
+  const [copied, setCopied] = useState(false)
+  const download = () => {
+    const blob = new Blob([value], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `harbor.${language || 'txt'}`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
   return (
-    <pre className="code-block">
-      {language ? <span className="code-lang">{language}</span> : null}
-      <code dangerouslySetInnerHTML={{ __html: html }} />
-    </pre>
+    <div className="code-card">
+      <div className="code-head">
+        <span>{(language || 'text').toLowerCase()}</span>
+        <span>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard.writeText(value).then(() => {
+                setCopied(true)
+                window.setTimeout(() => setCopied(false), 1200)
+              })
+            }}
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+          <button type="button" onClick={download}>
+            Download
+          </button>
+        </span>
+      </div>
+      <pre>
+        <code dangerouslySetInnerHTML={{ __html: html }} />
+      </pre>
+    </div>
   )
 }
 
@@ -99,12 +130,38 @@ class Boundary extends Component<{ text: string; children: ReactNode }, { failed
   }
 }
 
-export const Markdown = ({ text }: { text: string }) => (
+const citeChildren = (children: ReactNode, citations?: TextCitation[]) =>
+  Children.map(children, (child) => {
+    if (typeof child !== 'string' || !child.includes('〔')) {
+      return child
+    }
+    return child.split(/(〔\d+〕)/g).map((bit, index) => {
+      const match = /^〔(\d+)〕$/.exec(bit)
+      const citation = match ? citations?.[Number(match[1]) - 1] : undefined
+      if (!match || !citation) {
+        return bit
+      }
+      return (
+        <span className="cite" key={`${citation.url}-${index}`}>
+          {match[1]}
+          <span className="hover-card">
+            <strong>{citation.title || citation.url}</strong>
+            <p>{citation.cited_text}</p>
+          </span>
+        </span>
+      )
+    })
+  })
+
+export const Markdown = ({ text, citations }: { text: string; citations?: TextCitation[] }) => (
   <Boundary text={text}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
+        p({ children }) {
+          return <p>{citeChildren(children, citations)}</p>
+        },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined
           return (
