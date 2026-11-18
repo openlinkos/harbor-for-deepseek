@@ -1,3 +1,4 @@
+import { CONTENT_SECURITY_POLICY as SERVER_CSP } from '@harbor/api-client'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { CONTENT_SECURITY_POLICY } from './csp.js'
@@ -12,6 +13,7 @@ describe('content security policy', () => {
     expect(CONTENT_SECURITY_POLICY).not.toContain("style-src 'self' 'unsafe-inline'")
     expect(CONTENT_SECURITY_POLICY).not.toContain("script-src 'self' https")
     expect(CONTENT_SECURITY_POLICY.startsWith("default-src 'self'")).toBe(true)
+    expect(SERVER_CSP).toBe(CONTENT_SECURITY_POLICY)
   })
 
   it('ships the same policy in the Cloudflare Pages _headers file', () => {

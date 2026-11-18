@@ -26,6 +26,15 @@ let serverAbort: AbortController | null = null
 let serverRunId: string | null = null
 let persistTimer = 0
 
+export type ServerQuota = {
+  tokenUsed: number
+  tokenQuota: number
+  searchUsed: number
+  searchQuota: number
+  pageUsed: number
+  pageQuota: number
+}
+
 export type DraftFile = {
   localId: string
   filename: string
@@ -114,6 +123,7 @@ export type HarborState = {
   setupRequired: boolean
   serverUser: ServerUser | null
   serverMode: boolean
+  quota: ServerQuota | null
   showLogin: boolean
   showAdmin: boolean
   setupAdmin: (username: string, password: string) => Promise<void>
@@ -181,6 +191,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   setupRequired: false,
   serverUser: null,
   serverMode: false,
+  quota: null,
   showLogin: false,
   showAdmin: false,
 
@@ -792,6 +803,8 @@ const runTurn = async (text: string, regenerateParent?: string | null) => {
     safetyLevel: state.settings.safetyLevel,
     requestTitle: conversation.titleSource !== 'user',
     messages: history,
+    locale: state.settings.locale,
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   })
   abort = new AbortController()
   let draft = createDraft()
@@ -889,10 +902,10 @@ const probeHost = async (set: Setter, get: () => HarborState) => {
     return
   }
   try {
-    const me = await api<{ user: ServerUser; csrf: string }>('/api/me')
+    const me = await api<{ user: ServerUser; csrf: string; quota: ServerQuota }>('/api/me')
     setCsrf(me.csrf)
     const useServer = sessionStorage.getItem('harbor-mode') !== 'local'
-    set({ serverUser: me.user, serverMode: useServer, showAdmin: false })
+    set({ serverUser: me.user, serverMode: useServer, quota: me.quota, showAdmin: false })
     if (useServer) {
       await loadServerChats(set)
     }
@@ -933,6 +946,8 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
           expiresAt: file.expiresAt,
         })),
         ...state.prefs,
+        locale: state.settings.locale,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       }),
     },
   )
@@ -1036,6 +1051,13 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
   } finally {
     serverAbort = null
     serverRunId = null
-    useHarbor.setState({ streaming: false })
+    const previous = useHarbor.getState().totals
+    let quota = useHarbor.getState().quota
+    try {
+      quota = (await api<{ quota: ServerQuota }>('/api/me')).quota
+    } catch {
+      // The chat total still updates from the stream if the quota read fails.
+    }
+    useHarbor.setState({ streaming: false, totals: sumUsage([previous, draft.usage]), quota })
   }
 }

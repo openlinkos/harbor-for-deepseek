@@ -107,7 +107,18 @@ export const ServerLogin = () => {
 
 type KeyInfo = { id: string; label: string; last4: string; balanceCny: string | null; status: string; accountGroup: string }
 type AlertInfo = { id: string; message: string }
-type UserInfo = { id: string; username: string; role: string; tokenQuota: number; searchQuota: number; pageQuota: number }
+type UserInfo = { id: string; username: string; role: string; status: string; tokenQuota: number; searchQuota: number; pageQuota: number }
+type UsageRow = {
+  userId: string
+  username: string
+  day: string
+  apiKeyId: string
+  keyLabel: string
+  last4: string
+  inputTokens: number
+  outputTokens: number
+  estimatedCny: string
+}
 
 export const AdminScreen = () => {
   const t = useT()
@@ -119,15 +130,29 @@ export const AdminScreen = () => {
   const [secret, setSecret] = useState('')
   const [accountGroup, setAccountGroup] = useState('')
   const [invite, setInvite] = useState('')
+  const [threshold, setThreshold] = useState('50')
+  const [usage, setUsage] = useState<UsageRow[]>([])
   const [error, setError] = useState('')
+
+  const statusLabel = (status: string) => {
+    if (status === 'active') return t('statusActive')
+    if (status === 'exhausted') return t('statusExhausted')
+    if (status === 'error') return t('statusError')
+    if (status === 'disabled') return t('statusDisabled')
+    return status
+  }
 
   const reload = async () => {
     const keyBody = await api<{ keys: KeyInfo[] }>('/api/admin/keys')
     const alertBody = await api<{ alerts: AlertInfo[] }>('/api/admin/alerts')
     const userBody = await api<{ users: UserInfo[] }>('/api/admin/users')
+    const settingsBody = await api<{ lowBalanceCny: number }>('/api/admin/settings')
+    const usageBody = await api<{ daily: UsageRow[] }>('/api/admin/usage')
     setKeys(keyBody.keys)
     setAlerts(alertBody.alerts)
     setUsers(userBody.users)
+    setThreshold(String(settingsBody.lowBalanceCny))
+    setUsage(usageBody.daily)
   }
 
   useEffect(() => {
@@ -174,15 +199,43 @@ export const AdminScreen = () => {
             {t('addKey')}
           </button>
         </form>
-        <ul className="usage-grid" data-testid="admin-key-list">
+        <ul className="key-list" data-testid="admin-key-list">
           {keys.map((key) => (
-            <li key={key.id}>
-              {key.label} ····{key.last4} · {t('keyBalance')} {key.balanceCny ?? '—'} · {key.status}
-              {key.accountGroup ? ` · ${key.accountGroup}` : ''}
+            <li className="key-row" key={key.id}>
+              <strong>{key.label}</strong>
+              <span>····{key.last4}</span>
+              <span>
+                {t('keyBalance')} {key.balanceCny ?? '—'}
+              </span>
+              <span>{statusLabel(key.status)}</span>
+              <span>{key.accountGroup}</span>
             </li>
           ))}
         </ul>
         <h2>{t('alerts')}</h2>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            void api('/api/admin/settings', {
+              method: 'PATCH',
+              body: JSON.stringify({ lowBalanceCny: Number(threshold) }),
+            })
+              .then(() => reload())
+              .catch((reason) => setError(reason instanceof Error ? reason.message : 'error'))
+          }}
+        >
+          <label>
+            {t('alertThreshold')}
+            <input
+              data-testid="alert-threshold"
+              type="number"
+              min={0}
+              value={threshold}
+              onChange={(event) => setThreshold(event.target.value)}
+            />
+          </label>
+          <button type="submit">{t('save')}</button>
+        </form>
         <ul data-testid="admin-alerts">
           {alerts.map((alert) => (
             <li key={alert.id}>{alert.message}</li>
@@ -201,7 +254,32 @@ export const AdminScreen = () => {
           {t('inviteCreate')}
         </button>
         {invite ? <p data-testid="invite-code">{invite}</p> : null}
-        <h2>{t('quotaSave')}</h2>
+        <h2>{t('usageLedger')}</h2>
+        <table className="ledger" data-testid="admin-usage">
+          <thead>
+            <tr>
+              <th>{t('usageDay')}</th>
+              <th>{t('usageUser')}</th>
+              <th>{t('usageKey')}</th>
+              <th>{t('input')}</th>
+              <th>{t('output')}</th>
+              <th>{t('estimated')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usage.map((row) => (
+              <tr key={`${row.day}-${row.userId}-${row.apiKeyId}`}>
+                <td>{row.day}</td>
+                <td>{row.username}</td>
+                <td>{row.keyLabel ? `${row.keyLabel} ····${row.last4}` : '—'}</td>
+                <td>{row.inputTokens}</td>
+                <td>{row.outputTokens}</td>
+                <td>{row.estimatedCny}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <h2>{t('quotaHeading')}</h2>
         {users.map((user) => (
           <form
             key={user.id}
@@ -218,17 +296,17 @@ export const AdminScreen = () => {
               }).then(() => reload())
             }}
           >
-            <strong>{user.username}</strong> ({user.role})
+            <strong>{user.username}</strong> ({user.role} · {statusLabel(user.status)})
             <label>
-              tokens
+              {t('quotaTokens')}
               <input name="tokens" defaultValue={user.tokenQuota} />
             </label>
             <label>
-              searches
+              {t('quotaSearches')}
               <input name="searches" defaultValue={user.searchQuota} />
             </label>
             <label>
-              pages
+              {t('quotaPages')}
               <input name="pages" defaultValue={user.pageQuota} />
             </label>
             <button type="submit">{t('quotaSave')}</button>

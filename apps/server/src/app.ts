@@ -1,4 +1,4 @@
-import { buildRequest, clampExpireSeconds, DEFAULT_FILE_EXPIRE_SECONDS } from '@harbor/api-client'
+import { buildRequest, clampExpireSeconds, CONTENT_SECURITY_POLICY, DEFAULT_FILE_EXPIRE_SECONDS } from '@harbor/api-client'
 import { estimateCost } from '@harbor/pricing'
 import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@harbor/sse'
 import type { ContentBlock, Message, Usage } from '@harbor/types'
@@ -19,7 +19,14 @@ export type ServerOptions = {
   upstream?: string
   staticDir?: string
   trustProxy?: boolean
+  /** Send HSTS on every response, including plain HTTP. */
+  hsts?: boolean
+  /** How often an open run stream writes a comment. Tests use a short value. */
+  eventPingMs?: number
 }
+
+export const wantsHsts = (url: string, forwardedProto: string | undefined, trustProxy: boolean, forced: boolean): boolean =>
+  forced || url.startsWith('https:') || (trustProxy && forwardedProto === 'https')
 
 type Role = 'admin' | 'member'
 
@@ -317,6 +324,14 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       c.header('Access-Control-Allow-Headers', 'content-type, authorization, x-harbor-csrf')
       c.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
     }
+    c.header('X-Content-Type-Options', 'nosniff')
+    c.header('Referrer-Policy', 'no-referrer')
+    c.header('X-Frame-Options', 'DENY')
+    c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    c.header('Content-Security-Policy', CONTENT_SECURITY_POLICY)
+    if (wantsHsts(c.req.url, c.req.header('x-forwarded-proto'), options.trustProxy === true, options.hsts === true)) {
+      c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    }
     if (c.req.method === 'OPTIONS') {
       return c.body(null, 204)
     }
@@ -501,9 +516,19 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (user instanceof Response) {
       return user
     }
+    const used = await quotaState(user)
     return c.json({
       user: { id: user.id, username: user.username, role: user.role },
       csrf: user.csrf,
+      quota: {
+        tokenUsed: used.tokens,
+        tokenQuota: user.tokenQuota,
+        searchUsed: used.searches,
+        searchQuota: user.searchQuota,
+        pageUsed: used.pages,
+        pageQuota: user.pageQuota,
+        resetAt: nextShanghaiMidnight(),
+      },
     })
   })
 
@@ -833,6 +858,8 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     readLink: boolean
     effort: 'low' | 'high' | 'max'
     requestTitle: boolean
+    locale: 'zh' | 'en'
+    timeZone: string
   }) => {
     const controller = new AbortController()
     aborts.set(runId, controller)
@@ -840,6 +867,8 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       ...prefs,
       safetyLevel: 'high',
       messages: requestMessages,
+      locale: prefs.locale,
+      timeZone: prefs.timeZone,
     })
     try {
       const result = await upstreamCall(
@@ -1043,10 +1072,14 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       insert into chat_runs (id, user_id, conversation_id, message_id, status)
       values (${runId}, ${user.id}, ${conversationId}, ${assistantId}, 'streaming')
     `
+    const locale = body.locale === 'zh' ? 'zh' : 'en'
+    const timeZone = typeof body.timeZone === 'string' ? body.timeZone : 'Asia/Shanghai'
     void executeRun(runId, user, conversationId, assistantId, path, {
       model,
       thinking: body.thinking !== false,
       search: body.search === true,
+      locale,
+      timeZone,
       readLink: body.readLink === true,
       effort,
       requestTitle: conversation.title_source !== 'user',
@@ -1067,11 +1100,34 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     let cursor = Number(c.req.query('after') ?? '0')
     const encoder = new TextEncoder()
     const signal = c.req.raw.signal
+    const pingMs = options.eventPingMs ?? 15000
+    let closed = false
     const stream = new ReadableStream({
       async start(controller) {
-        const send = (chunk: string) => controller.enqueue(encoder.encode(chunk))
+        const send = (chunk: string) => {
+          if (closed) {
+            return
+          }
+          try {
+            controller.enqueue(encoder.encode(chunk))
+          } catch (error) {
+            closed = true
+            log('warn', 'event stream closed', { runId, error: error instanceof Error ? error.name : 'error' })
+          }
+        }
+        const close = () => {
+          if (closed) {
+            return
+          }
+          closed = true
+          try {
+            controller.close()
+          } catch {
+            // The client already hung up.
+          }
+        }
         try {
-          while (!signal.aborted) {
+          while (!signal.aborted && !closed) {
             const rows = await sql<{ seq: number; payload: unknown }[]>`
               select seq, payload from run_events where run_id = ${runId} and seq > ${cursor} order by seq
             `
@@ -1082,38 +1138,44 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
             const current = await sql<{ status: string }[]>`select status from chat_runs where id = ${runId}`
             if (current[0]?.status !== 'streaming') {
               send(`event: end\ndata: ${JSON.stringify({ status: current[0]?.status ?? 'error' })}\n\n`)
-              controller.close()
+              close()
               return
             }
             await new Promise<void>((resolve) => {
               const set = waiters.get(runId) ?? new Set()
-              const wake = () => {
+              let settled = false
+              let timer: ReturnType<typeof setTimeout> | undefined
+              const finish = () => {
+                if (settled) {
+                  return
+                }
+                settled = true
+                if (timer) {
+                  clearTimeout(timer)
+                }
+                signal.removeEventListener('abort', onAbort)
                 set.delete(wake)
                 resolve()
               }
+              const wake = () => finish()
               set.add(wake)
               waiters.set(runId, set)
-              const timer = setTimeout(() => {
-                set.delete(wake)
+              timer = setTimeout(() => {
                 send(`: ping\n\n`)
-                resolve()
-              }, 15000)
-              signal.addEventListener(
-                'abort',
-                () => {
-                  clearTimeout(timer)
-                  set.delete(wake)
-                  resolve()
-                },
-                { once: true },
-              )
+                finish()
+              }, pingMs)
+              const onAbort = () => finish()
+              signal.addEventListener('abort', onAbort, { once: true })
             })
           }
-          controller.close()
+          close()
         } catch (error) {
           log('warn', 'event stream closed', { runId, error: error instanceof Error ? error.name : 'error' })
-          controller.close()
+          close()
         }
+      },
+      cancel() {
+        closed = true
       },
     })
     return new Response(stream, {
@@ -1330,14 +1392,30 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       return c.json({ error: { message: 'forbidden' } }, 403)
     }
     const daily = await sql`
-      select user_id, day, input_tokens::text, output_tokens::text, cache_read_input_tokens::text,
-             tool_search, tool_fetch, tool_image_search, file_pages, estimated_cny::text
-      from usage_daily order by day desc limit 100
+      select d.user_id, u.username, d.day::text as day, d.api_key_id,
+             coalesce(k.label, '') as key_label, coalesce(k.last4, '') as last4,
+             d.input_tokens::text, d.output_tokens::text, d.cache_read_input_tokens::text,
+             d.tool_search, d.tool_fetch, d.tool_image_search, d.file_pages, d.estimated_cny::text
+      from usage_daily d
+      join users u on u.id = d.user_id
+      left join api_keys k on k.id = d.api_key_id
+      order by d.day desc, u.username asc
+      limit 100
     `
+    const asDay = (value: unknown): string => {
+      if (value instanceof Date) {
+        return shanghaiDay(value)
+      }
+      return /^(\d{4}-\d{2}-\d{2})/.exec(String(value))?.[1] ?? String(value)
+    }
     return c.json({
       daily: daily.map((row) => ({
         userId: row.user_id,
-        day: row.day,
+        username: row.username,
+        day: asDay(row.day),
+        apiKeyId: row.api_key_id,
+        keyLabel: row.key_label,
+        last4: row.last4,
         inputTokens: Number(row.input_tokens),
         outputTokens: Number(row.output_tokens),
         cacheReadTokens: Number(row.cache_read_input_tokens),
@@ -1371,6 +1449,17 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
         readAt: row.read_at,
       })),
     })
+  })
+
+  app.get('/api/admin/settings', async (c) => {
+    const user = await requireUser(c, false)
+    if (user instanceof Response) {
+      return user
+    }
+    if (user.role !== 'admin') {
+      return c.json({ error: { message: 'forbidden' } }, 403)
+    }
+    return c.json({ lowBalanceCny: await threshold() })
   })
 
   app.patch('/api/admin/settings', async (c) => {

@@ -1,8 +1,25 @@
 import { createServer, type Server } from 'node:http'
+import postgres from 'postgres'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createServer as createHarbor, type HarborServer } from './app.js'
 
-const databaseUrl = process.env.DATABASE_URL ?? 'postgres://harbor:harbor@127.0.0.1:5432/harbor'
+const configuredUrl = process.env.DATABASE_URL
+const databaseUrl = configuredUrl ?? 'postgres://harbor:harbor@127.0.0.1:5432/harbor'
+
+const postgresReady = await (async () => {
+  const sql = postgres(databaseUrl, { max: 1, connect_timeout: 2 })
+  try {
+    await sql`select 1`
+    return true
+  } catch (error) {
+    if (configuredUrl) {
+      throw error
+    }
+    return false
+  } finally {
+    await sql.end({ timeout: 1 }).catch(() => undefined)
+  }
+})()
 const masterKey = Buffer.alloc(32, 9)
 
 const sse = [
@@ -21,9 +38,9 @@ const sse = [
   '',
 ].join('\n')
 
-describe('harbor server', () => {
-  let harbor: HarborServer
-  let mock: Server
+describe.skipIf(!postgresReady)('harbor server', () => {
+  let harbor!: HarborServer
+  let mock!: Server
   let upstream: string
   const seen: string[] = []
   let fileBody = ''
@@ -61,6 +78,15 @@ describe('harbor server', () => {
         return
       }
       if (request.url?.includes('/messages')) {
+        try {
+          const parsed = JSON.parse(raw) as { system?: string }
+          seen.push(`system:${parsed.system ?? ''}`)
+        } catch {
+          seen.push('system:')
+        }
+        if (key.includes('slow-stream')) {
+          await new Promise((resolve) => setTimeout(resolve, 90))
+        }
         if (key.includes('fail-chat')) {
           response.writeHead(401, { 'content-type': 'application/json' })
           response.end(JSON.stringify({ error: { message: 'unauthorized' } }))
@@ -92,12 +118,15 @@ describe('harbor server', () => {
     const address = mock.address()
     const port = typeof address === 'object' && address ? address.port : 0
     upstream = `http://127.0.0.1:${port}`
-    harbor = await createHarbor({ databaseUrl, masterKey, upstream })
+    harbor = await createHarbor({ databaseUrl, masterKey, upstream, eventPingMs: 40, trustProxy: true })
   })
 
   afterAll(async () => {
-    await harbor.close()
-    await new Promise<void>((resolve, reject) => mock.close((error) => (error ? reject(error) : resolve())))
+    await harbor?.close().catch(() => undefined)
+    if (!mock?.listening) {
+      return
+    }
+    await new Promise<void>((resolve) => mock?.close(() => resolve()))
   })
 
   beforeEach(async () => {
@@ -210,6 +239,22 @@ describe('harbor server', () => {
     const bad = await harbor.sql<{ status: string }[]>`select status from api_keys where label = 'bad'`
     expect(bad[0]?.status).toBe('error')
     expect(seen.some((line) => line.includes('/messages') && line.includes('good-pool-key'))).toBe(true)
+    expect(seen.some((line) => line.startsWith('system:') && line.includes('Asia/Shanghai') && line.includes('Current date and time'))).toBe(true)
+    const ledger = await harbor.app.request('/api/admin/usage', { headers: authed(session, created.csrf) })
+    const ledgerBody = (await ledger.json()) as { daily: Array<{ day: string; username: string; keyLabel: string }> }
+    expect(ledgerBody.daily[0]?.day).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(ledgerBody.daily[0]?.username).toBe('ada')
+    expect(ledgerBody.daily[0]?.keyLabel).toBe('good')
+
+    const health = await harbor.app.request('http://127.0.0.1/api/health')
+    expect(health.headers.get('x-content-type-options')).toBe('nosniff')
+    expect(health.headers.get('x-frame-options')).toBe('DENY')
+    expect(health.headers.get('content-security-policy')).toContain("frame-ancestors 'none'")
+    expect(health.headers.get('strict-transport-security')).toBeNull()
+    const secure = await harbor.app.request('https://harbor.example/api/health')
+    expect(secure.headers.get('strict-transport-security')).toContain('max-age=31536000')
+    const forwarded = await harbor.app.request('http://127.0.0.1/api/health', { headers: { 'x-forwarded-proto': 'https' } })
+    expect(forwarded.headers.get('strict-transport-security')).toContain('max-age=31536000')
 
     const replay = await harbor.app.request(`/api/runs/${started.runId}/events?after=1`, {
       headers: authed(session, created.csrf),
@@ -217,6 +262,50 @@ describe('harbor server', () => {
     const tail = await replay.text()
     expect(tail).toContain('message_stop')
     expect(tail.startsWith('id: 1\n')).toBe(false)
+  })
+
+  it('does not write to a closed run stream after the ping interval', async () => {
+    const errors: string[] = []
+    const onError = (error: Error) => {
+      errors.push(error.name)
+    }
+    process.on('uncaughtException', onError)
+    try {
+      const setup = await harbor.app.request('/api/setup/admin', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+      })
+      const created = (await setup.json()) as { csrf: string }
+      const session = sessionOf(setup)
+      const headers = { 'content-type': 'application/json', ...authed(session, created.csrf, true) }
+      await harbor.app.request('/api/admin/keys', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ secret: 'slow-stream-key', accountGroup: 'slow' }),
+      })
+      await harbor.app.request('/api/conversations', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ id: 'slow-chat' }),
+      })
+      const run = await harbor.app.request('/api/conversations/slow-chat/runs', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ text: 'hello' }),
+      })
+      const started = (await run.json()) as { runId: string }
+      const events = await harbor.app.request(`/api/runs/${started.runId}/events`, {
+        headers: authed(session, created.csrf),
+      })
+      expect(await events.text()).toContain('"status":"complete"')
+      await new Promise((resolve) => setTimeout(resolve, 120))
+      expect(errors).toEqual([])
+      const stillUp = await harbor.app.request('/api/health')
+      expect(stillUp.status).toBe(200)
+    } finally {
+      process.off('uncaughtException', onError)
+    }
   })
 
   it('enforces the daily quota and merges a local import without overwriting', async () => {

@@ -54,7 +54,7 @@ pnpm preview
 
 ## 自托管
 
-`docker compose up` 会启动 Postgres 和同一个应用容器，不需要先写环境变量。第一页创建管理员，然后添加 API Key、邀请码和每人每天的额度。朋友在这个地址登录。可选变量、备份和升级见 [docs/self-host.zh-CN.md](docs/self-host.zh-CN.md)。镜像发布到 `ghcr.io/openlinkos/harbor-for-deepseek`。
+`docker compose pull && docker compose up -d` 会从 `ghcr.io/openlinkos/harbor-for-deepseek` 拉取镜像，并启动 Postgres 和同一个应用容器，不需要先写环境变量。第一页创建管理员，然后添加 API Key、邀请码和每人每天的额度。朋友在这个地址登录。可选变量、备份和升级见 [docs/self-host.zh-CN.md](docs/self-host.zh-CN.md)。
 
 如果官方 API 以后不再返回 CORS 头，静态页面会无法直连。这一版没有代理。不要在公开站点上悄悄加一个。
 

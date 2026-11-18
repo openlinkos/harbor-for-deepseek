@@ -1,4 +1,5 @@
 import { translate, type Locale } from '@harbor/i18n'
+import { presentBlocks } from './blocks.js'
 import { estimateCost, formatCny, sumUsage } from '@harbor/pricing'
 import { activePath, siblingIds } from '@harbor/types'
 import type { ContentBlock, Conversation, Message } from '@harbor/types'
@@ -197,17 +198,22 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
       return null
     }
     return (
-      <ul className="sources" data-testid="search-results">
-        {results.map((result) => (
-          <li key={result.url}>
-            <a href={result.url} target="_blank" rel="noreferrer noopener">
-              <strong>{result.title}</strong>
-              <span>{result.site_name || result.url}</span>
-            </a>
-            {result.snippet ? <p>{result.snippet}</p> : null}
-          </li>
-        ))}
-      </ul>
+      <details className="sources" data-testid="search-results">
+        <summary>
+          {t('sources')} · {results.length}
+        </summary>
+        <ul>
+          {results.map((result) => (
+            <li key={result.url}>
+              <a href={result.url} target="_blank" rel="noreferrer noopener">
+                <strong>{result.title}</strong>
+                <span>{result.site_name || result.url}</span>
+              </a>
+              {result.snippet ? <p>{result.snippet}</p> : null}
+            </li>
+          ))}
+        </ul>
+      </details>
     )
   }
   if (block.type === 'web_fetch_tool_result') {
@@ -294,7 +300,7 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
         ) : null}
       </header>
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
-      {message.blocks.map((block, blockIndex) => (
+      {presentBlocks(message.blocks).map((block, blockIndex) => (
         <BlockView
           key={`${message.id}-${blockIndex}`}
           block={block}
@@ -629,6 +635,7 @@ const Settings = () => {
   const logoutServer = useHarbor((state) => state.logoutServer)
   const openLogin = useHarbor((state) => state.openLogin)
   const totals = useHarbor((state) => state.totals)
+  const quota = useHarbor((state) => state.quota)
   const [asCopy, setAsCopy] = useState(false)
   const [nextKey, setNextKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
@@ -646,25 +653,42 @@ const Settings = () => {
         </header>
         <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
         <section>
-          <h3>{t('balance')}</h3>
-          <p data-testid="balance">
-            {info ? (
-              <>
-                {info.total_balance} {info.currency} · {balance?.is_available ? t('available') : t('unavailable')} · {t('granted')}{' '}
-                {info.granted_balance} · {t('toppedUp')} {info.topped_up_balance}
-              </>
-            ) : (
-              t('balanceFailed')
-            )}
-          </p>
-          {balanceError ? <p className="form-error">{t('balanceFailed')}</p> : null}
-          <button type="button" data-testid="refresh-balance" onClick={() => void refreshBalance()}>
-            {t('refresh')}
-          </button>
+          <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
+          {serverMode ? (
+            <p data-testid="quota">
+              {quota
+                ? t('quotaLine', {
+                    tokenUsed: quota.tokenUsed,
+                    tokenQuota: quota.tokenQuota,
+                    searchUsed: quota.searchUsed,
+                    searchQuota: quota.searchQuota,
+                    pageUsed: quota.pageUsed,
+                    pageQuota: quota.pageQuota,
+                  })
+                : t('balanceFailed')}
+            </p>
+          ) : (
+            <p data-testid="balance">
+              {info ? (
+                <>
+                  {info.total_balance} {info.currency} · {balance?.is_available ? t('available') : t('unavailable')} · {t('granted')}{' '}
+                  {info.granted_balance} · {t('toppedUp')} {info.topped_up_balance}
+                </>
+              ) : (
+                t('balanceFailed')
+              )}
+            </p>
+          )}
+          {balanceError && !serverMode ? <p className="form-error">{t('balanceFailed')}</p> : null}
+          {serverMode ? null : (
+            <button type="button" data-testid="refresh-balance" onClick={() => void refreshBalance()}>
+              {t('refresh')}
+            </button>
+          )}
         </section>
         <section>
           <h3>{t('usageTitle')}</h3>
-          <p className="hint">{t('noUsageApi')}</p>
+          <p className="hint">{serverMode ? t('serverUsageNote') : t('noUsageApi')}</p>
           <ul className="usage-grid">
             <li>{t('input')}: {totals.input_tokens}</li>
             <li>{t('cache')}: {totals.cache_read_input_tokens}</li>
@@ -718,9 +742,9 @@ const Settings = () => {
           </label>
         </section>
         <section>
-          <h3>{t('privacyTitle')}</h3>
-          <p className="hint">{t('currentKey')}</p>
-          <p className="hint">{t('importMergeNote')}</p>
+          <h3>{serverMode ? t('serverPrivacyTitle') : t('privacyTitle')}</h3>
+          <p className="hint">{serverMode ? t('serverPrivacyBody') : t('currentKey')}</p>
+          <p className="hint">{serverMode ? t('serverImportNote') : t('importMergeNote')}</p>
           <div className="button-row">
             <button type="button" data-testid="export-json" onClick={() => void exportJson()}>
               {t('exportJson')}
@@ -766,6 +790,7 @@ const Settings = () => {
             </label>
           </div>
         </section>
+        {serverMode ? null : (
         <section>
           <h3>{t('replaceKey')}</h3>
           <input type="password" value={nextKey} autoComplete="off" onChange={(event) => setNextKey(event.target.value)} />
@@ -784,6 +809,7 @@ const Settings = () => {
             </button>
           </div>
         </section>
+        )}
         <section>
           <h3>{t('serverTitle')}</h3>
           <p>{t('serverBody')}</p>

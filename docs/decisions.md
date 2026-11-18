@@ -15,3 +15,5 @@ The design notes and the ecosystem notes disagree in a few places. The ecosystem
 11. **Server mode and the public CSP.** The Pages `_headers` file only allows connections to this origin and `api.deepseek.com`. Logging into a server you host is done by opening that server’s own address. The public static site does not call it. On that address, on-device mode still does not call the server.
 12. **Database.** Postgres is the only server database. There is no SQLite path.
 13. **Proxied safety review.** Every chat the server sends upstream uses `safety_check` level `high`.
+14. **Clock in the prompt.** Both modes tell the model the current date and time. The default zone is Asia/Shanghai. The browser can send its own zone. A Chinese interface uses a Chinese system prompt and asks the model to reason in the user’s language.
+15. **Self-hosted headers.** The server sends the same CSP and framing headers as `apps/web/public/_headers`. HSTS is not sent on plain HTTP unless the request is HTTPS (or `TRUST_PROXY` says so) or `HARBOR_HSTS=1`.
