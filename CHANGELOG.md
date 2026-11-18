@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 — 2026-11-18
+
+Optional self-hosted server. `docker compose up` needs no environment variables and opens a setup wizard. Admins keep an encrypted key pool, official balances, a 50 CNY in-app alert, invite codes, and daily quotas. Logged-in browsers chat through the pool and can sync. On-device mode remains the default on the public static site.
+
 ## 0.1.0 — 2026-11-18
 
 First release of the M1 static web app.

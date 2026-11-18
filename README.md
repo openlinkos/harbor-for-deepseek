@@ -50,7 +50,11 @@ pnpm build   # static files in apps/web/dist
 pnpm preview
 ```
 
-Deployment, checksums, and the CSP headers: [docs/deploy.md](docs/deploy.md).
+Deployment of the static site, including Cloudflare Pages: [docs/deploy.md](docs/deploy.md).
+
+## Self-hosting
+
+`docker compose up` starts Postgres and one app container. Nothing has to be set in the environment. The first page creates an admin, who adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details, the optional variables, and backup steps: [docs/self-host.md](docs/self-host.md). The image is published to `ghcr.io/openlinkos/harbor-for-deepseek`.
 
 If the official API later stops sending CORS headers, the static page will stop working. A proxy is not included. Do not add one on the public host without saying so.
 

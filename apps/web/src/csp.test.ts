@@ -30,6 +30,7 @@ describe('content security policy', () => {
     const worker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8')
     expect(worker).toContain('api.deepseek.com')
     expect(worker).toContain('origin')
+    expect(worker).toContain("'/api/'")
     expect(worker).not.toContain('cache.add')
   })
 })

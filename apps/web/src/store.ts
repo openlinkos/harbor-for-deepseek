@@ -4,6 +4,7 @@ import { exportV3, importV3 } from '@harbor/archive-v3'
 import { estimateCost, sumUsage } from '@harbor/pricing'
 import { createDraft, reduceEvent } from '@harbor/sse'
 import { openIndexedRepository, openSecret, sealSecret } from '@harbor/storage'
+import { api, hostedPage, readRun, setCsrf, type ServerUser } from './remote.js'
 import type { Repository } from '@harbor/storage'
 import {
   activePath,
@@ -21,6 +22,8 @@ import { create } from 'zustand'
 const client = createClient()
 let repo: Repository | null = null
 let abort: AbortController | null = null
+let serverAbort: AbortController | null = null
+let serverRunId: string | null = null
 let persistTimer = 0
 
 export type DraftFile = {
@@ -107,6 +110,22 @@ export type HarborState = {
   setSettingsOpen: (open: boolean) => void
   setSidebarOpen: (open: boolean) => void
   dismissNotice: () => void
+  hosted: boolean
+  setupRequired: boolean
+  serverUser: ServerUser | null
+  serverMode: boolean
+  showLogin: boolean
+  showAdmin: boolean
+  setupAdmin: (username: string, password: string) => Promise<void>
+  loginServer: (username: string, password: string) => Promise<void>
+  registerServer: (code: string, username: string, password: string) => Promise<void>
+  logoutServer: () => Promise<void>
+  enterServerMode: () => Promise<void>
+  enterLocalMode: () => Promise<void>
+  syncServer: () => Promise<void>
+  copyLocalToServer: () => Promise<void>
+  openLogin: () => void
+  openAdmin: (open: boolean) => void
 }
 
 const repository = async () => {
@@ -158,6 +177,12 @@ export const useHarbor = create<HarborState>((set, get) => ({
   notice: null,
   prefs: defaultPrefs(),
   drafts: [],
+  hosted: false,
+  setupRequired: false,
+  serverUser: null,
+  serverMode: false,
+  showLogin: false,
+  showAdmin: false,
 
   async boot() {
     const previousKey = get().key
@@ -209,6 +234,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
     })
     if (key) {
       void get().refreshBalance()
+    }
+    if (hostedPage()) {
+      await probeHost(set, get)
     }
   },
 
@@ -286,6 +314,26 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async openChat(id) {
+    if (get().serverMode) {
+      const data = await api<{ messages: Message[] }>(`/api/conversations/${id}/messages`)
+      const conversation = get().conversations.find((item) => item.id === id)
+      set({
+        activeId: id,
+        messages: data.messages,
+        sidebarOpen: false,
+        drafts: [],
+        prefs: conversation
+          ? {
+              model: conversation.model,
+              thinking: conversation.thinking,
+              search: conversation.search,
+              readLink: conversation.readLink,
+              effort: conversation.effort,
+            }
+          : get().prefs,
+      })
+      return
+    }
     const store = await repository()
     const messages = await store.listMessages(id)
     const conversation = get().conversations.find((item) => item.id === id)
@@ -307,6 +355,15 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async rename(id, title) {
+    if (get().serverMode) {
+      await api(`/api/conversations/${id}`, { method: 'PATCH', body: JSON.stringify({ title }) })
+      set({
+        conversations: get().conversations.map((item) =>
+          item.id === id ? { ...item, title, titleSource: 'user' } : item,
+        ),
+      })
+      return
+    }
     const store = await repository()
     const current = get().conversations.find((item) => item.id === id)
     if (!current) {
@@ -318,6 +375,17 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async removeChat(id) {
+    if (get().serverMode) {
+      await api(`/api/conversations/${id}`, { method: 'DELETE' })
+      const wasActive = get().activeId === id
+      const conversations = get().conversations.filter((item) => item.id !== id)
+      const next = wasActive ? (conversations[0]?.id ?? null) : get().activeId
+      set({ conversations, activeId: next, messages: wasActive ? [] : get().messages })
+      if (wasActive && next) {
+        await get().openChat(next)
+      }
+      return
+    }
     const store = await repository()
     await store.deleteConversation(id)
     const conversations = get().conversations.filter((item) => item.id !== id)
@@ -343,6 +411,14 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const next = stamp({ ...conversation, activeLeafId: leaf })
+    if (get().serverMode) {
+      await api(`/api/conversations/${conversation.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ activeLeafId: leaf }),
+      })
+      set({ conversations: get().conversations.map((item) => (item.id === next.id ? next : item)) })
+      return
+    }
     await (await repository()).saveConversation(next)
     set({
       conversations: get().conversations.map((item) => (item.id === next.id ? next : item)),
@@ -351,6 +427,10 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async send(text) {
+    if (get().serverMode) {
+      await runServerTurn(text.trim(), null)
+      return
+    }
     const trimmed = text.trim()
     const { drafts, streaming, key } = get()
     if (streaming || !key) {
@@ -367,7 +447,14 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async regenerate(assistantId) {
     const assistant = get().messages.find((item) => item.id === assistantId)
-    if (!assistant || get().streaming || !get().key) {
+    if (!assistant || get().streaming) {
+      return
+    }
+    if (get().serverMode) {
+      await runServerTurn('', assistant.parentId)
+      return
+    }
+    if (!get().key) {
       return
     }
     await runTurn('', assistant.parentId)
@@ -375,6 +462,10 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   stop() {
     abort?.abort()
+    serverAbort?.abort()
+    if (serverRunId) {
+      void api(`/api/runs/${serverRunId}/abort`, { method: 'POST' }).catch(() => undefined)
+    }
   },
 
   async refreshBalance() {
@@ -391,6 +482,33 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async addFiles(files) {
+    if (get().serverMode) {
+      for (const file of files) {
+        const localId = nid()
+        const mapped = purposeForFile(file.name, file.type, get().settings.documentPurpose)
+        set({
+          drafts: [...get().drafts, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true }],
+        })
+        try {
+          const form = new FormData()
+          form.set('purpose', mapped.purpose)
+          form.set('file', file)
+          const uploaded = await api<{ id: string; expires_at: number | null }>('/api/files', { method: 'POST', body: form })
+          set({
+            drafts: get().drafts.map((item) =>
+              item.localId === localId ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at } : item,
+            ),
+          })
+        } catch (error) {
+          set({
+            drafts: get().drafts.map((item) =>
+              item.localId === localId ? { ...item, busy: false, error: error instanceof Error ? error.message : 'upload' } : item,
+            ),
+          })
+        }
+      }
+      return
+    }
     const key = get().key
     const settings = get().settings
     if (!key || get().prefs.model !== 'deepseek-flash') {
@@ -470,6 +588,80 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
   dismissNotice() {
     set({ notice: null })
+  },
+
+  async setupAdmin(username, password) {
+    const result = await api<{ user: ServerUser; csrf: string }>('/api/setup/admin', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    })
+    setCsrf(result.csrf)
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ setupRequired: false, serverUser: result.user, serverMode: true, showAdmin: result.user.role === 'admin', conversations: [], messages: [], activeId: null })
+  },
+
+  async loginServer(username, password) {
+    const result = await api<{ user: ServerUser; csrf: string }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    })
+    setCsrf(result.csrf)
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ serverUser: result.user, serverMode: true, showLogin: false, showAdmin: false })
+    await loadServerChats(set)
+  },
+
+  async registerServer(code, username, password) {
+    const result = await api<{ user: ServerUser; csrf: string }>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ code, username, password }),
+    })
+    setCsrf(result.csrf)
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ serverUser: result.user, serverMode: true, showLogin: false })
+    await loadServerChats(set)
+  },
+
+  async logoutServer() {
+    await api('/api/auth/logout', { method: 'POST' })
+    setCsrf('')
+    sessionStorage.removeItem('harbor-mode')
+    set({ serverUser: null, serverMode: false, showAdmin: false, showLogin: true })
+    await reloadLocal(set)
+  },
+
+  async enterServerMode() {
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ serverMode: true })
+    await loadServerChats(set)
+  },
+
+  async enterLocalMode() {
+    sessionStorage.setItem('harbor-mode', 'local')
+    set({ serverMode: false, showAdmin: false })
+    await reloadLocal(set)
+  },
+
+  async syncServer() {
+    await loadServerChats(set)
+  },
+
+  async copyLocalToServer() {
+    const payload = exportNative(await collect(), nowIso())
+    const result = await api<{ added: number; skipped: number }>('/api/migrations/local', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    set({ notice: `${result.added}:${result.skipped}` })
+    await loadServerChats(set)
+  },
+
+  openLogin() {
+    set({ showLogin: true })
+  },
+
+  openAdmin(open) {
+    set({ showAdmin: open })
   },
 }))
 
@@ -664,3 +856,186 @@ export const conversationCost = (messages: Message[]) =>
     sumUsage(messages.map((message) => message.usage)),
     new Date(),
   )
+
+type Setter = (partial: Partial<HarborState>) => void
+
+const reloadLocal = async (set: Setter) => {
+  const store = await repository()
+  const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  const activeId = conversations[0]?.id ?? null
+  const messages = activeId ? await store.listMessages(activeId) : []
+  set({ conversations, activeId, messages, serverMode: false })
+}
+
+const loadServerChats = async (set: Setter) => {
+  const sync = await api<{
+    cursor: number
+    conversations: Conversation[]
+    messages: Message[]
+  }>('/api/sync?cursor=0')
+  const conversations = [...sync.conversations].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  const previous = useHarbor.getState().activeId
+  const activeId = conversations.some((item) => item.id === previous) ? previous : (conversations[0]?.id ?? null)
+  const messages = activeId ? (await api<{ messages: Message[] }>(`/api/conversations/${activeId}/messages`)).messages : []
+  const usages = sync.messages.map((message) => message.usage)
+  set({ conversations, activeId, messages, totals: sumUsage(usages), serverMode: true })
+}
+
+const probeHost = async (set: Setter, get: () => HarborState) => {
+  set({ hosted: true })
+  const config = await api<{ setup_required: boolean }>('/api/config')
+  if (config.setup_required) {
+    set({ setupRequired: true })
+    return
+  }
+  try {
+    const me = await api<{ user: ServerUser; csrf: string }>('/api/me')
+    setCsrf(me.csrf)
+    const useServer = sessionStorage.getItem('harbor-mode') !== 'local'
+    set({ serverUser: me.user, serverMode: useServer, showAdmin: false })
+    if (useServer) {
+      await loadServerChats(set)
+    }
+  } catch {
+    set({ serverUser: null, serverMode: false })
+  }
+  void get
+}
+
+const runServerTurn = async (text: string, regenerateParent: string | null) => {
+  const state = useHarbor.getState()
+  if (state.streaming) {
+    return
+  }
+  let conversationId = state.activeId
+  if (!conversationId || regenerateParent === null && !state.conversations.some((item) => item.id === conversationId)) {
+    conversationId = nid()
+    await api('/api/conversations', {
+      method: 'POST',
+      body: JSON.stringify({ id: conversationId, ...state.prefs }),
+    })
+  }
+  const files = state.drafts.filter((file) => file.fileId)
+  useHarbor.setState({ streaming: true, drafts: [] })
+  const started = await api<{ runId: string; userMessageId: string; assistantMessageId: string }>(
+    `/api/conversations/${conversationId}/runs`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        text,
+        parentId: regenerateParent,
+        files: files.map((file) => ({
+          fileId: file.fileId,
+          filename: file.filename,
+          media: file.media,
+          purpose: file.purpose,
+          bytes: file.bytes,
+          expiresAt: file.expiresAt,
+        })),
+        ...state.prefs,
+      }),
+    },
+  )
+  serverRunId = started.runId
+  const now = nowIso()
+  const userMessage: Message | null = regenerateParent
+    ? null
+    : {
+        id: started.userMessageId,
+        conversationId,
+        parentId: state.activeId ? state.conversations.find((item) => item.id === conversationId)?.activeLeafId ?? null : null,
+        role: 'user',
+        status: 'complete',
+        blocks: [{ type: 'text', text }],
+        usage: null,
+        errorMessage: null,
+        createdAt: now,
+        updatedAt: now,
+        rev: 1,
+        deletedAt: null,
+      }
+  const assistant: Message = {
+    id: started.assistantMessageId,
+    conversationId,
+    parentId: regenerateParent ?? started.userMessageId,
+    role: 'assistant',
+    status: 'streaming',
+    blocks: [],
+    usage: null,
+    errorMessage: null,
+    createdAt: now,
+    updatedAt: now,
+    rev: 1,
+    deletedAt: null,
+  }
+  const conversations = state.conversations.some((item) => item.id === conversationId)
+    ? state.conversations.map((item) =>
+        item.id === conversationId ? { ...item, activeLeafId: assistant.id, updatedAt: now } : item,
+      )
+    : [
+        {
+          id: conversationId,
+          title: '',
+          titleSource: 'default' as const,
+          ...state.prefs,
+          pinned: false,
+          archived: false,
+          activeLeafId: assistant.id,
+          createdAt: now,
+          updatedAt: now,
+          rev: 1,
+          deletedAt: null,
+        },
+        ...state.conversations,
+      ]
+  useHarbor.setState({
+    conversations,
+    activeId: conversationId,
+    messages: [...state.messages.filter((item) => item.conversationId === conversationId), ...(userMessage ? [userMessage] : []), assistant],
+  })
+  serverAbort = new AbortController()
+  let draft = createDraft()
+  try {
+    await readRun(
+      started.runId,
+      (event) => {
+        draft = reduceEvent(draft, event)
+        if (event.type === 'message_delta' && event.delta.title) {
+          useHarbor.setState({
+            conversations: useHarbor.getState().conversations.map((item) =>
+              item.id === conversationId && item.titleSource !== 'user'
+                ? { ...item, title: event.delta.title ?? item.title, titleSource: 'auto' }
+                : item,
+            ),
+          })
+        }
+        useHarbor.setState({
+          messages: useHarbor.getState().messages.map((item) =>
+            item.id === assistant.id ? { ...item, blocks: draft.blocks.filter(Boolean), usage: draft.usage } : item,
+          ),
+        })
+      },
+      serverAbort.signal,
+    )
+    const status = draft.stopReason === 'refusal' ? 'refused' : serverAbort.signal.aborted ? 'aborted' : 'complete'
+    useHarbor.setState({
+      messages: useHarbor.getState().messages.map((item) =>
+        item.id === assistant.id
+          ? { ...item, status, blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean), usage: draft.usage }
+          : item,
+      ),
+    })
+  } catch (error) {
+    useHarbor.setState({
+      messages: useHarbor.getState().messages.map((item) =>
+        item.id === assistant.id
+          ? { ...item, status: 'error', errorMessage: error instanceof Error ? error.message : 'error', blocks: draft.blocks.filter(Boolean) }
+          : item,
+      ),
+    })
+  } finally {
+    serverAbort = null
+    serverRunId = null
+    useHarbor.setState({ streaming: false })
+  }
+}

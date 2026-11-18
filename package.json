@@ -17,6 +17,7 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "e2e": "pnpm --filter @harbor/web e2e",
+    "e2e:server": "pnpm --filter @harbor/web exec playwright test -c playwright.server.config.ts",
     "scan-secrets": "node scripts/scan-secrets.mjs"
   },
   "devDependencies": {
