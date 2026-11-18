@@ -8,7 +8,6 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const INK = [15, 23, 42]
 const ACCENT = [37, 99, 235]
 const INK_DARK = [226, 232, 240]
-const ACCENT_DARK = [107, 155, 255]
 const TILE = [15, 23, 42]
 
 const crcTable = new Uint32Array(256)
@@ -89,48 +88,54 @@ const distSeg = (px, py, x0, y0, x1, y1) => {
   return Math.hypot(px - (x0 + t * dx), py - (y0 + t * dy))
 }
 
-const RING_R = 13
-const RING_STROKE = 5.5
-const ringAngle = Math.acos(8 / RING_R) * (180 / Math.PI)
-const ringGap = (((RING_STROKE + 2.5) / RING_R) * (180 / Math.PI)) / 2
-
-const flattenArc = (cx, cy, radius, a0, a1, steps = 72) => {
+const clockwiseArc = (cx, cy, radius, a0, a1, steps = 12) => {
   let sweep = ((a1 - a0) % 360 + 360) % 360
   if (sweep === 0) sweep = 360
   const points = []
   for (let i = 0; i <= steps; i += 1) {
-    const deg = a0 + (sweep * i) / steps
-    const a = (deg * Math.PI) / 180
+    const a = ((a0 + (sweep * i) / steps) * Math.PI) / 180
     points.push([cx + radius * Math.cos(a), cy + radius * Math.sin(a)])
   }
   return points
 }
 
-const inkArc = flattenArc(16, 24, RING_R, -ringAngle + ringGap, 360 - ringAngle - ringGap)
-const accentArc = flattenArc(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap)
+const bubble = [[15, 4], [33, 4]]
+const joinArc = (cx, cy, radius, a0, a1) => {
+  const arc = clockwiseArc(cx, cy, radius, a0, a1)
+  arc.shift()
+  bubble.push(...arc)
+}
+joinArc(33, 14, 10, -90, 0)
+bubble.push([43, 22])
+joinArc(33, 22, 10, 0, 90)
+bubble.push([24, 32], [12, 42], [18, 32], [15, 32])
+joinArc(15, 22, 10, 90, 180)
+bubble.push([5, 14])
+joinArc(15, 14, 10, 180, 270)
 
-const nearest = (px, py, points) => {
-  let best = Infinity
-  for (let i = 0; i < points.length - 1; i += 1) {
-    best = Math.min(best, distSeg(px, py, points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]))
+const insidePoly = (x, y, points) => {
+  let inside = false
+  for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
+    const [xi, yi] = points[i]
+    const [xj, yj] = points[j]
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside
   }
-  return best
+  return inside
 }
 
 const cover = (px, py) => {
-  const half = RING_STROKE / 2
-  const ink = nearest(px, py, inkArc)
-  const accent = nearest(px, py, accentArc)
-  if (ink <= half && ink <= accent) return 'ink'
-  if (accent <= half) return 'accent'
+  if (distSeg(px, py, 16, 18.1, 32, 18.1) <= 2.6) return 'accent'
+  if (insidePoly(px, py, bubble)) return 'ink'
   return null
 }
+
+const BUBBLE = 'M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z'
+const BAR = 'M16 15.5h16a2.6 2.6 0 0 1 0 5.2H16a2.6 2.6 0 0 1 0-5.2Z'
 
 const render = (size, options) => {
   const ss = size > 256 ? 2 : 4
   const S = size * ss
   const src = Buffer.alloc(S * S * 4)
-  const stroke = options.small ? 5.5 : 4
   const ox = options.ox ?? 0
   const oy = options.oy ?? 0
   const scale = options.scale ?? 1
@@ -212,7 +217,7 @@ const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
   const oy = ox
   return render(size, {
     ink: INK_DARK,
-    accent: ACCENT_DARK,
+    accent: ACCENT, // bar sits on the light bubble, so the pale dark-mode blue would fall under 3:1
     small,
     scale,
     ox,
@@ -223,34 +228,17 @@ const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
   })
 }
 
-const arcPath = (cx, cy, radius, a0, a1) => {
-  const p = (deg) => {
-    const a = (deg * Math.PI) / 180
-    return [cx + radius * Math.cos(a), cy + radius * Math.sin(a)]
-  }
-  const [x0, y0] = p(a0)
-  const [x1, y1] = p(a1)
-  let sweep = ((a1 - a0) % 360 + 360) % 360
-  if (sweep === 0) sweep = 360
-  const n = (v) => (Math.round(v * 100) / 100).toString()
-  return `M${n(x0)} ${n(y0)}A${radius} ${radius} 0 ${sweep > 180 ? 1 : 0} 1 ${n(x1)} ${n(y1)}`
-}
-
-const INK_ARC = arcPath(16, 24, RING_R, -ringAngle + ringGap, 360 - ringAngle - ringGap)
-const ACCENT_ARC = arcPath(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap)
-const MOUTH_ARC = arcPath(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap - 95)
-
 const markSvg = (ink, accent) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<path d="${INK_ARC}" fill="none" stroke="${ink}" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
-  `<path d="${ACCENT_ARC}" fill="none" stroke="${accent}" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
+  `<path d="${BUBBLE}" fill="${ink}"/>` +
+  `<path d="${BAR}" fill="${accent}"/>` +
   `</svg>\n`
 
 const faviconSvg =
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<style>.ink,.accent{fill:none;stroke-width:${RING_STROKE};stroke-linecap:round}.ink{stroke:#0f172a}.accent{stroke:#2563eb}` +
-  `@media (prefers-color-scheme:dark){.ink{stroke:#e2e8f0}.accent{stroke:#6b9bff}}</style>` +
-  `<path class="ink" d="${INK_ARC}"/><path class="accent" d="${ACCENT_ARC}"/>` +
+  `<style>.ink{fill:#0f172a}.accent{fill:#2563eb}` +
+  `@media (prefers-color-scheme:dark){.ink{fill:#e2e8f0}}</style>` +
+  `<path class="ink" d="${BUBBLE}"/><path class="accent" d="${BAR}"/>` +
   `</svg>\n`
 
 const write = (path, data) => {
@@ -260,18 +248,10 @@ const write = (path, data) => {
 
 const optionSvg = (name, body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="${name}">${body}</svg>\n`
-const strokePair = (d1, d2) =>
-  `<path d="${d1}" fill="none" stroke="#0f172a" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
-  `<path d="${d2}" fill="none" stroke="#2563eb" stroke-width="${RING_STROKE}" stroke-linecap="round"/>`
 
 write(join(root, 'brand/logo.svg'), markSvg('#0f172a', '#2563eb'))
-write(join(root, 'brand/logo-dark.svg'), markSvg('#e2e8f0', '#6b9bff'))
-write(join(root, 'brand/options/kin.svg'), optionSvg('Kin', strokePair(INK_ARC, ACCENT_ARC)))
-write(join(root, 'brand/options/mouth.svg'), optionSvg('Mouth', strokePair(INK_ARC, MOUTH_ARC)))
-write(join(root, 'brand/options/haven.svg'), optionSvg('Haven', `<path fill="#0f172a" d="M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z"/><path fill="#2563eb" d="M16 15.5h16a2.6 2.6 0 0 1 0 5.2H16a2.6 2.6 0 0 1 0-5.2Z"/>`))
+write(join(root, 'brand/logo-dark.svg'), markSvg('#e2e8f0', '#2563eb'))
 write(join(root, 'brand/options/pool.svg'), optionSvg('Pool', `<path fill="#0f172a" fill-rule="evenodd" d="M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z M16 16H32A2.4 2.4 0 0 1 32 20.8H16A2.4 2.4 0 0 1 16 16Z"/>`))
-write(join(root, 'brand/options/basin.svg'), optionSvg('Basin', `<path fill="#0f172a" fill-rule="evenodd" d="M12 4H36A8 8 0 0 1 44 12V36A8 8 0 0 1 36 44H12A8 8 0 0 1 4 36V12A8 8 0 0 1 12 4Z M14 27H34A2.5 2.5 0 0 1 34 32H14A2.5 2.5 0 0 1 14 27Z"/>`))
-write(join(root, 'brand/options/line.svg'), optionSvg('Line', `<path fill="#0f172a" d="M12 4H36A8 8 0 0 1 44 12V36A8 8 0 0 1 36 44H12A8 8 0 0 1 4 36V12A8 8 0 0 1 12 4Z"/><path fill="#2563eb" d="M14 27H34A2.5 2.5 0 0 1 34 32H14A2.5 2.5 0 0 1 14 27Z"/>`))
 write(join(root, 'apps/web/public/logo.svg'), markSvg('#0f172a', '#2563eb'))
 write(join(root, 'apps/web/public/favicon.svg'), faviconSvg)
 
@@ -400,18 +380,8 @@ const vector = `<?xml version="1.0" encoding="utf-8"?>
     android:viewportWidth="108"
     android:viewportHeight="108">
     <group android:translateX="${pad.toFixed(2)}" android:translateY="${pad.toFixed(2)}" android:scaleX="${fit.toFixed(4)}" android:scaleY="${fit.toFixed(4)}">
-        <path
-            android:fillColor="#00000000"
-            android:pathData="${INK_ARC}"
-            android:strokeColor="#E2E8F0"
-            android:strokeLineCap="round"
-            android:strokeWidth="${RING_STROKE}"/>
-        <path
-            android:fillColor="#00000000"
-            android:pathData="${ACCENT_ARC}"
-            android:strokeColor="#6B9BFF"
-            android:strokeLineCap="round"
-            android:strokeWidth="${RING_STROKE}"/>
+        <path android:fillColor="#E2E8F0" android:pathData="${BUBBLE}"/>
+        <path android:fillColor="#2563EB" android:pathData="${BAR}"/>
     </group>
 </vector>
 `
