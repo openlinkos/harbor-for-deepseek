@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 — 2026-11-18
+
+Phone layout. Below 768px the chat matches the official phone screen: a short top bar, a docked input, a left drawer, and bottom sheets for sources and settings. Local mode calls the signed-out row 本地港湾 / Local Harbor. A nickname in Settings replaces that label.
+
 ## 0.4.0 — 2026-11-18
 
 iOS shell. The same Capacitor app builds an unsigned simulator binary on a macOS runner. TestFlight stays a manual archive from a maintainer’s Apple Developer account. No signing secret is stored in the repo.

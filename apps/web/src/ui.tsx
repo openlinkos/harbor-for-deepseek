@@ -6,7 +6,18 @@ import type { ContentBlock, Conversation, Message } from '@harbor/types'
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
+import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor, type HarborState } from './store.js'
+
+const useProfile = () => {
+  const [profile, setProfile] = useState<LocalProfile>(readProfile)
+  useEffect(() => {
+    const sync = () => setProfile(readProfile())
+    window.addEventListener('harbor-profile', sync)
+    return () => window.removeEventListener('harbor-profile', sync)
+  }, [])
+  return profile
+}
 
 const Mark = () => (
   <svg className="mark" viewBox="0 0 32 32" aria-hidden="true">
@@ -144,7 +155,7 @@ const ThemeSwitch = () => {
   const t = useT()
   const [theme, setTheme] = useState<ThemeChoice>(readTheme())
   return (
-    <div className="chips">
+    <div className="chips theme-cards">
       {(['system', 'light', 'dark'] as ThemeChoice[]).map((choice) => (
         <button
           key={choice}
@@ -244,15 +255,25 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     snippet: result.snippet ?? '',
     site: result.site_name || result.url,
   }))
+  const marks = (
+    <span className="favicons">
+      {results.slice(0, 3).map((result) => (
+        <i key={result.url}>{result.title.slice(0, 1)}</i>
+      ))}
+    </span>
+  )
   return (
-    <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
-      <span className="favicons">
-        {results.slice(0, 3).map((result) => (
-          <i key={result.url}>{result.title.slice(0, 1)}</i>
-        ))}
-      </span>
-      {t('readPages', { count: results.length })}
-    </button>
+    <div className="search-block">
+      <p className="found-line">
+        <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+        {t('foundPages', { count: results.length })}
+        {marks}
+      </p>
+      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
+        {marks}
+        {t('pagesPill', { count: results.length })}
+      </button>
+    </div>
   )
 }
 
@@ -308,7 +329,19 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
           </span>
         </header>
       ) : null}
-      {message.role === 'user' ? <div className="bubble">{textOf}</div> : null}
+      {message.role === 'user' ? (
+        <>
+          <div className="bubble">{textOf}</div>
+          <div className="user-actions">
+            <button type="button" aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
+              <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+            </button>
+            <button type="button" aria-label={t('edit')} onClick={() => window.dispatchEvent(new CustomEvent('harbor-prefill', { detail: textOf }))}>
+              <Icon d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+            </button>
+          </div>
+        </>
+      ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
       {message.role === 'assistant'
         ? presentBlocks(message.blocks).map((block, blockIndex) => (
@@ -352,11 +385,32 @@ export const Shell = () => {
     [state.messages, conversation?.activeLeafId],
   )
   const endRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const [away, setAway] = useState(false)
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
+    setAway(false)
   }, [path.length, state.streaming, state.messages])
+  useEffect(() => {
+    const viewport = window.visualViewport
+    if (!viewport) {
+      return undefined
+    }
+    const sync = () => {
+      const inset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+      document.documentElement.style.setProperty('--keyboard-inset', `${inset}px`)
+    }
+    sync()
+    viewport.addEventListener('resize', sync)
+    viewport.addEventListener('scroll', sync)
+    return () => {
+      viewport.removeEventListener('resize', sync)
+      viewport.removeEventListener('scroll', sync)
+    }
+  }, [])
 
   const total = estimateCost(state.totals, new Date())
+  const profile = useProfile()
   const [collapsed, setCollapsed] = useState(false)
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
@@ -374,7 +428,10 @@ export const Shell = () => {
     }
     return [...buckets.entries()]
   }, [state.conversations, filter, t])
-  const who = state.serverUser?.username ?? t('thisDevice')
+  const serverName = state.serverUser?.username
+  const who = serverName || profile.nickname || t('localHarbor')
+  const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
+  const narrow = () => window.matchMedia('(max-width: 767px)').matches
 
   return (
     <SourcesPanel.Provider value={setPanel}>
@@ -386,7 +443,7 @@ export const Shell = () => {
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(true)}>
+            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
           </span>
@@ -394,7 +451,7 @@ export const Shell = () => {
         {filtering ? (
           <input className="side-filter" value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
         ) : null}
-        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => void state.newChat()}>
+        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
           <Icon d="M12 5v14M5 12h14" /> {t('newChat')}
         </button>
         <div className="side-scroll">
@@ -408,14 +465,25 @@ export const Shell = () => {
             </div>
           ))}
         </div>
-        <div className="user-bar">
-          <span className="avatar">{who.slice(0, 1).toUpperCase()}</span>
-          <span className="user-label">{who}</span>
+        <div className="user-bar" title={serverName ? serverName : t('localStay')}>
+          <span className="avatar" aria-hidden="true">
+            {initial || (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                <circle cx="12" cy="5.5" r="2.2" />
+                <path d="M12 8v13M5 13.5a7 7 0 0 0 14 0" />
+              </svg>
+            )}
+          </span>
+          <span className="user-copy">
+            <span className="user-label">{who}</span>
+            {serverName ? null : <small>{t('localStay')}</small>}
+          </span>
           <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
             <Icon d="M6 12h.01M12 12h.01M18 12h.01" />
           </button>
           {userMenu ? (
             <div className="menu user-menu">
+              {serverName ? null : <p className="hint">{t('localStay')}</p>}
               <p className="side-usage" data-testid="total-usage">
                 {t('totalLine', {
                   inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
@@ -425,6 +493,8 @@ export const Shell = () => {
                 {state.balance ? <span data-testid="balance-side"> {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
               </p>
               <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('settings')}</button>
+              <button type="button" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('help')}</button>
+              {state.serverUser ? <button type="button" onClick={() => void state.logoutServer()}>{t('logout')}</button> : null}
             </div>
           ) : null}
         </div>
@@ -438,22 +508,48 @@ export const Shell = () => {
       <section className="stage">
         <header className="topbar">
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
-            <Icon d="M4 7h16M4 12h16M4 17h16" />
+            <Icon d="M4 8h8M4 14h14" />
           </button>
           <h2>{conversation?.title || ''}</h2>
-          {state.serverMode ? <span data-testid="server-mode">{t('serverChat')}</span> : null}
+          {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
+          <span className="top-actions">
+            <button className="icon-btn top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+              <Icon d="M12 5v14M5 12h14" />
+            </button>
+            {path.length > 0 ? (
+              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
+                <Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
+              </button>
+            ) : null}
+          </span>
         </header>
         {path.length === 0 ? (
           <div className="transcript" data-testid="message-list"><Empty /></div>
         ) : (
           <>
-            <div className="transcript" data-testid="message-list">
+            <div
+              className="transcript"
+              data-testid="message-list"
+              ref={listRef}
+              onScroll={() => {
+                const list = listRef.current
+                if (!list) {
+                  return
+                }
+                setAway(list.scrollHeight - list.scrollTop - list.clientHeight > 96)
+              }}
+            >
               {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
               <div ref={endRef} />
             </div>
+            {away ? (
+              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })}>
+                <Icon d="M6 9l6 6 6-6" />
+              </button>
+            ) : null}
             <div className="composer-wrap">
               <Composer />
               <p className="footnote">{t('disclaimer')}</p>
@@ -480,6 +576,7 @@ export const Shell = () => {
           </ol>
         </aside>
       ) : null}
+      {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => setPanel(null)} /> : null}
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
@@ -491,6 +588,7 @@ export const Shell = () => {
 const ChatLink = ({ conversation, active }: { conversation: Conversation; active: boolean }) => {
   const t = useT()
   const openChat = useHarbor((state) => state.openChat)
+  const setSidebarOpen = useHarbor((state) => state.setSidebarOpen)
   const rename = useHarbor((state) => state.rename)
   const removeChat = useHarbor((state) => state.removeChat)
   const [editing, setEditing] = useState(false)
@@ -503,7 +601,7 @@ const ChatLink = ({ conversation, active }: { conversation: Conversation; active
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
-        <button type="button" onClick={() => void openChat(conversation.id)}>{conversation.title || t('newChat')}</button>
+        <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id) }}>{conversation.title || t('newChat')}</button>
       )}
       <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => setOpen((value) => !value)}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? (
@@ -538,7 +636,16 @@ const Composer = () => {
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
   const [text, setText] = useState('')
+  const box = useRef<HTMLTextAreaElement>(null)
   const [effortOpen, setEffortOpen] = useState(false)
+  useEffect(() => {
+    const onPrefill = (event: Event) => {
+      setText((event as CustomEvent<string>).detail)
+      box.current?.focus()
+    }
+    window.addEventListener('harbor-prefill', onPrefill)
+    return () => window.removeEventListener('harbor-prefill', onPrefill)
+  }, [])
   const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
     const value = text
@@ -561,6 +668,7 @@ const Composer = () => {
         </ul>
       ) : null}
       <textarea
+        ref={box}
         data-testid="composer"
         rows={2}
         placeholder={t('composerPlaceholder')}
@@ -653,24 +761,51 @@ const Settings = () => {
   const [asCopy, setAsCopy] = useState(false)
   const [nextKey, setNextKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
+  const [tab, setTab] = useState<'general' | 'profile' | 'data'>('general')
+  const profile = useProfile()
+  const [nickname, setNickname] = useState(profile.nickname)
+  const [initial, setInitial] = useState(profile.initial)
   const saveKey = useHarbor((state) => state.saveKey)
   const info = balance?.balance_infos[0]
   const cost = estimateCost(totals, new Date())
   return (
     <div className="modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
-      <div className="modal-card">
-        <header>
+      <div className="modal-card" data-tab={tab}>
+        <header className="settings-head">
           <h2>{t('settings')}</h2>
-          <button type="button" className="ghost" onClick={() => setSettingsOpen(false)}>
-            {t('close')}
+          <button type="button" className="ghost settings-x" aria-label={t('close')} onClick={() => setSettingsOpen(false)}>
+            <span className="settings-close-word">{t('close')}</span>
+            <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
         </header>
-        <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
-        <section>
+        <nav className="settings-tabs" aria-label={t('settings')}>
+          {(['general', 'profile', 'data'] as const).map((item) => (
+            <button key={item} type="button" className={tab === item ? 'on' : ''} onClick={() => setTab(item)}>
+              {item === 'general' ? t('tabGeneral') : item === 'profile' ? t('tabProfile') : t('tabData')}
+            </button>
+          ))}
+        </nav>
+        <section className="settings-general">
+          <LanguageSwitch locale={settings.locale} onChange={(locale) => void setLocale(locale)} />
+        </section>
+        <section className="settings-general">
           <h3>{t('theme')}</h3>
           <ThemeSwitch />
         </section>
-        <section>
+        <section className="settings-profile">
+          <h3>{t('tabProfile')}</h3>
+          <p className="hint">{t('localStay')}</p>
+          <label>
+            {t('nickname')}
+            <input data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+          </label>
+          <label>
+            {t('avatarInitial')}
+            <input data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+          </label>
+          <button type="button" className="primary" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
+        </section>
+        <section className="settings-data">
           <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
           {serverMode ? (
             <p data-testid="quota">
@@ -704,7 +839,7 @@ const Settings = () => {
             </button>
           )}
         </section>
-        <section>
+        <section className="settings-data">
           <h3>{t('usageTitle')}</h3>
           <p className="hint">{serverMode ? t('serverUsageNote') : t('noUsageApi')}</p>
           <ul className="usage-grid">
@@ -721,7 +856,7 @@ const Settings = () => {
             </li>
           </ul>
         </section>
-        <section>
+        <section className="settings-general">
           <h3>{t('model')}</h3>
           <label>
             {t('model')}
@@ -743,7 +878,7 @@ const Settings = () => {
           </button>
           {prefs.model !== 'deepseek-flash' ? <p className="hint">{t('toolsFlashOnly')}</p> : null}
         </section>
-        <section>
+        <section className="settings-general">
           <h3>{t('safety')}</h3>
           <label>
             <select
@@ -781,7 +916,7 @@ const Settings = () => {
             </select>
           </label>
         </section>
-        <section>
+        <section className="settings-data">
           <h3>{serverMode ? t('serverPrivacyTitle') : t('privacyTitle')}</h3>
           <p className="hint">{serverMode ? t('serverPrivacyBody') : t('currentKey')}</p>
           <p className="hint">{serverMode ? t('serverImportNote') : t('importMergeNote')}</p>
@@ -831,7 +966,7 @@ const Settings = () => {
           </div>
         </section>
         {serverMode ? null : (
-        <section>
+        <section className="settings-data">
           <h3>{t('replaceKey')}</h3>
           <input type="password" value={nextKey} autoComplete="off" onChange={(event) => setNextKey(event.target.value)} />
           <input
@@ -850,7 +985,7 @@ const Settings = () => {
           </div>
         </section>
         )}
-        <section>
+        <section className="settings-data">
           <h3>{t('serverTitle')}</h3>
           <p>{native ? t('nativeServerBody') : t('serverBody')}</p>
           {native && !serverUser ? (
@@ -928,7 +1063,7 @@ const Settings = () => {
             </button>
           ) : null}
         </section>
-        <section>
+        <section className="settings-general">
           <h3>{t('about')}</h3>
           <p>{t('disclaimerLong')}</p>
           <p className="hint">

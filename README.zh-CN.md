@@ -11,11 +11,11 @@ Harbor 是 openlinkos 社区开发的非官方开源项目，与杭州深度求�
 ## 功能
 
 - 流式对话，模型为 `deepseek-flash` 与 `deepseek-v4-pro`，可显示思考过程。
-- Flash 上可用：联网搜索、读链接、文件上传（官方侧默认 7 天后过期）、自动标题。
+- Flash 上可用：联网搜索、打开网页、文件上传（官方侧默认 7 天后过期）、自动标题。
 - 多个对话，重命名、删除、停止、重新生成（保留为分支）。
 - Markdown、代码高亮、KaTeX 公式、Mermaid。
 - 中文和英文界面，手机上可用，可安装为 PWA。
-- 按流式响应里的 `usage` 估算每个对话和全部对话的用量，并用 `GET /user/balance` 显示官方余额。官方没有用量历史接口。
+- 按流式响应里的 `usage` 估算每个对话和累计用量，并用 `GET /user/balance` 显示官方余额。官方不提供用量历史。
 - `safety_check` 默认 `high`。
 - 导出自有 JSON（带版本号）。导入按对话 id 合并，不覆盖已有对话。v3 ZIP 按官方归档的形状交换它能表达的字段。
 
@@ -25,8 +25,8 @@ Harbor 是 openlinkos 社区开发的非官方开源项目，与杭州深度求�
 
 | | |
 |---|---|
-| Key | 存在这台设备的 IndexedDB。可以设口令（PBKDF2-SHA-256 + AES-256-GCM）。不进 `localStorage`，也不进网址。 |
-| 对话 | 存在这台设备的 IndexedDB。 |
+| Key | 存在本机的 IndexedDB。可以设口令（PBKDF2-SHA-256 + AES-256-GCM）。不进 `localStorage`，也不进网址。 |
+| 对话 | 存在本机的 IndexedDB。 |
 | 请求 | 浏览器直连 `https://api.deepseek.com`，`credentials: "omit"`。 |
 | 这个网站 | 只有静态文件。没有账号，没有统计。 |
 
