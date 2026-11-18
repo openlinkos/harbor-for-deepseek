@@ -99,7 +99,7 @@ export const KeyGate = () => {
   const [keyOpen, setKeyOpen] = useState(false)
   const [draft, setDraft] = useState('')
   const [think, setThink] = useState(true)
-  const [search, setSearch] = useState(false)
+  const [search, setSearch] = useState(true)
   const [error, setError] = useState('')
 
   const onSave = (event: FormEvent) => {
@@ -173,7 +173,7 @@ export const KeyGate = () => {
                     <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
                   </button>
                   <button type="button" className={search ? 'chip on' : 'chip'} onClick={() => setSearch((value) => !value)}>
-                    <Icon d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" /> {t('search')}
+                    <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
                   </button>
                 </div>
                 <button className={`send ${draft.trim() ? 'ready' : ''}`} data-testid="landing-send" type="submit" aria-label={t('send')}>

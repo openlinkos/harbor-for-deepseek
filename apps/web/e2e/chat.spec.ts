@@ -140,7 +140,6 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
 
   await page.getByTestId('new-chat').click()
   await page.getByTestId('toggle-thinking').click()
-  await page.getByTestId('toggle-search').click()
   await page.getByTestId('composer').fill('冰岛现在大约多少人口？')
   await page.getByTestId('send').click()
   await page.getByTestId('search-results').click()
@@ -219,7 +218,6 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.screenshot({ path: join(shots, 'm-thinking.png') })
   await page.getByRole('button', { name: '新对话' }).click()
   await page.getByTestId('toggle-thinking').click()
-  await page.getByTestId('toggle-search').click()
   await page.getByTestId('composer').fill('冰岛现在大约多少人口？')
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('394,000')
@@ -267,6 +265,7 @@ test('landing and key step at desktop and phone sizes', async ({ page }) => {
   await install(page)
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/')
+  await expect(page.getByRole('heading', { name: '对话留在本机' })).toBeVisible()
   await page.screenshot({ path: join(shots, 'landing-light-1280.png') })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.screenshot({ path: join(shots, 'landing-mobile.png') })
