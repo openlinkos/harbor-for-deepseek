@@ -9,9 +9,9 @@ import { readFile } from 'node:fs/promises'
 import { extname, join, sep } from 'node:path'
 import { Readable } from 'node:stream'
 import postgres from 'postgres'
-import { hashPassword, openSecret, randomToken, sealSecret, sha256, verifyPassword } from './crypto.js'
+import { hashPassword, openSecret, randomToken, redactText, sealSecret, sha256, tokenEquals, verifyPassword } from './crypto.js'
 import { log } from './log.js'
-import { SCHEMA } from './schema.js'
+import { applyMigrations } from './schema.js'
 
 export type ServerOptions = {
   databaseUrl: string
@@ -23,6 +23,20 @@ export type ServerOptions = {
   hsts?: boolean
   /** How often an open run stream writes a comment. Tests use a short value. */
   eventPingMs?: number
+  /** `true` forces the Secure attribute. `false` leaves it off. Omitted follows https. */
+  cookieSecure?: boolean
+  /** When set, this list is the only CORS allowlist. */
+  corsOrigins?: string[]
+  /** One-time token required by POST /api/setup/admin. */
+  bootstrapToken?: string
+  /** Create the first admin at startup when none exists. */
+  bootstrapAdmin?: { username: string; password: string }
+  /** Allow the first visitor to become admin. Off unless a local test asks for it. */
+  allowOpenSetup?: boolean
+  /** Default lifetime of a new invite, in hours. */
+  inviteTtlHours?: number
+  authRateLimit?: number
+  chatRateLimit?: number
 }
 
 export const wantsHsts = (url: string, forwardedProto: string | undefined, trustProxy: boolean, forced: boolean): boolean =>
@@ -60,8 +74,7 @@ const TOKEN_QUOTA = 2_000_000
 const SEARCH_QUOTA = 100
 const PAGE_QUOTA = 80
 const LOW_BALANCE_DEFAULT = 50
-
-const hits = new Map<string, number[]>()
+const SETUP_LOCK = 764522
 
 const readBody = async <T>(c: { req: { json: () => Promise<T> } }): Promise<T> => {
   try {
@@ -69,18 +82,6 @@ const readBody = async <T>(c: { req: { json: () => Promise<T> } }): Promise<T> =
   } catch {
     return {} as T
   }
-}
-
-const limited = (ip: string): boolean => {
-  const now = Date.now()
-  const recent = (hits.get(ip) ?? []).filter((time) => now - time < 10 * 60 * 1000)
-  if (recent.length >= 30) {
-    hits.set(ip, recent)
-    return true
-  }
-  recent.push(now)
-  hits.set(ip, recent)
-  return false
 }
 
 const shanghaiDay = (date = new Date()): string =>
@@ -113,7 +114,7 @@ const publicKey = (row: KeyRow) => ({
   accountGroup: row.account_group,
   balanceCny: row.last_balance_cny,
   isAvailable: row.is_available,
-  lastError: row.last_error,
+  lastError: row.last_error ? redactText(row.last_error, []) : row.last_error,
 })
 
 export type HarborServer = {
@@ -125,8 +126,39 @@ export type HarborServer = {
 
 export const createServer = async (options: ServerOptions): Promise<HarborServer> => {
   const sql = postgres(options.databaseUrl, { max: 8, onnotice: () => undefined })
-  await sql.unsafe(SCHEMA)
+  await applyMigrations(sql)
+  if (options.bootstrapAdmin) {
+    const existingAdmins = await sql`select id from users where role = 'admin' limit 1`
+    if (existingAdmins.length === 0) {
+      const adminId = crypto.randomUUID()
+      const admin = options.bootstrapAdmin
+      await sql`
+        insert into users (id, username, password_hash, role, token_quota, search_quota, page_quota)
+        values (${adminId}, ${admin.username}, ${await hashPassword(admin.password)}, 'admin', ${TOKEN_QUOTA}, ${SEARCH_QUOTA}, ${PAGE_QUOTA})
+      `
+      await sql`insert into user_counters (user_id, next_rev) values (${adminId}, 0)`
+      log('info', 'created admin from environment', { username: admin.username })
+    }
+  }
   await sql`update chat_runs set status = 'aborted', finished_at = now(), error = 'restarted' where status = 'streaming'`
+  const buckets = new Map<string, number[]>()
+  const hitLimit = (bucket: string, max: number, windowMs: number): boolean => {
+    const now = Date.now()
+    const recent = (buckets.get(bucket) ?? []).filter((time) => now - time < windowMs)
+    buckets.set(bucket, recent)
+    return recent.length >= max
+  }
+  const recordHit = (bucket: string, max: number, windowMs: number): boolean => {
+    if (hitLimit(bucket, max, windowMs)) {
+      return true
+    }
+    const recent = buckets.get(bucket) ?? []
+    recent.push(Date.now())
+    buckets.set(bucket, recent)
+    return false
+  }
+  const authLimited = (ip: string): boolean => recordHit(`auth:${ip}`, options.authRateLimit ?? 30, 10 * 60 * 1000)
+  const chatLimited = (userId: string): boolean => recordHit(`chat:${userId}`, options.chatRateLimit ?? 30, 60 * 1000)
   const upstream = options.upstream ?? 'https://api.deepseek.com'
   const waiters = new Map<string, Set<() => void>>()
   const aborts = new Map<string, AbortController>()
@@ -314,6 +346,9 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
   }
 
   const allowedOrigins = async (): Promise<string[]> => {
+    if (options.corsOrigins) {
+      return options.corsOrigins
+    }
     const rows = await sql<{ value: unknown }[]>`select value from app_settings where key = 'cors_origins'`
     const value = rows[0]?.value
     if (Array.isArray(value) && value.every((item) => typeof item === 'string')) {
@@ -356,8 +391,18 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     return 'local'
   }
 
-  const secureCookie = (url: string, forwarded?: string) =>
-    options.trustProxy ? forwarded === 'https' : url.startsWith('https:')
+  const secureCookie = (url: string, forwarded?: string): boolean => {
+    if (options.cookieSecure === true) {
+      return true
+    }
+    if (options.cookieSecure === false) {
+      return false
+    }
+    if (url.startsWith('https:')) {
+      return true
+    }
+    return options.trustProxy === true && forwarded === 'https'
+  }
 
   const writeSessionCookie = (c: Parameters<typeof setCookie>[0], token: string) => {
     setCookie(c, 'harbor_session', token, {
@@ -423,45 +468,115 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     return user
   }
 
+  const rateLimited = (c: Parameters<typeof setCookie>[0]) => {
+    c.header('retry-after', '60')
+    return c.json({ error: { message: 'rate limited' } }, 429)
+  }
+
+  app.get('/healthz', (c) => c.json({ ok: true }))
+
+  app.get('/readyz', async (c) => {
+    try {
+      await sql`select 1 as ok`
+      return c.json({ ok: true })
+    } catch {
+      return c.json({ ok: false }, 503)
+    }
+  })
+
   app.get('/api/health', (c) => c.json({ ok: true }))
 
   app.get('/api/config', async (c) => {
     const rows = await sql`select id from users where role = 'admin' limit 1`
+    const setupRequired = rows.length === 0
+    let bootstrap: 'open' | 'token' | 'env' | 'blocked' | 'done' = 'done'
+    if (setupRequired) {
+      if (options.bootstrapToken) {
+        bootstrap = 'token'
+      } else if (options.allowOpenSetup) {
+        bootstrap = 'open'
+      } else if (options.bootstrapAdmin) {
+        bootstrap = 'env'
+      } else {
+        bootstrap = 'blocked'
+      }
+    }
     return c.json({
-      product_name: 'Harbor',
-      setup_required: rows.length === 0,
+      product_name: 'Harbor for DeepSeek',
+      setup_required: setupRequired,
       mode: 'server',
+      bootstrap,
     })
   })
 
   app.post('/api/setup/admin', async (c) => {
-    if (limited(clientIp(c))) {
-      return c.json({ error: { message: 'rate limited' } }, 429)
+    if (authLimited(clientIp(c))) {
+      return rateLimited(c)
     }
-    const existing = await sql`select id from users where role = 'admin' limit 1`
-    if (existing.length > 0) {
-      return c.json({ error: { message: 'setup already finished' } }, 403)
-    }
-    const body = await readBody<{ username?: string; password?: string }>(c)
+    const body = await readBody<{ username?: string; password?: string; token?: string }>(c)
     const username = (body.username ?? '').trim()
     const password = body.password ?? ''
     if (!/^[a-zA-Z0-9_-]{3,32}$/.test(username) || password.length < 8) {
       return c.json({ error: { message: 'username or password is not acceptable' } }, 400)
     }
-    const id = crypto.randomUUID()
-    await sql`
-      insert into users (id, username, password_hash, role, token_quota, search_quota, page_quota)
-      values (${id}, ${username}, ${await hashPassword(password)}, 'admin', ${TOKEN_QUOTA}, ${SEARCH_QUOTA}, ${PAGE_QUOTA})
-    `
-    await sql`insert into user_counters (user_id, next_rev) values (${id}, 0)`
-    const session = await issueSession(id, c.req.header('user-agent') ?? 'web')
-    writeSessionCookie(c, session.token)
-    return c.json({ user: { id, username, role: 'admin' }, csrf: session.csrf, token: session.token })
+    const provided = (body.token ?? c.req.header('x-harbor-bootstrap') ?? '').trim()
+    const existing = await sql`select id from users where role = 'admin' limit 1`
+    if (existing.length > 0) {
+      return c.json({ error: { message: 'setup already finished' } }, 403)
+    }
+    if (options.bootstrapToken) {
+      if (!tokenEquals(provided, options.bootstrapToken)) {
+        return c.json({ error: { message: 'bootstrap token is not usable' } }, 403)
+      }
+    } else if (!options.allowOpenSetup) {
+      return c.json({ error: { message: 'bootstrap token is not usable' } }, 403)
+    }
+    const passwordHash = await hashPassword(password)
+    try {
+      const created = await sql.begin(async (tx) => {
+        await tx`select pg_advisory_xact_lock(${SETUP_LOCK})`
+        const admins = await tx`select id from users where role = 'admin' limit 1`
+        if (admins.length > 0) {
+          return { ok: false as const, error: 'setup already finished', status: 403 as const }
+        }
+        if (options.bootstrapToken) {
+          const tokenKey = `bootstrap:${sha256(options.bootstrapToken)}`
+          const used = await tx`select value from app_settings where key = ${tokenKey}`
+          if (used.length > 0 || !tokenEquals(provided, options.bootstrapToken)) {
+            return { ok: false as const, error: 'bootstrap token is not usable', status: 403 as const }
+          }
+          await tx`
+            insert into app_settings (key, value) values (${tokenKey}, 'true'::jsonb)
+            on conflict (key) do nothing
+          `
+        }
+        const id = crypto.randomUUID()
+        await tx`
+          insert into users (id, username, password_hash, role, token_quota, search_quota, page_quota)
+          values (${id}, ${username}, ${passwordHash}, 'admin', ${TOKEN_QUOTA}, ${SEARCH_QUOTA}, ${PAGE_QUOTA})
+        `
+        await tx`insert into user_counters (user_id, next_rev) values (${id}, 0)`
+        return { ok: true as const, id }
+      })
+      if (!created.ok) {
+        return c.json({ error: { message: created.error } }, created.status)
+      }
+      const session = await issueSession(created.id, c.req.header('user-agent') ?? 'web')
+      writeSessionCookie(c, session.token)
+      return c.json({ user: { id: created.id, username, role: 'admin' }, csrf: session.csrf, token: session.token })
+    } catch (error) {
+      const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : ''
+      if (code === '23505') {
+        return c.json({ error: { message: 'username is taken' } }, 409)
+      }
+      log('warn', 'admin setup failed', { error: error instanceof Error ? error.name : 'error' })
+      return c.json({ error: { message: 'setup failed' } }, 400)
+    }
   })
 
   app.post('/api/auth/register', async (c) => {
-    if (limited(clientIp(c))) {
-      return c.json({ error: { message: 'rate limited' } }, 429)
+    if (authLimited(clientIp(c))) {
+      return rateLimited(c)
     }
     const body = await readBody<{ code?: string; username?: string; password?: string }>(c)
     const username = (body.username ?? '').trim()
@@ -494,15 +609,20 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
   })
 
   app.post('/api/auth/login', async (c) => {
-    if (limited(clientIp(c))) {
-      return c.json({ error: { message: 'rate limited' } }, 429)
+    if (authLimited(clientIp(c))) {
+      return rateLimited(c)
     }
     const body = await readBody<{ username?: string; password?: string }>(c)
+    const username = (body.username ?? '').trim()
+    if (hitLimit(`fail:${username}`, 10, 10 * 60 * 1000)) {
+      return rateLimited(c)
+    }
     const rows = await sql<{ id: string; password_hash: string; role: Role; status: string; username: string }[]>`
-      select id, username, password_hash, role, status from users where username = ${(body.username ?? '').trim()}
+      select id, username, password_hash, role, status from users where username = ${username}
     `
     const row = rows[0]
     if (!row || row.status !== 'active' || !(await verifyPassword(body.password ?? '', row.password_hash))) {
+      recordHit(`fail:${username}`, 10, 10 * 60 * 1000)
       return c.json({ error: { message: 'invalid username or password' } }, 401)
     }
     const session = await issueSession(row.id, c.req.header('user-agent') ?? 'web')
@@ -516,7 +636,10 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       return user
     }
     await sql`delete from auth_sessions where id = ${user.sessionId}`
-    deleteCookie(c, 'harbor_session', { path: '/' })
+    deleteCookie(c, 'harbor_session', {
+      path: '/',
+      secure: secureCookie(c.req.url, c.req.header('x-forwarded-proto')),
+    })
     return c.json({ ok: true })
   })
 
@@ -836,28 +959,24 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
         log('warn', 'upstream network', { keyId: key.id, error: error instanceof Error ? error.name : 'error' })
         skipGroups.add(key.account_group)
         continue
+      } finally {
+        headers.delete('x-api-key')
       }
       await sql`update api_keys set last_used_at = now() where id = ${key.id}`
-      if (response.status === 401) {
-        await markKey(key.id, 'error', 'unauthorized')
+      if (response.status === 401 || response.status === 402 || response.status === 429) {
+        await response.body?.cancel().catch(() => undefined)
+        if (response.status === 401) {
+          await markKey(key.id, 'error', 'unauthorized')
+        } else if (response.status === 402) {
+          await markKey(key.id, 'exhausted', 'payment required')
+        }
         skipGroups.add(key.account_group)
-        lastStatus = 401
+        lastStatus = response.status
         continue
       }
-      if (response.status === 402) {
-        await markKey(key.id, 'exhausted', 'payment required')
-        skipGroups.add(key.account_group)
-        lastStatus = 402
-        continue
-      }
-      if (response.status === 429) {
-        skipGroups.add(key.account_group)
-        lastStatus = 429
-        continue
-      }
-      return { response, key }
+      return { response, key, secret: plain }
     }
-    return { response: null as Response | null, key: null as KeyRow | null, lastStatus }
+    return { response: null as Response | null, key: null as KeyRow | null, secret: '', lastStatus }
   }
 
   const executeRun = async (runId: string, user: AuthUser, conversationId: string, messageId: string, requestMessages: Message[], prefs: {
@@ -897,8 +1016,10 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       }
       await sql`update chat_runs set api_key_id = ${result.key.id} where id = ${runId}`
       if (!result.response.ok || !result.response.body) {
-        await finishRun(runId, 'error', `upstream ${result.response.status}`)
-        await sql`update messages set status = 'error', error_message = ${`upstream ${result.response.status}`}, updated_at = now() where id = ${messageId}`
+        const status = result.response.status
+        await result.response.body?.cancel().catch(() => undefined)
+        await finishRun(runId, 'error', `upstream ${status}`)
+        await sql`update messages set status = 'error', error_message = ${`upstream ${status}`}, updated_at = now() where id = ${messageId}`
         return
       }
       const decoder = new ServerSentEventDecoder()
@@ -979,6 +1100,9 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     const user = await requireUser(c, true)
     if (user instanceof Response) {
       return user
+    }
+    if (chatLimited(user.id)) {
+      return rateLimited(c)
     }
     const conversationId = c.req.param('id')
     const conversations = await sql<Record<string, unknown>[]>`
@@ -1219,6 +1343,9 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (user instanceof Response) {
       return user
     }
+    if (chatLimited(user.id)) {
+      return rateLimited(c)
+    }
     const form = await c.req.formData()
     const file = form.get('file')
     if (!(file instanceof File)) {
@@ -1232,6 +1359,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     outgoing.set('file', file, file.name)
     const result = await upstreamCall('/files', { method: 'POST', body: outgoing }, new Set())
     if (!result.response?.ok) {
+      await result.response?.body?.cancel().catch(() => undefined)
       return c.json({ error: { message: 'upload failed' } }, 502)
     }
     const raw = (await result.response.json()) as { id?: string; bytes?: number; expires_at?: number; filename?: string; purpose?: string }
@@ -1262,7 +1390,13 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (!result.response) {
       return c.json({ error: { message: 'no usable key' } }, 503)
     }
-    return new Response(result.response.body, { status: result.response.status, headers: { 'content-type': 'application/json' } })
+    if (!result.response.ok) {
+      await result.response.body?.cancel().catch(() => undefined)
+      log('warn', 'upstream models failed', { status: result.response.status, keyId: result.key?.id })
+      return c.json({ error: { message: `upstream ${result.response.status}` } }, 502)
+    }
+    const text = redactText(await result.response.text(), [result.secret])
+    return new Response(text, { status: result.response.status, headers: { 'content-type': 'application/json' } })
   })
 
   app.post('/api/admin/keys', async (c) => {
@@ -1337,14 +1471,21 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (user.role !== 'admin') {
       return c.json({ error: { message: 'forbidden' } }, 403)
     }
-    const body = await readBody<{ maxUses?: number }>(c)
+    const body = await readBody<{ maxUses?: number; expiresInHours?: number }>(c)
+    const requested = Number(body.expiresInHours ?? options.inviteTtlHours ?? 168)
+    if (!Number.isFinite(requested)) {
+      return c.json({ error: { message: 'invite lifetime is not acceptable' } }, 400)
+    }
+    const hours = Math.min(24 * 30, Math.max(1, Math.floor(requested)))
+    const maxUses = Math.max(1, Math.min(100, Math.floor(body.maxUses ?? 1)))
     const code = randomToken().slice(0, 10)
     const id = crypto.randomUUID()
+    const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000)
     await sql`
-      insert into invite_codes (id, code, created_by, max_uses)
-      values (${id}, ${code}, ${user.id}, ${Math.max(1, body.maxUses ?? 1)})
+      insert into invite_codes (id, code, created_by, max_uses, expires_at)
+      values (${id}, ${code}, ${user.id}, ${maxUses}, ${expiresAt})
     `
-    return c.json({ id, code, maxUses: Math.max(1, body.maxUses ?? 1) })
+    return c.json({ id, code, maxUses, expiresAt: expiresAt.toISOString() })
   })
 
   app.get('/api/admin/users', async (c) => {
@@ -1489,6 +1630,9 @@ app.get('/api/admin/settings', async (c) => {
     }
     if (user.role !== 'admin') {
       return c.json({ error: { message: 'forbidden' } }, 403)
+    }
+    if (options.corsOrigins) {
+      return c.json({ error: { message: 'origins are set by CORS_ORIGINS' } }, 403)
     }
     const body = await readBody<{ origins?: string[] }>(c)
     const origins = (body.origins ?? []).map((item) => item.trim()).filter(Boolean)

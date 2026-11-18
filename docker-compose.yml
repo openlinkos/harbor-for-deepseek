@@ -1,33 +1,22 @@
-# No environment variable is required.
-# `docker compose up` creates the database password and the key-encryption key on the data volume.
+# Copy .env.example to .env and set the secrets before starting.
+
+name: harbor
 
 services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: harbor
-      POSTGRES_DB: harbor
+      POSTGRES_USER: ${POSTGRES_USER:-harbor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-harbor}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - harbor_data:/data
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        set -eu
-        umask 077
-        if [ -n "$${POSTGRES_PASSWORD:-}" ]; then
-          printf '%s' "$$POSTGRES_PASSWORD" > /data/db-password
-        elif [ ! -s /data/db-password ]; then
-          tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 > /data/db-password
-        fi
-        chmod 600 /data/db-password
-        export POSTGRES_PASSWORD="$$(cat /data/db-password)"
-        exec docker-entrypoint.sh postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U harbor -d harbor"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-harbor} -d ${POSTGRES_DB:-harbor}"]
       interval: 5s
       timeout: 5s
       retries: 20
+      start_period: 10s
     restart: unless-stopped
 
   harbor:
@@ -39,15 +28,29 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
-    volumes:
-      - harbor_data:/data
+      - "${HARBOR_PORT:-8080}:8080"
     environment:
-      DATA_DIR: /data
+      DATABASE_URL: postgres://${POSTGRES_USER:-harbor}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-harbor}
+      KEY_ENCRYPTION_SECRET: ${KEY_ENCRYPTION_SECRET:?Set KEY_ENCRYPTION_SECRET in .env}
       PORT: "8080"
-      DB_HOST: db
+      DEEPSEEK_API_ORIGIN: ${DEEPSEEK_API_ORIGIN:-https://api.deepseek.com}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+      HARBOR_HSTS: ${HARBOR_HSTS:-0}
+      COOKIE_SECURE: ${COOKIE_SECURE:-auto}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      INVITE_TTL_HOURS: ${INVITE_TTL_HOURS:-168}
+      BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ALLOW_OPEN_SETUP: ${ALLOW_OPEN_SETUP:-0}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/readyz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     restart: unless-stopped
 
 volumes:
   pgdata:
-  harbor_data:

@@ -22,6 +22,26 @@ export const verifyPassword = async (password: string, stored: string): Promise<
 
 export const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
 
+export const tokenEquals = (provided: string, expected: string): boolean => {
+  const left = createHash('sha256').update(provided).digest()
+  const right = createHash('sha256').update(expected).digest()
+  return timingSafeEqual(left, right)
+}
+
+const SECRET_TEXT = /sk-[A-Za-z0-9_-]{8,}|Bearer\s+[A-Za-z0-9._~+/-]{8,}/gi
+
+export const redactText = (value: string, secrets: string[]): string => {
+  let out = value
+  const unique = [...new Set(secrets.filter((secret) => secret.length >= 8))]
+  unique.sort((left, right) => right.length - left.length)
+  for (const secret of unique) {
+    if (out.includes(secret)) {
+      out = out.split(secret).join('[redacted]')
+    }
+  }
+  return out.replace(SECRET_TEXT, '[redacted]')
+}
+
 export const randomToken = (): string => randomBytes(32).toString('base64url')
 
 export const sealSecret = (plain: string, master: Buffer): { ciphertext: Buffer; nonce: Buffer } => {

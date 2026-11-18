@@ -50,7 +50,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -f deploy/Dockerfile -t harbor:ci .
+      - run: DOCKER_BUILDKIT=1 docker build -f deploy/Dockerfile -t harbor:ci .
+
+  server-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      POSTGRES_PASSWORD: e2e-db-password-0123456789abcd
+      KEY_ENCRYPTION_SECRET: 00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff
+      BOOTSTRAP_TOKEN: e2e-bootstrap-token-0123456789
+      COMPOSE_PROJECT_NAME: harbor
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait
+      - name: Create an admin, invite a user, chat, and sync
+        run: node apps/server/e2e/run.mjs
+      - name: App logs omit the key and the message
+        if: always()
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.e2e.yml logs --no-color harbor > /tmp/harbor-logs.txt
+          if grep -F 'sk-mockpoolsecretvalue' /tmp/harbor-logs.txt; then
+            echo 'log contained the upstream key' >&2
+            exit 1
+          fi
+          if grep -F 'sync-check-phrase' /tmp/harbor-logs.txt; then
+            echo 'log contained message text' >&2
+            exit 1
+          fi
+      - name: Stop Compose
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml down -v
 
   android:
     runs-on: ubuntu-latest

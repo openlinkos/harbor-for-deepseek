@@ -1,4 +1,6 @@
-export const SCHEMA = `
+import type { Sql } from 'postgres'
+
+const INIT = `
 CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY,
   username text UNIQUE NOT NULL,
@@ -189,3 +191,41 @@ INSERT INTO app_settings (key, value) VALUES (
   '["capacitor://localhost","https://localhost","http://localhost"]'::jsonb
 ) ON CONFLICT (key) DO NOTHING;
 `
+
+const INVITE_EXPIRY = `
+UPDATE invite_codes
+SET expires_at = created_at + interval '7 days'
+WHERE expires_at IS NULL;
+CREATE INDEX IF NOT EXISTS invite_codes_expires_at ON invite_codes (expires_at);
+`
+
+export const MIGRATIONS: ReadonlyArray<{ id: string; sql: string }> = [
+  { id: '001_init', sql: INIT },
+  { id: '002_invite_expiry', sql: INVITE_EXPIRY },
+]
+
+const LOCK_KEY = 764521
+
+export const applyMigrations = async (sql: Sql): Promise<void> => {
+  await sql`select pg_advisory_lock(${LOCK_KEY})`
+  try {
+    await sql.unsafe(`
+      create table if not exists schema_migrations (
+        id text primary key,
+        applied_at timestamptz not null default now()
+      )
+    `)
+    for (const migration of MIGRATIONS) {
+      const done = await sql<{ id: string }[]>`select id from schema_migrations where id = ${migration.id}`
+      if (done.length > 0) {
+        continue
+      }
+      await sql.begin(async (tx) => {
+        await tx.unsafe(migration.sql)
+        await tx`insert into schema_migrations (id) values (${migration.id})`
+      })
+    }
+  } finally {
+    await sql`select pg_advisory_unlock(${LOCK_KEY})`
+  }
+}
