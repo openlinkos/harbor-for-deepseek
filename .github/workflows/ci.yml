@@ -41,6 +41,8 @@ jobs:
       - run: pnpm build
       - run: pnpm --filter @harbor/web exec playwright install --with-deps chromium
       - run: pnpm e2e
+      - run: node scripts/prepare-mobile.mjs --lan
+      - run: pnpm --filter @harbor/web exec playwright test -c playwright.android.config.ts
       - run: pnpm --filter @harbor/server build
       - run: pnpm e2e:server
 
@@ -49,3 +51,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -f deploy/Dockerfile -t harbor:ci .
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Use the preinstalled Android SDK
+        run: |
+          sdk="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "$sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$sdk/cmdline-tools/16.0/bin" >> "$GITHUB_PATH"
+          echo "$sdk/platform-tools" >> "$GITHUB_PATH"
+      - name: Install the Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: node scripts/prepare-mobile.mjs --lan
+      - run: pnpm --filter @harbor/mobile exec cap sync android
+      - name: Assemble a debug APK
+        working-directory: apps/mobile/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: harbor-debug-apk
+          path: apps/mobile/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

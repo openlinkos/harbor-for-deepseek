@@ -184,4 +184,8 @@ CREATE TABLE IF NOT EXISTS app_settings (
   value jsonb NOT NULL
 );
 INSERT INTO app_settings (key, value) VALUES ('low_balance_cny', '50'::jsonb) ON CONFLICT (key) DO NOTHING;
+INSERT INTO app_settings (key, value) VALUES (
+  'cors_origins',
+  '["capacitor://localhost","https://localhost","http://localhost"]'::jsonb
+) ON CONFLICT (key) DO NOTHING;
 `

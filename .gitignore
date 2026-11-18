@@ -17,3 +17,9 @@ blob-report
 apps/web/dist
 apps/web/playwright-report
 apps/web/test-results
+apps/mobile/www
+apps/mobile/android/.gradle
+apps/mobile/android/local.properties
+apps/mobile/android/app/build
+apps/mobile/android/build
+*.apk

@@ -1,0 +1,22 @@
+{
+  "name": "@harbor/mobile",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare-www": "node ../../scripts/prepare-mobile.mjs",
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.4.3",
+    "@capacitor/app": "7.0.2",
+    "@capacitor/core": "7.4.3",
+    "@capacitor/filesystem": "7.1.4",
+    "@capacitor/keyboard": "7.0.3",
+    "@capacitor/share": "7.0.2",
+    "@capacitor/status-bar": "7.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.4.3"
+  }
+}

@@ -2,26 +2,43 @@ import { readStreamEvent, ServerSentEventDecoder } from '@harbor/sse'
 import type { StreamEvent } from '@harbor/types'
 
 let csrf = ''
+let remoteBase = ''
+let bearer = ''
 
 export const setCsrf = (value: string) => {
   csrf = value
 }
+
+export const setRemoteSession = (base: string, token: string) => {
+  remoteBase = base.replace(/\/$/, '')
+  bearer = token
+  csrf = ''
+}
+
+export const clearRemoteSession = () => {
+  remoteBase = ''
+  bearer = ''
+}
+
+const endpoint = (path: string) => (remoteBase && path.startsWith('/') ? `${remoteBase}${path}` : path)
 
 const headers = (jsonBody: boolean) => {
   const result = new Headers()
   if (jsonBody) {
     result.set('content-type', 'application/json')
   }
-  if (csrf) {
+  if (bearer) {
+    result.set('authorization', `Bearer ${bearer}`)
+  } else if (csrf) {
     result.set('x-harbor-csrf', csrf)
   }
   return result
 }
 
 export const api = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
-  const response = await fetch(path, {
+  const response = await fetch(endpoint(path), {
     ...init,
-    credentials: 'include',
+    credentials: bearer ? 'omit' : 'include',
     headers: headers(typeof init.body === 'string'),
   })
   const text = await response.text()
@@ -44,7 +61,11 @@ export const readRun = async (
 ): Promise<string> => {
   let after = 0
   while (!signal.aborted) {
-    const response = await fetch(`/api/runs/${runId}/events?after=${after}`, { credentials: 'include', signal })
+    const response = await fetch(endpoint(`/api/runs/${runId}/events?after=${after}`), {
+      credentials: bearer ? 'omit' : 'include',
+      headers: headers(false),
+      signal,
+    })
     if (!response.ok || !response.body) {
       throw new Error('events failed')
     }

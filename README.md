@@ -19,7 +19,7 @@ Harbor is an unofficial open-source community project by openlinkos. It is not a
 - `safety_check` is `high` by default.
 - Export and import a versioned JSON archive. Import merges by conversation id and does not replace chats you already have. A v3 ZIP follows the official archive shape for the fields it can represent.
 
-A self-hosted server (Docker, PostgreSQL, a key pool, invites, sync) and the Android and iOS shells are later milestones. They are not in this release. See [docs/decisions.md](docs/decisions.md).
+A self-hosted server is described in [docs/self-host.md](docs/self-host.md). The Android app is a Capacitor shell of this same page: the key stays on the device, and a server address is optional. See [docs/android.md](docs/android.md). iOS is the next milestone.
 
 ## Privacy
 
@@ -51,6 +51,10 @@ pnpm preview
 ```
 
 Deployment of the static site, including Cloudflare Pages: [docs/deploy.md](docs/deploy.md).
+
+## Android
+
+The app is the same interface. Chat still goes to `https://api.deepseek.com` unless you type a Harbor server you run and log in. Export and import use the share sheet. Pull requests build a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets exist. Details: [docs/android.md](docs/android.md).
 
 ## Self-hosting
 

@@ -4,6 +4,8 @@ import '@fontsource/inter/600.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App.js'
+import { isNativeApp, listenForBack } from './native.js'
+import { useHarbor } from './store.js'
 import { applyTheme, readTheme } from './themeMode.js'
 import './theme.css'
 import './styles.css'
@@ -14,6 +16,18 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
     applyTheme('system')
   }
 })
+
+const native = isNativeApp()
+if (native) {
+  useHarbor.setState({ native: true })
+  void listenForBack(() => useHarbor.getState().dismissOverlay()).catch(() => undefined)
+  void import('@capacitor/keyboard')
+    .then(({ Keyboard, KeyboardResize }) => Keyboard.setResizeMode({ mode: KeyboardResize.Body }))
+    .catch(() => undefined)
+  void import('@capacitor/status-bar')
+    .then(({ StatusBar, Style }) => StatusBar.setStyle({ style: Style.Light }))
+    .catch(() => undefined)
+}
 
 const root = document.getElementById('root')
 if (root) {

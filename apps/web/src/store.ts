@@ -4,7 +4,10 @@ import { exportV3, importV3 } from '@harbor/archive-v3'
 import { estimateCost, sumUsage } from '@harbor/pricing'
 import { createDraft, reduceEvent } from '@harbor/sse'
 import { openIndexedRepository, openSecret, sealSecret } from '@harbor/storage'
-import { api, hostedPage, readRun, setCsrf, type ServerUser } from './remote.js'
+import { isNativeApp, shareDownload } from './native.js'
+import { readRemoteSession, writeRemoteSession } from './nativeSession.js'
+import { api, clearRemoteSession, hostedPage, readRun, setCsrf, setRemoteSession, type ServerUser } from './remote.js'
+import { validateServerUrl } from './serverUrl.js'
 import type { Repository } from '@harbor/storage'
 import {
   activePath,
@@ -136,6 +139,13 @@ export type HarborState = {
   copyLocalToServer: () => Promise<void>
   openLogin: () => void
   openAdmin: (open: boolean) => void
+  native: boolean
+  allowLanHttp: boolean
+  serverBase: string
+  setAllowLanHttp: (value: boolean) => void
+  connectRemote: (base: string, username: string, password: string) => Promise<void>
+  registerRemote: (base: string, code: string, username: string, password: string) => Promise<void>
+  dismissOverlay: () => boolean
 }
 
 const repository = async () => {
@@ -156,6 +166,10 @@ const leafUnder = (messages: Message[], startId: string): string => {
 }
 
 const download = (filename: string, blob: Blob) => {
+  if (isNativeApp()) {
+    void shareDownload(filename, blob)
+    return
+  }
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -194,6 +208,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
   quota: null,
   showLogin: false,
   showAdmin: false,
+  native: false,
+  allowLanHttp: false,
+  serverBase: '',
 
   async boot() {
     const previousKey = get().key
@@ -248,6 +265,23 @@ export const useHarbor = create<HarborState>((set, get) => ({
     }
     if (hostedPage()) {
       await probeHost(set, get)
+    } else if (get().native || isNativeApp()) {
+      set({ native: true })
+      const saved = await readRemoteSession()
+      if (saved?.token && saved.base) {
+        setRemoteSession(saved.base, saved.token)
+        set({ serverBase: saved.base, serverUser: { id: '', username: saved.username, role: 'member' } })
+        try {
+          const me = await api<{ user: ServerUser }>('/api/me')
+          set({ serverUser: me.user, serverMode: sessionStorage.getItem('harbor-mode') !== 'local' })
+          if (sessionStorage.getItem('harbor-mode') !== 'local') {
+            await loadServerChats(set)
+          }
+        } catch {
+          clearRemoteSession()
+          await writeRemoteSession(null)
+        }
+      }
     }
   },
 
@@ -634,10 +668,14 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async logoutServer() {
-    await api('/api/auth/logout', { method: 'POST' })
+    await api('/api/auth/logout', { method: 'POST' }).catch(() => undefined)
     setCsrf('')
+    clearRemoteSession()
+    if (get().native) {
+      await writeRemoteSession(null)
+    }
     sessionStorage.removeItem('harbor-mode')
-    set({ serverUser: null, serverMode: false, showAdmin: false, showLogin: true })
+    set({ serverUser: null, serverMode: false, serverBase: '', showAdmin: false, showLogin: get().native ? false : true })
     await reloadLocal(set)
   },
 
@@ -673,6 +711,72 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   openAdmin(open) {
     set({ showAdmin: open })
+  },
+
+  setAllowLanHttp(value) {
+    set({ allowLanHttp: value })
+  },
+
+  async connectRemote(base, username, password) {
+    const origin = validateServerUrl(base, get().allowLanHttp)
+    const result = await fetch(`${origin}/api/auth/login`, {
+      method: 'POST',
+      credentials: 'omit',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    }).then(async (response) => {
+      const data = (await response.json()) as { token?: string; user?: ServerUser; error?: { message?: string } }
+      if (!response.ok || !data.token || !data.user) {
+        throw new Error(data.error?.message || 'login failed')
+      }
+      return data
+    })
+    setRemoteSession(origin, result.token!)
+    await writeRemoteSession({ base: origin, token: result.token!, username: result.user!.username })
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ serverBase: origin, serverUser: result.user!, serverMode: true, showLogin: false, native: isNativeApp() })
+    await loadServerChats(set)
+  },
+
+  async registerRemote(base, code, username, password) {
+    const origin = validateServerUrl(base, get().allowLanHttp)
+    const result = await fetch(`${origin}/api/auth/register`, {
+      method: 'POST',
+      credentials: 'omit',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code, username, password }),
+    }).then(async (response) => {
+      const data = (await response.json()) as { token?: string; user?: ServerUser; error?: { message?: string } }
+      if (!response.ok || !data.token || !data.user) {
+        throw new Error(data.error?.message || 'register failed')
+      }
+      return data
+    })
+    setRemoteSession(origin, result.token!)
+    await writeRemoteSession({ base: origin, token: result.token!, username: result.user!.username })
+    sessionStorage.setItem('harbor-mode', 'server')
+    set({ serverBase: origin, serverUser: result.user!, serverMode: true, showLogin: false, native: isNativeApp() })
+    await loadServerChats(set)
+  },
+
+  dismissOverlay() {
+    if (get().settingsOpen) {
+      set({ settingsOpen: false })
+      return true
+    }
+    if (get().showAdmin) {
+      set({ showAdmin: false })
+      return true
+    }
+    if (get().showLogin) {
+      set({ showLogin: false })
+      return true
+    }
+    if (get().sidebarOpen) {
+      set({ sidebarOpen: false })
+      return true
+    }
+    return false
   },
 }))
 
