@@ -89,46 +89,40 @@ const distSeg = (px, py, x0, y0, x1, y1) => {
   return Math.hypot(px - (x0 + t * dx), py - (y0 + t * dy))
 }
 
-const flattenQuad = (p0, p1, p2, steps = 14) => {
+const RING_R = 13
+const RING_STROKE = 5.5
+const ringAngle = Math.acos(8 / RING_R) * (180 / Math.PI)
+const ringGap = (((RING_STROKE + 2.5) / RING_R) * (180 / Math.PI)) / 2
+
+const flattenArc = (cx, cy, radius, a0, a1, steps = 72) => {
+  let sweep = ((a1 - a0) % 360 + 360) % 360
+  if (sweep === 0) sweep = 360
   const points = []
   for (let i = 0; i <= steps; i += 1) {
-    const t = i / steps
-    const u = 1 - t
-    points.push([
-      u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0],
-      u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1],
-    ])
+    const deg = a0 + (sweep * i) / steps
+    const a = (deg * Math.PI) / 180
+    points.push([cx + radius * Math.cos(a), cy + radius * Math.sin(a)])
   }
   return points
 }
 
-const hull = [
-  [18, 18],
-  [28, 28],
-  [40, 28],
-  ...flattenQuad([40, 28], [34, 40], [24, 40]).slice(1),
-  ...flattenQuad([24, 40], [8, 40], [8, 30]).slice(1),
-  [12, 30],
-]
-const wave = flattenQuad([6, 44], [24, 40], [42, 44])
+const inkArc = flattenArc(16, 24, RING_R, -ringAngle + ringGap, 360 - ringAngle - ringGap)
+const accentArc = flattenArc(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap)
 
-const insidePoly = (x, y, points) => {
-  let inside = false
-  for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
-    const [xi, yi] = points[i]
-    const [xj, yj] = points[j]
-    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside
+const nearest = (px, py, points) => {
+  let best = Infinity
+  for (let i = 0; i < points.length - 1; i += 1) {
+    best = Math.min(best, distSeg(px, py, points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]))
   }
-  return inside
+  return best
 }
 
-const cover = (px, py, stroke) => {
-  if (insidePoly(px, py, hull)) return 'ink'
-  let nearest = Infinity
-  for (let i = 0; i < wave.length - 1; i += 1) {
-    nearest = Math.min(nearest, distSeg(px, py, wave[i][0], wave[i][1], wave[i + 1][0], wave[i + 1][1]))
-  }
-  if (nearest <= stroke / 2) return 'accent'
+const cover = (px, py) => {
+  const half = RING_STROKE / 2
+  const ink = nearest(px, py, inkArc)
+  const accent = nearest(px, py, accentArc)
+  if (ink <= half && ink <= accent) return 'ink'
+  if (accent <= half) return 'accent'
   return null
 }
 
@@ -153,7 +147,7 @@ const render = (size, options) => {
       const lx = (gx - ox) / scale
       const ly = (gy - oy) / scale
       if (lx >= -2 && ly >= -2 && lx <= 50 && ly <= 50) {
-        const hit = cover(lx, ly, stroke)
+        const hit = cover(lx, ly)
         if (hit === 'ink') color = options.ink
         if (hit === 'accent') color = options.accent
       }
@@ -213,7 +207,7 @@ const insideRound = (px, py, x, y, w, h, r) => {
 
 const lightMark = (size, small) => render(size, { ink: INK, accent: ACCENT, small, scale: 1, ox: 0, oy: 0 })
 const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
-  const scale = 0.7
+  const scale = 0.9
   const ox = (1 - scale) * 24
   const oy = ox
   return render(size, {
@@ -229,21 +223,34 @@ const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
   })
 }
 
-const SAIL = 'M18 18L28 28H40Q34 40 24 40Q8 40 8 30H12Z'
-const WAVER = 'M6 44Q24 40 42 44'
+const arcPath = (cx, cy, radius, a0, a1) => {
+  const p = (deg) => {
+    const a = (deg * Math.PI) / 180
+    return [cx + radius * Math.cos(a), cy + radius * Math.sin(a)]
+  }
+  const [x0, y0] = p(a0)
+  const [x1, y1] = p(a1)
+  let sweep = ((a1 - a0) % 360 + 360) % 360
+  if (sweep === 0) sweep = 360
+  const n = (v) => (Math.round(v * 100) / 100).toString()
+  return `M${n(x0)} ${n(y0)}A${radius} ${radius} 0 ${sweep > 180 ? 1 : 0} 1 ${n(x1)} ${n(y1)}`
+}
 
-const markSvg = (stroke, ink, accent) =>
+const INK_ARC = arcPath(16, 24, RING_R, -ringAngle + ringGap, 360 - ringAngle - ringGap)
+const ACCENT_ARC = arcPath(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap)
+const MOUTH_ARC = arcPath(32, 24, RING_R, 180 - ringAngle + ringGap, 360 + (180 - ringAngle) - ringGap - 95)
+
+const markSvg = (ink, accent) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<path d="${SAIL}" fill="${ink}"/>` +
-  `<path d="${WAVER}" fill="none" stroke="${accent}" stroke-width="${stroke}" stroke-linecap="round"/>` +
+  `<path d="${INK_ARC}" fill="none" stroke="${ink}" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
+  `<path d="${ACCENT_ARC}" fill="none" stroke="${accent}" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
   `</svg>\n`
 
 const faviconSvg =
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<style>.ink{fill:#0f172a}.accent{fill:none;stroke:#2563eb;stroke-width:5.5;stroke-linecap:round}` +
-  `@media (prefers-color-scheme:dark){.ink{fill:#e2e8f0}.accent{stroke:#6b9bff}}</style>` +
-  `<path class="ink" d="${SAIL}"/>` +
-  `<path class="accent" d="${WAVER}"/>` +
+  `<style>.ink,.accent{fill:none;stroke-width:${RING_STROKE};stroke-linecap:round}.ink{stroke:#0f172a}.accent{stroke:#2563eb}` +
+  `@media (prefers-color-scheme:dark){.ink{stroke:#e2e8f0}.accent{stroke:#6b9bff}}</style>` +
+  `<path class="ink" d="${INK_ARC}"/><path class="accent" d="${ACCENT_ARC}"/>` +
   `</svg>\n`
 
 const write = (path, data) => {
@@ -253,14 +260,19 @@ const write = (path, data) => {
 
 const optionSvg = (name, body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="${name}">${body}</svg>\n`
+const strokePair = (d1, d2) =>
+  `<path d="${d1}" fill="none" stroke="#0f172a" stroke-width="${RING_STROKE}" stroke-linecap="round"/>` +
+  `<path d="${d2}" fill="none" stroke="#2563eb" stroke-width="${RING_STROKE}" stroke-linecap="round"/>`
 
-write(join(root, 'brand/logo.svg'), markSvg(4, '#0f172a', '#2563eb'))
-write(join(root, 'brand/logo-dark.svg'), markSvg(4, '#e2e8f0', '#6b9bff'))
-write(join(root, 'brand/options/sail.svg'), optionSvg('Sail', `<path d="${SAIL}" fill="#0f172a"/><path d="${WAVER}" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>`))
-write(join(root, 'brand/options/wave.svg'), optionSvg('Wave', `<path d="M6 22Q24 10 42 22L42 32Q24 24 6 32Z" fill="#2563eb"/>`))
-write(join(root, 'brand/options/buoy.svg'), optionSvg('Buoy', `<path d="M16 6L22 12L16 18L10 12Z" fill="#0f172a"/><path d="M6 26Q24 18 42 26L42 36Q24 30 6 36Z" fill="#2563eb"/>`))
-write(join(root, 'brand/options/lamp.svg'), optionSvg('Lamp', `<path d="M12 26h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V28a2 2 0 0 1 2-2z" fill="#0f172a"/><path d="M24 26L46 12L46 30Z" fill="#2563eb"/>`))
-write(join(root, 'apps/web/public/logo.svg'), markSvg(4, '#0f172a', '#2563eb'))
+write(join(root, 'brand/logo.svg'), markSvg('#0f172a', '#2563eb'))
+write(join(root, 'brand/logo-dark.svg'), markSvg('#e2e8f0', '#6b9bff'))
+write(join(root, 'brand/options/kin.svg'), optionSvg('Kin', strokePair(INK_ARC, ACCENT_ARC)))
+write(join(root, 'brand/options/mouth.svg'), optionSvg('Mouth', strokePair(INK_ARC, MOUTH_ARC)))
+write(join(root, 'brand/options/haven.svg'), optionSvg('Haven', `<path fill="#0f172a" d="M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z"/><path fill="#2563eb" d="M16 15.5h16a2.6 2.6 0 0 1 0 5.2H16a2.6 2.6 0 0 1 0-5.2Z"/>`))
+write(join(root, 'brand/options/pool.svg'), optionSvg('Pool', `<path fill="#0f172a" fill-rule="evenodd" d="M15 4H33A10 10 0 0 1 43 14V22A10 10 0 0 1 33 32H24L12 42L18 32H15A10 10 0 0 1 5 22V14A10 10 0 0 1 15 4Z M16 16H32A2.4 2.4 0 0 1 32 20.8H16A2.4 2.4 0 0 1 16 16Z"/>`))
+write(join(root, 'brand/options/basin.svg'), optionSvg('Basin', `<path fill="#0f172a" fill-rule="evenodd" d="M12 4H36A8 8 0 0 1 44 12V36A8 8 0 0 1 36 44H12A8 8 0 0 1 4 36V12A8 8 0 0 1 12 4Z M14 27H34A2.5 2.5 0 0 1 34 32H14A2.5 2.5 0 0 1 14 27Z"/>`))
+write(join(root, 'brand/options/line.svg'), optionSvg('Line', `<path fill="#0f172a" d="M12 4H36A8 8 0 0 1 44 12V36A8 8 0 0 1 36 44H12A8 8 0 0 1 4 36V12A8 8 0 0 1 12 4Z"/><path fill="#2563eb" d="M14 27H34A2.5 2.5 0 0 1 34 32H14A2.5 2.5 0 0 1 14 27Z"/>`))
+write(join(root, 'apps/web/public/logo.svg'), markSvg('#0f172a', '#2563eb'))
 write(join(root, 'apps/web/public/favicon.svg'), faviconSvg)
 
 const publicDir = join(root, 'apps/web/public')
@@ -379,24 +391,28 @@ write(join(splashSet, 'splash-2732x2732.png'), iosSplash)
 write(join(splashSet, 'splash-2732x2732-1.png'), iosSplash)
 write(join(splashSet, 'splash-2732x2732-2.png'), iosSplash)
 
-const fit = 108 / 48 * 0.7
+const fit = (108 / 48) * 0.9
 const pad = (108 - 48 * fit) / 2
-const vx = (n) => (pad + n * fit).toFixed(2)
 const vector = `<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#E2E8F0"
-        android:pathData="M${vx(18)},${vx(18)}L${vx(28)},${vx(28)}L${vx(40)},${vx(28)}Q${vx(34)},${vx(40)} ${vx(24)},${vx(40)}Q${vx(8)},${vx(40)} ${vx(8)},${vx(30)}L${vx(12)},${vx(30)}Z"/>
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M${vx(6)},${vx(44)}Q${vx(24)},${vx(40)} ${vx(42)},${vx(44)}"
-        android:strokeColor="#6B9BFF"
-        android:strokeLineCap="round"
-        android:strokeWidth="${(4 * fit).toFixed(2)}"/>
+    <group android:translateX="${pad.toFixed(2)}" android:translateY="${pad.toFixed(2)}" android:scaleX="${fit.toFixed(4)}" android:scaleY="${fit.toFixed(4)}">
+        <path
+            android:fillColor="#00000000"
+            android:pathData="${INK_ARC}"
+            android:strokeColor="#E2E8F0"
+            android:strokeLineCap="round"
+            android:strokeWidth="${RING_STROKE}"/>
+        <path
+            android:fillColor="#00000000"
+            android:pathData="${ACCENT_ARC}"
+            android:strokeColor="#6B9BFF"
+            android:strokeLineCap="round"
+            android:strokeWidth="${RING_STROKE}"/>
+    </group>
 </vector>
 `
 write(join(res, 'drawable/ic_launcher_foreground.xml'), vector)

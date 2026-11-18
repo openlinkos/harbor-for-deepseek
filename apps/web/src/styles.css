@@ -541,8 +541,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .mark { width: 22px; height: 22px; display: block; flex: none; }
 .greeting .mark, .gate-card .mark { width: 28px; height: 28px; }
-.mark .ink-f { fill: currentColor; }
-.mark .accent { fill: none; stroke: var(--dsw-alias-brand-text); stroke-width: 5.5; stroke-linecap: round; }
+.mark .ink, .mark .accent { fill: none; stroke-width: 5.5; stroke-linecap: round; }
+.mark .ink { stroke: currentColor; }
+.mark .accent { stroke: var(--dsw-alias-brand-text); }
 .legal { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .refused { color: var(--dsw-alias-state-error-primary); }
 .hljs-keyword, .hljs-selector-tag { color: #cf222e; }
