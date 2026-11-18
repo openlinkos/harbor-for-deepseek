@@ -45,6 +45,7 @@ kubectl apply -f deploy/web/k8s/rbac.yaml
 
 - `latest` on `master`
 - `sha-<short>`
+- `<YYYYMMDDHHmmss>-<sha7>` on pushes to `master` (UTC clock, 7-character commit sha), the tag Flux ImagePolicy sorts on prod-us
 - semver tags (`1.2.3`, `1.2`, `1`) when the git tag is a version
 
 It uses `GITHUB_TOKEN` with `packages: write`.
