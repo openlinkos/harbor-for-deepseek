@@ -107,10 +107,12 @@ export type HarborState = {
   newChat: () => Promise<void>
   openChat: (id: string) => Promise<void>
   rename: (id: string, title: string) => Promise<void>
+  pin: (id: string) => Promise<void>
   removeChat: (id: string) => Promise<void>
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
   regenerate: (assistantId: string) => Promise<void>
+  editUser: (messageId: string, text: string) => Promise<void>
   stop: () => void
   refreshBalance: () => Promise<void>
   addFiles: (files: File[]) => Promise<void>
@@ -419,6 +421,19 @@ export const useHarbor = create<HarborState>((set, get) => ({
     set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
   },
 
+  async pin(id) {
+    const current = get().conversations.find((item) => item.id === id)
+    if (!current) {
+      return
+    }
+    const next = stamp({ ...current, pinned: !current.pinned })
+    if (!get().serverMode) {
+      const store = await repository()
+      await store.saveConversation(next)
+    }
+    set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
+  },
+
   async removeChat(id) {
     if (get().serverMode) {
       await api(`/api/conversations/${id}`, { method: 'DELETE' })
@@ -503,6 +518,22 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     await runTurn('', assistant.parentId)
+  },
+
+  async editUser(messageId, text) {
+    const message = get().messages.find((item) => item.id === messageId)
+    const trimmed = text.trim()
+    if (!message || message.role !== 'user' || !trimmed || get().streaming) {
+      return
+    }
+    if (get().serverMode) {
+      await runServerTurn(trimmed, message.parentId)
+      return
+    }
+    if (!get().key) {
+      return
+    }
+    await runTurn(trimmed, undefined, message.parentId)
   },
 
   stop() {
@@ -813,7 +844,7 @@ const applyImport = async (
   useHarbor.setState({ notice: `${plan.added}:${plan.skipped}`, booted: true })
 }
 
-const runTurn = async (text: string, regenerateParent?: string | null) => {
+const runTurn = async (text: string, regenerateParent?: string | null, branchFrom?: string | null) => {
   const state = useHarbor.getState()
   const key = state.key
   if (!key) {
@@ -832,6 +863,9 @@ const runTurn = async (text: string, regenerateParent?: string | null) => {
   if (regenerateParent !== undefined) {
     parentId = regenerateParent
   } else {
+    if (branchFrom !== undefined) {
+      parentId = branchFrom
+    }
     const user: Message = {
       id: nid(),
       conversationId: conversation.id,

@@ -47,19 +47,28 @@ const highlight = (language: string | undefined, value: string) => {
   return hljs.highlightAuto(value).value
 }
 
+const label = (zh: string, en: string) => (document.documentElement.lang === 'en' ? en : zh)
+
+const BOX = /[┌┐└┘├┤┬┴┼─│╔╗╚╝╠╣╦╩╬═║╭╮╯╰]/
+
 const Mermaid = ({ chart }: { chart: string }) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const view = useRef<HTMLDivElement>(null)
+  const card = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
+  const [tab, setTab] = useState<'chart' | 'code'>('chart')
+  const [zoom, setZoom] = useState(1)
+  const [menu, setMenu] = useState(false)
   useEffect(() => {
     let cancelled = false
     setFailed(false)
     void import('mermaid').then(async ({ default: mermaid }) => {
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' })
+      const dark = document.body.hasAttribute('data-ds-dark-theme')
+      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: dark ? 'dark' : 'neutral' })
       const id = `m-${Math.random().toString(36).slice(2)}`
       try {
         const { svg } = await mermaid.render(id, chart)
-        if (!cancelled && ref.current) {
-          ref.current.innerHTML = svg
+        if (!cancelled && view.current) {
+          view.current.innerHTML = svg
         }
       } catch {
         if (!cancelled) {
@@ -71,10 +80,52 @@ const Mermaid = ({ chart }: { chart: string }) => {
       cancelled = true
     }
   }, [chart])
-  if (failed) {
-    return <pre className="code-fallback">{chart}</pre>
+  const download = () => {
+    const svg = view.current?.querySelector('svg')
+    if (!svg) {
+      return
+    }
+    const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'diagram.svg'
+    link.click()
+    URL.revokeObjectURL(url)
   }
-  return <div className="mermaid" ref={ref} />
+  return (
+    <div className="diagram-card" data-testid="mermaid-card" ref={card}>
+      <div className="diagram-bar">
+        <div className="diagram-tabs" role="tablist">
+          <button type="button" role="tab" aria-selected={tab === 'chart'} className={tab === 'chart' ? 'on' : ''} onClick={() => setTab('chart')}>{label('图表', 'Diagram')}</button>
+          <button type="button" role="tab" aria-selected={tab === 'code'} className={tab === 'code' ? 'on' : ''} onClick={() => setTab('code')}>{label('代码', 'Code')}</button>
+        </div>
+        <div className="diagram-tools">
+          {tab === 'chart' ? (
+            <>
+              <button type="button" aria-label={label('缩小', 'Zoom out')} onClick={() => setZoom((value) => Math.max(0.5, Number((value - 0.1).toFixed(2))))}>−</button>
+              <button type="button" aria-label={label('放大', 'Zoom in')} onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}>+</button>
+            </>
+          ) : (
+            <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>{label('复制', 'Copy')}</button>
+          )}
+          <button type="button" aria-label={label('下载', 'Download')} onClick={() => setMenu((value) => !value)}>{label('下载', 'Download')}</button>
+          {menu ? (
+            <div className="menu diagram-menu">
+              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 SVG', 'Download SVG')}</button>
+              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 PNG', 'Download PNG')}</button>
+            </div>
+          ) : null}
+          <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => void card.current?.requestFullscreen?.()}>{label('全屏', 'Full screen')}</button>
+        </div>
+      </div>
+      {failed ? <pre className="diagram-source"><code>{chart}</code></pre> : null}
+      <pre className="diagram-source" hidden={failed || tab !== 'code'}><code>{chart}</code></pre>
+      <div className="diagram-view" hidden={failed || tab !== 'chart'}>
+        <div className="mermaid" ref={view} style={{ transform: `scale(${zoom})` }} />
+      </div>
+    </div>
+  )
 }
 
 const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
@@ -103,10 +154,10 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
               })
             }}
           >
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? '✓ ' : ''}{label('复制', 'Copy')}
           </button>
-          <button type="button" onClick={download}>
-            Download
+          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
+            ↓
           </button>
         </span>
       </div>
@@ -132,11 +183,11 @@ class Boundary extends Component<{ text: string; children: ReactNode }, { failed
 
 const citeChildren = (children: ReactNode, citations?: TextCitation[]) =>
   Children.map(children, (child) => {
-    if (typeof child !== 'string' || !child.includes('〔')) {
+    if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
       return child
     }
-    return child.split(/(〔\d+〕)/g).map((bit, index) => {
-      const match = /^〔(\d+)〕$/.exec(bit)
+    return child.split(/(〔\d+〕|\[\d+\]|\(\d+\))/g).map((bit, index) => {
+      const match = /^(?:〔|\[|\()(\d+)(?:〕|\]|\))$/.exec(bit)
       const citation = match ? citations?.[Number(match[1]) - 1] : undefined
       if (!match || !citation) {
         return bit
@@ -162,6 +213,9 @@ export const Markdown = ({ text, citations }: { text: string; citations?: TextCi
         p({ children }) {
           return <p>{citeChildren(children, citations)}</p>
         },
+        li({ children }) {
+          return <li>{citeChildren(children, citations)}</li>
+        },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined
           return (
@@ -173,13 +227,25 @@ export const Markdown = ({ text, citations }: { text: string; citations?: TextCi
         code({ className, children }) {
           const value = String(children).replace(/\n$/, '')
           const language = /language-([\w-]+)/.exec(className ?? '')?.[1]
-          if (!className) {
+          const block = Boolean(className) || value.includes('\n')
+          if (!block) {
             return <code className="inline-code">{children}</code>
           }
           if (language === 'mermaid') {
             return <Mermaid chart={value} />
           }
+          if (BOX.test(value)) {
+            return (
+              <div className="code-card">
+                <pre className="box-drawing"><code>{value}</code></pre>
+              </div>
+            )
+          }
           return <CodeBlock language={language} value={value} />
+        },
+        img({ src, alt }) {
+          const safe = src && (/^https:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) ? src : undefined
+          return <img className="md-img" src={safe} alt={alt ?? ''} />
         },
       }}
     >

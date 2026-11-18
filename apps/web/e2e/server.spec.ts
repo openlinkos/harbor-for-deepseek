@@ -43,6 +43,8 @@ test('wizard, admin pool, login, and sync across two profiles', async ({ browser
   await admin.getByTestId('user-menu').click()
   await expect(admin.getByTestId('total-usage')).toContainText('41')
   await admin.getByTestId('settings-open').click()
+  await admin.getByRole('button', { name: '数据管理' }).click()
+  await admin.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
   await expect(admin.getByTestId('quota')).toContainText('74')
   await expect(admin.getByTestId('settings-dialog')).not.toContainText('当前 Key 只保存在本机')
   await admin.getByRole('button', { name: '关闭' }).click()
@@ -57,6 +59,8 @@ test('wizard, admin pool, login, and sync across two profiles', async ({ browser
   await expect(other.getByTestId('server-mode')).toBeVisible()
   await other.getByTestId('user-menu').click()
   await other.getByTestId('settings-open').click()
+  await other.getByRole('button', { name: '数据管理' }).click()
+  await other.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
   await other.getByTestId('server-sync').click()
   await expect(other.getByTestId('sidebar')).toContainText('简单加法')
 
