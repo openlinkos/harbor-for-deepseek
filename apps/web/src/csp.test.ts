@@ -14,6 +14,18 @@ describe('content security policy', () => {
     expect(CONTENT_SECURITY_POLICY.startsWith("default-src 'self'")).toBe(true)
   })
 
+  it('ships the same policy in the Cloudflare Pages _headers file', () => {
+    const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8')
+    expect(headers).toMatch(/^\/\*/m)
+    expect(headers).toContain('Strict-Transport-Security: max-age=31536000; includeSubDomains')
+    expect(headers).toContain('X-Content-Type-Options: nosniff')
+    expect(headers).toContain('Referrer-Policy: no-referrer')
+    expect(headers).toContain('X-Frame-Options: DENY')
+    expect(headers).toContain('Permissions-Policy: camera=(), microphone=(), geolocation=()')
+    expect(headers).toContain(`Content-Security-Policy: ${CONTENT_SECURITY_POLICY}`)
+    expect(headers).not.toContain('unsafe-eval')
+  })
+
   it('keeps the service worker off the API host', () => {
     const worker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8')
     expect(worker).toContain('api.deepseek.com')

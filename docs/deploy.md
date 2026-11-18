@@ -22,14 +22,30 @@ Publish the checksums next to the files, or attach `apps/web/dist` from the **St
 
 ## Headers
 
-`deploy/Caddyfile` is an example. Repeat the same Content-Security-Policy as the meta tag in `apps/web/src/csp.ts`. Also send:
+`deploy/Caddyfile` is an example for a host you run yourself. Repeat the same Content-Security-Policy as the meta tag in `apps/web/src/csp.ts`. Also send:
 
 - `Strict-Transport-Security`
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: no-referrer`
 - `X-Frame-Options: DENY`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 
 Serve only the files in `dist`. Access logs on the host will see page loads, not keys and not chat bodies.
+
+## Cloudflare Pages
+
+The public site is hosted on Cloudflare Pages. Pages does not read `deploy/Caddyfile`. The same headers are in `apps/web/public/_headers`, and Vite copies that file to `apps/web/dist/_headers`.
+
+Project settings:
+
+| Setting | Value |
+|---|---|
+| Root directory | repository root |
+| Build command | `pnpm install --frozen-lockfile && pnpm build` |
+| Build output directory | `apps/web/dist` |
+| Functions | none. Do not add a Pages Function, and do not proxy `api.deepseek.com`. |
+
+Node.js 22. No environment variables. After a deploy, the response for `/` should include `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, the Permissions-Policy above, and the Content-Security-Policy from `apps/web/src/csp.ts`. Pages cannot strip the `Server` header the way the Caddy example does.
 
 ## Check a deploy
 
