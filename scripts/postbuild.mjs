@@ -35,6 +35,28 @@ writeFileSync(join(dist, '404.html'), html)
 copyFileSync(join(root, 'LICENSE'), join(dist, 'LICENSE'))
 copyFileSync(join(root, 'NOTICE'), join(dist, 'NOTICE'))
 
+const headersPath = join(dist, '_headers')
+const headers = readFileSync(headersPath, 'utf8')
+const publicHeaders = readFileSync(join(root, 'apps/web/public/_headers'), 'utf8')
+if (headers !== publicHeaders) {
+  throw new Error('dist/_headers does not match apps/web/public/_headers')
+}
+for (const line of [
+  'Strict-Transport-Security: max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options: nosniff',
+  'Referrer-Policy: no-referrer',
+  'X-Frame-Options: DENY',
+  'Permissions-Policy: camera=(), microphone=(), geolocation=()',
+  "connect-src 'self' https://api.deepseek.com",
+]) {
+  if (!headers.includes(line)) {
+    throw new Error(`dist/_headers is missing ${line}`)
+  }
+}
+if (headers.includes('unsafe-eval')) {
+  throw new Error('dist/_headers allows unsafe-eval')
+}
+
 const files = []
 const walk = (dir) => {
   for (const name of readdirSync(dir)) {
