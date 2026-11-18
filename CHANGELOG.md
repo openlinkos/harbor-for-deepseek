@@ -2,7 +2,7 @@
 
 ## 0.5.4 — 2026-11-18
 
-The sidebar wordmark is one line: Harbor for DeepSeek. The mark is a mooring (quay, bollard, ring) in the OpenLinkOS stroke system. Buttons, links, and chips use the OpenLinkOS blue. A small footer sits under the user row. The chat column does not carry a disclaimer.
+The sidebar wordmark is one line: Harbor for DeepSeek. The mark is a low sailboat in the OpenLinkOS palette. Buttons, links, and chips use the OpenLinkOS blue. A small footer sits under the user row. The chat column does not carry a disclaimer.
 
 ## 0.5.3 — 2026-11-18
 

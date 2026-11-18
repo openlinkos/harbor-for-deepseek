@@ -21,8 +21,8 @@ const useProfile = () => {
 
 const Mark = () => (
   <svg className="mark" viewBox="0 0 48 48" aria-hidden="true">
-    <path d="M10 36H38M18 36V14" />
-    <circle cx="31" cy="20" r="6.2" />
+    <path className="ink-f" d="M18 18L28 28H40Q34 40 24 40Q8 40 8 30H12Z" />
+    <path className="accent" d="M6 44Q24 40 42 44" />
   </svg>
 )
 

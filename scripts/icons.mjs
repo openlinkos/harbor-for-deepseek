@@ -89,22 +89,46 @@ const distSeg = (px, py, x0, y0, x1, y1) => {
   return Math.hypot(px - (x0 + t * dx), py - (y0 + t * dy))
 }
 
-const mooring = {
-  lines: [
-    [10, 36, 38, 36],
-    [18, 36, 18, 14],
-  ],
-  ring: [31, 20, 6.2],
+const flattenQuad = (p0, p1, p2, steps = 14) => {
+  const points = []
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps
+    const u = 1 - t
+    points.push([
+      u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0],
+      u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1],
+    ])
+  }
+  return points
+}
+
+const hull = [
+  [18, 18],
+  [28, 28],
+  [40, 28],
+  ...flattenQuad([40, 28], [34, 40], [24, 40]).slice(1),
+  ...flattenQuad([24, 40], [8, 40], [8, 30]).slice(1),
+  [12, 30],
+]
+const wave = flattenQuad([6, 44], [24, 40], [42, 44])
+
+const insidePoly = (x, y, points) => {
+  let inside = false
+  for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
+    const [xi, yi] = points[i]
+    const [xj, yj] = points[j]
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside
+  }
+  return inside
 }
 
 const cover = (px, py, stroke) => {
-  const half = stroke / 2
-  let ink = Infinity
-  for (const [x0, y0, x1, y1] of mooring.lines) ink = Math.min(ink, distSeg(px, py, x0, y0, x1, y1))
-  const [cx, cy, r] = mooring.ring
-  const accent = Math.abs(Math.hypot(px - cx, py - cy) - r)
-  if (accent <= half && accent <= ink) return 'accent'
-  if (ink <= half) return 'ink'
+  if (insidePoly(px, py, hull)) return 'ink'
+  let nearest = Infinity
+  for (let i = 0; i < wave.length - 1; i += 1) {
+    nearest = Math.min(nearest, distSeg(px, py, wave[i][0], wave[i][1], wave[i + 1][0], wave[i + 1][1]))
+  }
+  if (nearest <= stroke / 2) return 'accent'
   return null
 }
 
@@ -205,17 +229,21 @@ const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
   })
 }
 
+const SAIL = 'M18 18L28 28H40Q34 40 24 40Q8 40 8 30H12Z'
+const WAVER = 'M6 44Q24 40 42 44'
+
 const markSvg = (stroke, ink, accent) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<path d="M10 36H38M18 36V14" fill="none" stroke="${ink}" stroke-width="${stroke}" stroke-linecap="round"/>` +
-  `<circle cx="31" cy="20" r="6.2" fill="none" stroke="${accent}" stroke-width="${stroke}"/>` +
+  `<path d="${SAIL}" fill="${ink}"/>` +
+  `<path d="${WAVER}" fill="none" stroke="${accent}" stroke-width="${stroke}" stroke-linecap="round"/>` +
   `</svg>\n`
 
 const faviconSvg =
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
-  `<style>.ink{stroke:#0f172a}.accent{stroke:#2563eb}@media (prefers-color-scheme:dark){.ink{stroke:#e2e8f0}.accent{stroke:#6b9bff}}</style>` +
-  `<path class="ink" d="M10 36H38M18 36V14" fill="none" stroke-width="5.5" stroke-linecap="round"/>` +
-  `<circle class="accent" cx="31" cy="20" r="6.2" fill="none" stroke-width="5.5"/>` +
+  `<style>.ink{fill:#0f172a}.accent{fill:none;stroke:#2563eb;stroke-width:5.5;stroke-linecap:round}` +
+  `@media (prefers-color-scheme:dark){.ink{fill:#e2e8f0}.accent{stroke:#6b9bff}}</style>` +
+  `<path class="ink" d="${SAIL}"/>` +
+  `<path class="accent" d="${WAVER}"/>` +
   `</svg>\n`
 
 const write = (path, data) => {
@@ -223,26 +251,15 @@ const write = (path, data) => {
   writeFileSync(path, data)
 }
 
-const option = (name, body) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="${name}">` +
-  `<path d="${body.ink}" fill="none" stroke="#0f172a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>` +
-  body.accent +
-  `</svg>\n`
+const optionSvg = (name, body) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="${name}">${body}</svg>\n`
 
 write(join(root, 'brand/logo.svg'), markSvg(4, '#0f172a', '#2563eb'))
 write(join(root, 'brand/logo-dark.svg'), markSvg(4, '#e2e8f0', '#6b9bff'))
-write(join(root, 'brand/options/berth.svg'), option('Berth', {
-  ink: 'M15 13V27A9 9 0 0 0 33 27V13',
-  accent: '<circle cx="24" cy="19" r="4.6" fill="none" stroke="#2563eb" stroke-width="4"/>',
-}))
-write(join(root, 'brand/options/mooring.svg'), option('Mooring', {
-  ink: 'M10 36H38M18 36V14',
-  accent: '<circle cx="31" cy="20" r="6.2" fill="none" stroke="#2563eb" stroke-width="4"/>',
-}))
-write(join(root, 'brand/options/channel.svg'), option('Channel', {
-  ink: 'M13 35L20 15M35 35L28 15',
-  accent: '<circle cx="24" cy="28" r="3.4" fill="#2563eb"/>',
-}))
+write(join(root, 'brand/options/sail.svg'), optionSvg('Sail', `<path d="${SAIL}" fill="#0f172a"/><path d="${WAVER}" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>`))
+write(join(root, 'brand/options/wave.svg'), optionSvg('Wave', `<path d="M6 22Q24 10 42 22L42 32Q24 24 6 32Z" fill="#2563eb"/>`))
+write(join(root, 'brand/options/buoy.svg'), optionSvg('Buoy', `<path d="M16 6L22 12L16 18L10 12Z" fill="#0f172a"/><path d="M6 26Q24 18 42 26L42 36Q24 30 6 36Z" fill="#2563eb"/>`))
+write(join(root, 'brand/options/lamp.svg'), optionSvg('Lamp', `<path d="M12 26h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V28a2 2 0 0 1 2-2z" fill="#0f172a"/><path d="M24 26L46 12L46 30Z" fill="#2563eb"/>`))
 write(join(root, 'apps/web/public/logo.svg'), markSvg(4, '#0f172a', '#2563eb'))
 write(join(root, 'apps/web/public/favicon.svg'), faviconSvg)
 
@@ -362,6 +379,9 @@ write(join(splashSet, 'splash-2732x2732.png'), iosSplash)
 write(join(splashSet, 'splash-2732x2732-1.png'), iosSplash)
 write(join(splashSet, 'splash-2732x2732-2.png'), iosSplash)
 
+const fit = 108 / 48 * 0.7
+const pad = (108 - 48 * fit) / 2
+const vx = (n) => (pad + n * fit).toFixed(2)
 const vector = `<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -369,17 +389,14 @@ const vector = `<?xml version="1.0" encoding="utf-8"?>
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#00000000"
-        android:pathData="M31.95,72.9L76.05,72.9M44.55,72.9L44.55,38.25"
-        android:strokeColor="#E2E8F0"
-        android:strokeLineCap="round"
-        android:strokeWidth="6.3"/>
+        android:fillColor="#E2E8F0"
+        android:pathData="M${vx(18)},${vx(18)}L${vx(28)},${vx(28)}L${vx(40)},${vx(28)}Q${vx(34)},${vx(40)} ${vx(24)},${vx(40)}Q${vx(8)},${vx(40)} ${vx(8)},${vx(30)}L${vx(12)},${vx(30)}Z"/>
     <path
         android:fillColor="#00000000"
-        android:pathData="M65.03,37.94a9.77,9.77 0 1,1 0,19.53a9.77,9.77 0 1,1 0,-19.53"
+        android:pathData="M${vx(6)},${vx(44)}Q${vx(24)},${vx(40)} ${vx(42)},${vx(44)}"
         android:strokeColor="#6B9BFF"
         android:strokeLineCap="round"
-        android:strokeWidth="6.3"/>
+        android:strokeWidth="${(4 * fit).toFixed(2)}"/>
 </vector>
 `
 write(join(res, 'drawable/ic_launcher_foreground.xml'), vector)
