@@ -13,7 +13,8 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
-import { Component, useEffect, useRef, useState, type ReactNode } from 'react'
+import type { TextCitation } from '@harbor/types'
+import { Children, Component, useEffect, useRef, useState, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -129,12 +130,38 @@ class Boundary extends Component<{ text: string; children: ReactNode }, { failed
   }
 }
 
-export const Markdown = ({ text }: { text: string }) => (
+const citeChildren = (children: ReactNode, citations?: TextCitation[]) =>
+  Children.map(children, (child) => {
+    if (typeof child !== 'string' || !child.includes('〔')) {
+      return child
+    }
+    return child.split(/(〔\d+〕)/g).map((bit, index) => {
+      const match = /^〔(\d+)〕$/.exec(bit)
+      const citation = match ? citations?.[Number(match[1]) - 1] : undefined
+      if (!match || !citation) {
+        return bit
+      }
+      return (
+        <span className="cite" key={`${citation.url}-${index}`}>
+          {match[1]}
+          <span className="hover-card">
+            <strong>{citation.title || citation.url}</strong>
+            <p>{citation.cited_text}</p>
+          </span>
+        </span>
+      )
+    })
+  })
+
+export const Markdown = ({ text, citations }: { text: string; citations?: TextCitation[] }) => (
   <Boundary text={text}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
+        p({ children }) {
+          return <p>{citeChildren(children, citations)}</p>
+        },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined
           return (

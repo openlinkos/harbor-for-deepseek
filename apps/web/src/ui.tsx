@@ -6,7 +6,7 @@ import type { ContentBlock, Conversation, Message } from '@harbor/types'
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
-import { conversationCost, useHarbor, type HarborState } from './store.js'
+import { useHarbor, type HarborState } from './store.js'
 
 const Mark = () => (
   <svg className="mark" viewBox="0 0 32 32" aria-hidden="true">
@@ -179,33 +179,19 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     return <Thinking text={block.thinking} />
   }
   if (block.type === 'text') {
+    const marked = block.citations?.length
+      ? `${block.text.trimEnd()}${block.citations.map((_, index) => `〔${index + 1}〕`).join('')}`
+      : block.text
     return (
       <div className="prose" data-testid={testId}>
-        <Markdown text={block.text} />
-        {block.citations?.map((citation, index) => (
-          <span className="cite" key={citation.url}>
-            {index + 1}
-            <span className="hover-card">
-              <strong>{citation.title || citation.url}</strong>
-              <p>{citation.cited_text}</p>
-            </span>
-          </span>
-        ))}
+        <Markdown text={marked} citations={block.citations} />
       </div>
     )
   }
   if (block.type === 'server_tool_use') {
     const action = block.input.action
     if (action === 'search') {
-      const queries =
-        'queries' in block.input && Array.isArray(block.input.queries)
-          ? block.input.queries.filter((item): item is string => typeof item === 'string')
-          : []
-      return (
-        <p className="tool-line">
-          {t('searchQueries')}: {queries.join(' · ')}
-        </p>
-      )
+      return null
     }
     if (action === 'open_page' && 'url' in block.input && typeof block.input.url === 'string') {
       return <p className="tool-line">{t('opened')}: {block.input.url}</p>
@@ -259,20 +245,14 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     site: result.site_name || result.url,
   }))
   return (
-    <div data-testid="search-results">
-      <p className="found-line">
-        <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
-        {t('foundPages', { count: results.length })}
-        <span className="favicons">
-          {results.slice(0, 4).map((result) => (
-            <i key={result.url}>{result.title.slice(0, 1)}</i>
-          ))}
-        </span>
-      </p>
-      <button className="sources-pill" type="button" onClick={() => openPanel(items)}>
-        {t('pagesPill', { count: results.length })}
-      </button>
-    </div>
+    <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
+      <span className="favicons">
+        {results.slice(0, 3).map((result) => (
+          <i key={result.url}>{result.title.slice(0, 1)}</i>
+        ))}
+      </span>
+      {t('readPages', { count: results.length })}
+    </button>
   )
 }
 
@@ -296,8 +276,9 @@ const Thinking = ({ text }: { text: string }) => {
   return (
     <section className="thinking" data-testid="thinking">
       <button type="button" onClick={() => setOpen((value) => !value)}>
-        <Icon d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+        <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" />
         {t('thoughtFor', { seconds })}
+        <Icon d="M9 6l6 6-6 6" />
       </button>
       {open ? <div className="thinking-body">{text}</div> : null}
     </section>
@@ -375,22 +356,24 @@ export const Shell = () => {
     endRef.current?.scrollIntoView({ block: 'end' })
   }, [path.length, state.streaming, state.messages])
 
-  const chatUsage = conversationCost(state.messages)
   const total = estimateCost(state.totals, new Date())
   const [collapsed, setCollapsed] = useState(false)
+  const [filtering, setFiltering] = useState(false)
+  const [filter, setFilter] = useState('')
+  const [userMenu, setUserMenu] = useState(false)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
   const groups = useMemo(() => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
-    for (const item of state.conversations) {
+    for (const item of state.conversations.filter((chat) => !filter || (chat.title || t('newChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when).setHours(0, 0, 0, 0)) / 86_400_000
       const label = days < 1 ? t('groupToday') : days < 7 ? t('group7') : days < 30 ? t('group30') : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
       buckets.set(label, [...(buckets.get(label) ?? []), item])
     }
     return [...buckets.entries()]
-  }, [state.conversations, t])
+  }, [state.conversations, filter, t])
   const who = state.serverUser?.username ?? t('thisDevice')
 
   return (
@@ -399,10 +382,18 @@ export const Shell = () => {
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
           <span className="brand-name"><Mark /> Harbor</span>
-          <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(true)}>
-            <Icon d="M15 6H5m0 0 4-4M5 6l4 4M9 18h10m0 0-4-4m4 4-4 4" />
-          </button>
+          <span className="sider-icons">
+            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
+              <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+            </button>
+            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(true)}>
+              <Icon d="M15 6H5m0 0 4-4M5 6l4 4" />
+            </button>
+          </span>
         </div>
+        {filtering ? (
+          <input className="side-filter" value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
+        ) : null}
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => void state.newChat()}>
           <Icon d="M12 5v14M5 12h14" /> {t('newChat')}
         </button>
@@ -417,21 +408,26 @@ export const Shell = () => {
             </div>
           ))}
         </div>
-        <div className="side-usage" data-testid="total-usage">
-          <span>{t('allChats')}</span>
-          <strong>
-            {t('totalLine', {
-              inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
-              outTokens: state.totals.output_tokens,
-              cny: formatCny(total.totalCny),
-            })}
-          </strong>
-          {state.balance ? <span data-testid="balance-side">{t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
-        </div>
-        <button className="user-row" type="button" data-testid="settings-open" onClick={() => state.setSettingsOpen(true)}>
+        <div className="user-bar">
           <span className="avatar">{who.slice(0, 1).toUpperCase()}</span>
-          <span>{who}<small>{state.serverMode ? t('serverChat') : t('tagline')}</small></span>
-        </button>
+          <span className="user-label">{who}</span>
+          <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
+            <Icon d="M6 12h.01M12 12h.01M18 12h.01" />
+          </button>
+          {userMenu ? (
+            <div className="menu user-menu">
+              <p className="side-usage" data-testid="total-usage">
+                {t('totalLine', {
+                  inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
+                  outTokens: state.totals.output_tokens,
+                  cny: formatCny(total.totalCny),
+                })}
+                {state.balance ? <span data-testid="balance-side"> {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
+              </p>
+              <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('settings')}</button>
+            </div>
+          ) : null}
+        </div>
       </aside>
       {collapsed ? (
         <div className="float-pill">
@@ -458,7 +454,6 @@ export const Shell = () => {
               {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
               <div ref={endRef} />
             </div>
-            {conversation ? <p className="chat-usage">{t('thisChat')} · {formatCny(chatUsage.totalCny)} {t('cny')}</p> : null}
             <div className="composer-wrap">
               <Composer />
               <p className="footnote">{t('disclaimer')}</p>
@@ -470,7 +465,9 @@ export const Shell = () => {
         <aside className="search-panel" data-testid="search-panel">
           <header>
             <strong>{t('searchPanel')}</strong>
-            <button className="icon-btn" type="button" onClick={() => setPanel(null)}>{t('close')}</button>
+            <button className="icon-btn panel-close" type="button" aria-label={t('close')} onClick={() => setPanel(null)}>
+              <Icon d="M6 6l12 12M18 6 6 18" />
+            </button>
           </header>
           <ol>
             {panel.map((item, index) => (
@@ -521,25 +518,11 @@ const ChatLink = ({ conversation, active }: { conversation: Conversation; active
 
 const Empty = () => {
   const t = useT()
-  const send = useHarbor((state) => state.send)
-  const streaming = useHarbor((state) => state.streaming)
-  const prompts = [
-    ['suggestion-math', t('suggestionMath')],
-    ['suggestion-search', t('suggestionSearch')],
-    ['suggestion-link', t('suggestionLink')],
-  ] as const
   return (
     <div className="home">
       <h2 className="greeting"><Mark /> {t('emptyTitle')}</h2>
       <Composer />
       <p className="footnote">{t('disclaimer')}</p>
-      <div className="suggestions">
-        {prompts.map(([id, prompt]) => (
-          <button key={id} data-testid={id} type="button" disabled={streaming} onClick={() => void send(prompt)}>
-            {prompt}
-          </button>
-        ))}
-      </div>
     </div>
   )
 }
@@ -555,6 +538,7 @@ const Composer = () => {
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
   const [text, setText] = useState('')
+  const [effortOpen, setEffortOpen] = useState(false)
   const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
     const value = text
@@ -591,14 +575,25 @@ const Composer = () => {
       />
       <div className="composer-tools">
         <div className="chips">
-          <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-            <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
-          </button>
+          <span className="chip-wrap">
+            <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+              <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
+            </button>
+            <button className="chip-more" type="button" aria-label={t('effort')} onClick={() => setEffortOpen((value) => !value)}>
+              <Icon d="M6 9l6 6 6-6" />
+            </button>
+            {effortOpen ? (
+              <div className="menu effort-menu">
+                {(['low', 'high', 'max'] as const).map((level) => (
+                  <button key={level} type="button" onClick={() => { void setPrefs({ effort: level }); setEffortOpen(false) }}>
+                    {level}{prefs.effort === level ? ' ·' : ''}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </span>
           <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
-          </button>
-          <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
-            {t('readLink')}
           </button>
         </div>
         <div className="tool-right">
@@ -613,25 +608,15 @@ const Composer = () => {
           )}
         </div>
       </div>
-      <div className="model-row">
-        <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
-          <option value="deepseek-flash">DeepSeek {t('flash')}</option>
-          <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
-        </select>
-        <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
-          <option value="low">low</option>
-          <option value="high">high</option>
-          <option value="max">max</option>
-        </select>
-        {!flash ? <span className="hint">{t('toolsFlashOnly')}</span> : null}
       </div>
-    </div>
   )
 }
 
 const Settings = () => {
   const t = useT()
   const settings = useHarbor((state) => state.settings)
+  const prefs = useHarbor((state) => state.prefs)
+  const setPrefs = useHarbor((state) => state.setPrefs)
   const balance = useHarbor((state) => state.balance)
   const balanceError = useHarbor((state) => state.balanceError)
   const patchSettings = useHarbor((state) => state.patchSettings)
@@ -724,6 +709,28 @@ const Settings = () => {
               {t('estimated')}: {formatCny(cost.totalCny)} {t('cny')} ({cost.peak ? t('peak') : t('offPeak')})
             </li>
           </ul>
+        </section>
+        <section>
+          <h3>{t('model')}</h3>
+          <label>
+            {t('model')}
+            <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
+              <option value="deepseek-flash">DeepSeek {t('flash')}</option>
+              <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
+            </select>
+          </label>
+          <label>
+            {t('effort')}
+            <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
+              <option value="low">low</option>
+              <option value="high">high</option>
+              <option value="max">max</option>
+            </select>
+          </label>
+          <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={prefs.model !== 'deepseek-flash'} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
+            {t('readLink')}
+          </button>
+          {prefs.model !== 'deepseek-flash' ? <p className="hint">{t('toolsFlashOnly')}</p> : null}
         </section>
         <section>
           <h3>{t('safety')}</h3>
