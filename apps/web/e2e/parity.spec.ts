@@ -156,7 +156,11 @@ test('stream and stop', async ({ page }) => {
   await send(page, '慢一点')
   await expect(page.getByTestId('stop')).toBeVisible()
   await page.getByTestId('stop').click()
+  await expect(page.getByTestId('stop')).toBeHidden()
+  await expect(page.getByTestId('send')).toBeVisible()
+  await expect(page.locator('.form-error')).toHaveCount(0)
   await expect(page.getByText('已停止')).toBeVisible()
+  await expect(page.getByTestId('message-user')).toContainText('慢一点')
   mode = 'ok'
   await send(page, '继续')
   await expect(page.getByTestId('assistant-text').last()).toContainText('第一版')
