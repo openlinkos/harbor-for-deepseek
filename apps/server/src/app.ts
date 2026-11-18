@@ -1522,7 +1522,7 @@ app.get('/api/admin/settings', async (c) => {
 
   const serveIndex = async (c: { html: (body: string) => Response | Promise<Response> }) => {
     if (!options.staticDir) {
-      return c.html('<!doctype html><title>Harbor</title>')
+      return c.html('<!doctype html><title>Harbor for DeepSeek</title>')
     }
     const html = await readFile(`${options.staticDir}/index.html`, 'utf8')
     return c.html(html.replace('</head>', '<meta name="harbor-server" content="1"></head>'))

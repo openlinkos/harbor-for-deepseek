@@ -34,15 +34,29 @@ a { color: var(--dsw-alias-brand-text); }
   align-items: center;
   gap: 8px;
 }
-.sider-top { height: 44px; justify-content: space-between; padding: 4px 4px 8px; }
+.sider-top { min-height: 52px; height: auto; justify-content: space-between; padding: 4px 4px 8px; }
 .brand-name {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.wordmark { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.15; }
+.wordmark-main {
   font-weight: 650;
   font-size: 18px;
   letter-spacing: -0.03em;
   color: var(--dsw-alias-brand-text);
+}
+.wordmark-for {
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0;
+  color: var(--dsw-alias-label-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .icon-btn, .menu-item, .chip, .send, .new-chat, .ghost {
   border: 0;
