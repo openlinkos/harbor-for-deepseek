@@ -63,6 +63,25 @@ const useT = () => {
     translate(locale, key, vars)
 }
 
+const EyeIcon = ({ off }: { off?: boolean }) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      d={off
+        ? 'M3 3l18 18M10.5 10.7a2 2 0 002.8 2.8M7 7.2C5.2 8.4 3.8 10.2 3 12c1.6 3.2 4.8 6 9 6 1.4 0 2.7-.3 3.9-.8M14 6.3A9 9 0 0121 12c-.4.8-1 1.6-1.7 2.3'
+        : 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z'}
+    />
+    {off ? null : <circle cx="12" cy="12" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.7" />}
+  </svg>
+)
+
+const DOCS = 'https://github.com/openlinkos/harbor-for-deepseek/blob/master/SECURITY.md'
+const PLATFORM = 'https://platform.deepseek.com'
+const REPO = 'https://github.com/openlinkos/harbor-for-deepseek'
+
 export const KeyGate = () => {
   const t = useT()
   const locked = useHarbor((state) => state.locked)
@@ -76,6 +95,11 @@ export const KeyGate = () => {
   const [passphrase, setPassphrase] = useState('')
   const [ack, setAck] = useState(false)
   const [show, setShow] = useState(false)
+  const [advanced, setAdvanced] = useState(false)
+  const [keyOpen, setKeyOpen] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [think, setThink] = useState(true)
+  const [search, setSearch] = useState(true)
   const [error, setError] = useState('')
 
   const onSave = (event: FormEvent) => {
@@ -90,17 +114,24 @@ export const KeyGate = () => {
     event.preventDefault()
     void unlock(passphrase).then((ok) => setError(ok ? '' : t('wrongPassphrase')))
   }
+  const askForKey = (event?: FormEvent) => {
+    event?.preventDefault()
+    setKeyOpen(true)
+  }
 
   return (
-    <main className="gate">
-      <div className="gate-card">
-        <Mark />
-        <h1>{t('product')}</h1>
-        <p className="lede">{t('tagline')}</p>
+    <main className="landing" data-testid="landing">
+      <header className="landing-bar">
+        <span className="brand-name">
+          <Mark />
+          <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
+        </span>
         <LanguageSwitch locale={locale} onChange={setLocale} />
+      </header>
+      <div className="landing-stage">
         {locked ? (
-          <form onSubmit={onUnlock}>
-            <h2>{t('unlockTitle')}</h2>
+          <form className="key-card" onSubmit={onUnlock}>
+            <h1>{t('unlockTitle')}</h1>
             <label>
               {t('passcode')}
               <input
@@ -112,59 +143,114 @@ export const KeyGate = () => {
               />
             </label>
             {error ? <p className="form-error">{error}</p> : null}
-            <button className="primary" data-testid="unlock-submit" type="submit">
+            <button className="primary block" data-testid="unlock-submit" type="submit">
               {t('unlock')}
             </button>
           </form>
         ) : (
-          <form onSubmit={onSave}>
+          <>
+            <h1 className="landing-title">{t('landingTitle')}</h1>
+            <form className="composer landing-composer" onSubmit={askForKey}>
+              <textarea
+                data-testid="landing-draft"
+                rows={2}
+                value={draft}
+                placeholder={t('landingPlaceholder')}
+                onChange={(event) => {
+                  setDraft(event.target.value)
+                  if (event.target.value.trim()) setKeyOpen(true)
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault()
+                    setKeyOpen(true)
+                  }
+                }}
+              />
+              <div className="composer-tools">
+                <div className="chips">
+                  <button type="button" className={think ? 'chip on' : 'chip'} onClick={() => setThink((value) => !value)}>
+                    <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
+                  </button>
+                  <button type="button" className={search ? 'chip on' : 'chip'} onClick={() => setSearch((value) => !value)}>
+                    <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
+                  </button>
+                </div>
+                <button className={`send ${draft.trim() ? 'ready' : ''}`} data-testid="landing-send" type="submit" aria-label={t('send')}>
+                  <Icon d="M12 19V5M6 11l6-6 6 6" />
+                </button>
+              </div>
+            </form>
+            <div className="landing-pills">
+              <button type="button" className="landing-pill" data-testid="start-chat" onClick={() => setKeyOpen(true)}>
+                <Icon d="M8 12h8M12 8v8" /> {t('startChat')}
+              </button>
+              <a className="landing-pill" href={PLATFORM} target="_blank" rel="noreferrer noopener">
+                <Icon d="M8 7h8v10H8zM10 7V5h4v2" /> {t('apiPlatform')}
+              </a>
+              <a className="landing-pill" href={REPO} target="_blank" rel="noreferrer noopener">
+                <Icon d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 00-.9-2.6c3-.3 6.1-1.5 6.1-6.6a4.7 4.7 0 00-1.3-3.3 4.4 4.4 0 00-.1-3.2s-1-.3-3.3 1.2a11.4 11.4 0 00-6 0C6.2 1.1 5.2 1.4 5.2 1.4a4.4 4.4 0 00-.1 3.2 4.7 4.7 0 00-1.3 3.3c0 5.1 3.1 6.3 6.1 6.6a3.4 3.4 0 00-.9 2.6V21" /> {t('github')}
+              </a>
+            </div>
+            {hosted ? (
+              <button className="landing-pill" type="button" data-testid="open-login" onClick={openLogin}>
+                {t('loginTitle')}
+              </button>
+            ) : null}
+          </>
+        )}
+      </div>
+      <SiteFooter />
+      {keyOpen && !locked ? (
+        <div className="modal" role="dialog" aria-modal="true" data-testid="key-dialog">
+          <form className="key-card" onSubmit={onSave}>
             <h2>{t('keyTitle')}</h2>
-            <p className="risk">{t('keyBody')}</p>
+            <p className="key-lead">
+              {t('keyBody')}{' '}
+              <a href={DOCS} target="_blank" rel="noreferrer noopener">{t('learnMore')}</a>
+            </p>
+            <label className="key-field">
+              <span className="sr">{t('keyPlaceholder')}</span>
+              <input
+                data-testid="key-input"
+                type={show ? 'text' : 'password'}
+                value={key}
+                autoComplete="off"
+                spellCheck={false}
+                placeholder={t('keyPlaceholder')}
+                onChange={(event) => setKey(event.target.value)}
+              />
+              <button type="button" className="eye" aria-label={show ? t('hide') : t('show')} onClick={() => setShow((value) => !value)}>
+                <EyeIcon off={show} />
+              </button>
+            </label>
+            <button type="button" className="advanced" aria-expanded={advanced} onClick={() => setAdvanced((value) => !value)}>
+              {t('advanced')}
+            </button>
+            {advanced ? (
+              <label>
+                {t('passphraseOptional')}
+                <input
+                  data-testid="key-passphrase"
+                  type="password"
+                  value={passphrase}
+                  autoComplete="new-password"
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
+                <span className="hint">{t('passphraseHint')}</span>
+              </label>
+            ) : null}
             <label className="check">
               <input data-testid="key-ack" type="checkbox" checked={ack} onChange={(event) => setAck(event.target.checked)} />
               <span>{t('keyAck')}</span>
             </label>
-            <label>
-              {t('keyPlaceholder')}
-              <span className="field-row">
-                <input
-                  data-testid="key-input"
-                  type={show ? 'text' : 'password'}
-                  value={key}
-                  autoComplete="off"
-                  spellCheck={false}
-                  placeholder={t('keyPlaceholder')}
-                  onChange={(event) => setKey(event.target.value)}
-                />
-                <button type="button" className="ghost" onClick={() => setShow((value) => !value)}>
-                  {show ? t('hide') : t('show')}
-                </button>
-              </span>
-            </label>
-            <label>
-              {t('passphraseOptional')}
-              <input
-                data-testid="key-passphrase"
-                type="password"
-                value={passphrase}
-                autoComplete="new-password"
-                onChange={(event) => setPassphrase(event.target.value)}
-              />
-            </label>
-            <p className="hint">{t('passphraseHint')}</p>
             {error ? <p className="form-error">{error}</p> : null}
-            <button className="primary" data-testid="key-save" type="submit">
+            <button className="primary block" data-testid="key-save" type="submit">
               {t('saveKey')}
             </button>
           </form>
-        )}
-        {hosted ? (
-          <button className="ghost" type="button" data-testid="open-login" onClick={openLogin}>
-            {t('loginTitle')}
-          </button>
-        ) : null}
-        <SiteFooter />
-      </div>
+        </div>
+      ) : null}
     </main>
   )
 }
@@ -193,11 +279,11 @@ const ThemeSwitch = () => {
 
 const LanguageSwitch = ({ locale, onChange }: { locale: Locale; onChange: (locale: Locale) => void }) => (
   <div className="lang" role="group" aria-label="language">
-    <button type="button" className={locale === 'zh' ? 'on' : ''} onClick={() => onChange('zh')}>
+    <button type="button" className={locale === 'zh' ? 'on' : ''} aria-pressed={locale === 'zh'} onClick={() => onChange('zh')}>
       中文
     </button>
-    <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => onChange('en')}>
-      English
+    <button type="button" className={locale === 'en' ? 'on' : ''} aria-label="English" aria-pressed={locale === 'en'} onClick={() => onChange('en')}>
+      EN
     </button>
   </div>
 )

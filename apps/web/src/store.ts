@@ -55,7 +55,7 @@ type Prefs = Pick<Conversation, 'model' | 'thinking' | 'search' | 'readLink' | '
 const defaultPrefs = (): Prefs => ({
   model: 'deepseek-flash',
   thinking: true,
-  search: false,
+  search: true,
   readLink: false,
   effort: 'high',
 })
