@@ -438,7 +438,8 @@ export const Shell = () => {
     return [...buckets.entries()]
   }, [state.conversations, filter, t])
   const serverName = state.serverUser?.username
-  const who = serverName || profile.nickname || t('localHarbor')
+  const who = serverName || profile.nickname || t('localMode')
+  const modeLine = serverName ? t('serverChat') : profile.nickname ? t('localMode') : t('localStay')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
 
@@ -474,25 +475,20 @@ export const Shell = () => {
             </div>
           ))}
         </div>
-        <div className="user-bar" title={serverName ? serverName : t('localStay')}>
+        <div className="user-bar" title={modeLine}>
           <span className="avatar" aria-hidden="true">
-            {initial || (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-                <circle cx="12" cy="5.5" r="2.2" />
-                <path d="M12 8v13M5 13.5a7 7 0 0 0 14 0" />
-              </svg>
-            )}
+            {initial || <Icon d="M4 5h16v11H4zM2 19h20" />}
           </span>
           <span className="user-copy">
             <span className="user-label">{who}</span>
-            {serverName ? null : <small>{t('localStay')}</small>}
+            <small>{modeLine}</small>
           </span>
           <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
             <Icon d="M6 12h.01M12 12h.01M18 12h.01" />
           </button>
           {userMenu ? (
             <div className="menu user-menu">
-              {serverName ? null : <p className="hint">{t('localStay')}</p>}
+              <p className="hint">{serverName ? t('serverChat') : t('localStay')}</p>
               <p className="side-usage" data-testid="total-usage">
                 {t('totalLine', {
                   inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
