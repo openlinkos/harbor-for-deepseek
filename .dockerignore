@@ -7,3 +7,6 @@ docs/screenshots
 playwright-report
 test-results
 *.log
+.env
+.env.*
+!.env.example

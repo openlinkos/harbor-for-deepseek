@@ -1,11 +1,12 @@
-# Harbor server
+# Harbor for DeepSeek server
 
-Optional self-hosted backend. Postgres is the only database.
+Server mode. Postgres is the database.
 
 ```bash
-docker compose up
+cp .env.example .env
+docker compose up -d
 ```
 
-No environment variable is required. The wizard, key pool, invites, quotas, and sync are described in [docs/self-host.md](../../docs/self-host.md) and [docs/self-host.zh-CN.md](../../docs/self-host.zh-CN.md).
+[English](../../docs/self-hosting.md) · [中文](../../docs/self-hosting_cn.md)
 
-The image listens on port 8080 and serves the web app plus `/api`. Upstream keys stay on the server.
+The process listens on port 8080 and serves the web app plus `/api`. API keys stay on the server.

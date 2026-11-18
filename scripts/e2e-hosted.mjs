@@ -79,6 +79,7 @@ const child = spawn(process.execPath, [join(root, 'apps/server/dist/server.js')]
     STATIC_DIR: join(root, 'apps/web/dist'),
     DATA_DIR: join(root, '.tmp-e2e'),
     E2E_RESET: '1',
+    ALLOW_OPEN_SETUP: '1',
     DEEPSEEK_API_ORIGIN: `http://127.0.0.1:${port}`,
     KEY_ENCRYPTION_SECRET: '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff',
   },

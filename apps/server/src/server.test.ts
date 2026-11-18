@@ -2,6 +2,7 @@ import { createServer, type Server } from 'node:http'
 import postgres from 'postgres'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createServer as createHarbor, type HarborServer } from './app.js'
+import { applyMigrations } from './schema.js'
 
 const configuredUrl = process.env.DATABASE_URL
 const databaseUrl = configuredUrl ?? 'postgres://harbor:harbor@127.0.0.1:5432/harbor'
@@ -96,6 +97,16 @@ describe.skipIf(!postgresReady)('harbor server', () => {
         response.end(sse)
         return
       }
+      if (request.url === '/models') {
+        if (key.includes('boom')) {
+          response.writeHead(500, { 'content-type': 'application/json' })
+          response.end(JSON.stringify({ error: { message: `rejected ${key}` } }))
+          return
+        }
+        response.writeHead(200, { 'content-type': 'application/json' })
+        response.end(JSON.stringify({ echoed: key, data: [{ id: 'deepseek-flash' }] }))
+        return
+      }
       if (request.url === '/files') {
         fileBody = raw
         response.writeHead(200, { 'content-type': 'application/json' })
@@ -118,7 +129,14 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     const address = mock.address()
     const port = typeof address === 'object' && address ? address.port : 0
     upstream = `http://127.0.0.1:${port}`
-    harbor = await createHarbor({ databaseUrl, masterKey, upstream, eventPingMs: 40, trustProxy: true })
+    harbor = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      eventPingMs: 40,
+      trustProxy: true,
+      allowOpenSetup: true,
+    })
   })
 
   afterAll(async () => {
@@ -139,7 +157,18 @@ describe.skipIf(!postgresReady)('harbor server', () => {
         api_keys, user_counters, users
       restart identity cascade
     `
+    await harbor.sql`delete from app_settings where key like 'bootstrap:%'`
   })
+
+  const resetData = async () => {
+    await harbor.sql`
+      truncate table
+        run_events, chat_runs, usage_events, usage_daily, alerts, balance_snapshots,
+        messages, tombstones, conversations, files, auth_sessions, invite_codes,
+        api_keys, user_counters, users
+      restart identity cascade
+    `
+  }
 
   const sessionOf = (response: Response) => {
     const raw = response.headers.get('set-cookie') ?? ''
@@ -158,6 +187,10 @@ describe.skipIf(!postgresReady)('harbor server', () => {
       body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
     })
     expect(setup.status).toBe(200)
+    const cookie = setup.headers.get('set-cookie') ?? ''
+    expect(cookie).toContain('HttpOnly')
+    expect(cookie).toContain('SameSite=Lax')
+    expect(cookie.toLowerCase()).not.toContain('secure')
     const created = (await setup.json()) as { csrf: string; user: { role: string } }
     expect(created.user.role).toBe('admin')
     const again = await harbor.app.request('/api/setup/admin', {
@@ -476,5 +509,240 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     expect(fileBody).toContain('604800')
     const saved = await harbor.sql<{ expires_at: Date | null }[]>`select expires_at from files`
     expect(saved[0]?.expires_at).toBeTruthy()
+  })
+
+  it('applies migrations once and serves health checks', async () => {
+    const before = await harbor.sql<{ id: string }[]>`select id from schema_migrations order by id`
+    expect(before.map((row) => row.id)).toEqual(['001_init', '002_invite_expiry'])
+    await applyMigrations(harbor.sql)
+    const after = await harbor.sql<{ id: string }[]>`select id from schema_migrations order by id`
+    expect(after.map((row) => row.id)).toEqual(before.map((row) => row.id))
+    expect((await harbor.app.request('/healthz')).status).toBe(200)
+    expect((await harbor.app.request('/readyz')).status).toBe(200)
+    const secure = await harbor.app.request('https://harbor.example/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    expect(secure.headers.get('set-cookie')).toContain('Secure')
+  })
+
+  it('requires a one-time bootstrap token, expires invites, and hides upstream keys', async () => {
+    const blocked = await createHarbor({ databaseUrl, masterKey, upstream, allowOpenSetup: false })
+    const open = await blocked.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    expect(open.status).toBe(403)
+    const config = (await (await blocked.app.request('/api/config')).json()) as { bootstrap: string }
+    expect(config.bootstrap).toBe('blocked')
+    await blocked.close()
+
+    const tokenServer = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      bootstrapToken: 'one-time-token-value',
+    })
+    const missing = await tokenServer.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    expect(missing.status).toBe(403)
+    const setup = await tokenServer.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse', token: 'one-time-token-value' }),
+    })
+    expect(setup.status).toBe(200)
+    const again = await tokenServer.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'bea', password: 'correct-horse', token: 'one-time-token-value' }),
+    })
+    expect(again.status).toBe(403)
+    await tokenServer.close()
+
+    await resetData()
+    const envServer = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      bootstrapAdmin: { username: 'root', password: 'correct-horse' },
+    })
+    const ready = (await (await envServer.app.request('/api/config')).json()) as { setup_required: boolean }
+    expect(ready.setup_required).toBe(false)
+    const login = await envServer.app.request('/api/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'root', password: 'correct-horse' }),
+    })
+    expect(login.status).toBe(200)
+    await envServer.close()
+
+    await resetData()
+    const setupMain = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const admin = (await setupMain.json()) as { csrf: string }
+    const session = sessionOf(setupMain)
+    const headers = { 'content-type': 'application/json', ...authed(session, admin.csrf, true) }
+    const invite = await harbor.app.request('/api/admin/invites', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ maxUses: 1, expiresInHours: 24 }),
+    })
+    const inviteBody = (await invite.json()) as { code: string; expiresAt: string }
+    expect(Date.parse(inviteBody.expiresAt)).toBeGreaterThan(Date.now())
+    await harbor.sql`update invite_codes set expires_at = now() - interval '1 hour' where code = ${inviteBody.code}`
+    const expired = await harbor.app.request('/api/auth/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code: inviteBody.code, username: 'late', password: 'another-pass' }),
+    })
+    expect(expired.status).toBe(400)
+
+    const echo = await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ label: 'echo', secret: 'sk-echopoolsecretvalue', accountGroup: 'echo' }),
+    })
+    expect(echo.status).toBe(200)
+    const listed = await harbor.app.request('/api/admin/keys', { headers: authed(session, admin.csrf) })
+    expect(await listed.text()).not.toContain('sk-echopoolsecretvalue')
+    const models = await harbor.app.request('/models', { headers: authed(session, admin.csrf) })
+    const modelsBody = await models.text()
+    expect(models.status).toBe(200)
+    expect(modelsBody).not.toContain('sk-echopoolsecretvalue')
+    expect(modelsBody).toContain('[redacted]')
+
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ label: 'boom', secret: 'sk-boompoolsecretvalue', accountGroup: 'boom', priority: 1 }),
+    })
+    await harbor.sql`update api_keys set priority = 0 where label = 'boom'`
+    await harbor.sql`update api_keys set status = 'error' where label = 'echo'`
+    const leaked = await harbor.app.request('/models', { headers: authed(session, admin.csrf) })
+    const leakedBody = await leaked.text()
+    expect(leaked.status).toBe(502)
+    expect(leakedBody).not.toContain('sk-boompoolsecretvalue')
+    expect(leakedBody).toContain('upstream 500')
+  })
+
+  it('rate limits auth and chat, and keeps CORS on the configured origin', async () => {
+    const limited = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      allowOpenSetup: true,
+      authRateLimit: 2,
+      chatRateLimit: 1,
+    })
+    const postSetup = () =>
+      limited.app.request('/api/setup/admin', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ username: 'no', password: 'no' }),
+      })
+    expect((await postSetup()).status).toBe(400)
+    expect((await postSetup()).status).toBe(400)
+    const blockedAuth = await postSetup()
+    expect(blockedAuth.status).toBe(429)
+    expect(blockedAuth.headers.get('retry-after')).toBe('60')
+
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const admin = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    const headers = { 'content-type': 'application/json', ...authed(session, admin.csrf, true) }
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ secret: 'good-pool-key', accountGroup: 'healthy' }),
+    })
+    const tight = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      allowOpenSetup: true,
+      chatRateLimit: 1,
+    })
+    const moved = await tight.sql`select id from users where username = 'ada'`
+    expect(moved.length).toBe(1)
+    await tight.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'rate-chat' }),
+    })
+    const first = await tight.app.request('/api/conversations/rate-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text: 'hello from the test' }),
+    })
+    expect(first.status).toBe(200)
+    const started = (await first.json()) as { runId: string }
+    const events = await tight.app.request(`/api/runs/${started.runId}/events`, {
+      headers: authed(session, admin.csrf),
+    })
+    expect(await events.text()).toContain('"status":"complete"')
+    const second = await tight.app.request('/api/conversations/rate-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text: 'hello again' }),
+    })
+    expect(second.status).toBe(429)
+    await tight.close()
+    await limited.close()
+
+    const cors = await createHarbor({
+      databaseUrl,
+      masterKey,
+      upstream,
+      allowOpenSetup: true,
+      corsOrigins: ['https://app.example'],
+    })
+    const corsSetup = await cors.app.request('/api/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    expect(corsSetup.status).toBe(200)
+    const corsAdmin = (await corsSetup.json()) as { csrf: string; token: string }
+    const allowed = await cors.app.request('/api/me', {
+      headers: { origin: 'https://app.example', authorization: `Bearer ${corsAdmin.token}` },
+    })
+    expect(allowed.headers.get('access-control-allow-origin')).toBe('https://app.example')
+    const denied = await cors.app.request('/api/me', {
+      headers: { origin: 'https://evil.example', authorization: `Bearer ${corsAdmin.token}` },
+    })
+    expect(denied.headers.get('access-control-allow-origin')).toBeNull()
+    const widened = await cors.app.request('/api/admin/cors', {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        ...authed(sessionOf(corsSetup), corsAdmin.csrf, true),
+      },
+      body: JSON.stringify({ origins: ['https://evil.example'] }),
+    })
+    expect(widened.status).toBe(403)
+    await cors.close()
+  })
+
+  it('reports not ready when the database connection is closed', async () => {
+    const extra = await createHarbor({ databaseUrl, masterKey, upstream, allowOpenSetup: true })
+    expect((await extra.app.request('/healthz')).status).toBe(200)
+    await extra.sql.end({ timeout: 1 })
+    const ready = await extra.app.request('/readyz')
+    expect(ready.status).toBe(503)
+    expect(await ready.text()).not.toContain('postgres')
+    await extra.close().catch(() => undefined)
   })
 })
