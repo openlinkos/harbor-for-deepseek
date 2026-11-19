@@ -277,6 +277,6 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(idle).not.toHaveClass(/active/)
   await idle.hover()
   await idle.locator('.more').click()
-  await expect(page.getByRole('button', { name: '重命名' })).toBeVisible()
+  await expect(page.getByRole('menuitem', { name: '重命名' })).toBeVisible()
   await shot(page, 'sidebar-item-menu.png')
 })
