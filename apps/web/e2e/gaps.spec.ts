@@ -1,9 +1,4 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const mobileShots = join(process.cwd(), '../../docs/parity/mobile')
-mkdirSync(mobileShots, { recursive: true })
 
 const sse = (events: unknown[]) =>
   `${events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')}: keep-alive\n\n`
@@ -62,10 +57,8 @@ test('mobile drawer', async ({ page }) => {
   await unlock(page)
   await expect(page.locator('.sidebar')).toBeHidden()
   await expect(page.locator('.greeting')).toHaveCSS('font-size', '20px')
-  await page.screenshot({ path: join(mobileShots, 'home-390.png') })
   await page.getByTestId('menu').click()
   await expect(page.locator('.sidebar')).toBeVisible()
-  await page.screenshot({ path: join(mobileShots, 'drawer-390.png') })
   const box = await page.locator('.sidebar').boundingBox()
   expect(Math.round(box?.width ?? 0)).toBe(261)
   const footer = await page.locator('.user-bar').boundingBox()

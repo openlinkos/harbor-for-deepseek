@@ -45,10 +45,18 @@ export const SiteFooter = () => {
   )
 }
 
-const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={size >= 24 ? 2 : 1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke ?? (size >= 20 ? 2 : 1.7)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={d} />
   </svg>
+)
+
+const Wordmark = () => (
+  <span className="wordmark">
+    <span className="wordmark-name">Harbor</span>
+    {' '}
+    <span className="wordmark-sub">for DeepSeek</span>
+  </span>
 )
 
 const Favicon = ({ label }: { label: string }) => (
@@ -141,7 +149,7 @@ export const KeyGate = () => {
       <header className="landing-bar">
         <span className="brand-name">
           <Mark />
-          <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
+          <Wordmark />
         </span>
         <LanguageSwitch locale={locale} onChange={setLocale} />
       </header>
@@ -656,10 +664,10 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
           <div className="bubble">{textOf}</div>
           <div className="user-actions">
             <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
-              <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+              <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
             </button>
             <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
-              <Icon d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+              <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
             </button>
           </div>
         </>
@@ -685,14 +693,14 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <Icon d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+              <Icon size={20} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={20} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={20} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
             if (!textOf || !('speechSynthesis' in window)) return
             const utterance = new SpeechSynthesisUtterance(textOf)
@@ -705,8 +713,8 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             window.speechSynthesis.cancel()
             setSpeaking(true)
             window.speechSynthesis.speak(utterance)
-          }}>{speaking ? <Icon d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          }}>{speaking ? <Icon size={20} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={20} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={20} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -900,7 +908,7 @@ export const Shell = () => {
         <div className="sider-top">
           <span className="brand-name">
             <Mark />
-            <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
+            <Wordmark />
           </span>
           <span className="sider-icons">
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
@@ -999,7 +1007,7 @@ export const Shell = () => {
       <section className="stage">
         <header className="topbar">
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
-            <Icon size={22} d="M4 8h10M4 15h16" />
+            <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
           <h2>{conversation?.title || ''}</h2>
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
@@ -1008,11 +1016,11 @@ export const Shell = () => {
           ) : null}
           <span className="top-actions">
             <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
-              <Icon d="M6 7h9a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H9l-3 2v-2H6a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM9 12h6M12 9v6" />
+              <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
             {path.length > 0 ? (
               <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor for DeepSeek', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
-                <Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
+                <Icon size={22} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
               </button>
             ) : null}
           </span>
@@ -1126,6 +1134,8 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
+        <>
+        {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
         <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
           <button type="button" onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" />{t('rename')}</button>
           <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />{conversation.pinned ? t('unpin') : t('pin')}</button>
@@ -1139,7 +1149,8 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
           <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
           <button className="danger" type="button" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
-        </div>,
+        </div>
+        </>,
         document.body,
       ) : null}
       {confirming ? (

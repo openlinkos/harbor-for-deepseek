@@ -74,17 +74,25 @@ a { color: var(--dsw-alias-brand-text); }
   color: var(--dsw-alias-label-primary);
 }
 .wordmark {
-  display: block;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
   line-height: 1;
 }
-.wordmark-ds { color: var(--dsw-alias-brand-text); }
+.wordmark-name {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--dsw-alias-label-primary);
+}
+.wordmark-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8b9096;
+}
 .icon-btn, .menu-item, .chip, .send, .new-chat, .ghost {
   border: 0;
   background: transparent;
@@ -619,11 +627,21 @@ body[data-ds-dark-theme] .composer {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 .chip:hover:not(:disabled):not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
+.composer .chip:not(.on) {
+  background: #fff;
+  border-color: #e5e7eb;
+  color: #8b9096;
+}
+body[data-ds-dark-theme] .composer .chip:not(.on) {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #9aa0a6;
+}
 .composer .chip.on,
 .chip.on {
   background: #e4edfd;
   color: #3964fe;
-  border: 1px solid #b7c8fe;
+  border: 1px solid #7ea2fe;
   box-shadow: none;
 }
 body[data-ds-dark-theme] .composer .chip.on,
@@ -1171,7 +1189,19 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
   }
   .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; z-index: 1001; }
-  .menu-mobile, .top-new { display: grid; width: 40px; height: 40px; border: 0; background: transparent; box-shadow: none; }
+  .menu-mobile, .top-new, .topbar .icon-btn {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #1a1a1a;
+  }
+  body[data-ds-dark-theme] .menu-mobile,
+  body[data-ds-dark-theme] .top-new,
+  body[data-ds-dark-theme] .topbar .icon-btn { color: #f2f3f5; }
+  .menu-mobile svg, .top-new svg, .topbar .icon-btn svg { width: 24px; height: 24px; }
   .kbd { display: none; }
   .new-chat {
     background: #fff;
@@ -1185,8 +1215,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .server-pill, .topbar .ghost { display: none; }
   .topbar {
     height: calc(56px + env(safe-area-inset-top));
-    padding: env(safe-area-inset-top) 8px 0 12px;
+    padding: env(safe-area-inset-top) 6px 0;
   }
+  .topbar h2 { font-size: 16px; font-weight: 560; }
   .top-actions { display: flex; }
   .transcript {
     width: auto;
@@ -1222,6 +1253,14 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   }
   .composer textarea { min-height: 36px; width: 100%; }
   .send, .tool-right .icon-btn { width: 36px; height: 36px; }
+  .item-menu-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1050;
+  }
   .item-menu.sheet {
     position: fixed;
     left: 0;
@@ -1232,7 +1271,16 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     min-width: 0;
     z-index: 1100;
     border-radius: 24px 24px 0 0;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    padding: 10px 8px calc(12px + env(safe-area-inset-bottom));
+  }
+  .item-menu.sheet::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.16);
+    margin: 2px auto 10px;
   }
   .settings-shell {
     width: 100%;
@@ -1253,9 +1301,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .usage { order: 1; }
   .sources-pill { order: 2; align-self: flex-start; }
   .action-row { order: 3; }
-  .action-row svg, .user-actions svg { width: 20px; height: 20px; }
+  .action-row button, .user-actions button { width: 28px; height: 28px; }
+  .action-row svg, .user-actions svg, .code-head button { width: 20px; height: 20px; }
+  .code-head button { width: auto; min-height: 28px; height: 28px; font-size: 15px; padding: 0 8px; }
   .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
-  .user-actions button { width: 28px; height: 28px; border: 0; background: transparent; color: #8b9096; display: grid; place-items: center; }
+  .user-actions button { border: 0; background: transparent; color: #5c6166; display: grid; place-items: center; }
   .thinking button { position: sticky; top: 0; z-index: 2; background: var(--dsw-alias-bg-base); padding: 8px 0; }
   .jump-end {
     display: grid;

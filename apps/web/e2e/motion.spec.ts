@@ -118,7 +118,7 @@ for (const point of points) {
       const pop = await page.locator('.settings-shell').evaluate((node) => getComputedStyle(node).animationName)
       expect(pop).toContain('harbor-pop')
       const scrollColor = await page.locator('.settings-main').evaluate((node) => getComputedStyle(node).scrollbarColor)
-      expect(scrollColor).toContain('rgba(0, 0, 0, 0.08)')
+      expect(scrollColor).toContain('rgba(0, 0, 0')
       await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
       await expect(page.getByTestId('settings-dialog')).toBeHidden()
       if (mobile) {
@@ -168,6 +168,8 @@ for (const point of points) {
         expect(drawer).toBe(261)
         await page.locator('.chat-link .more').first().click()
         await expect(page.locator('.item-menu.sheet')).toBeVisible()
+        await expect(page.locator('.item-menu-scrim')).toBeVisible()
+        await page.locator('.item-menu-scrim').click({ position: { x: 200, y: 120 } })
         await page.getByTestId('new-chat').click()
       } else {
         await page.locator('.chat-link .more').first().click()

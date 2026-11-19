@@ -9,7 +9,7 @@ test.use({
   viewport: { width: 390, height: 844 },
   isMobile: true,
   hasTouch: true,
-  deviceScaleFactor: 1,
+  deviceScaleFactor: 3,
   userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
 })
 
@@ -105,6 +105,7 @@ test('mobile states at 390x844', async ({ page }) => {
   expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeGreaterThanOrEqual(373)
   expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeLessThanOrEqual(375)
   await shot(page, 'home-no-history.png')
+  await shot(page, 'home-390.png')
   await page.getByTestId('composer').focus()
   await shot(page, 'composer-focused.png')
 
@@ -146,10 +147,11 @@ test('mobile states at 390x844', async ({ page }) => {
   await page.getByTestId('menu').click()
   await expect(page.locator('.sidebar')).toBeVisible()
   await shot(page, 'drawer.png')
+  await shot(page, 'drawer-390.png')
   await page.locator('.chat-link .more').first().click()
   await expect(page.locator('.item-menu.sheet')).toBeVisible()
   await shot(page, 'item-menu-sheet.png')
-  await page.locator('.chat-link .more').first().click()
+  await page.locator('.item-menu-scrim').click({ position: { x: 200, y: 120 } })
   await expect(page.locator('.item-menu.sheet')).toBeHidden()
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
