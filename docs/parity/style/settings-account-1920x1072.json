@@ -1,15 +1,15 @@
 {
   "state": "settings-account",
   "viewport": "1920x1072",
-  "officialVisible": 120,
-  "matched": 40,
-  "matchedEqual": 38,
-  "matchedDiff": 2,
-  "officialOnly": 12,
-  "harborOnly": 9,
-  "allowlisted": 19,
-  "unmatchedOfficial": 12,
-  "unmatchedOurs": 9,
+  "officialVisible": 119,
+  "matched": 60,
+  "matchedEqual": 60,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 5,
+  "allowlisted": 18,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 5,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -129,174 +129,6 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "main > div @800,460 516×60",
-      "property": "y",
-      "official": "460",
-      "ours": "473.98",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,460 516×60",
-      "property": "h",
-      "official": "60",
-      "ours": "47.59",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,460 516×60",
-      "property": "box-shadow",
-      "official": "rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,460 516×60",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,460 516×60",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,460 516×60",
-      "property": "padding-bottom",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "y",
-      "official": "400",
-      "ours": "416.39",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "h",
-      "official": "60",
-      "ours": "47.59",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "box-shadow",
-      "official": "rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘手机号码’",
-      "property": "padding-bottom",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1288,419 28×22",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1288,479 28×22",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,520 516×60",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1288,539 28×22",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,580 516×60",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,592 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,592 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,640 516×60",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,652 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,652 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,712 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,712 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > icon 22×22 @12,22",
       "property": "unmatched",
       "official": "",
@@ -304,15 +136,6 @@
       "status": "allowed",
       "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
       "id": "brand-header-mark"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
     },
     {
       "key": "sidebar > span @18,1024 32×32",
@@ -349,29 +172,8 @@
       "status": "allowed",
       "reason": "brand — the 本地模式 footer is the Harbor account footer.",
       "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "main > textbox @842,420 474×40",
-      "property": "unmatched",
-      "official": "",
-      "ours": "input",
-      "status": "fail"
-    },
-    {
-      "key": "main > textbox @853,478 463×40",
-      "property": "unmatched",
-      "official": "",
-      "ours": "input",
-      "status": "fail"
-    },
-    {
-      "key": "main > button ‘保存’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "保存",
-      "status": "fail"
     }
   ],
-  "unexplained": 27,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

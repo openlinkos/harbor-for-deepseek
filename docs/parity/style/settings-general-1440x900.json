@@ -1,15 +1,15 @@
 {
   "state": "settings-general",
   "viewport": "1440x900",
-  "officialVisible": 104,
+  "officialVisible": 103,
   "matched": 52,
   "matchedEqual": 52,
   "matchedDiff": 0,
   "officialOnly": 0,
-  "harborOnly": 6,
-  "allowlisted": 19,
+  "harborOnly": 5,
+  "allowlisted": 18,
   "unmatchedOfficial": 0,
-  "unmatchedOurs": 6,
+  "unmatchedOurs": 5,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -136,15 +136,6 @@
       "status": "allowed",
       "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
       "id": "brand-header-mark"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
     },
     {
       "key": "sidebar > span @18,852 32×32",

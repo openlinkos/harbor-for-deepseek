@@ -1,15 +1,15 @@
 {
   "state": "scroll-up",
   "viewport": "1440x900",
-  "officialVisible": 143,
+  "officialVisible": 118,
   "matched": 35,
   "matchedEqual": 16,
   "matchedDiff": 19,
-  "officialOnly": 32,
-  "harborOnly": 17,
-  "allowlisted": 20,
-  "unmatchedOfficial": 32,
-  "unmatchedOurs": 17,
+  "officialOnly": 31,
+  "harborOnly": 16,
+  "allowlisted": 19,
+  "unmatchedOfficial": 31,
+  "unmatchedOurs": 16,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -146,13 +146,6 @@
     },
     {
       "key": "control ‘深度思考’",
-      "property": "x",
-      "official": "475.5",
-      "ours": "443.5",
-      "status": "fail"
-    },
-    {
-      "key": "control ‘深度思考’",
       "property": "y",
       "official": "825",
       "ours": "816.61",
@@ -160,23 +153,9 @@
     },
     {
       "key": "control ‘智能搜索’",
-      "property": "x",
-      "official": "577.52",
-      "ours": "545.5",
-      "status": "fail"
-    },
-    {
-      "key": "control ‘智能搜索’",
       "property": "y",
       "official": "825",
       "ours": "816.61",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘深度思考’",
-      "property": "x",
-      "official": "504.5",
-      "ours": "472.5",
       "status": "fail"
     },
     {
@@ -184,13 +163,6 @@
       "property": "y",
       "official": "830",
       "ours": "821.61",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘智能搜索’",
-      "property": "x",
-      "official": "606.52",
-      "ours": "574.5",
       "status": "fail"
     },
     {
@@ -328,20 +300,6 @@
     },
     {
       "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "x",
-      "official": "462.5",
-      "ours": "430.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "w",
-      "official": "776",
-      "ours": "840",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
       "property": "h",
       "official": "28",
       "ours": "20.39",
@@ -383,24 +341,38 @@
       "status": "fail"
     },
     {
-      "key": "main > div @475,707 752×40",
-      "property": "x",
-      "official": "474.5",
-      "ours": "430.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
+      "key": "main > div @475,475 752×40",
       "property": "y",
-      "official": "707",
-      "ours": "708.36",
+      "official": "475",
+      "ours": "486.98",
       "status": "fail"
     },
     {
-      "key": "main > div @475,707 752×40",
-      "property": "w",
-      "official": "752",
-      "ours": "840",
+      "key": "main > div @475,475 752×40",
+      "property": "h",
+      "official": "40",
+      "ours": "28",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,475 752×40",
+      "property": "background-color",
+      "official": "rgb(255, 255, 255)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,475 752×40",
+      "property": "border-top-left-radius",
+      "official": "12px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,475 752×40",
+      "property": "border-top-right-radius",
+      "official": "12px",
+      "ours": "0px",
       "status": "fail"
     },
     {
@@ -429,13 +401,6 @@
       "property": "border-top-right-radius",
       "official": "12px",
       "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @463,748 776×124",
-      "property": "x",
-      "official": "462.5",
-      "ours": "430.5",
       "status": "fail"
     },
     {
@@ -447,23 +412,9 @@
     },
     {
       "key": "main > div @463,748 776×124",
-      "property": "w",
-      "official": "776",
-      "ours": "840",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @463,748 776×124",
       "property": "box-shadow",
       "official": "rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
       "ours": "rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > textbox @464,753 774×60",
-      "property": "x",
-      "official": "463.5",
-      "ours": "431.5",
       "status": "fail"
     },
     {
@@ -474,66 +425,24 @@
       "status": "fail"
     },
     {
-      "key": "main > textbox @464,753 774×60",
-      "property": "w",
-      "official": "774",
-      "ours": "838",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
-      "property": "x",
-      "official": "474.5",
-      "ours": "430.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
+      "key": "main > icon 14×14 @487,835",
       "property": "y",
-      "official": "475",
-      "ours": "467.63",
+      "official": "835",
+      "ours": "826.61",
       "status": "fail"
     },
     {
-      "key": "main > div @475,475 752×40",
-      "property": "w",
-      "official": "752",
-      "ours": "840",
+      "key": "main > button @1148,825 34×34",
+      "property": "y",
+      "official": "825",
+      "ours": "816.61",
       "status": "fail"
     },
     {
-      "key": "main > div @475,475 752×40",
-      "property": "h",
-      "official": "40",
-      "ours": "28",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
-      "property": "background-color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "x",
-      "official": "1191.5",
-      "ours": "1179.5",
+      "key": "main > icon 16×16 @1157,834",
+      "property": "y",
+      "official": "834",
+      "ours": "825.61",
       "status": "fail"
     },
     {
@@ -544,69 +453,6 @@
       "status": "fail"
     },
     {
-      "key": "main > button @1192,825 34×34",
-      "property": "background-color",
-      "official": "rgb(57, 100, 254)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "opacity",
-      "official": "0.4",
-      "ours": "1",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "border-top-left-radius",
-      "official": "50%",
-      "ours": "4096px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "border-top-right-radius",
-      "official": "50%",
-      "ours": "4096px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "border-bottom-right-radius",
-      "official": "50%",
-      "ours": "4096px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "border-bottom-left-radius",
-      "official": "50%",
-      "ours": "4096px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "font-weight",
-      "official": "500",
-      "ours": "400",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1192,825 34×34",
-      "property": "color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1201,834",
-      "property": "x",
-      "official": "1200.5",
-      "ours": "1188.5",
-      "status": "fail"
-    },
-    {
       "key": "main > icon 16×16 @1201,834",
       "property": "y",
       "official": "834",
@@ -614,24 +460,31 @@
       "status": "fail"
     },
     {
+      "key": "main > icon 14×14 @589,835",
+      "property": "y",
+      "official": "835",
+      "ours": "826.61",
+      "status": "fail"
+    },
+    {
       "key": "main > div::after @475,188",
       "property": "x",
       "official": "474.5",
-      "ours": "451.5",
+      "ours": "495.5",
       "status": "fail"
     },
     {
       "key": "main > div::after @475,188",
       "property": "y",
       "official": "188",
-      "ours": "179.8",
+      "ours": "175.89",
       "status": "fail"
     },
     {
       "key": "main > div::after @475,188",
       "property": "w",
       "official": "762",
-      "ours": "819",
+      "ours": "731",
       "status": "fail"
     },
     {
@@ -663,24 +516,59 @@
       "status": "fail"
     },
     {
-      "key": "main > div @475,475 752×40",
-      "property": "x",
-      "official": "474.5",
-      "ours": "430.5",
+      "key": "main > div @475,707 752×40",
+      "property": "y",
+      "official": "707",
+      "ours": "750.98",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "h",
+      "official": "40",
+      "ours": "28",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "background-color",
+      "official": "rgb(249, 250, 251)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "border-top-left-radius",
+      "official": "12px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "border-top-right-radius",
+      "official": "12px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @475,707 752×40",
+      "property": "line-height",
+      "official": "20px",
+      "ours": "28px",
       "status": "fail"
     },
     {
       "key": "main > div @475,475 752×40",
       "property": "y",
       "official": "475",
-      "ours": "502.02",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,475 752×40",
-      "property": "w",
-      "official": "752",
-      "ours": "840",
+      "ours": "442.98",
       "status": "fail"
     },
     {
@@ -723,160 +611,6 @@
       "property": "line-height",
       "official": "20px",
       "ours": "28px",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @475,811",
-      "property": "x",
-      "official": "474.5",
-      "ours": "454.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @475,811",
-      "property": "y",
-      "official": "811",
-      "ours": "826.61",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @475,811",
-      "property": "w",
-      "official": "12",
-      "ours": "14",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @475,811",
-      "property": "h",
-      "official": "12",
-      "ours": "14",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @1215,811",
-      "property": "x",
-      "official": "1214.5",
-      "ours": "1232.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @1215,811",
-      "property": "y",
-      "official": "811",
-      "ours": "825.61",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @1215,811",
-      "property": "w",
-      "official": "12",
-      "ours": "16",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 12×12 @1215,811",
-      "property": "h",
-      "official": "12",
-      "ours": "16",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "x",
-      "official": "474.5",
-      "ours": "430.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "y",
-      "official": "707",
-      "ours": "742.75",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "w",
-      "official": "752",
-      "ours": "840",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "h",
-      "official": "40",
-      "ours": "28",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "background-color",
-      "official": "rgb(249, 250, 251)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "font-size",
-      "official": "13px",
-      "ours": "16px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @475,707 752×40",
-      "property": "line-height",
-      "official": "20px",
-      "ours": "28px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1192,825 34×34",
-      "property": "x",
-      "official": "1191.5",
-      "ours": "1223.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1192,825 34×34",
-      "property": "y",
-      "official": "825",
-      "ours": "816.61",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1192,825 34×34",
-      "property": "opacity",
-      "official": "1",
-      "ours": "0.4",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @589,835",
-      "property": "x",
-      "official": "588.52",
-      "ours": "556.5",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @589,835",
-      "property": "y",
-      "official": "835",
-      "ours": "826.61",
       "status": "fail"
     },
     {
@@ -1055,6 +789,20 @@
       "status": "fail"
     },
     {
+      "key": "main > icon 12×12 @475,811",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @1215,811",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
       "key": "main > button @1193,694 34×34",
       "property": "unmatched",
       "official": "div",
@@ -1083,27 +831,6 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 14×14 @487,835",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1148,825 34×34",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1157,834",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > icon 22×22 @12,22",
       "property": "unmatched",
       "official": "",
@@ -1111,15 +838,6 @@
       "status": "allowed",
       "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
       "id": "brand-header-mark"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
     },
     {
       "key": "sidebar > span @18,852 32×32",
@@ -1172,7 +890,7 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 20×20 @1211,68",
+      "key": "main > icon 20×20 @1167,64",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -1186,7 +904,7 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 20×20 @1249,68",
+      "key": "main > icon 20×20 @1205,64",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -1200,21 +918,21 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @431,138",
+      "key": "main > icon 16×16 @475,134",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @585,138",
+      "key": "main > icon 16×16 @629,134",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "main > div @438,166 833×51",
+      "key": "main > div @482,162 745×51",
       "property": "unmatched",
       "official": "",
       "ours": "div",
@@ -1235,6 +953,6 @@
       "status": "fail"
     }
   ],
-  "unexplained": 149,
+  "unexplained": 110,
   "pass": false
 }

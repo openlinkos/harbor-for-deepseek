@@ -1,15 +1,15 @@
 {
   "state": "settings-data",
   "viewport": "1920x1072",
-  "officialVisible": 108,
-  "matched": 47,
-  "matchedEqual": 38,
-  "matchedDiff": 9,
-  "officialOnly": 6,
-  "harborOnly": 7,
-  "allowlisted": 19,
-  "unmatchedOfficial": 6,
-  "unmatchedOurs": 7,
+  "officialVisible": 107,
+  "matched": 50,
+  "matchedEqual": 50,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 5,
+  "allowlisted": 18,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 5,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -129,279 +129,6 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "main > span ‘管理’",
-      "property": "x",
-      "official": "1266",
-      "ours": "1288",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘管理’",
-      "property": "y",
-      "official": "445",
-      "ours": "429",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘导出’",
-      "property": "x",
-      "official": "1266",
-      "ours": "1288",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘导出’",
-      "property": "y",
-      "official": "518",
-      "ours": "489",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘删除’",
-      "property": "box-shadow",
-      "official": "none",
-      "ours": "rgb(242, 90, 90) 0px 0px 0px 1px inset",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘删除’",
-      "property": "color",
-      "official": "rgb(236, 19, 19)",
-      "ours": "rgb(242, 90, 90)",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "y",
-      "official": "371",
-      "ours": "369",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "h",
-      "official": "24",
-      "ours": "22",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "font-size",
-      "official": "13.3333px",
-      "ours": "14px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "line-height",
-      "official": "normal",
-      "ours": "22px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "color",
-      "official": "rgb(0, 0, 0)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "padding-top",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "padding-right",
-      "official": "6px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "padding-bottom",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > switch @1276,371 40×24",
-      "property": "padding-left",
-      "official": "6px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
-      "property": "y",
-      "official": "378",
-      "ours": "370",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
-      "property": "w",
-      "official": "376",
-      "ours": "360",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
-      "property": "h",
-      "official": "36",
-      "ours": "44",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
-      "property": "line-height",
-      "official": "18px",
-      "ours": "22px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "y",
-      "official": "426",
-      "ours": "410",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "x",
-      "official": "1295",
-      "ours": "1276",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "y",
-      "official": "374",
-      "ours": "369",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1295,374 18×18",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,486 516×86",
-      "property": "y",
-      "official": "486",
-      "ours": "470",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @800,486 516×86",
-      "property": "h",
-      "official": "86",
-      "ours": "60",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "y",
-      "official": "572",
-      "ours": "530",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,438 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,438 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,511 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,511 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1244,584 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1244,584 72×36",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > icon 22×22 @12,22",
       "property": "unmatched",
       "official": "",
@@ -409,15 +136,6 @@
       "status": "allowed",
       "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
       "id": "brand-header-mark"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
     },
     {
       "key": "sidebar > span @18,1024 32×32",
@@ -454,15 +172,8 @@
       "status": "allowed",
       "reason": "brand — the 本地模式 footer is the Harbor account footer.",
       "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "main > button ‘刷新’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "刷新",
-      "status": "fail"
     }
   ],
-  "unexplained": 40,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

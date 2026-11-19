@@ -179,7 +179,7 @@ const dropInside = (pool: StyleNode[], rows: StyleNode[]) =>
 
 const sameControl = (left: StyleNode, right: StyleNode) => {
   const tags = new Set([left.tag, right.tag])
-  return tags.size === 2 && [...tags].every((tag) => tag === 'button' || tag === 'a' || tag === 'div' || tag === 'label' || tag === 'form')
+  return tags.size === 2 && [...tags].every((tag) => tag === 'button' || tag === 'a' || tag === 'div' || tag === 'label' || tag === 'form' || tag === 'input')
 }
 
 const shellOf = (node: StyleNode, pool: StyleNode[]) => {
@@ -226,7 +226,7 @@ const pairShortcuts = (official: StyleNode[], ours: StyleNode[]) => {
 }
 
 const pairGreetings = (official: StyleNode[], ours: StyleNode[]) => {
-  const big = (node: StyleNode) => regionOf(node) === 'main' && Number.parseFloat(node.style['font-size'] || '0') >= 20 && visibleText(node).length > 4
+  const big = (node: StyleNode) => Number.parseFloat(node.style['font-size'] || '0') >= 20 && visibleText(node).length > 4 && node.rect.w > 80 && node.rect.y > 40
   const left = official.filter(big).sort(byPos)
   const right = ours.filter(big).sort(byPos)
   return zip(left, right, undefined, 'main > greeting').map((pair) => ({ ...pair, how: 'position' as const }))
@@ -243,8 +243,14 @@ const distance = (left: StyleNode, right: StyleNode) => {
 export const matchCaptures = (official: Capture, ours: Capture): MatchResult => {
   const viewport = official.viewport || { width: 1440, height: 900 }
   const isPageCanvas = (node: StyleNode) => !visibleText(node) && node.tag !== 'svg' && node.rect.w >= viewport.width - 2 && node.rect.h >= viewport.height - 2
-  let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport) && !isPageCanvas(node))
-  let oursPool = ours.elements.filter((node) => isVisiblePainted(node, ours.viewport || viewport) && !isPageCanvas(node))
+  const isSyntaxToken = (node: StyleNode) => {
+    if (node.tag !== 'span' && node.tag !== 'code') return false
+    if (node.role === 'button' || !visibleText(node)) return false
+    const size = Number.parseFloat(node.style['font-size'] || '0')
+    return size > 0 && size <= 13.5 && node.rect.h <= 22
+  }
+  let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport) && !isPageCanvas(node) && !isSyntaxToken(node))
+  let oursPool = ours.elements.filter((node) => isVisiblePainted(node, ours.viewport || viewport) && !isPageCanvas(node) && !isSyntaxToken(node))
   const officialVisible = officialPool.length
   const pairs: Pair[] = []
 
@@ -331,7 +337,9 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   for (const left of officialPool) {
     const text = visibleText(left)
     if (!text || text.length > 12 || left.pseudo || usedLabelOfficial.has(left)) continue
-    const rightText = oursPool.find((node) => !usedLabelOurs.has(node) && !node.pseudo && visibleText(node) === text && regionOf(node) === regionOf(left))
+    const rightText = oursPool
+      .filter((node) => !usedLabelOurs.has(node) && !node.pseudo && visibleText(node) === text && regionOf(node) === regionOf(left))
+      .sort((a, b) => Math.abs(a.rect.y - left.rect.y) - Math.abs(b.rect.y - left.rect.y))[0]
     if (!rightText) continue
     const officialShell = controlShell(left, officialPool)
     const oursShell = controlShell(rightText, oursPool)

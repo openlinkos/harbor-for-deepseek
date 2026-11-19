@@ -4,7 +4,7 @@ Result: PASS (0 unexplained)
 
 - Matched elements: 40
 - Unmatched official: 0
-- Unmatched ours: 6
+- Unmatched ours: 5
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -24,11 +24,11 @@ Result: PASS (0 unexplained)
 
 # sidebar-item-menu 1920x1072
 
-Result: FAIL (2 unexplained)
+Result: PASS (0 unexplained)
 
-- Matched elements: 39
-- Unmatched official: 1
-- Unmatched ours: 7
+- Matched elements: 40
+- Unmatched official: 0
+- Unmatched ours: 5
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -45,5 +45,3 @@ Result: FAIL (2 unexplained)
 | allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
-| fail | sidebar > icon 16×16 @225,469 | unmatched | svg |  |  |
-| fail | sidebar > icon 16×16 @179,173 | unmatched |  | svg |  |

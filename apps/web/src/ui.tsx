@@ -701,14 +701,14 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={16} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <Icon size={20} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+              <Icon size={16} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={20} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={20} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={16} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={16} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
             if (!textOf || !('speechSynthesis' in window)) return
             const utterance = new SpeechSynthesisUtterance(textOf)
@@ -721,8 +721,8 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             window.speechSynthesis.cancel()
             setSpeaking(true)
             window.speechSynthesis.speak(utterance)
-          }}>{speaking ? <Icon size={20} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={20} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={20} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          }}>{speaking ? <Icon size={16} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={16} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -1036,6 +1036,10 @@ export const Shell = () => {
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
           <span className="top-actions">
+            <a className="download-app" href="https://github.com/openlinkos/harbor-for-deepseek/releases" target="_blank" rel="noreferrer noopener">
+              <Icon d="M12 4v10M8 10l4 4 4-4M5 18h14" />
+              <span>{t('downloadApp')}</span>
+            </a>
             <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
               <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
@@ -1483,41 +1487,67 @@ const Settings = () => {
           </section>
         </details>
         <section className="settings-account">
-          <h3>{t('tabProfile')}</h3>
-          <p className="hint">{t('localStay')}</p>
-          <label>
-            {t('nickname')}
-            <input data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-          </label>
-          <label>
-            {t('avatarInitial')}
-            <input data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
-          </label>
-          <button type="button" className="primary" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
+          <div className="settings-line">
+            <span>{t('accountEmail')}</span>
+            <input className="account-value" data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+          </div>
+          <div className="settings-line">
+            <span>{t('accountPhone')}</span>
+            <span className="account-chip wide">
+              <input className="account-value" data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+              <button type="button" className="account-action phone" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountChange')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountWechat')}</span>
+            <span className="account-chip">
+              <span className="account-pill">{t('accountUnbound')}</span>
+              <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountBind')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountMinor')}</span>
+            <span className="account-chip">
+              <span className="account-pill">{t('accountOff')}</span>
+              <button type="button" className="account-action"><span>{t('accountChange')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountDevices')}</span>
+            <button type="button" className="account-quiet">{t('accountManage')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountSignOutAll')}</span>
+            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountSignOut')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountDelete')}</span>
+            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountDeleteAction')}</button>
+          </div>
         </section>
         <section className="settings-data">
-          <div className="settings-line">
-            <div>
-              <strong>{t('improveToggle')}</strong>
+          <div className="settings-line stack">
+            <div className="settings-copy">
+              <span>{t('improveToggle')}</span>
               <p className="hint">{t('improveBody')}</p>
             </div>
-            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }} />
+            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }}><span className="knob" /></button>
           </div>
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
-            <button type="button" onClick={() => setSharedNote(true)}>{t('manage')}</button>
+            <button type="button" className="account-quiet" onClick={() => setSharedNote(true)}>{t('manage')}</button>
           </div>
           {sharedNote ? <p className="hint">{t('noShared')}</p> : null}
-          <div className="settings-line">
-            <div>
-              <strong>{t('exportAll')}</strong>
+          <div className="settings-line stack">
+            <div className="settings-copy wide">
+              <span>{t('exportAll')}</span>
               <p className="hint">{t('exportAllBody')}</p>
             </div>
-            <button type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
+            <button type="button" className="account-quiet" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
           </div>
           <div className="settings-line">
             <span>{t('deleteAll')}</span>
-            <button type="button" className="danger outline" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
+            <button type="button" className="account-danger" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
             {confirmAll ? (
               <ConfirmDialog
                 label={t('deleteConfirm')}
@@ -1735,11 +1765,11 @@ const Settings = () => {
         <section className="settings-legal">
           <div className="settings-line">
             <span>{t('terms')}</span>
-            <a href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE">{t('view')}</a>
+            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE"><span>{t('view')}</span></a>
           </div>
           <div className="settings-line">
             <span>{t('privacyPolicy')}</span>
-            <a href="https://github.com/openlinkos/harbor-for-deepseek">{t('view')}</a>
+            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek"><span>{t('view')}</span></a>
           </div>
           <SiteFooter />
           <p className="hint">
