@@ -17,7 +17,7 @@ const databaseNames = async () => {
 
 const copyDatabase = async (from: string, to: string, setup: (db: import('idb').IDBPDatabase) => void) => {
   const names = await databaseNames()
-  if (!names.includes(from)) return
+  if (!names.includes(from) || names.includes(to)) return
   const source = await openDB(from)
   const target = await openDB(to, DB_VERSION, { upgrade: setup })
   const stores = [...source.objectStoreNames]
