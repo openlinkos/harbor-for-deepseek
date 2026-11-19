@@ -107,6 +107,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('balance-side')).toContainText('317.22')
+  await expect(page.getByTestId('balance-side')).toContainText('CNY 可用')
   await page.getByRole('button', { name: '关闭' }).click()
   await page.screenshot({ path: join(shots, '02-empty.png') })
   await expect(page.getByTestId('sidebar')).toContainText('DeepAPI')
@@ -233,6 +234,8 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('nickname')).toBeVisible()
   await expect(page.getByTestId('avatar-initial')).toBeVisible()
+  await expect(page.getByTestId('avatar-initial')).toHaveAttribute('placeholder', '字')
+  expect(await page.getByTestId('avatar-initial').evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
   await page.getByTestId('nickname').fill('阿港')
   await page.getByTestId('avatar-initial').fill('港')
   await page.getByRole('button', { name: '保存' }).click()
@@ -372,10 +375,16 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   const measure = async () => page.evaluate(() => {
-    const row = (selector: string) => {
-      const node = document.querySelector(selector)?.closest('.settings-line') as HTMLElement
+    const label = (selector: string) => {
+      const node = document.querySelector(selector) as HTMLElement
       const style = getComputedStyle(node)
-      return { h: Math.round(node.getBoundingClientRect().height), fs: style.fontSize, lh: style.lineHeight }
+      const row = node.closest('.settings-line') as HTMLElement
+      return { h: Math.round(row.getBoundingClientRect().height), fs: style.fontSize, lh: style.lineHeight }
+    }
+    const hint = (selector: string) => {
+      const node = document.querySelector(selector) as HTMLElement
+      const style = getComputedStyle(node)
+      return { fs: style.fontSize, lh: style.lineHeight, fits: node.scrollHeight <= node.clientHeight + 1 }
     }
     const box = (selector: string) => {
       const node = document.querySelector(selector) as HTMLElement
@@ -383,18 +392,27 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
       const rect = node.getBoundingClientRect()
       return { h: Math.round(rect.height), w: Math.round(rect.width), bg: style.backgroundColor, color: style.color, radius: style.borderRadius, tag: node.tagName }
     }
+    const paired = (selector: string) => {
+      const button = document.querySelector(selector) as HTMLElement
+      const row = button.closest('.settings-line') as HTMLElement
+      return { label: row.querySelector(':scope > span')?.textContent ?? '', button: button.textContent ?? '' }
+    }
     return {
-      usage: row('[data-testid="usage-grid"] .settings-line span'),
+      usage: label('[data-testid="usage-grid"] .settings-line > span'),
       bullets: document.querySelectorAll('[data-testid="usage-grid"] li').length,
-      replace: row('[data-testid="replace-key"] .settings-line span'),
+      replace: label('[data-testid="replace-key"] .settings-line > span'),
       keyInput: box('[data-testid="replace-key"] input'),
       save: box('[data-testid="replace-save"]'),
-      server: row('[data-testid="server-note"] .settings-copy > span'),
+      savePair: paired('[data-testid="replace-save"]'),
+      server: label('[data-testid="server-note"] .settings-copy > span'),
+      serverHint: hint('[data-testid="server-note"] .hint'),
       expiry: box('[data-testid="file-expiry"]'),
       purpose: box('[data-testid="purpose-select"]'),
     }
   })
   await page.getByRole('button', { name: '数据管理' }).click()
+  await expect(page.getByText('导出本机保存的对话记录。')).toBeVisible()
+  await expect(page.getByText('下载链接的有效期为 7 天')).toHaveCount(0)
   const light = await measure()
   expect(light.usage).toMatchObject({ h: 60, fs: '14px', lh: '22px' })
   expect(light.bullets).toBe(0)
@@ -402,7 +420,11 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(light.keyInput.h).toBe(36)
   expect(light.save.h).toBe(36)
   expect(light.save.bg).toBe('rgba(0, 0, 0, 0)')
-  expect(light.server).toMatchObject({ h: 86, fs: '14px', lh: '22px' })
+  expect(light.savePair.label).not.toBe(light.savePair.button)
+  expect(light.server.fs).toBe('14px')
+  expect(light.server.lh).toBe('22px')
+  expect(light.server.h).toBeGreaterThanOrEqual(86)
+  expect(light.serverHint).toMatchObject({ fs: '12px', lh: '18px', fits: true })
   await page.getByRole('button', { name: '通用设置' }).click()
   const general = await measure()
   expect(general.expiry.h).toBe(36)
@@ -410,7 +432,8 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   await page.getByRole('button', { name: '深色' }).click()
   await page.getByRole('button', { name: '数据管理' }).click()
   const dark = await measure()
-  expect(dark.usage.h).toBe(60)
+  expect(dark.usage).toMatchObject({ h: 60, fs: '14px', lh: '22px' })
+  expect(dark.serverHint).toMatchObject({ fs: '12px', lh: '18px', fits: true })
   expect(dark.keyInput.h).toBe(36)
   expect(dark.keyInput.bg).not.toBe('rgb(53, 54, 56)')
   expect(dark.save.bg).not.toBe('rgb(53, 54, 56)')
@@ -422,6 +445,59 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(darkGeneral.purpose.h).toBe(36)
   expect(darkGeneral.purpose.tag).not.toBe('SELECT')
   expect(darkGeneral.purpose.bg).toBe('rgb(67, 69, 74)')
+})
+
+test('390 purpose menu picks 文本识别', async ({ page }) => {
+  await install(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('menu').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByTestId('purpose-select').click()
+  const option = page.getByRole('option', { name: '文本识别' })
+  await expect(option).toBeVisible()
+  const box = await option.boundingBox()
+  expect(box).toBeTruthy()
+  expect(box!.y).toBeGreaterThanOrEqual(0)
+  expect(box!.y + box!.height).toBeLessThanOrEqual(844)
+  await option.click()
+  await expect(page.getByTestId('purpose-select')).toContainText('文本识别')
+})
+
+test('server note hint fits at 1440 and 390', async ({ page }) => {
+  await install(page)
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByRole('button', { name: '数据管理' }).click()
+  const fits = () => page.locator('[data-testid="server-note"] .hint').evaluate((node) => node.scrollHeight <= node.clientHeight + 1)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  expect(await fits()).toBe(true)
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(await fits()).toBe(true)
+})
+
+test('settings stay up when balance has no infos', async ({ page }) => {
+  await install(page)
+  await page.route('https://api.deepseek.com/user/balance', async (route) => {
+    await route.fulfill({ json: { is_available: true } })
+  })
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByRole('button', { name: '账号管理' }).click()
+  await expect(page.getByTestId('settings-dialog')).toBeVisible()
+  await expect(page.getByTestId('balance-side')).toHaveText('没有读到余额。')
 })
 
 test('390 composer and title stay above a sticky code header', async ({ page }) => {

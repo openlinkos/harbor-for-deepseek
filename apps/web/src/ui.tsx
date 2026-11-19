@@ -368,17 +368,28 @@ const VOICES = ['贝壳', '白浪', '海星', '暗潮']
 const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLDivElement>(null)
-  const [box, setBox] = useState({ top: 0, right: 0 })
-  const show = () => {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [box, setBox] = useState({ top: 0, right: 0, maxHeight: 320 })
+  const show = () => setOpen((value) => !value)
+  useLayoutEffect(() => {
+    if (!open) return
     const rect = trigger.current?.getBoundingClientRect()
-    if (rect) setBox({ top: rect.bottom + 6, right: window.innerWidth - rect.right - shiftRight })
-    setOpen((value) => !value)
-  }
+    const menu = menuRef.current
+    if (!rect || !menu) return
+    const margin = 8
+    const needed = menu.scrollHeight
+    const spaceBelow = window.innerHeight - rect.bottom - margin
+    const spaceAbove = rect.top - margin
+    const openUp = needed > spaceBelow && spaceAbove > spaceBelow
+    const available = Math.max(36, (openUp ? spaceAbove : spaceBelow) - 6)
+    const top = openUp ? Math.max(margin, rect.top - 6 - Math.min(needed, available)) : rect.bottom + 6
+    setBox({ top, right: window.innerWidth - rect.right - shiftRight, maxHeight: available })
+  }, [open, shiftRight])
   return (
     <div className="pill-menu">
       <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
-        <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, minHeight: menuClass === 'lang-menu' ? Math.max(240, window.innerHeight - box.top - 8) : undefined }}>
+        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
@@ -1574,13 +1585,12 @@ const Settings = () => {
             <span>{t('balance')}</span>
             <span className="account-side">
               <span data-testid="balance-side">
-                {balanceError || !balance?.balance_infos[0]
+                {balanceError || !balance?.balance_infos?.[0]
                   ? t('balanceFailed')
                   : <>
-                      {balance.balance_infos[0].total_balance} {balance.balance_infos[0].currency}
+                      {balance.balance_infos[0].total_balance} {balance.balance_infos[0].currency} {balance.is_available ? t('available') : t('unavailable')}
                       <span className="hint">
-                        {balance.is_available ? t('available') : t('unavailable')}
-                        {' · '}{t('granted')} {balance.balance_infos[0].granted_balance}
+                        {t('granted')} {balance.balance_infos[0].granted_balance}
                         {' · '}{t('toppedUp')} {balance.balance_infos[0].topped_up_balance}
                       </span>
                     </>}
@@ -1610,7 +1620,7 @@ const Settings = () => {
           <div className="settings-line account-nickname">
             <span>{t('nickname')}</span>
             <input className="account-value" data-testid="nickname" value={nickname} placeholder={t('nickname')} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-            <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder="" maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+            <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder={t('avatarMark')} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
             <button type="button" className="account-quiet" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
           </div>
         </section>
@@ -1716,19 +1726,19 @@ const Settings = () => {
         {serverMode ? null : (
         <section className="settings-data" data-testid="replace-key">
           <div className="settings-line">
-            <span>{t('replaceKey')}</span>
+            <span>API Key</span>
             <input className="settings-pill wide" type="password" value={nextKey} autoComplete="off" onChange={(event) => setNextKey(event.target.value)} />
           </div>
           <div className="settings-line">
-            <span>{t('passphraseOptional')}</span>
-            <input className="settings-pill wide" type="password" placeholder={t('passphraseOptional')} value={passphrase} onChange={(event) => setPassphrase(event.target.value)} />
+            <span>{t('passcode')}</span>
+            <input className="settings-pill wide" type="password" value={passphrase} autoComplete="off" onChange={(event) => setPassphrase(event.target.value)} />
           </div>
           <div className="settings-line">
-            <span>{t('save')}</span>
+            <span>{t('replaceKey')}</span>
             <button type="button" className="account-quiet" data-testid="replace-save" onClick={() => void saveKey(nextKey, passphrase, true)}>{t('save')}</button>
           </div>
           <div className="settings-line">
-            <span>{t('clearKey')}</span>
+            <span>{t('deviceKey')}</span>
             <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
         </section>
@@ -1777,8 +1787,8 @@ const Settings = () => {
                 <input className="settings-pill wide" data-testid="remote-invite" value={inviteCode} autoComplete="off" onChange={(event) => setInviteCode(event.target.value)} />
               </div>
               <div className="settings-line">
-                <span>{inviteCode.trim() ? t('registerSubmit') : t('connectServer')}</span>
-                <button type="submit" className="account-quiet" data-testid="remote-login">{t('save')}</button>
+                <span>{inviteCode.trim() ? t('registerTitle') : t('loginTitle')}</span>
+                <button type="submit" className="account-quiet" data-testid="remote-login">{inviteCode.trim() ? t('registerSubmit') : t('connectServer')}</button>
               </div>
               {remoteError ? <p className="error">{remoteError}</p> : null}
             </form>
@@ -1786,10 +1796,10 @@ const Settings = () => {
           {serverUser ? (
             <>
               {serverBase ? <p className="hint" data-testid="connected-server">{t('connectedServer')}: {serverBase}</p> : null}
-            <div className="settings-line"><span>{t('syncNow')}</span><button type="button" className="account-quiet" data-testid="server-sync" onClick={() => void syncServer()}>{t('syncNow')}</button></div>
-            <div className="settings-line"><span>{t('copyLocal')}</span><button type="button" className="account-quiet" data-testid="copy-local" onClick={() => void copyLocalToServer()}>{t('copyLocal')}</button></div>
-            <div className="settings-line"><span>{serverMode ? t('useLocal') : t('useServer')}</span><button type="button" className="account-quiet" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>{serverMode ? t('useLocal') : t('useServer')}</button></div>
-            <div className="settings-line"><span>{t('logout')}</span><button type="button" className="account-quiet" onClick={() => void logoutServer()}>{t('logout')}</button></div>
+            <div className="settings-line"><span>{t('syncNow')}</span><button type="button" className="account-quiet" data-testid="server-sync" onClick={() => void syncServer()}>{t('syncAct')}</button></div>
+            <div className="settings-line"><span>{t('copyLocal')}</span><button type="button" className="account-quiet" data-testid="copy-local" onClick={() => void copyLocalToServer()}>{t('copyAct')}</button></div>
+            <div className="settings-line"><span>{serverMode ? t('useLocal') : t('useServer')}</span><button type="button" className="account-quiet" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>{t('switchAct')}</button></div>
+            <div className="settings-line"><span>{t('logout')}</span><button type="button" className="account-quiet" onClick={() => void logoutServer()}>{t('logoutAct')}</button></div>
             </>
           ) : hosted ? (
             <button type="button" data-testid="open-login" onClick={openLogin}>
