@@ -2,14 +2,14 @@
   "state": "scroll-up",
   "viewport": "390x844",
   "officialVisible": 33,
-  "matched": 11,
+  "matched": 12,
   "matchedEqual": 2,
-  "matchedDiff": 9,
-  "officialOnly": 19,
-  "harborOnly": 29,
+  "matchedDiff": 10,
+  "officialOnly": 18,
+  "harborOnly": 28,
   "allowlisted": 11,
-  "unmatchedOfficial": 19,
-  "unmatchedOurs": 29,
+  "unmatchedOfficial": 18,
+  "unmatchedOurs": 28,
   "mismatches": [
     {
       "key": "control ‘智能搜索’",
@@ -43,189 +43,84 @@
       "key": "row-more 1",
       "property": "w",
       "official": "34",
-      "ours": "36",
+      "ours": "28",
       "status": "fail"
     },
     {
       "key": "row-more 1",
       "property": "h",
       "official": "34",
-      "ours": "36",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "background-color",
-      "official": "rgba(0, 0, 0, 0)",
-      "ours": "rgb(255, 255, 255)",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "box-shadow",
-      "official": "none",
-      "ours": "rgba(0, 0, 0, 0.2) 0px 0px 1px 0px, rgba(0, 0, 0, 0.02) 0px 0px 4px 0px, rgba(0, 0, 0, 0.08) 0px 12px 32px 0px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "50%",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "50%",
+      "ours": "28",
       "status": "fail"
     },
     {
       "key": "row-more 1",
       "property": "font-size",
       "official": "14px",
-      "ours": "16px",
+      "ours": "13px",
       "status": "fail"
     },
     {
       "key": "row-more 1",
       "property": "line-height",
       "official": "22px",
-      "ours": "27.2px",
+      "ours": "20px",
       "status": "fail"
     },
     {
       "key": "row-more 1",
       "property": "color",
       "official": "rgb(15, 17, 21)",
-      "ours": "rgb(97, 102, 107)",
+      "ours": "rgb(92, 97, 102)",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-top-width",
-      "official": "0px",
-      "ours": "1px",
+      "key": "sidebar > div @0,0 331×60",
+      "property": "y",
+      "official": "0",
+      "ours": "12",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-top-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
+      "key": "sidebar > div @0,0 331×60",
+      "property": "w",
+      "official": "331",
+      "ours": "341",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-top-style",
-      "official": "none",
-      "ours": "solid",
+      "key": "sidebar > div @0,0 331×60",
+      "property": "h",
+      "official": "60",
+      "ours": "48",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
+      "key": "sidebar > div @0,0 331×60",
       "property": "padding-top",
-      "official": "0px",
-      "ours": "1px",
+      "official": "12px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-right-width",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-right-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-right-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
+      "key": "sidebar > div @0,0 331×60",
       "property": "padding-right",
-      "official": "0px",
-      "ours": "6px",
+      "official": "10px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-bottom-width",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-bottom-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-bottom-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
+      "key": "sidebar > div @0,0 331×60",
       "property": "padding-bottom",
-      "official": "0px",
-      "ours": "1px",
+      "official": "4px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "row-more 1",
-      "property": "border-left-width",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-left-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "border-left-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
+      "key": "sidebar > div @0,0 331×60",
       "property": "padding-left",
-      "official": "0px",
-      "ours": "6px",
+      "official": "10px",
+      "ours": "18px",
       "status": "fail"
     },
     {
@@ -432,13 +327,6 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > div ‘快速排序详解’",
       "property": "unmatched",
       "official": "快速排序详解",
@@ -587,7 +475,7 @@
       "id": "brand-footer-unmatched-official"
     },
     {
-      "key": "sidebar > heading ‘对照’",
+      "key": "sidebar > div ‘对照’",
       "property": "unmatched",
       "official": "",
       "ours": "对照",
@@ -622,14 +510,7 @@
       "status": "fail"
     },
     {
-      "key": "main > button ‘复制’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "复制",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 20×20 @286,120",
+      "key": "main > icon 20×20 @284,148",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -643,21 +524,21 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 20×20 @324,120",
+      "key": "main > icon 20×20 @322,148",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 16×16 @44,160",
+      "key": "sidebar > icon 16×16 @44,204",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 16×16 @198,160",
+      "key": "sidebar > icon 16×16 @198,204",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -727,13 +608,6 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > p ‘第 9 段。把这条回答撑到超过一屏，便于回到底部’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "第 9 段。把这条回答撑到超过一屏，便于回到底部",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > button @37,733 92×34",
       "property": "unmatched",
       "official": "",
@@ -783,6 +657,13 @@
       "status": "fail"
     },
     {
+      "key": "sidebar > button ‘回到底部’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "回到底部",
+      "status": "fail"
+    },
+    {
       "key": "sidebar > icon 16×16 @187,650",
       "property": "unmatched",
       "official": "",
@@ -790,6 +671,6 @@
       "status": "fail"
     }
   ],
-  "unexplained": 97,
+  "unexplained": 80,
   "pass": false
 }

@@ -17,7 +17,7 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | sidebar-collapsed | 1440x900 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
 | answer | 1440x900 | 121 | 74 | 1 | 0 | 5 | 19 | 3 | FAIL |
 | thinking-collapsed | 1440x900 | 123 | 38 | 20 | 17 | 31 | 19 | 94 | FAIL |
-| scroll-up | 1440x900 | 114 | 28 | 6 | 31 | 15 | 19 | 70 | FAIL |
+| scroll-up | 1440x900 | 114 | 39 | 6 | 22 | 7 | 19 | 61 | FAIL |
 | sidebar-date-groups | 1440x900 | 64 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | home-with-history | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | user-menu | 1920x1072 | 82 | 28 | 0 | 3 | 8 | 26 | 0 | PASS |
@@ -28,9 +28,9 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | search-dialog | 1920x1072 | 29 | 28 | 0 | 0 | 0 | 0 | 0 | PASS |
 | sidebar-item-menu | 1920x1072 | 86 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1920x1072 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
-| answer | 1920x1072 | 141 | 38 | 39 | 6 | 8 | 19 | 58 | FAIL |
-| thinking-collapsed | 1920x1072 | 144 | 27 | 11 | 44 | 40 | 19 | 112 | FAIL |
-| scroll-up | 1920x1072 | 144 | 31 | 8 | 44 | 15 | 19 | 114 | FAIL |
+| answer | 1920x1072 | 141 | 74 | 4 | 5 | 9 | 19 | 23 | FAIL |
+| thinking-collapsed | 1920x1072 | 144 | 38 | 20 | 26 | 29 | 19 | 101 | FAIL |
+| scroll-up | 1920x1072 | 144 | 39 | 8 | 35 | 7 | 19 | 84 | FAIL |
 | sidebar-date-groups | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | home-with-history | 390x844 | 23 | 19 | 0 | 0 | 0 | 0 | 0 | PASS |
 | user-menu | 390x844 | 93 | 6 | 13 | 28 | 20 | 38 | 66 | FAIL |
@@ -38,11 +38,11 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | settings-account | 390x844 | 130 | 8 | 35 | 35 | 22 | 31 | 143 | FAIL |
 | settings-data | 390x844 | 118 | 6 | 23 | 44 | 29 | 31 | 146 | FAIL |
 | settings-terms | 390x844 | 108 | 7 | 23 | 37 | 28 | 35 | 107 | FAIL |
-| answer | 390x844 | 54 | 4 | 9 | 35 | 40 | 18 | 94 | FAIL |
-| thinking-collapsed | 390x844 | 62 | 2 | 13 | 29 | 46 | 9 | 145 | FAIL |
-| scroll-up | 390x844 | 33 | 2 | 9 | 19 | 29 | 11 | 97 | FAIL |
+| answer | 390x844 | 54 | 4 | 22 | 20 | 49 | 17 | 181 | FAIL |
+| thinking-collapsed | 390x844 | 62 | 2 | 15 | 26 | 50 | 10 | 155 | FAIL |
+| scroll-up | 390x844 | 33 | 2 | 10 | 18 | 28 | 11 | 80 | FAIL |
 | mobile-drawer | 390x844 | 71 | 18 | 10 | 2 | 7 | 18 | 38 | FAIL |
-| mobile-item-sheet | 390x844 | 94 | 12 | 22 | 23 | 50 | 29 | 138 | FAIL |
+| mobile-item-sheet | 390x844 | 94 | 12 | 23 | 21 | 72 | 32 | 160 | FAIL |
 
 ## home-with-history 1440x900
 
