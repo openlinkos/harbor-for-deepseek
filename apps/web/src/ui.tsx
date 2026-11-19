@@ -1545,6 +1545,8 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('fileExpiry')}</span>
             <input
+              className="settings-pill"
+              data-testid="file-expiry"
               type="number"
               min={1}
               max={30}
@@ -1554,17 +1556,13 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('filePurpose')}</span>
-            <select
-              value={settings.documentPurpose}
-              onChange={(event) =>
-                void patchSettings({
-                  documentPurpose: event.target.value === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition',
-                })
-              }
-            >
-              <option value="rich_layout_recognition">{t('richLayout')}</option>
-              <option value="text_recognition">{t('textRecognition')}</option>
-            </select>
+            <AnchoredMenu
+              testId="purpose-select"
+              label={settings.documentPurpose === 'text_recognition' ? t('textRecognition') : t('richLayout')}
+              selected={settings.documentPurpose === 'text_recognition' ? t('textRecognition') : t('richLayout')}
+              options={[t('richLayout'), t('textRecognition')]}
+              onPick={(value) => void patchSettings({ documentPurpose: value === t('textRecognition') ? 'text_recognition' : 'rich_layout_recognition' })}
+            />
           </div>
         </section>
         <section className="settings-account">
@@ -1646,21 +1644,23 @@ const Settings = () => {
           </div>
         </section>
         <section className="settings-data">
-          <h3>{t('usageTitle')}</h3>
-          <p className="hint">{serverMode ? t('serverUsageNote') : t('noUsageApi')}</p>
-          <ul className="usage-grid">
-            <li>{t('input')}: {totals.input_tokens}</li>
-            <li>{t('cache')}: {totals.cache_read_input_tokens}</li>
-            <li>{t('output')}: {totals.output_tokens}</li>
-            <li>{t('thinkingTokens')}: {totals.output_tokens_details?.thinking_tokens ?? 0}</li>
-            <li>{t('billedSearch')}: {totals.server_tool_use?.tool_search ?? 0}</li>
-            <li>{t('billedFetch')}: {totals.server_tool_use?.tool_fetch ?? 0}</li>
-            <li>{t('displaySearch')}: {totals.server_tool_use?.web_search_requests ?? 0}</li>
-            <li>{t('displayFetch')}: {totals.server_tool_use?.web_fetch_requests ?? 0}</li>
-            <li>
-              {t('estimated')}: {formatCny(cost.totalCny)} {t('cny')} ({cost.peak ? t('peak') : t('offPeak')})
-            </li>
-          </ul>
+          <div className="settings-line stack">
+            <div className="settings-copy wide">
+              <span>{t('usageTitle')}</span>
+              <p className="hint">{serverMode ? t('serverUsageNote') : t('noUsageApi')}</p>
+            </div>
+          </div>
+          <div className="usage-grid" data-testid="usage-grid">
+            <div className="settings-line"><span>{t('input')}</span><span>{totals.input_tokens}</span></div>
+            <div className="settings-line"><span>{t('cache')}</span><span>{totals.cache_read_input_tokens}</span></div>
+            <div className="settings-line"><span>{t('output')}</span><span>{totals.output_tokens}</span></div>
+            <div className="settings-line"><span>{t('thinkingTokens')}</span><span>{totals.output_tokens_details?.thinking_tokens ?? 0}</span></div>
+            <div className="settings-line"><span>{t('billedSearch')}</span><span>{totals.server_tool_use?.tool_search ?? 0}</span></div>
+            <div className="settings-line"><span>{t('billedFetch')}</span><span>{totals.server_tool_use?.tool_fetch ?? 0}</span></div>
+            <div className="settings-line"><span>{t('displaySearch')}</span><span>{totals.server_tool_use?.web_search_requests ?? 0}</span></div>
+            <div className="settings-line"><span>{t('displayFetch')}</span><span>{totals.server_tool_use?.web_fetch_requests ?? 0}</span></div>
+            <div className="settings-line"><span>{t('estimated')}</span><span>{formatCny(cost.totalCny)} {t('cny')} ({cost.peak ? t('peak') : t('offPeak')})</span></div>
+          </div>
         </section>
         <section className="settings-data">
           {serverMode ? <h3>{t('serverPrivacyTitle')}</h3> : null}
@@ -1714,28 +1714,32 @@ const Settings = () => {
           </div>
         </section>
         {serverMode ? null : (
-        <section className="settings-data">
-          <h3>{t('replaceKey')}</h3>
-          <input type="password" value={nextKey} autoComplete="off" onChange={(event) => setNextKey(event.target.value)} />
-          <input
-            type="password"
-            placeholder={t('passphraseOptional')}
-            value={passphrase}
-            onChange={(event) => setPassphrase(event.target.value)}
-          />
-          <div className="button-row">
-            <button type="button" onClick={() => void saveKey(nextKey, passphrase, true)}>
-              {t('save')}
-            </button>
-            <button type="button" onClick={() => void clearKey()}>
-              {t('clearKey')}
-            </button>
+        <section className="settings-data" data-testid="replace-key">
+          <div className="settings-line">
+            <span>{t('replaceKey')}</span>
+            <input className="settings-pill wide" type="password" value={nextKey} autoComplete="off" onChange={(event) => setNextKey(event.target.value)} />
+          </div>
+          <div className="settings-line">
+            <span>{t('passphraseOptional')}</span>
+            <input className="settings-pill wide" type="password" placeholder={t('passphraseOptional')} value={passphrase} onChange={(event) => setPassphrase(event.target.value)} />
+          </div>
+          <div className="settings-line">
+            <span>{t('save')}</span>
+            <button type="button" className="account-quiet" data-testid="replace-save" onClick={() => void saveKey(nextKey, passphrase, true)}>{t('save')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('clearKey')}</span>
+            <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
         </section>
         )}
-        <section className="settings-data">
-          <h3>{t('serverTitle')}</h3>
-          <p>{native ? t('nativeServerBody') : t('serverBody')}</p>
+        <section className="settings-data" data-testid="server-note">
+          <div className="settings-line stack">
+            <div className="settings-copy wide">
+              <span>{t('serverTitle')}</span>
+              <p className="hint">{native ? t('nativeServerBody') : t('serverBody')}</p>
+            </div>
+          </div>
           {native && !serverUser ? (
             <form
               className="stack"
@@ -1750,60 +1754,42 @@ const Settings = () => {
                 })
               }}
             >
-              <label>
-                {t('serverUrl')}
-                <input data-testid="server-url" value={remoteUrl} autoComplete="off" onChange={(event) => setRemoteUrl(event.target.value)} />
-              </label>
-              <label className="check">
-                <input
-                  data-testid="allow-lan"
-                  type="checkbox"
-                  checked={allowLanHttp}
-                  onChange={(event) => setAllowLanHttp(event.target.checked)}
-                />
-                {t('allowLanHttp')}
-              </label>
-              <label>
-                {t('loginUser')}
-                <input data-testid="remote-user" value={remoteUser} autoComplete="username" onChange={(event) => setRemoteUser(event.target.value)} />
-              </label>
-              <label>
-                {t('loginPassword')}
-                <input
-                  data-testid="remote-password"
-                  type="password"
-                  value={remotePassword}
-                  autoComplete="current-password"
-                  onChange={(event) => setRemotePassword(event.target.value)}
-                />
-              </label>
-              <label>
-                {t('registerCode')}
-                <input data-testid="remote-invite" value={inviteCode} autoComplete="off" onChange={(event) => setInviteCode(event.target.value)} />
-              </label>
-              <button type="submit" data-testid="remote-login">
-                {inviteCode.trim() ? t('registerSubmit') : t('connectServer')}
-              </button>
+              <div className="settings-line">
+                <span>{t('serverUrl')}</span>
+                <input className="settings-pill wide" data-testid="server-url" value={remoteUrl} autoComplete="off" onChange={(event) => setRemoteUrl(event.target.value)} />
+              </div>
+              <div className="settings-line">
+                <span>{t('allowLanHttp')}</span>
+                <button type="button" data-testid="allow-lan" className={allowLanHttp ? 'switch on' : 'switch'} aria-pressed={allowLanHttp} onClick={() => setAllowLanHttp(!allowLanHttp)}>
+                  <span className="knob" />
+                </button>
+              </div>
+              <div className="settings-line">
+                <span>{t('loginUser')}</span>
+                <input className="settings-pill wide" data-testid="remote-user" value={remoteUser} autoComplete="username" onChange={(event) => setRemoteUser(event.target.value)} />
+              </div>
+              <div className="settings-line">
+                <span>{t('loginPassword')}</span>
+                <input className="settings-pill wide" data-testid="remote-password" type="password" value={remotePassword} autoComplete="current-password" onChange={(event) => setRemotePassword(event.target.value)} />
+              </div>
+              <div className="settings-line">
+                <span>{t('registerCode')}</span>
+                <input className="settings-pill wide" data-testid="remote-invite" value={inviteCode} autoComplete="off" onChange={(event) => setInviteCode(event.target.value)} />
+              </div>
+              <div className="settings-line">
+                <span>{inviteCode.trim() ? t('registerSubmit') : t('connectServer')}</span>
+                <button type="submit" className="account-quiet" data-testid="remote-login">{t('save')}</button>
+              </div>
               {remoteError ? <p className="error">{remoteError}</p> : null}
             </form>
           ) : null}
           {serverUser ? (
             <>
               {serverBase ? <p className="hint" data-testid="connected-server">{t('connectedServer')}: {serverBase}</p> : null}
-            <div className="button-row">
-              <button type="button" data-testid="server-sync" onClick={() => void syncServer()}>
-                {t('syncNow')}
-              </button>
-              <button type="button" data-testid="copy-local" onClick={() => void copyLocalToServer()}>
-                {t('copyLocal')}
-              </button>
-              <button type="button" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>
-                {serverMode ? t('useLocal') : t('useServer')}
-              </button>
-              <button type="button" onClick={() => void logoutServer()}>
-                {t('logout')}
-              </button>
-            </div>
+            <div className="settings-line"><span>{t('syncNow')}</span><button type="button" className="account-quiet" data-testid="server-sync" onClick={() => void syncServer()}>{t('syncNow')}</button></div>
+            <div className="settings-line"><span>{t('copyLocal')}</span><button type="button" className="account-quiet" data-testid="copy-local" onClick={() => void copyLocalToServer()}>{t('copyLocal')}</button></div>
+            <div className="settings-line"><span>{serverMode ? t('useLocal') : t('useServer')}</span><button type="button" className="account-quiet" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>{serverMode ? t('useLocal') : t('useServer')}</button></div>
+            <div className="settings-line"><span>{t('logout')}</span><button type="button" className="account-quiet" onClick={() => void logoutServer()}>{t('logout')}</button></div>
             </>
           ) : hosted ? (
             <button type="button" data-testid="open-login" onClick={openLogin}>

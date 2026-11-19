@@ -357,9 +357,71 @@ test('390 top-bar buttons stay above the white fill', async ({ page }) => {
   await page.getByTestId('composer').fill('3 加 5 等于几？')
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('8')
+  await page.locator('.top-fill').evaluate((node) => { node.style.pointerEvents = 'auto' })
   expect(await topmostButton(page, '[data-testid="menu"]')).toBe('menu')
   expect(await topmostButton(page, '[data-testid="top-new"]')).toBe('top-new')
   expect(await topmostButton(page, 'button[aria-label="share"]')).toBe('share')
+})
+
+test('kept settings rows use the official 60px line and 36px controls', async ({ page }) => {
+  await install(page)
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  const measure = async () => page.evaluate(() => {
+    const row = (selector: string) => {
+      const node = document.querySelector(selector)?.closest('.settings-line') as HTMLElement
+      const style = getComputedStyle(node)
+      return { h: Math.round(node.getBoundingClientRect().height), fs: style.fontSize, lh: style.lineHeight }
+    }
+    const box = (selector: string) => {
+      const node = document.querySelector(selector) as HTMLElement
+      const style = getComputedStyle(node)
+      const rect = node.getBoundingClientRect()
+      return { h: Math.round(rect.height), w: Math.round(rect.width), bg: style.backgroundColor, color: style.color, radius: style.borderRadius, tag: node.tagName }
+    }
+    return {
+      usage: row('[data-testid="usage-grid"] .settings-line span'),
+      bullets: document.querySelectorAll('[data-testid="usage-grid"] li').length,
+      replace: row('[data-testid="replace-key"] .settings-line span'),
+      keyInput: box('[data-testid="replace-key"] input'),
+      save: box('[data-testid="replace-save"]'),
+      server: row('[data-testid="server-note"] .settings-copy > span'),
+      expiry: box('[data-testid="file-expiry"]'),
+      purpose: box('[data-testid="purpose-select"]'),
+    }
+  })
+  await page.getByRole('button', { name: '数据管理' }).click()
+  const light = await measure()
+  expect(light.usage).toMatchObject({ h: 60, fs: '14px', lh: '22px' })
+  expect(light.bullets).toBe(0)
+  expect(light.replace).toMatchObject({ h: 60, fs: '14px', lh: '22px' })
+  expect(light.keyInput.h).toBe(36)
+  expect(light.save.h).toBe(36)
+  expect(light.save.bg).toBe('rgba(0, 0, 0, 0)')
+  expect(light.server).toMatchObject({ h: 86, fs: '14px', lh: '22px' })
+  await page.getByRole('button', { name: '通用设置' }).click()
+  const general = await measure()
+  expect(general.expiry.h).toBe(36)
+  expect(general.purpose.h).toBe(36)
+  await page.getByRole('button', { name: '深色' }).click()
+  await page.getByRole('button', { name: '数据管理' }).click()
+  const dark = await measure()
+  expect(dark.usage.h).toBe(60)
+  expect(dark.keyInput.h).toBe(36)
+  expect(dark.keyInput.bg).not.toBe('rgb(53, 54, 56)')
+  expect(dark.save.bg).not.toBe('rgb(53, 54, 56)')
+  expect(dark.save.color).not.toBe('rgb(15, 17, 21)')
+  expect(dark.save.h).toBe(36)
+  await page.getByRole('button', { name: '通用设置' }).click()
+  const darkGeneral = await measure()
+  expect(darkGeneral.expiry.h).toBe(36)
+  expect(darkGeneral.purpose.h).toBe(36)
+  expect(darkGeneral.purpose.tag).not.toBe('SELECT')
+  expect(darkGeneral.purpose.bg).toBe('rgb(67, 69, 74)')
 })
 
 test('390 composer and title stay above a sticky code header', async ({ page }) => {
