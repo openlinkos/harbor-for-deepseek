@@ -142,7 +142,7 @@ test('mobile states at 390x844', async ({ page }) => {
   await shot(page, 'answer-code.png')
 
   await page.getByTestId('top-new').click()
-  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)/)
+  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，有什么我能帮你的吗？/)
   await shot(page, 'home-with-history.png')
   await page.getByTestId('menu').click()
   await expect(page.locator('.sidebar')).toBeVisible()

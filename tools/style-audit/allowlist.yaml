@@ -1,0 +1,37 @@
+# Allowed style-audit exceptions. A state passes only when every mismatch
+# is listed here. Brand pairs are aligned in match.ts; these entries are the
+# explicit reason, not a pixel mask.
+exceptions:
+  - id: font-family
+    property: font-family
+    reason: known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.
+  - id: brand-wordmark
+    brand: wordmark
+    reason: brand — DeepSeek logo/wordmark maps to the Harbor wordmark.
+  - id: brand-logo
+    brand: logo
+    reason: brand — DeepSeek logo maps to the Harbor mark.
+  - id: brand-account-footer
+    brand: account-footer
+    reason: brand — the official account footer maps to the 本地模式 footer.
+  - id: brand-chat-list
+    brand: chat-list
+    property: text
+    reason: brand — chat list rows align by vertical position. Titles are local data and are not a style mismatch.
+  - id: brand-wordmark-unmatched
+    unmatched: ours
+    text: "Harbor|for DeepSeek"
+    reason: brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.
+  - id: brand-footer-unmatched-ours
+    unmatched: ours
+    text: "本地模式|密钥与对话"
+    reason: brand — the 本地模式 footer is the Harbor account footer.
+  - id: brand-footer-unmatched-official
+    unmatched: official
+    text: "@"
+    region: footer
+    reason: brand — official account email or name in the sidebar footer.
+  - id: toggles-default-on
+    text: "深度思考|智能搜索|思考|搜索|Thinking|Search|toggle-thinking|toggle-search"
+    property: "background-color|color|border-top-color|border-right-color|border-bottom-color|border-left-color|border-top-width|border-right-width|border-bottom-width|border-left-width|box-shadow"
+    reason: owner rule — both the thinking and search toggles default ON.

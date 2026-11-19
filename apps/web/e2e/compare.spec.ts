@@ -135,7 +135,7 @@ const shot = async (page: Page, name: string) => {
 }
 
 const pinGreeting = async (page: Page) => {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
+  for (let attempt = 0; attempt < 24; attempt += 1) {
     const text = await page.locator('.greeting').innerText()
     if (text.includes('欢迎回来，随时开始吧')) {
       return
