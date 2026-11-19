@@ -9,6 +9,8 @@
 body {
   --dsl-modal-overlay-opacity: 0.36;
   --harbor-overlay-blur: 2px;
+  --message-list-max-width: 840px;
+  --sider-width: 261px;
   --ds-control-height-xl: 44px;
   --ds-control-height-l: 40px;
   --ds-control-height-m: 36px;

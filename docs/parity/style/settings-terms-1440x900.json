@@ -7,7 +7,7 @@
   "matchedDiff": 0,
   "officialOnly": 0,
   "harborOnly": 11,
-  "allowlisted": 18,
+  "allowlisted": 24,
   "unmatchedOfficial": 0,
   "unmatchedOurs": 11,
   "mismatches": [
@@ -178,44 +178,56 @@
       "property": "unmatched",
       "official": "",
       "ours": "footer",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "main > link ‘GitHub’",
       "property": "unmatched",
       "official": "",
       "ours": "GitHub",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "main > link ‘许可证’",
       "property": "unmatched",
       "official": "",
       "ours": "许可证",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "main > link ‘OpenLinkOS’",
       "property": "unmatched",
       "official": "",
       "ours": "OpenLinkOS",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "main > link ‘openlinkos/harbor-for-de’",
       "property": "unmatched",
       "official": "",
       "ours": "openlinkos/harbor-for-de",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "main > link ‘platform.deepseek.com’",
       "property": "unmatched",
       "official": "",
       "ours": "platform.deepseek.com",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     }
   ],
-  "unexplained": 6,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

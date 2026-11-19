@@ -6,6 +6,7 @@ import type { ContentBlock, Conversation, Message } from '@harbor/types'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
+import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor, type HarborState } from './store.js'
@@ -761,6 +762,12 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
 
 export const Shell = () => {
   const t = useT()
+  useEffect(() => {
+    loadSkin()
+    const onTheme = () => loadSkin()
+    window.addEventListener('harbor-theme', onTheme)
+    return () => window.removeEventListener('harbor-theme', onTheme)
+  }, [])
   const state = useHarbor()
   const conversation = state.conversations.find((item) => item.id === state.activeId) ?? null
   const path = useMemo(
@@ -1071,7 +1078,7 @@ export const Shell = () => {
         ) : (
           <>
             <div
-              className="transcript"
+              className="transcript chat-scroll"
               data-testid="message-list"
               ref={listRef}
               onScroll={() => {
@@ -1083,18 +1090,20 @@ export const Shell = () => {
                 setAway(!(list.scrollTop + list.offsetHeight > list.scrollHeight - 52))
               }}
             >
-              {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
-              <div ref={endRef} />
+              <div className="chat-column">
+                {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
+                <div ref={endRef} />
+              </div>
+              <div className="composer-wrap">
+                <Composer />
+                <p className="footnote ai-note">{t('aiNote')}</p>
+              </div>
             </div>
             {away ? (
               <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); listRef.current?.scrollTo({ left: 0, top: listRef.current.scrollHeight, behavior: 'instant' }) }}>
                 <Icon d="M6 9l6 6 6-6" />
               </button>
             ) : null}
-            <div className="composer-wrap">
-              <Composer />
-              <p className="footnote ai-note">{t('aiNote')}</p>
-            </div>
           </>
         )}
       </section>
@@ -1459,6 +1468,24 @@ const Settings = () => {
         <details className="settings-more settings-general" data-testid="settings-more-general">
           <summary>{t('more')}</summary>
           <section className="settings-general">
+            <div className="settings-line">
+              <span>{t('skin')}</span>
+              <label className="file-button">
+                {t('skinImport')}
+                <input
+                  data-testid="skin-file"
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0]
+                    event.target.value = ''
+                    if (!file) return
+                    void file.text().then((raw) => saveSkin(parseSkin(raw))).catch(() => undefined)
+                  }}
+                />
+              </label>
+              <button type="button" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</button>
+            </div>
             <h3>{t('model')}</h3>
             <label>
               {t('model')}

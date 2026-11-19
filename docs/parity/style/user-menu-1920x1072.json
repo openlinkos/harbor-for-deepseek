@@ -105,7 +105,7 @@
       "key": "sidebar > account 1",
       "property": "w",
       "official": "129.13",
-      "ours": "158",
+      "ours": "155",
       "status": "allowed",
       "reason": "brand — the official account footer maps to the 本地模式 footer.",
       "id": "brand-account-footer"
@@ -228,7 +228,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "sidebar > div @20,763 172×263",
+      "key": "sidebar > div @20,763 169×263",
       "property": "unmatched",
       "official": "",
       "ours": "div",
@@ -237,10 +237,10 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "sidebar > p ‘10 入 · 4 出 · 约 0.0000 元’",
+      "key": "sidebar > p ‘10 入 · 4 出 · 约 0.0001 元’",
       "property": "unmatched",
       "official": "",
-      "ours": "10 入 · 4 出 · 约 0.0000 元",
+      "ours": "10 入 · 4 出 · 约 0.0001 元",
       "status": "allowed",
       "reason": "brand — the 本地模式 footer is the Harbor account footer.",
       "id": "brand-footer-unmatched-ours"

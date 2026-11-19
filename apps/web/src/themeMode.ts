@@ -17,4 +17,5 @@ export const applyTheme = (choice: ThemeChoice) => {
 export const saveTheme = (choice: ThemeChoice) => {
   localStorage.setItem(KEY, choice)
   applyTheme(choice)
+  window.dispatchEvent(new Event('harbor-theme'))
 }

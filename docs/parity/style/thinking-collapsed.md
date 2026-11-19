@@ -1,10 +1,10 @@
 # thinking-collapsed 1440x900
 
-Result: FAIL (159 unexplained)
+Result: FAIL (106 unexplained)
 
-- Matched elements: 43
-- Unmatched official: 33
-- Unmatched ours: 35
+- Matched elements: 39
+- Unmatched official: 34
+- Unmatched ours: 40
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -23,29 +23,16 @@ Result: FAIL (159 unexplained)
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
 | fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
-| fail | control ‘深度思考’ | y | 825 | 816.61 |  |
-| fail | control ‘智能搜索’ | y | 825 | 816.61 |  |
-| fail | main > span ‘深度思考’ | y | 830 | 821.61 |  |
-| fail | main > span ‘智能搜索’ | y | 830 | 821.61 |  |
-| fail | main > code ‘captureStyleAudit’ | x | 599.92 | 496.5 |  |
-| fail | main > code ‘captureStyleAudit’ | y | 390 | 397.89 |  |
-| fail | main > code ‘captureStyleAudit’ | w | 143.28 | 150.81 |  |
-| fail | main > code ‘captureStyleAudit’ | h | 22 | 18 |  |
-| fail | main > code ‘captureStyleAudit’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘captureStyleAudit’ | padding-left | 5px | 4px |  |
-| fail | main > code ‘ReferenceError’ | x | 964.8 | 975.64 |  |
-| fail | main > code ‘ReferenceError’ | y | 688 | 397.89 |  |
-| fail | main > code ‘ReferenceError’ | w | 119.77 | 125.61 |  |
-| fail | main > code ‘ReferenceError’ | h | 22 | 18 |  |
-| fail | main > code ‘ReferenceError’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘ReferenceError’ | padding-left | 5px | 4px |  |
-| fail | main > code ‘this’ | x | 593.02 | 596.67 |  |
-| fail | main > code ‘this’ | y | 756 | 465.89 |  |
-| fail | main > code ‘this’ | h | 22 | 18 |  |
-| fail | main > code ‘this’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘this’ | padding-left | 5px | 4px |  |
+| fail | main > button @1391,12 34×34 | x | 1391 | 1390 |  |
+| fail | main > button @1391,12 34×34 | y | 12 | 10 |  |
+| fail | main > icon 16×16 @1400,21 | x | 1400 | 1399 |  |
+| fail | main > icon 16×16 @1400,21 | y | 21 | 19 |  |
+| fail | main > icon 14×14 @1203,704 | x | 1202.5 | 1214.5 |  |
+| fail | main > icon 14×14 @1203,704 | y | 704 | 721.8 |  |
+| fail | main > icon 14×14 @1203,704 | w | 14 | 12 |  |
+| fail | main > icon 14×14 @1203,704 | h | 14 | 12 |  |
 | fail | main > div @475,276 752×40 | x | 474.5 | 488.5 |  |
-| fail | main > div @475,276 752×40 | y | 276 | 271.89 |  |
+| fail | main > div @475,276 752×40 | y | 276 | 253.8 |  |
 | fail | main > div @475,276 752×40 | w | 752 | 724 |  |
 | fail | main > div @475,276 752×40 | h | 40 | 44 |  |
 | fail | main > div @475,276 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
@@ -53,70 +40,24 @@ Result: FAIL (159 unexplained)
 | fail | main > div @475,276 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @475,276 752×40 | font-size | 16px | 13px |  |
 | fail | main > div @475,276 752×40 | line-height | 28px | 22px |  |
-| fail | main > button @1391,12 34×34 | x | 1391 | 1392 |  |
-| fail | main > button @1391,12 34×34 | y | 12 | 10 |  |
-| fail | main > button @1391,12 34×34 | w | 34 | 32 |  |
-| fail | main > button @1391,12 34×34 | h | 34 | 32 |  |
-| fail | main > button @1391,12 34×34 | border-top-left-radius | 4096px | 8px |  |
-| fail | main > button @1391,12 34×34 | border-top-right-radius | 4096px | 8px |  |
-| fail | main > button @1391,12 34×34 | border-bottom-right-radius | 4096px | 8px |  |
-| fail | main > button @1391,12 34×34 | border-bottom-left-radius | 4096px | 8px |  |
-| fail | main > button @1391,12 34×34 | font-size | 14px | 16px |  |
-| fail | main > button @1391,12 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| fail | main > button @1391,12 34×34 | padding-top | 0px | 1px |  |
-| fail | main > button @1391,12 34×34 | padding-right | 0px | 6px |  |
-| fail | main > button @1391,12 34×34 | padding-bottom | 0px | 1px |  |
-| fail | main > button @1391,12 34×34 | padding-left | 0px | 6px |  |
-| fail | main > icon 16×16 @1400,21 | x | 1400 | 1398 |  |
-| fail | main > icon 16×16 @1400,21 | y | 21 | 15 |  |
-| fail | main > icon 16×16 @1400,21 | w | 16 | 22 |  |
-| fail | main > icon 16×16 @1400,21 | h | 16 | 22 |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
 | fail | main > icon 14×16 @1102,520 | x | 1102.47 | 1101.5 |  |
-| fail | main > icon 14×16 @1102,520 | y | 520 | 515.89 |  |
+| fail | main > icon 14×16 @1102,520 | y | 520 | 497.8 |  |
 | fail | main > button @1092,514 63×28 | x | 1092.47 | 1091.5 |  |
-| fail | main > button @1092,514 63×28 | y | 514 | 509.89 |  |
+| fail | main > button @1092,514 63×28 | y | 514 | 491.8 |  |
 | fail | main > icon 14×16 @1167,520 | x | 1167.48 | 1166.5 |  |
-| fail | main > icon 14×16 @1167,520 | y | 520 | 515.89 |  |
+| fail | main > icon 14×16 @1167,520 | y | 520 | 497.8 |  |
 | fail | main > button @1157,514 63×28 | x | 1157.48 | 1156.5 |  |
-| fail | main > button @1157,514 63×28 | y | 514 | 509.89 |  |
-| fail | main > div @463,748 776×124 | y | 748 | 739.61 |  |
-| fail | main > div @463,748 776×124 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
-| fail | main > textbox @464,753 774×60 | y | 753 | 744.61 |  |
-| fail | main > icon 14×14 @487,835 | y | 835 | 826.61 |  |
-| fail | main > button @1148,825 34×34 | y | 825 | 816.61 |  |
-| fail | main > icon 16×16 @1157,834 | y | 834 | 825.61 |  |
-| fail | main > button @1192,825 34×34 | y | 825 | 816.61 |  |
-| fail | main > icon 16×16 @1201,834 | y | 834 | 825.61 |  |
-| fail | main > icon 14×14 @589,835 | y | 835 | 826.61 |  |
-| fail | main > div @475,508 752×116 | y | 508 | 503.89 |  |
-| fail | main > div @475,508 752×116 | h | 116 | 94 |  |
-| fail | main > div::after @475,188 | x | 474.5 | 495.5 |  |
-| fail | main > div::after @475,188 | y | 188 | 175.89 |  |
-| fail | main > div::after @475,188 | w | 762 | 731 |  |
-| fail | main > div::after @475,188 | h | 35 | 23.09 |  |
+| fail | main > button @1157,514 63×28 | y | 514 | 491.8 |  |
+| fail | main > div::after @475,188 | x | 474.5 | 496.5 |  |
+| fail | main > div::after @475,188 | y | 188 | 162.8 |  |
+| fail | main > div::after @475,188 | w | 762 | 730 |  |
+| fail | main > div::after @475,188 | h | 35 | 24 |  |
 | fail | main > div::after @475,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div::after @475,188 | line-height | normal | 23.1px |  |
-| fail | main > div::after @475,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
-| fail | main > span ‘。’ | x | 1084.56 | 1101.5 |  |
-| fail | main > span ‘。’ | y | 688 | 669.89 |  |
-| fail | main > span ‘。’ | w | 16.02 | 14 |  |
-| fail | main > span ‘。’ | h | 20 | 16 |  |
-| fail | main > span ‘。’ | font-size | 16px | 13px |  |
-| fail | main > span ‘。’ | font-weight | 400 | 500 |  |
-| fail | main > span ‘。’ | line-height | 28px | 20px |  |
-| fail | main > span ‘。’ | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| fail | main > div @475,796 752×40 | y | 796 | 767.89 |  |
-| fail | main > div @475,796 752×40 | h | 40 | 28 |  |
-| fail | main > div @475,796 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div @475,796 752×40 | border-top-left-radius | 12px | 0px |  |
-| fail | main > div @475,796 752×40 | border-top-right-radius | 12px | 0px |  |
-| fail | main > div @475,276 752×94 | y | 276 | 215.89 |  |
+| fail | main > div::after @475,188 | line-height | normal | 24px |  |
+| fail | main > div::after @475,188 | color | rgb(128, 0, 128) | rgb(97, 102, 107) |  |
+| fail | main > div @475,508 752×116 | y | 508 | 485.8 |  |
+| fail | main > div @475,508 752×116 | h | 116 | 94 |  |
+| fail | main > div @475,276 752×94 | y | 276 | 197.8 |  |
 | fail | main > div @475,276 752×94 | h | 94 | 116 |  |
 | fail | sidebar > button @216,261 28×28 | unmatched | div |  |  |
 | fail | sidebar > icon 16×16 @222,267 | unmatched | svg |  |  |
@@ -141,6 +82,8 @@ Result: FAIL (159 unexplained)
 | fail | main > icon 12×12 @475,612 | unmatched | svg |  |  |
 | fail | main > icon 12×12 @1215,612 | unmatched | svg |  |  |
 | fail | main > div @475,796 752×94 | unmatched | div |  |  |
+| fail | main > div @475,796 752×40 | unmatched | div |  |  |
+| fail | main > div @475,796 752×40 | unmatched | div |  |  |
 | fail | main > button @1092,802 63×28 | unmatched | div |  |  |
 | fail | main > icon 14×16 @1102,808 | unmatched | svg |  |  |
 | fail | main > button @1157,802 63×28 | unmatched | div |  |  |
@@ -150,45 +93,49 @@ Result: FAIL (159 unexplained)
 | fail | main > button @1193,694 34×34 | unmatched | div |  |  |
 | fail | main > div @1193,694 34×34 | unmatched | div |  |  |
 | fail | main > div @1193,694 34×34 | unmatched | div |  |  |
-| fail | main > icon 14×14 @1203,704 | unmatched | svg |  |  |
 | fail | sidebar > heading ‘对照’ | unmatched |  | 对照 |  |
 | fail | main > button ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > icon 20×20 @1167,64 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @1167,68 | unmatched |  | svg |  |
 | fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
-| fail | main > icon 20×20 @1205,64 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @1205,68 | unmatched |  | svg |  |
 | fail | main > button ‘已思考（用时 1 秒）’ | unmatched |  | 已思考（用时 1 秒） |  |
-| fail | main > icon 16×16 @475,134 | unmatched |  | svg |  |
-| fail | main > icon 16×16 @629,134 | unmatched |  | svg |  |
-| fail | main > button @1092,222 63×28 | unmatched |  | button |  |
-| fail | main > icon 14×16 @1102,228 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @475,116 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @629,116 | unmatched |  | svg |  |
+| fail | main > button @1092,204 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1102,210 | unmatched |  | svg |  |
 | fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @1167,228 | unmatched |  | svg |  |
-| fail | main > div @475,658 752×94 | unmatched |  | div |  |
-| fail | main > button @1092,664 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1167,210 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @475,302 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @1215,302 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @475,568 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @1215,568 | unmatched |  | svg |  |
+| fail | main > div @475,640 752×94 | unmatched |  | div |  |
+| fail | main > button @1092,646 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1102,652 | unmatched |  | svg |  |
 | fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @1167,670 | unmatched |  | svg |  |
+| fail | main > icon 14×16 @1167,652 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @475,722 | unmatched |  | svg |  |
 | fail | main > button ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > icon 16×16 @481,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @475,826 | unmatched |  | svg |  |
 | fail | main > button ‘重新生成’ | unmatched |  | 重新生成 |  |
-| fail | main > icon 16×16 @519,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @513,826 | unmatched |  | svg |  |
 | fail | main > button ‘喜欢’ | unmatched |  | 喜欢 |  |
-| fail | main > icon 16×16 @557,818 | unmatched |  | svg |  |
-| fail | main > button ‘不喜欢’ | unmatched |  | 不喜欢 |  |
-| fail | main > icon 16×16 @595,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @551,826 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @589,826 | unmatched |  | svg |  |
 | fail | main > button ‘朗读’ | unmatched |  | 朗读 |  |
-| fail | main > icon 16×16 @633,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @627,826 | unmatched |  | svg |  |
 | fail | main > button ‘分享’ | unmatched |  | 分享 |  |
-| fail | main > icon 16×16 @671,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @665,826 | unmatched |  | svg |  |
 | fail | main > button ‘回到底部’ | unmatched |  | 回到底部 |  |
-| fail | main > icon 16×16 @1396,742 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @843,706 | unmatched |  | svg |  |
 
 # thinking-collapsed 1920x1072
 
-Result: FAIL (172 unexplained)
+Result: FAIL (112 unexplained)
 
-- Matched elements: 44
-- Unmatched official: 42
-- Unmatched ours: 33
+- Matched elements: 38
+- Unmatched official: 44
+- Unmatched ours: 40
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -207,35 +154,12 @@ Result: FAIL (172 unexplained)
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
 | fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
-| fail | control ‘深度思考’ | y | 997 | 988.61 |  |
-| fail | control ‘智能搜索’ | y | 997 | 988.61 |  |
-| fail | main > span ‘深度思考’ | y | 1002 | 993.61 |  |
-| fail | main > span ‘智能搜索’ | y | 1002 | 993.61 |  |
-| fail | main > code ‘captureStyleAudit’ | x | 839.92 | 736.5 |  |
-| fail | main > code ‘captureStyleAudit’ | y | 390 | 397.89 |  |
-| fail | main > code ‘captureStyleAudit’ | w | 143.28 | 150.81 |  |
-| fail | main > code ‘captureStyleAudit’ | h | 22 | 18 |  |
-| fail | main > code ‘captureStyleAudit’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘captureStyleAudit’ | padding-left | 5px | 4px |  |
-| fail | main > code ‘ReferenceError’ | x | 1204.8 | 1215.64 |  |
-| fail | main > code ‘ReferenceError’ | y | 688 | 397.89 |  |
-| fail | main > code ‘ReferenceError’ | w | 119.77 | 125.61 |  |
-| fail | main > code ‘ReferenceError’ | h | 22 | 18 |  |
-| fail | main > code ‘ReferenceError’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘ReferenceError’ | padding-left | 5px | 4px |  |
-| fail | main > code ‘this’ | x | 833.02 | 836.67 |  |
-| fail | main > code ‘this’ | y | 756 | 465.89 |  |
-| fail | main > code ‘this’ | h | 22 | 18 |  |
-| fail | main > code ‘this’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘this’ | padding-left | 5px | 4px |  |
-| fail | main > code ‘captureStyleAudit()’ | x | 899.91 | 901.14 |  |
-| fail | main > code ‘captureStyleAudit()’ | y | 1064 | 773.89 |  |
-| fail | main > code ‘captureStyleAudit()’ | w | 158.97 | 167.61 |  |
-| fail | main > code ‘captureStyleAudit()’ | h | 22 | 18 |  |
-| fail | main > code ‘captureStyleAudit()’ | padding-right | 5px | 4px |  |
-| fail | main > code ‘captureStyleAudit()’ | padding-left | 5px | 4px |  |
+| fail | main > button @1871,12 34×34 | x | 1871 | 1870 |  |
+| fail | main > button @1871,12 34×34 | y | 12 | 10 |  |
+| fail | main > icon 16×16 @1880,21 | x | 1880 | 1879 |  |
+| fail | main > icon 16×16 @1880,21 | y | 21 | 19 |  |
 | fail | main > div @715,276 752×40 | x | 714.5 | 728.5 |  |
-| fail | main > div @715,276 752×40 | y | 276 | 271.89 |  |
+| fail | main > div @715,276 752×40 | y | 276 | 253.8 |  |
 | fail | main > div @715,276 752×40 | w | 752 | 724 |  |
 | fail | main > div @715,276 752×40 | h | 40 | 44 |  |
 | fail | main > div @715,276 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
@@ -243,70 +167,24 @@ Result: FAIL (172 unexplained)
 | fail | main > div @715,276 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,276 752×40 | font-size | 16px | 13px |  |
 | fail | main > div @715,276 752×40 | line-height | 28px | 22px |  |
-| fail | main > button @1871,12 34×34 | x | 1871 | 1872 |  |
-| fail | main > button @1871,12 34×34 | y | 12 | 10 |  |
-| fail | main > button @1871,12 34×34 | w | 34 | 32 |  |
-| fail | main > button @1871,12 34×34 | h | 34 | 32 |  |
-| fail | main > button @1871,12 34×34 | border-top-left-radius | 4096px | 8px |  |
-| fail | main > button @1871,12 34×34 | border-top-right-radius | 4096px | 8px |  |
-| fail | main > button @1871,12 34×34 | border-bottom-right-radius | 4096px | 8px |  |
-| fail | main > button @1871,12 34×34 | border-bottom-left-radius | 4096px | 8px |  |
-| fail | main > button @1871,12 34×34 | font-size | 14px | 16px |  |
-| fail | main > button @1871,12 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| fail | main > button @1871,12 34×34 | padding-top | 0px | 1px |  |
-| fail | main > button @1871,12 34×34 | padding-right | 0px | 6px |  |
-| fail | main > button @1871,12 34×34 | padding-bottom | 0px | 1px |  |
-| fail | main > button @1871,12 34×34 | padding-left | 0px | 6px |  |
-| fail | main > icon 16×16 @1880,21 | x | 1880 | 1878 |  |
-| fail | main > icon 16×16 @1880,21 | y | 21 | 15 |  |
-| fail | main > icon 16×16 @1880,21 | w | 16 | 22 |  |
-| fail | main > icon 16×16 @1880,21 | h | 16 | 22 |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
-| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
 | fail | main > icon 14×16 @1342,520 | x | 1342.47 | 1341.5 |  |
-| fail | main > icon 14×16 @1342,520 | y | 520 | 515.89 |  |
+| fail | main > icon 14×16 @1342,520 | y | 520 | 497.8 |  |
 | fail | main > button @1332,514 63×28 | x | 1332.47 | 1331.5 |  |
-| fail | main > button @1332,514 63×28 | y | 514 | 509.89 |  |
+| fail | main > button @1332,514 63×28 | y | 514 | 491.8 |  |
 | fail | main > icon 14×16 @1407,520 | x | 1407.48 | 1406.5 |  |
-| fail | main > icon 14×16 @1407,520 | y | 520 | 515.89 |  |
+| fail | main > icon 14×16 @1407,520 | y | 520 | 497.8 |  |
 | fail | main > button @1397,514 63×28 | x | 1397.48 | 1396.5 |  |
-| fail | main > button @1397,514 63×28 | y | 514 | 509.89 |  |
-| fail | main > div @703,920 776×124 | y | 920 | 911.61 |  |
-| fail | main > div @703,920 776×124 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
-| fail | main > textbox @704,925 774×60 | y | 925 | 916.61 |  |
-| fail | main > icon 14×14 @727,1007 | y | 1007 | 998.61 |  |
-| fail | main > button @1388,997 34×34 | y | 997 | 988.61 |  |
-| fail | main > icon 16×16 @1397,1006 | y | 1006 | 997.61 |  |
-| fail | main > button @1432,997 34×34 | y | 997 | 988.61 |  |
-| fail | main > icon 16×16 @1441,1006 | y | 1006 | 997.61 |  |
-| fail | main > icon 14×14 @829,1007 | y | 1007 | 998.61 |  |
-| fail | main > div @715,508 752×116 | y | 508 | 503.89 |  |
-| fail | main > div @715,508 752×116 | h | 116 | 94 |  |
-| fail | main > div::after @715,188 | x | 714.5 | 735.5 |  |
-| fail | main > div::after @715,188 | y | 188 | 175.89 |  |
-| fail | main > div::after @715,188 | w | 762 | 731 |  |
-| fail | main > div::after @715,188 | h | 35 | 23.09 |  |
+| fail | main > button @1397,514 63×28 | y | 514 | 491.8 |  |
+| fail | main > div::after @715,188 | x | 714.5 | 736.5 |  |
+| fail | main > div::after @715,188 | y | 188 | 162.8 |  |
+| fail | main > div::after @715,188 | w | 762 | 730 |  |
+| fail | main > div::after @715,188 | h | 35 | 24 |  |
 | fail | main > div::after @715,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div::after @715,188 | line-height | normal | 23.1px |  |
-| fail | main > div::after @715,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
-| fail | main > span ‘。’ | x | 1324.56 | 1341.5 |  |
-| fail | main > span ‘。’ | y | 688 | 669.89 |  |
-| fail | main > span ‘。’ | w | 16.02 | 14 |  |
-| fail | main > span ‘。’ | h | 20 | 16 |  |
-| fail | main > span ‘。’ | font-size | 16px | 13px |  |
-| fail | main > span ‘。’ | font-weight | 400 | 500 |  |
-| fail | main > span ‘。’ | line-height | 28px | 20px |  |
-| fail | main > span ‘。’ | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| fail | main > div @715,796 752×40 | y | 796 | 767.89 |  |
-| fail | main > div @715,796 752×40 | h | 40 | 28 |  |
-| fail | main > div @715,796 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | main > div @715,796 752×40 | border-top-left-radius | 12px | 0px |  |
-| fail | main > div @715,796 752×40 | border-top-right-radius | 12px | 0px |  |
-| fail | main > div @715,276 752×94 | y | 276 | 215.89 |  |
+| fail | main > div::after @715,188 | line-height | normal | 24px |  |
+| fail | main > div::after @715,188 | color | rgb(128, 0, 128) | rgb(97, 102, 107) |  |
+| fail | main > div @715,508 752×116 | y | 508 | 485.8 |  |
+| fail | main > div @715,508 752×116 | h | 116 | 94 |  |
+| fail | main > div @715,276 752×94 | y | 276 | 197.8 |  |
 | fail | main > div @715,276 752×94 | h | 94 | 116 |  |
 | fail | sidebar > button @216,261 28×28 | unmatched | div |  |  |
 | fail | sidebar > icon 16×16 @222,267 | unmatched | svg |  |  |
@@ -331,6 +209,8 @@ Result: FAIL (172 unexplained)
 | fail | main > icon 12×12 @715,612 | unmatched | svg |  |  |
 | fail | main > icon 12×12 @1455,612 | unmatched | svg |  |  |
 | fail | main > div @715,796 752×94 | unmatched | div |  |  |
+| fail | main > div @715,796 752×40 | unmatched | div |  |  |
+| fail | main > div @715,796 752×40 | unmatched | div |  |  |
 | fail | main > button @1332,802 63×28 | unmatched | div |  |  |
 | fail | main > icon 14×16 @1342,808 | unmatched | svg |  |  |
 | fail | main > button @1397,802 63×28 | unmatched | div |  |  |
@@ -352,83 +232,84 @@ Result: FAIL (172 unexplained)
 | fail | main > icon 14×14 @1443,876 | unmatched | svg |  |  |
 | fail | sidebar > heading ‘对照’ | unmatched |  | 对照 |  |
 | fail | main > button ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > icon 20×20 @1407,64 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @1407,68 | unmatched |  | svg |  |
 | fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
-| fail | main > icon 20×20 @1445,64 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @1445,68 | unmatched |  | svg |  |
 | fail | main > button ‘已思考（用时 1 秒）’ | unmatched |  | 已思考（用时 1 秒） |  |
-| fail | main > icon 16×16 @715,134 | unmatched |  | svg |  |
-| fail | main > icon 16×16 @869,134 | unmatched |  | svg |  |
-| fail | main > button @1332,222 63×28 | unmatched |  | button |  |
-| fail | main > icon 14×16 @1342,228 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @715,116 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @869,116 | unmatched |  | svg |  |
+| fail | main > button @1332,204 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1342,210 | unmatched |  | svg |  |
 | fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @1407,228 | unmatched |  | svg |  |
-| fail | main > div @715,658 752×94 | unmatched |  | div |  |
-| fail | main > button @1332,664 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1407,210 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @715,302 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @1455,302 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @715,568 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @1455,568 | unmatched |  | svg |  |
+| fail | main > div @715,640 752×94 | unmatched |  | div |  |
+| fail | main > button @1332,646 63×28 | unmatched |  | button |  |
+| fail | main > icon 14×16 @1342,652 | unmatched |  | svg |  |
 | fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @1407,670 | unmatched |  | svg |  |
+| fail | main > icon 14×16 @1407,652 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @715,722 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @1455,722 | unmatched |  | svg |  |
 | fail | main > button ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > icon 16×16 @721,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @715,826 | unmatched |  | svg |  |
 | fail | main > button ‘重新生成’ | unmatched |  | 重新生成 |  |
-| fail | main > icon 16×16 @759,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @753,826 | unmatched |  | svg |  |
 | fail | main > button ‘喜欢’ | unmatched |  | 喜欢 |  |
-| fail | main > icon 16×16 @797,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @791,826 | unmatched |  | svg |  |
 | fail | main > button ‘不喜欢’ | unmatched |  | 不喜欢 |  |
-| fail | main > icon 16×16 @835,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @829,826 | unmatched |  | svg |  |
 | fail | main > button ‘朗读’ | unmatched |  | 朗读 |  |
-| fail | main > icon 16×16 @873,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @867,826 | unmatched |  | svg |  |
 | fail | main > button ‘分享’ | unmatched |  | 分享 |  |
-| fail | main > icon 16×16 @911,818 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @905,826 | unmatched |  | svg |  |
 
 # thinking-collapsed 390x844
 
-Result: FAIL (160 unexplained)
+Result: FAIL (145 unexplained)
 
 - Matched elements: 15
-- Unmatched official: 27
-- Unmatched ours: 41
+- Unmatched official: 29
+- Unmatched ours: 46
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
-| fail | control ‘智能搜索’ | x | 131.02 | 151 |  |
-| fail | control ‘智能搜索’ | y | 769 | 734.31 |  |
-| fail | sidebar > span ‘智能搜索’ | x | 160.02 | 180 |  |
-| fail | sidebar > span ‘智能搜索’ | y | 774 | 739.31 |  |
-| fail | sidebar > div @16,710 358×106 | x | 16 | 36 |  |
-| fail | sidebar > div @16,710 358×106 | y | 710 | 713.8 |  |
-| fail | sidebar > div @16,710 358×106 | w | 358 | 318 |  |
-| fail | sidebar > div @16,710 358×106 | h | 106 | 94 |  |
-| fail | sidebar > div @16,710 358×106 | background-color | rgb(255, 255, 255) | rgb(249, 250, 251) |  |
-| fail | sidebar > div @16,710 358×106 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | none |  |
-| fail | sidebar > div @16,710 358×106 | border-top-left-radius | 24px | 12px |  |
-| fail | sidebar > div @16,710 358×106 | border-top-right-radius | 24px | 12px |  |
-| fail | sidebar > div @16,710 358×106 | border-bottom-right-radius | 24px | 12px |  |
-| fail | sidebar > div @16,710 358×106 | border-bottom-left-radius | 24px | 12px |  |
-| fail | sidebar > div @16,710 358×106 | border-top-width | 1px | 0px |  |
-| fail | sidebar > div @16,710 358×106 | border-top-color | rgba(0, 0, 0, 0.1) | rgb(15, 17, 21) |  |
-| fail | sidebar > div @16,710 358×106 | border-top-style | solid | none |  |
-| fail | sidebar > div @16,710 358×106 | border-right-width | 1px | 0px |  |
-| fail | sidebar > div @16,710 358×106 | border-right-color | rgba(0, 0, 0, 0.1) | rgb(15, 17, 21) |  |
-| fail | sidebar > div @16,710 358×106 | border-right-style | solid | none |  |
-| fail | sidebar > div @16,710 358×106 | border-bottom-width | 1px | 0px |  |
-| fail | sidebar > div @16,710 358×106 | border-bottom-color | rgba(0, 0, 0, 0.1) | rgb(15, 17, 21) |  |
-| fail | sidebar > div @16,710 358×106 | border-bottom-style | solid | none |  |
-| fail | sidebar > div @16,710 358×106 | border-left-width | 1px | 0px |  |
-| fail | sidebar > div @16,710 358×106 | border-left-color | rgba(0, 0, 0, 0.1) | rgb(15, 17, 21) |  |
-| fail | sidebar > div @16,710 358×106 | border-left-style | solid | none |  |
-| fail | sidebar > div @20,404 350×40 | x | 20 | 36 |  |
-| fail | sidebar > div @20,404 350×40 | w | 350 | 318 |  |
-| fail | sidebar > div @20,404 350×40 | h | 40 | 28 |  |
-| fail | sidebar > div @20,404 350×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | sidebar > div @20,404 350×40 | border-top-left-radius | 12px | 0px |  |
-| fail | sidebar > div @20,404 350×40 | border-top-right-radius | 12px | 0px |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | x | 16 | 36 |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | y | 816 | 809.31 |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | w | 358 | 318 |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 18.69 |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 18.7px |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
-| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
+| fail | control ‘智能搜索’ | x | 131.02 | 139 |  |
+| fail | control ‘智能搜索’ | y | 769 | 733 |  |
+| fail | sidebar > span ‘智能搜索’ | x | 160.02 | 168 |  |
+| fail | sidebar > span ‘智能搜索’ | y | 774 | 738 |  |
+| fail | row-more 1 | w | 34 | 36 |  |
+| fail | row-more 1 | h | 34 | 36 |  |
+| fail | row-more 1 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
+| fail | row-more 1 | box-shadow | none | rgba(0, 0, 0, 0.2) 0px 0px 1px 0px, rgba(0, 0, 0, 0.02) 0px 0px 4px 0px, rgba(0, 0, 0, 0.08) 0px 12px 32px 0px |  |
+| fail | row-more 1 | border-top-left-radius | 4096px | 50% |  |
+| fail | row-more 1 | border-top-right-radius | 4096px | 50% |  |
+| fail | row-more 1 | border-bottom-right-radius | 4096px | 50% |  |
+| fail | row-more 1 | border-bottom-left-radius | 4096px | 50% |  |
+| fail | row-more 1 | font-size | 14px | 16px |  |
+| fail | row-more 1 | line-height | 22px | 27.2px |  |
+| fail | row-more 1 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
+| fail | row-more 1 | border-top-width | 0px | 1px |  |
+| fail | row-more 1 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | row-more 1 | border-top-style | none | solid |  |
+| fail | row-more 1 | padding-top | 0px | 1px |  |
+| fail | row-more 1 | border-right-width | 0px | 1px |  |
+| fail | row-more 1 | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | row-more 1 | border-right-style | none | solid |  |
+| fail | row-more 1 | padding-right | 0px | 6px |  |
+| fail | row-more 1 | border-bottom-width | 0px | 1px |  |
+| fail | row-more 1 | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | row-more 1 | border-bottom-style | none | solid |  |
+| fail | row-more 1 | padding-bottom | 0px | 1px |  |
+| fail | row-more 1 | border-left-width | 0px | 1px |  |
+| fail | row-more 1 | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | row-more 1 | border-left-style | none | solid |  |
+| fail | row-more 1 | padding-left | 0px | 6px |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | x | 16 | 24 |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | y | 816 | 808 |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | w | 358 | 342 |  |
 | fail | main > button @331,12 44×44 | x | 331 | 348 |  |
 | fail | main > button @331,12 44×44 | w | 44 | 32 |  |
 | fail | main > button @331,12 44×44 | h | 44 | 32 |  |
@@ -443,52 +324,37 @@ Result: FAIL (160 unexplained)
 | fail | main > button @331,12 44×44 | padding-right | 0px | 6px |  |
 | fail | main > button @331,12 44×44 | padding-bottom | 0px | 1px |  |
 | fail | main > button @331,12 44×44 | padding-left | 0px | 6px |  |
-| fail | main > icon 20×20 @343,24 | x | 343 | 354 |  |
-| fail | main > icon 20×20 @343,24 | y | 24 | 17 |  |
-| fail | main > icon 20×20 @343,24 | w | 20 | 22 |  |
-| fail | main > icon 20×20 @343,24 | h | 20 | 22 |  |
-| fail | main > button @328,656 34×34 | x | 328 | 336 |  |
-| fail | main > button @328,656 34×34 | y | 656 | 676 |  |
-| fail | main > button @328,656 34×34 | w | 34 | 36 |  |
-| fail | main > button @328,656 34×34 | h | 34 | 36 |  |
-| fail | main > button @328,656 34×34 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
-| fail | main > button @328,656 34×34 | font-size | 14px | 16px |  |
-| fail | main > button @328,656 34×34 | line-height | 22px | 27.2px |  |
-| fail | main > button @328,656 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| fail | main > button @328,656 34×34 | border-top-width | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | main > button @328,656 34×34 | border-top-style | none | solid |  |
-| fail | main > button @328,656 34×34 | padding-top | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-right-width | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | main > button @328,656 34×34 | border-right-style | none | solid |  |
-| fail | main > button @328,656 34×34 | padding-right | 0px | 6px |  |
-| fail | main > button @328,656 34×34 | border-bottom-width | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | main > button @328,656 34×34 | border-bottom-style | none | solid |  |
-| fail | main > button @328,656 34×34 | padding-bottom | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-left-width | 0px | 1px |  |
-| fail | main > button @328,656 34×34 | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | main > button @328,656 34×34 | border-left-style | none | solid |  |
-| fail | main > button @328,656 34×34 | padding-left | 0px | 6px |  |
-| fail | main > icon 14×14 @338,666 | x | 338 | 346 |  |
-| fail | main > icon 14×14 @338,666 | y | 666 | 686 |  |
-| fail | main > icon 14×14 @338,666 | w | 14 | 16 |  |
-| fail | main > icon 14×14 @338,666 | h | 14 | 16 |  |
+| fail | main > icon 20×20 @343,24 | x | 343 | 356 |  |
+| fail | main > icon 20×20 @343,24 | y | 24 | 20 |  |
+| fail | main > icon 20×20 @343,24 | w | 20 | 16 |  |
+| fail | main > icon 20×20 @343,24 | h | 20 | 16 |  |
+| fail | main > icon 16×16 @292,778 | x | 292 | 284 |  |
+| fail | main > icon 16×16 @292,778 | y | 778 | 787.8 |  |
+| fail | main > icon 16×16 @292,778 | w | 16 | 14 |  |
 | fail | main > icon 20×20 @289,24 | x | 289 | 312 |  |
-| fail | sidebar > div::after @20,260 | x | 20 | 57 |  |
-| fail | sidebar > div::after @20,260 | y | 260 | 231.8 |  |
-| fail | sidebar > div::after @20,260 | w | 360 | 297 |  |
-| fail | sidebar > div::after @20,260 | h | 35 | 23.09 |  |
-| fail | sidebar > div::after @20,260 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| fail | sidebar > div::after @20,260 | line-height | normal | 23.1px |  |
-| fail | sidebar > div::after @20,260 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
-| fail | sidebar > textbox @17,715 356×42 | x | 17 | 37 |  |
-| fail | sidebar > textbox @17,715 356×42 | y | 715 | 680.31 |  |
-| fail | sidebar > textbox @17,715 356×42 | w | 356 | 324 |  |
-| fail | sidebar > icon 14×14 @195,270 | x | 194.94 | 227 |  |
-| fail | sidebar > icon 14×14 @195,270 | y | 270 | 283.8 |  |
+| fail | sidebar > icon 14×14 @195,270 | x | 194.94 | 219 |  |
+| fail | sidebar > icon 14×14 @195,270 | y | 270 | 261.8 |  |
 | fail | sidebar > icon 14×14 @195,270 | h | 14 | 16 |  |
+| fail | sidebar > div @20,404 350×40 | x | 20 | 44 |  |
+| fail | sidebar > div @20,404 350×40 | y | 404 | 381.8 |  |
+| fail | sidebar > div @20,404 350×40 | w | 350 | 302 |  |
+| fail | sidebar > div @20,404 350×40 | h | 40 | 28 |  |
+| fail | sidebar > div @20,404 350×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > div @20,404 350×40 | border-top-left-radius | 12px | 0px |  |
+| fail | sidebar > div @20,404 350×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > icon 16×16 @336,778 | x | 336 | 301 |  |
+| fail | main > icon 16×16 @336,778 | y | 778 | 787.8 |  |
+| fail | main > icon 16×16 @336,778 | w | 16 | 30 |  |
+| fail | main > icon 16×16 @336,778 | font-size | 16px | 15px |  |
+| fail | main > icon 16×16 @336,778 | line-height | 0px | 20px |  |
+| fail | main > icon 16×16 @336,778 | color | rgb(255, 255, 255) | rgb(97, 102, 107) |  |
+| fail | sidebar > div @16,710 358×106 | x | 16 | 24 |  |
+| fail | sidebar > div @16,710 358×106 | y | 710 | 674 |  |
+| fail | sidebar > div @16,710 358×106 | w | 358 | 342 |  |
+| fail | sidebar > div @16,710 358×106 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
+| fail | sidebar > textbox @17,715 356×42 | x | 17 | 25 |  |
+| fail | sidebar > textbox @17,715 356×42 | y | 715 | 679 |  |
+| fail | sidebar > textbox @17,715 356×42 | w | 356 | 340 |  |
 | fail | sidebar > div @0,0 331×60 | unmatched | div |  |  |
 | fail | sidebar > div ‘快排与归并复杂度’ | unmatched | 快排与归并复杂度 |  |  |
 | fail | sidebar > button @277,12 44×44 | unmatched | div |  |  |
@@ -498,6 +364,7 @@ Result: FAIL (160 unexplained)
 | fail | main > icon 16×16 @310,222 | unmatched | svg |  |  |
 | fail | main > button @342,216 28×28 | unmatched | div |  |  |
 | fail | main > icon 16×16 @348,222 | unmatched | svg |  |  |
+| fail | sidebar > div::after @20,260 | unmatched | div::after |  |  |
 | fail | sidebar > icon 16×16 @20,269 | unmatched | svg |  |  |
 | fail | sidebar > span ‘下面给出一个原地快速排序的 Python 实现，’ | unmatched | 下面给出一个原地快速排序的 Python 实现， |  |  |
 | fail | sidebar > div @20,404 350×930 | unmatched | div |  |  |
@@ -514,38 +381,43 @@ Result: FAIL (160 unexplained)
 | fail | sidebar > span ‘下载应用’ | unmatched |  | 下载应用 |  |
 | fail | main > button ‘开启新对话’ | unmatched |  | 开启新对话 |  |
 | fail | main > button ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > icon 20×20 @294,120 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @286,120 | unmatched |  | svg |  |
 | fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
-| fail | main > icon 20×20 @332,120 | unmatched |  | svg |  |
-| fail | sidebar > icon 16×16 @190,182 | unmatched |  | svg |  |
+| fail | main > icon 20×20 @324,120 | unmatched |  | svg |  |
+| fail | sidebar > icon 16×16 @44,160 | unmatched |  | svg |  |
+| fail | sidebar > icon 16×16 @198,160 | unmatched |  | svg |  |
+| fail | sidebar > p ‘reasoning’ | unmatched |  | reasoning |  |
 | fail | sidebar > p ‘返回一个定时器 ID，可用于取消：’ | unmatched |  | 返回一个定时器 ID，可用于取消： |  |
-| fail | sidebar > div @36,272 318×116 | unmatched |  | div |  |
-| fail | sidebar > button @219,278 63×28 | unmatched |  | button |  |
+| fail | sidebar > div @44,250 302×116 | unmatched |  | div |  |
+| fail | sidebar > button @211,256 63×28 | unmatched |  | button |  |
 | fail | sidebar > span ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @292,284 | unmatched |  | svg |  |
+| fail | sidebar > button ‘下载’ | unmatched |  | 下载 |  |
+| fail | main > icon 14×16 @284,262 | unmatched |  | svg |  |
 | fail | sidebar > code ‘timerId = (captureStyleA’ | unmatched |  | timerId = (captureStyleA |  |
+| fail | sidebar > icon 12×12 @44,354 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @334,354 | unmatched |  | svg |  |
 | fail | sidebar > listitem ‘必须已经定义，否则这行代码执行时会立即报 。’ | unmatched |  | 必须已经定义，否则这行代码执行时会立即报 。 |  |
 | fail | sidebar > listitem ‘10 秒后调用时默认不传参数。’ | unmatched |  | 10 秒后调用时默认不传参数。 |  |
 | fail | sidebar > listitem ‘如果函数依赖 ，直接传入可能会丢失上下文，建议写’ | unmatched |  | 如果函数依赖 ，直接传入可能会丢失上下文，建议写 |  |
-| fail | sidebar > div @36,560 318×94 | unmatched |  | div |  |
-| fail | sidebar > button @219,566 63×28 | unmatched |  | button |  |
-| fail | sidebar > icon 14×16 @227,572 | unmatched |  | svg |  |
+| fail | sidebar > div @44,622 302×94 | unmatched |  | div |  |
+| fail | sidebar > button @211,628 63×28 | unmatched |  | button |  |
+| fail | sidebar > icon 14×16 @219,634 | unmatched |  | svg |  |
 | fail | sidebar > span ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @292,572 | unmatched |  | svg |  |
+| fail | sidebar > button ‘下载’ | unmatched |  | 下载 |  |
+| fail | main > icon 14×16 @284,634 | unmatched |  | svg |  |
+| fail | sidebar > icon 12×12 @44,704 | unmatched |  | svg |  |
+| fail | main > icon 12×12 @334,704 | unmatched |  | svg |  |
 | fail | sidebar > listitem ‘如果需要传参：’ | unmatched |  | 如果需要传参： |  |
-| fail | sidebar > button @219,720 63×28 | unmatched |  | button |  |
-| fail | sidebar > icon 14×16 @227,726 | unmatched |  | svg |  |
+| fail | sidebar > div @44,776 302×94 | unmatched |  | div |  |
+| fail | sidebar > button @211,782 63×28 | unmatched |  | button |  |
+| fail | sidebar > icon 14×16 @219,788 | unmatched |  | svg |  |
 | fail | sidebar > span ‘复制’ | unmatched |  | 复制 |  |
-| fail | main > button ‘下载’ | unmatched |  | 下载 |  |
-| fail | main > icon 14×16 @292,726 | unmatched |  | svg |  |
-| fail | sidebar > p ‘简单说： 。’ | unmatched |  | 简单说： 。 |  |
-| fail | sidebar > div @36,675 326×106 | unmatched |  | div |  |
-| fail | sidebar > button @49,734 92×34 | unmatched |  | button |  |
-| fail | sidebar > icon 14×14 @60,744 | unmatched |  | svg |  |
-| fail | sidebar > icon 14×14 @162,744 | unmatched |  | svg |  |
+| fail | sidebar > button ‘下载’ | unmatched |  | 下载 |  |
+| fail | sidebar > button @37,733 92×34 | unmatched |  | button |  |
+| fail | sidebar > icon 14×14 @48,743 | unmatched |  | svg |  |
+| fail | sidebar > icon 14×14 @150,743 | unmatched |  | svg |  |
 | fail | sidebar > label ‘添加文件’ | unmatched |  | 添加文件 |  |
-| fail | main > icon 16×16 @280,743 | unmatched |  | svg |  |
-| fail | main > button @315,734 34×34 | unmatched |  | button |  |
-| fail | main > icon 16×16 @324,743 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @284,742 | unmatched |  | svg |  |
+| fail | main > button @319,733 34×34 | unmatched |  | button |  |
+| fail | main > icon 16×16 @328,742 | unmatched |  | svg |  |
+| fail | sidebar > icon 16×16 @187,650 | unmatched |  | svg |  |

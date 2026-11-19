@@ -7,7 +7,7 @@
   "matchedDiff": 23,
   "officialOnly": 37,
   "harborOnly": 28,
-  "allowlisted": 31,
+  "allowlisted": 35,
   "unmatchedOfficial": 37,
   "unmatchedOurs": 28,
   "mismatches": [
@@ -1037,21 +1037,27 @@
       "property": "unmatched",
       "official": "",
       "ours": "footer",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "sidebar > p ‘OpenLinkOS 发起的开源项目’",
       "property": "unmatched",
       "official": "",
       "ours": "OpenLinkOS 发起的开源项目",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "sidebar > p ‘DeepSeek 是其所有者的商标。本项目与深度’",
       "property": "unmatched",
       "official": "",
       "ours": "DeepSeek 是其所有者的商标。本项目与深度",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     },
     {
       "key": "sidebar > p ‘·’",
@@ -1065,9 +1071,11 @@
       "property": "unmatched",
       "official": "",
       "ours": "platform.deepseek.com",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.",
+      "id": "brand-terms-footer"
     }
   ],
-  "unexplained": 111,
+  "unexplained": 107,
   "pass": false
 }

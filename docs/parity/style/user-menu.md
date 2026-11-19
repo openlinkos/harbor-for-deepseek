@@ -18,7 +18,7 @@ Result: PASS (0 unexplained)
 | allowed | sidebar > wordmark 1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > account 1 | x | 58 | 27 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | y | 859.5 | 609.83 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | sidebar > account 1 | w | 129.13 | 158 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | w | 129.13 | 155 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | h | 17 | 20.39 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | font-size | 14px | 12px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 20.4px | brand — the official account footer maps to the 本地模式 footer. |
@@ -44,7 +44,7 @@ Result: PASS (0 unexplained)
 | allowed | sidebar > wordmark 1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > account 1 | x | 58 | 27 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | y | 1031.5 | 781.83 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | sidebar > account 1 | w | 129.13 | 158 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | w | 129.13 | 155 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | h | 17 | 20.39 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | font-size | 14px | 12px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 20.4px | brand — the official account footer maps to the 本地模式 footer. |
