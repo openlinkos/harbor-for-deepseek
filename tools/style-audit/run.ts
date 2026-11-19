@@ -94,6 +94,21 @@ const answerEssay = [
   '',
   '简单说：**10 秒后执行一次** `captureStyleAudit()`。',
 ].join('\n')
+const mobileEssay = [
+  '这行代码的作用是：',
+  '',
+  '```js',
+  'setTimeout(captureStyleAudit, 10000)',
+  '```',
+  '',
+  '延迟 10 秒后执行 `captureStyleAudit` **函数一次**。',
+  '',
+  '`10000` 单位是毫秒，即 10 秒。',
+  '',
+  answerEssay,
+].join('\n')
+const mobileThinking = `我们需要回答用户。用户只写了 "setTimeout(captureStyleAudit, 10000)"。${'先确认函数已经定义，再说明延迟、返回值和取消方式。'.repeat(12)}`
+const timerPrompt = 'setTimeout(captureStyleAudit, 10000)'
 const longCode = `\`\`\`ts\n${Array.from({ length: 20 }, (_, index) => `const line${index} = ${index}`).join('\n')}\n\`\`\``
 
 type Mode = 'ok' | 'hold' | 'error' | 'rich' | 'long' | 'code' | 'versions'
@@ -103,11 +118,13 @@ let hold: Promise<void> = Promise.resolve()
 let releaseHold = () => {}
 
 let answerTitle = '对照'
+let answerBody = answerEssay
+let thinkingText = 'reasoning'
 const sse = (text: string, title = answerTitle) => {
   const events = [
     { type: 'message_start', message: { id: 'req', model: 'deepseek-flash' } },
     { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
-    { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: 'reasoning' } },
+    { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: thinkingText } },
     { type: 'content_block_stop', index: 0 },
     { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
     { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text } },
@@ -122,6 +139,8 @@ const arm = (next: Mode) => {
   mode = next
   calls = 0
   answerTitle = '对照'
+  answerBody = answerEssay
+  thinkingText = 'reasoning'
   if (next === 'hold') hold = new Promise((resolve) => { releaseHold = resolve })
   else releaseHold = () => {}
 }
@@ -151,7 +170,7 @@ const install = async (page: Page) => {
       return
     }
     calls += 1
-    const text = mode === 'rich' ? rich : mode === 'long' ? longAnswer : mode === 'code' ? longCode : mode === 'versions' && calls > 1 ? '第二版' : answerEssay
+    const text = mode === 'rich' ? rich : mode === 'long' ? longAnswer : mode === 'code' ? longCode : mode === 'versions' && calls > 1 ? '第二版' : answerBody
     await route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(text, mode === 'versions' ? '版本' : answerTitle) })
   })
 }
@@ -168,7 +187,10 @@ const unlock = async (page: Page) => {
 }
 
 const seedPinned = async (page: Page) => {
-  if ((page.viewportSize()?.width || 0) < 768) return
+  if ((page.viewportSize()?.width || 0) < 768) {
+    answerTitle = '定时器解释'
+    return
+  }
   answerTitle = '测试会话A'
   await send(page, '占位')
   await page.locator('.chat-link').hover()
@@ -371,7 +393,21 @@ const states: StateSpec[] = [
   {
     id: 'answer', rows: [5, 7, 8, 10, 13, 46, 47], viewports: all, official: true,
     steps: ['Send any short message and wait until the answer, the action row, and the AI disclaimer are visible. Do not scroll.'],
-    run: async (page) => { arm('ok'); await unlock(page); await seedPinned(page); await send(page, '你好') },
+    run: async (page, mobile) => {
+      arm('ok')
+      if (mobile) {
+        answerBody = mobileEssay
+        thinkingText = mobileThinking
+        answerTitle = '定时器解释'
+      }
+      await unlock(page)
+      await seedPinned(page)
+      await send(page, mobile ? timerPrompt : '你好')
+      if (mobile) await page.evaluate(() => {
+        const list = document.querySelector('[data-testid="message-list"]')
+        if (list) list.scrollTop = list.scrollHeight
+      })
+    },
   },
   {
     id: 'answer-markdown', rows: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 56, 57], viewports: all, official: true,
@@ -401,12 +437,21 @@ const states: StateSpec[] = [
   {
     id: 'thinking-collapsed', rows: [43], viewports: all, official: true,
     steps: ['Open an answer that has a thinking block. Click the thinking header so the body is collapsed.'],
-    run: async (page) => {
+    run: async (page, mobile) => {
       arm('ok')
+      if (mobile) {
+        answerBody = mobileEssay
+        thinkingText = mobileThinking
+        answerTitle = '定时器解释'
+      }
       await unlock(page)
       await seedPinned(page)
-      await send(page, '思考')
+      await send(page, mobile ? timerPrompt : '思考')
       await page.getByTestId('thinking').getByRole('button').click()
+      if (mobile) await page.evaluate(() => {
+        const list = document.querySelector('[data-testid="message-list"]')
+        if (list) list.scrollTop = 0
+      })
     },
   },
   {
@@ -465,7 +510,24 @@ const states: StateSpec[] = [
   {
     id: 'scroll-up', rows: [25], viewports: all, official: true,
     steps: ['Open a long answer, scroll up until 回到底部 is visible, and capture before clicking it.'],
-    run: async (page) => {
+    run: async (page, mobile) => {
+      if (mobile) {
+        arm('ok')
+        answerBody = mobileEssay
+        thinkingText = mobileThinking
+        answerTitle = '定时器解释'
+        await unlock(page)
+        await send(page, timerPrompt)
+        await page.evaluate(() => {
+          const list = document.querySelector('[data-testid="message-list"]')
+          const node = [...document.querySelectorAll('p, span')].find((item) => item.textContent?.startsWith('返回一个定时器'))
+          if (!list || !node) return
+          const delta = node.getBoundingClientRect().top - 575
+          list.scrollTop += delta
+        })
+        await page.getByRole('button', { name: '回到底部' }).waitFor()
+        return
+      }
       arm('long')
       await unlock(page)
       await seedPinned(page)
@@ -711,6 +773,14 @@ const main = async () => {
           await install(page)
           await state.run(page, viewport.mobile)
           await page.mouse.move(0, 0)
+          await page.evaluate(() => {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+            let node = walker.nextNode()
+            while (node) {
+              if (node.nodeValue?.includes('用时 1 秒')) node.nodeValue = node.nodeValue.replace('用时 1 秒', '用时 3 秒')
+              node = walker.nextNode()
+            }
+          })
           await page.evaluate(() => document.fonts.ready)
           await page.waitForTimeout(350)
           const data = await page.evaluate((name: string) => {

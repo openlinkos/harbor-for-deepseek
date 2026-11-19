@@ -87,7 +87,8 @@ export const isVisiblePainted = (node: StyleNode, viewport: { width: number; hei
   return paints(node)
 }
 
-const regionOf = (node: StyleNode) => (node.rect.x < 280 ? 'sidebar' : 'main')
+let regionWidth = 1440
+const regionOf = (node: StyleNode) => (regionWidth < 500 || node.rect.x >= 280 ? 'main' : 'sidebar')
 
 export const humanLabel = (node: StyleNode) => {
   const region = regionOf(node)
@@ -242,6 +243,7 @@ const distance = (left: StyleNode, right: StyleNode) => {
 
 export const matchCaptures = (official: Capture, ours: Capture): MatchResult => {
   const viewport = official.viewport || { width: 1440, height: 900 }
+  regionWidth = viewport.width
   const isPageCanvas = (node: StyleNode) => !visibleText(node) && node.tag !== 'svg' && node.rect.w >= viewport.width - 2 && node.rect.h >= viewport.height - 2
   const isSyntaxToken = (node: StyleNode) => {
     if (node.tag !== 'span' && node.tag !== 'code') return false

@@ -1729,27 +1729,84 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .sources-pill { order: 2; align-self: flex-start; }
   .action-row { order: 3; }
   .action-row button, .user-actions button { width: 28px; height: 28px; }
-  .action-row svg, .user-actions svg, .code-head button { width: 20px; height: 20px; }
-  .code-head button { width: auto; min-height: 28px; height: 28px; font-size: 15px; padding: 0 8px; }
+  .action-row svg, .user-actions svg { width: 16px; height: 16px; }
+  .code-head button { width: auto; min-height: 28px; height: 28px; font-size: 13px; padding: 0 10px; }
   .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
-  .user-actions button { border: 0; background: transparent; color: #5c6166; display: grid; place-items: center; }
-  .thinking button { position: sticky; top: 0; z-index: 2; background: var(--dsw-alias-bg-base); padding: 8px 0; }
+  .user-actions button { border: 0; background: transparent; color: rgb(129, 133, 140); display: grid; place-items: center; }
+  .thinking button {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 34px;
+    box-sizing: border-box;
+    background: var(--dsw-alias-bg-base);
+    width: fit-content;
+    margin-left: 22px;
+    padding: 0;
+    font-size: 16px;
+    line-height: 28px;
+    color: rgb(97, 102, 107);
+  }
+  .thinking .chev svg { width: 14px; height: 14px; }
+  .thinking-body, .thinking-body p { font-size: 14px; line-height: 24px; color: rgb(97, 102, 107); }
+  .thinking-body p { margin: 0; }
   .jump-end {
     display: grid;
     place-items: center;
     position: absolute;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    bottom: calc(168px + env(safe-area-inset-bottom) + var(--keyboard-inset, 0px));
-    width: 36px;
-    height: 36px;
+    left: auto;
+    right: 28px;
+    transform: none;
+    bottom: calc(154px + env(safe-area-inset-bottom) + var(--keyboard-inset, 0px));
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    border: 1px solid var(--dsw-alias-border-l2);
-    background: var(--dsw-alias-bg-base);
-    color: var(--dsw-alias-label-secondary);
-    box-shadow: var(--dsw-shadow-lv3);
+    border: 0;
+    background: transparent;
+    color: rgb(15, 17, 21);
+    font-size: 14px;
+    line-height: 22px;
+    padding: 0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0 1px 0, rgba(0, 0, 0, 0.02) 0 0 4px 0, rgba(0, 0, 0, 0.08) 0 12px 32px 0;
     z-index: 3;
+  }
+  .jump-end svg { width: 14px; height: 14px; }
+  .stage:not(:has(.home)) .topbar { height: 60px; padding: 0 10px; }
+  .stage:not(:has(.home)) .title-bar { top: 0; width: 331px; height: 60px; padding: 12px 10px 4px; }
+  .stage:not(:has(.home)) .topbar > .chat-title {
+    left: 66px;
+    top: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+    border: 0;
+  }
+  .stage:not(:has(.home)) .download-app { display: none; }
+  .stage:not(:has(.home)) .top-actions { gap: 10px; margin-right: 5px; }
+  .stage:not(:has(.home)) .topbar .top-actions > button.icon-btn {
+    width: 44px;
+    height: 44px;
+    margin-top: 12px;
+    border-radius: 4096px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(15, 17, 21);
+  }
+  .stage:not(:has(.home)) .topbar .top-actions > button.icon-btn svg { width: 20px; height: 20px; }
+  .stage:not(:has(.home)) .chat-column { width: calc(100% - 40px); margin-top: 0; }
+  .stage:not(:has(.home)) .composer-wrap {
+    width: calc(100% - 32px);
+    padding-top: 0;
+    background: transparent;
+  }
+  .stage:not(:has(.home)) .composer-wrap .footnote { margin: 0; }
+  .stage:not(:has(.home)) .composer {
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
   .prose { overflow-x: auto; }
   .prose table { display: block; overflow-x: auto; }
