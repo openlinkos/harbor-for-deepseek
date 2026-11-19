@@ -546,7 +546,7 @@ test('welcome back', async ({ page }) => {
   await unlock(page)
   await send(page, '回来')
   await page.getByTestId('new-chat').click()
-  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+  await expect(page.locator('.greeting')).toContainText('今天有什么可以帮到你？')
   await expect(page.locator('.kbd')).toContainText('Ctrl J')
 })
 
