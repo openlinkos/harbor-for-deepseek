@@ -131,7 +131,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await expect(page.getByTestId('balance-side')).toContainText('317.22')
   await page.getByRole('button', { name: '数据管理' }).click()
   await expect(page.locator('.usage-grid')).toContainText('41')
-  await expect(page.getByTestId('safety-select')).toHaveValue('high')
+  expect(await page.getByTestId('safety-select').textContent()).toContain('高')
   await page.screenshot({ path: join(shots, '04-settings.png') })
   await page.getByRole('button', { name: '账号管理' }).click()
   await page.screenshot({ path: join(process.cwd(), '../../submission/awesome-deepseek-integration/docs/harbor/assets/settings-key.png') })
@@ -160,11 +160,17 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '通用设置' }).click()
   await expect(page.getByTestId('model-select')).toBeVisible()
-  await page.getByTestId('model-select').selectOption('deepseek-v4-pro')
-  await page.getByTestId('effort-select').selectOption('low')
-  await expect(page.getByTestId('effort-select')).toHaveValue('low')
-  await page.getByTestId('safety-select').selectOption('low')
-  await expect(page.getByTestId('safety-select')).toHaveValue('low')
+  await page.getByTestId('model-select').click()
+  await page.getByRole('option', { name: 'DeepSeek Pro' }).click()
+  await expect(page.getByTestId('model-select')).toContainText('DeepSeek Pro')
+  await page.getByTestId('effort-select').click()
+  await page.getByRole('option', { name: 'low', exact: true }).click()
+  await expect(page.getByTestId('effort-select')).toContainText('low')
+  await page.getByTestId('safety-select').click()
+  await page.getByRole('option', { name: '低（与不传该参数相同）' }).click()
+  await expect(page.getByTestId('safety-select')).toContainText('低')
+  await page.getByTestId('safety-select').click()
+  await page.getByRole('option', { name: '高（公开站点默认）' }).click()
   await page.getByTestId('skin-reset').click()
   await expect(page.getByTestId('toggle-search')).toHaveAttribute('aria-disabled', 'true')
   const searchClass = await page.getByTestId('toggle-search').getAttribute('class')
@@ -329,4 +335,136 @@ test('english footer keeps the trademark note off the composer', async ({ page }
   await expect(page.locator('.footnote')).toHaveCount(0)
   await expect(page.locator('body')).not.toContainText('平替')
   await expect(page.locator('body')).not.toContainText('非官方社区项目')
+})
+
+const topmostButton = async (page: Page, selector: string) => {
+  const box = await page.locator(selector).boundingBox()
+  expect(box).toBeTruthy()
+  return page.evaluate(({ x, y }) => {
+    const hit = document.elementFromPoint(x, y)
+    const button = hit?.closest('button')
+    return button?.getAttribute('data-testid') || button?.getAttribute('aria-label') || ''
+  }, { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 })
+}
+
+test('390 top-bar buttons stay above the white fill', async ({ page }) => {
+  await install(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('composer').fill('3 加 5 等于几？')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text')).toContainText('8')
+  expect(await topmostButton(page, '[data-testid="menu"]')).toBe('menu')
+  expect(await topmostButton(page, '[data-testid="top-new"]')).toBe('top-new')
+  expect(await topmostButton(page, 'button[aria-label="share"]')).toBe('share')
+})
+
+test('390 composer and title stay above a sticky code header', async ({ page }) => {
+  await install(page)
+  await page.route('https://api.deepseek.com/**', async (route) => {
+    if (!route.request().url().includes('/messages') || !route.request().postData()?.includes('代码块')) {
+      await route.fallback()
+      return
+    }
+    const events = [
+      { type: 'message_start', message: { id: 'req-code', model: 'deepseek-flash' } },
+      { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '先写一段代码。' } },
+      { type: 'content_block_stop', index: 0 },
+      { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
+      { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '```js\nconst timerId = setTimeout(captureStyleAudit, 10000)\nclearTimeout(timerId)\n```\n' + '说明。\n'.repeat(30) } },
+      { type: 'content_block_stop', index: 1 },
+      { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null, title: '自我介绍' }, usage: { input_tokens: 10, output_tokens: 20, output_tokens_details: { thinking_tokens: 4 } } },
+      { type: 'message_stop' },
+    ]
+    await route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: sse(events) })
+  })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('composer').fill('代码块')
+  await page.getByTestId('send').click()
+  await expect(page.locator('.code-sticky')).toBeVisible()
+  await page.locator('[data-testid="message-list"]').evaluate((node) => { node.scrollTop = node.scrollHeight })
+  const layers = await page.evaluate(() => ({
+    top: Number(getComputedStyle(document.querySelector('.topbar')!).zIndex),
+    composer: Number(getComputedStyle(document.querySelector('.composer-wrap')!).zIndex),
+    code: Number(getComputedStyle(document.querySelector('.code-sticky')!).zIndex),
+  }))
+  expect(layers.top).toBeGreaterThan(layers.code)
+  expect(layers.composer).toBeGreaterThan(layers.code)
+  const composer = await page.getByTestId('composer').boundingBox()
+  const hit = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-testid="composer"], .code-sticky, .code-head')?.getAttribute('data-testid') || document.elementFromPoint(x, y)?.closest('.code-sticky, .code-head')?.className || '', { x: composer!.x + 20, y: composer!.y + 20 })
+  expect(hit).toContain('composer')
+  const title = await page.locator('.chat-title').boundingBox()
+  const thought = await page.getByText(/已思考/).first().boundingBox()
+  if (title && thought) {
+    const overlaps = title.x < thought.x + thought.width && thought.x < title.x + title.width && title.y < thought.y + thought.height && thought.y < title.y + title.height
+    expect(overlaps).toBe(false)
+  }
+})
+
+test('dark landing matches the light landing', async ({ page }) => {
+  const read = async () => page.evaluate(() => {
+    const chip = document.querySelector('.landing .chip.on') as HTMLElement
+    const lang = document.querySelector('.landing .lang') as HTMLElement
+    const en = [...document.querySelectorAll('.landing .lang button')].find((node) => node.textContent?.trim() === 'EN') as HTMLElement
+    const word = document.querySelector('.landing .wordmark-name') as HTMLElement
+    const box = document.querySelector('.landing .composer') as HTMLElement
+    const chipStyle = getComputedStyle(chip)
+    return {
+      word: getComputedStyle(word).color,
+      border: getComputedStyle(box).borderTopColor,
+      chipBg: chipStyle.backgroundColor,
+      chipText: chipStyle.color,
+      chipBorder: chipStyle.borderTopColor,
+      lang: getComputedStyle(lang).backgroundColor,
+      en: getComputedStyle(en).color,
+    }
+  })
+  for (const width of [1920, 1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
+    await page.emulateMedia({ colorScheme: 'light' })
+    await page.addInitScript(() => localStorage.setItem('deepapi-theme', 'system'))
+    await page.goto('/')
+    await page.locator('.landing .chip.on').first().waitFor()
+    const light = await read()
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.reload()
+    await page.locator('.landing .chip.on').first().waitFor()
+    const dark = await read()
+    expect(dark).toEqual(light)
+    expect(dark.word).not.toBe('rgb(249, 250, 251)')
+    expect(dark.chipBg).toBe('rgb(237, 243, 254)')
+    expect(dark.chipText).toBe('rgb(57, 100, 254)')
+    expect(dark.chipBorder).toBe('rgb(183, 200, 254)')
+    expect(dark.lang).toBe('rgb(241, 243, 245)')
+    expect(dark.en).toBe('rgb(15, 17, 21)')
+    expect(dark.border).toBe('rgba(0, 0, 0, 0.1)')
+    await page.getByTestId('landing-send').click()
+    const key = await page.locator('.key-card').evaluate((node) => {
+      const input = node.querySelector('input') as HTMLElement
+      return { card: getComputedStyle(node).backgroundColor, border: getComputedStyle(input).borderTopColor }
+    })
+    expect(key.card).toBe('rgb(255, 255, 255)')
+    expect(key.border).toBe('rgba(0, 0, 0, 0.1)')
+  }
+})
+
+test('a dark settings switch stays brand blue when on', async ({ page }) => {
+  await install(page)
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByTestId('toggle-read').click()
+  await page.getByRole('button', { name: '深色' }).click()
+  await expect(page.getByTestId('toggle-read')).toHaveCSS('background-color', 'rgb(57, 100, 254)')
 })

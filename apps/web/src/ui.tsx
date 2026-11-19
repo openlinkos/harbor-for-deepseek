@@ -1391,6 +1391,7 @@ const Settings = () => {
   const prefs = useHarbor((state) => state.prefs)
   const setPrefs = useHarbor((state) => state.setPrefs)
   const balance = useHarbor((state) => state.balance)
+  const balanceError = useHarbor((state) => state.balanceError)
   const patchSettings = useHarbor((state) => state.patchSettings)
   const setLocale = useHarbor((state) => state.setLocale)
   const refreshBalance = useHarbor((state) => state.refreshBalance)
@@ -1500,29 +1501,33 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('model')}</span>
-            <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
-              <option value="deepseek-flash">DeepSeek {t('flash')}</option>
-              <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
-            </select>
+            <AnchoredMenu
+              testId="model-select"
+              label={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
+              selected={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
+              options={[`DeepSeek ${t('flash')}`, `DeepSeek ${t('pro')}`]}
+              onPick={(value) => void setPrefs({ model: value.endsWith(t('pro')) ? 'deepseek-v4-pro' : 'deepseek-flash' })}
+            />
           </div>
           <div className="settings-line">
             <span>{t('effort')}</span>
-            <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
-              <option value="low">low</option>
-              <option value="high">high</option>
-              <option value="max">max</option>
-            </select>
+            <AnchoredMenu
+              testId="effort-select"
+              label={prefs.effort}
+              selected={prefs.effort}
+              options={['low', 'high', 'max']}
+              onPick={(value) => void setPrefs({ effort: value as HarborState['prefs']['effort'] })}
+            />
           </div>
           <div className="settings-line">
             <span>{t('safety')}</span>
-            <select
-              data-testid="safety-select"
-              value={settings.safetyLevel}
-              onChange={(event) => void patchSettings({ safetyLevel: event.target.value === 'low' ? 'low' : 'high' })}
-            >
-              <option value="high">{t('safetyHigh')}</option>
-              <option value="low">{t('safetyLow')}</option>
-            </select>
+            <AnchoredMenu
+              testId="safety-select"
+              label={settings.safetyLevel === 'low' ? t('safetyLow') : t('safetyHigh')}
+              selected={settings.safetyLevel === 'low' ? t('safetyLow') : t('safetyHigh')}
+              options={[t('safetyHigh'), t('safetyLow')]}
+              onPick={(value) => void patchSettings({ safetyLevel: value === t('safetyLow') ? 'low' : 'high' })}
+            />
           </div>
           <div className="settings-line">
             <span>{t('readLink')}</span>
@@ -1564,12 +1569,24 @@ const Settings = () => {
         </section>
         <section className="settings-account">
           <div className="settings-line">
+            <span>API Key</span>
             <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
           <div className="settings-line">
             <span>{t('balance')}</span>
             <span className="account-side">
-              <span data-testid="balance-side">{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
+              <span data-testid="balance-side">
+                {balanceError || !balance?.balance_infos[0]
+                  ? t('balanceFailed')
+                  : <>
+                      {balance.balance_infos[0].total_balance} {balance.balance_infos[0].currency}
+                      <span className="hint">
+                        {balance.is_available ? t('available') : t('unavailable')}
+                        {' · '}{t('granted')} {balance.balance_infos[0].granted_balance}
+                        {' · '}{t('toppedUp')} {balance.balance_infos[0].topped_up_balance}
+                      </span>
+                    </>}
+              </span>
               {serverMode ? null : (
                 <button type="button" className="account-quiet" data-testid="refresh-balance" onClick={() => void refreshBalance()}>{t('refresh')}</button>
               )}
@@ -1592,13 +1609,11 @@ const Settings = () => {
               </span>
             </div>
           ) : null}
-          <div className="settings-line">
+          <div className="settings-line account-nickname">
             <span>{t('nickname')}</span>
-            <span className="account-chip wide">
-              <input className="account-value" data-testid="nickname" value={nickname} placeholder={t('nickname')} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-              <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder={t('nickname')} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
-              <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('save')}</span></button>
-            </span>
+            <input className="account-value" data-testid="nickname" value={nickname} placeholder={t('nickname')} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+            <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder="" maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+            <button type="button" className="account-quiet" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
           </div>
         </section>
         <section className="settings-data">
@@ -1648,7 +1663,7 @@ const Settings = () => {
           </ul>
         </section>
         <section className="settings-data">
-          <h3>{serverMode ? t('serverPrivacyTitle') : t('privacyTitle')}</h3>
+          {serverMode ? <h3>{t('serverPrivacyTitle')}</h3> : null}
           <p className="hint">{serverMode ? t('serverPrivacyBody') : t('currentKey')}</p>
           <p className="hint">{serverMode ? t('serverImportNote') : t('importMergeNote')}</p>
           <div className="settings-line">
@@ -1668,7 +1683,7 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('importJson')}</span>
             <label className="file-button">
-              {t('importJson')}
+              {t('importAct')}
               <input
                 data-testid="import-json"
                 type="file"
@@ -1684,7 +1699,7 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('importZip')}</span>
             <label className="file-button">
-              {t('importZip')}
+              {t('importAct')}
               <input
                 data-testid="import-zip"
                 type="file"

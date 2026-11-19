@@ -474,6 +474,9 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 }
 .topbar h2 { margin: 0; font-size: 16px; font-weight: 560; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage:not(:has(.home)) .topbar { height: 49px; }
+.stage:not(:has(.home)) .topbar { position: relative; z-index: 7; }
+.stage:not(:has(.home)) .topbar > :not(.chat-title) { position: relative; z-index: 1; }
+.menu-mobile, .top-actions { position: relative; z-index: 1; }
 .stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 1; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; align-items: center; height: 22px; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; }
 body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: #f2f3f5; }
 @media (max-width: 767px) {
@@ -636,7 +639,7 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .code-sticky {
   position: sticky;
   top: 0;
-  z-index: 6;
+  z-index: 1;
   height: 40px;
   background: var(--dsw-alias-bg-base);
   border-radius: 12px 12px 0 0;
@@ -870,7 +873,7 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
 .stage:not(:has(.home)) .composer-wrap {
   position: sticky;
   bottom: 0;
-  z-index: 2;
+  z-index: 8;
   width: min(776px, calc(100% - 48px));
   margin: auto 0 0;
   padding-top: 24px;
@@ -1399,21 +1402,42 @@ body[data-ds-dark-theme] .settings-main button:not(.chip) { background: var(--ds
   line-height: 22px;
 }
 .settings-main .settings-line .account-quiet,
-.settings-main .settings-line .account-danger {
-  height: 36px;
+.settings-main .settings-line .account-danger,
+.settings-line .file-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
   min-width: 72px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 4096px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 18px;
   background: transparent;
+  color: rgb(15, 17, 21);
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
-  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  white-space: nowrap;
 }
+body[data-ds-dark-theme] .settings-main .settings-line .account-quiet,
+body[data-ds-dark-theme] .settings-main .settings-line .account-danger,
+body[data-ds-dark-theme] .settings-line .file-button {
+  background: transparent;
+  color: rgb(15, 17, 21);
+}
+.settings-main .settings-line .account-danger { border-color: rgb(236, 19, 19); color: rgb(236, 19, 19); }
+.settings-line.account-nickname { flex-wrap: nowrap; }
+.settings-main .settings-line.account-nickname input.account-value:not([type='hidden']):not([type='file']) { min-width: 0; width: 72px; flex: 1 1 auto; }
+.settings-main .settings-line.account-nickname input.account-value.short:not([type='hidden']):not([type='file']) { flex: 0 0 36px; width: 36px; min-width: 36px; }
 .settings-main .settings-line .account-action { color: var(--dsw-alias-brand-text); }
 .settings-main .settings-line .account-danger { color: rgb(236, 19, 19); }
-.settings-line .pill-menu button, .settings-line .pill-menu > div { position: relative; display: inline-flex; align-items: center; min-width: 90px; height: 36px; padding: 0 14px; border-radius: 18px; background: rgb(241, 243, 245); cursor: pointer; }
+.settings-line .pill-menu button, .settings-line .pill-menu > div { position: relative; display: inline-flex; align-items: center; min-width: 90px; height: 36px; padding: 0 26px 0 14px; border-radius: 18px; background: rgb(241, 243, 245); cursor: pointer; }
+.settings-line .pill-menu > div svg { position: absolute; right: 8px; top: 11px; width: 14px; height: 14px; color: rgb(97, 102, 107); }
+body[data-ds-dark-theme] .settings-line .pill-menu > div,
+body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67, 69, 74); }
 .settings-line .pill-gap { width: 10px; flex: none; }
 .settings-line .pill-menu button svg { position: absolute; right: 14px; top: 11px; width: 14px; height: 14px; margin: 0; }
 .settings-line + .settings-line { box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0 0 inset; }
@@ -1461,6 +1485,8 @@ body[data-ds-dark-theme] .settings-main button:not(.chip) { background: var(--ds
 }
 .settings-main button.switch.on,
 .switch.on { background: #3964fe; }
+body[data-ds-dark-theme] .settings-main button.switch { background: #43454a; }
+body[data-ds-dark-theme] .settings-main button.switch.on { background: rgb(57, 100, 254); }
 .switch.on .knob { left: 19px; }
 .settings-main button.danger.outline,
 .settings-line button.danger {
@@ -1924,9 +1950,10 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .stage:not(:has(.home)) .topbar .top-actions > button.icon-btn svg { width: 20px; height: 20px; }
   .stage:not(:has(.home)) .chat-column { width: calc(100% - 40px); margin-top: 0; }
   .stage:not(:has(.home)) .composer-wrap {
+    z-index: 8;
     width: calc(100% - 32px);
-    padding-top: 0;
-    background: transparent;
+    padding-top: 8px;
+    background: var(--dsw-alias-bg-base);
   }
   .stage:not(:has(.home)) .composer-wrap .footnote { margin: 0; }
   .stage:not(:has(.home)) .composer {
@@ -1982,15 +2009,13 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .settings-close-word { display: none; }
   .settings-x { width: 32px; height: 32px; display: grid; place-items: center; padding: 0; }
   .settings-x svg { display: block; }
-  .theme-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .theme-cards .chip {
+  .settings-shell .theme-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .settings-shell .theme-cards button.chip {
+    width: 100%;
+    min-width: 0;
     height: 84px;
+    padding: 12px 4px;
     border-radius: 14px;
-    flex-direction: column;
-    justify-content: center;
-    background: var(--dsw-alias-bg-skeleton);
-    border-color: transparent;
-    color: var(--dsw-alias-label-primary);
   }
   .theme-cards .chip.on { background: var(--dsw-alias-bg-layer-3); border-color: var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); }
 }
@@ -2055,20 +2080,41 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     margin-inline: auto;
   }
 }
-body[data-ds-dark-theme] .landing .composer .chip,
-body[data-ds-dark-theme] .landing .composer .chip.on,
-body[data-ds-dark-theme] .landing .chip,
-body[data-ds-dark-theme] .landing .chip.on {
+body[data-ds-dark-theme] .landing {
+  color-scheme: light;
+  color: rgb(15, 17, 21);
+}
+body[data-ds-dark-theme] .landing .wordmark-name,
+body[data-ds-dark-theme] .landing .brand-name,
+body[data-ds-dark-theme] .landing .landing-title,
+body[data-ds-dark-theme] .landing .landing-app { color: rgb(15, 17, 21); }
+body[data-ds-dark-theme] .landing .mark,
+body[data-ds-dark-theme] .landing .mark .ink { color: rgb(15, 17, 21); fill: rgb(15, 17, 21); }
+body[data-ds-dark-theme] .landing .composer,
+body[data-ds-dark-theme] .landing .key-card,
+body[data-ds-dark-theme] .landing .key-field input {
   background: #fff;
-  color: #0f1115;
-  border: 1px solid rgba(15, 17, 21, 0.08);
+  color: rgb(15, 17, 21);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+body[data-ds-dark-theme] .landing .composer .chip:not(.on) {
+  background: #fff;
+  color: rgb(15, 17, 21);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+body[data-ds-dark-theme] .landing .composer .chip.on,
+body[data-ds-dark-theme] .landing .chip.on {
+  background: rgb(237, 243, 254);
+  color: rgb(57, 100, 254);
+  border: 1px solid rgb(183, 200, 254);
 }
 body[data-ds-dark-theme] .landing .lang {
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(28, 36, 48, 0.08);
+  background: rgb(241, 243, 245);
+  border-color: rgba(0, 0, 0, 0.1);
 }
-body[data-ds-dark-theme] .landing .lang button { color: #5c6570; background: transparent; }
-body[data-ds-dark-theme] .landing .lang button.on { background: #fff; color: #1c2430; }
+body[data-ds-dark-theme] .landing .lang button,
+body[data-ds-dark-theme] .landing .lang button.on { color: rgb(15, 17, 21); background: transparent; }
+body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
