@@ -68,7 +68,6 @@ const ICON_GLYPH: Record<string, GlyphName> = {
   'M12 19V5M6 11l6-6 6 6': 'send',
   'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3': 'search',
   'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18': 'sidebar',
-  'M6 6l12 12M18 6 6 18': 'close',
   'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8': 'newChat',
   'M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01': 'multi',
   'M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z': 'pin',
@@ -86,12 +85,12 @@ const ICON_GLYPH: Record<string, GlyphName> = {
   'M6 4h9l3 3v13H6z': 'attach',
   'M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8': 'attach',
 }
-const Icon = ({ d, size = 16 }: { d: string; size?: number; stroke?: number }) => {
+const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => {
   const name = ICON_GLYPH[d]
   if (name) return <Glyph name={name} size={size} />
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={1.7} aria-hidden="true">
-      <path d={d} />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke ?? (size >= 20 ? 2 : 1.7)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} fill="none" />
     </svg>
   )
 }
