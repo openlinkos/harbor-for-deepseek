@@ -168,6 +168,8 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
       <pre className={long && !expanded ? 'collapsed' : ''}>
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
+      <svg className="code-corner" width="12" height="12" aria-hidden="true" />
+      <svg className="code-corner end" width="12" height="12" aria-hidden="true" />
       {long ? (
         <button type="button" className="code-fold" onClick={() => setExpanded((open) => !open)}>
           {expanded ? label('收起', 'Collapse') : label('展开', 'Expand')}

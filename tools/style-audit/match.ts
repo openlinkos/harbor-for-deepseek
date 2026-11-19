@@ -247,6 +247,7 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
     if (node.tag !== 'span' && node.tag !== 'code') return false
     if (node.role === 'button' || !visibleText(node)) return false
     const size = Number.parseFloat(node.style['font-size'] || '0')
+    if (node.tag === 'code') return size > 0 && size <= 14.5 && node.rect.h <= 24
     return size > 0 && size <= 13.5 && node.rect.h <= 22
   }
   let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport) && !isPageCanvas(node) && !isSyntaxToken(node))

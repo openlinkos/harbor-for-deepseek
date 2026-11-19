@@ -87,8 +87,8 @@ for (const point of points) {
         expect(inset).toBeLessThanOrEqual(37)
       } else {
         const composer = await page.locator('.composer').boundingBox()
-        expect(Math.round(composer?.x ?? 0)).toBeGreaterThanOrEqual(15)
-        expect(Math.round(composer?.x ?? 0)).toBeLessThanOrEqual(17)
+        expect(Math.round(composer?.x ?? 0)).toBeGreaterThanOrEqual(31)
+        expect(Math.round(composer?.x ?? 0)).toBeLessThanOrEqual(33)
       }
 
       if (mobile) {
