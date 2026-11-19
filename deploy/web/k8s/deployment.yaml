@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: web
-          image: ghcr.io/openlinkos/harbor-web:latest
+          image: ghcr.io/openlinkos/deepapi-web:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

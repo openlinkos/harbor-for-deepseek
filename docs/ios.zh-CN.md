@@ -1,6 +1,6 @@
 # iOS
 
-iOS 上的 Harbor 和 Android 是同一个 Capacitor 壳（`org.linkos.harbor`）。默认仍是设备上的 Key。不填写你自己的 Harbor 服务器时，对话直接发往 `https://api.deepseek.com`。服务器地址、bearer 令牌和按需同步与 Android 相同。见 [android.zh-CN.md](android.zh-CN.md)。
+iOS 上的 DeepAPI 和 Android 是同一个 Capacitor 壳（`org.linkos.harbor`）。默认仍是设备上的 Key。不填写你自己的 DeepAPI 服务器时，对话直接发往 `https://api.deepseek.com`。服务器地址、bearer 令牌和按需同步与 Android 相同。见 [android.zh-CN.md](android.zh-CN.md)。
 
 iOS 壳里的页面来源是 `capacitor://localhost`。服务器的默认跨域名单包含它。管理员可以修改这份名单。
 
@@ -22,7 +22,7 @@ App Transport Security 只允许 HTTPS（`NSAllowsArbitraryLoads` 为 false）�
 pnpm install
 pnpm build
 node scripts/prepare-mobile.mjs
-pnpm --filter @harbor/mobile exec cap sync ios
+pnpm --filter @deepapi/mobile exec cap sync ios
 cd apps/mobile/ios/App
 xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug \
   -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \

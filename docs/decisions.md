@@ -2,7 +2,7 @@
 
 The design notes and the ecosystem notes disagree in a few places. The ecosystem notes win on naming. Other differences are implementation choices for M1.
 
-1. **Name and host.** The interface says Harbor for DeepSeek. Launcher labels stay Harbor where the full name does not fit. The public host in the docs is `https://hfd.linkos.org`, not `harbor.linkos.org`.
+1. **Name and host.** The interface says DeepAPI. The launcher label is DeepAPI. The public host is `https://deepapi.linkos.org`. `https://hfd.linkos.org` redirects there and keeps the path and query.
 2. **chat-demo.** The app is a new React interface, not a fork of the chat-demo UI. The Messages API behavior and the v3 ZIP layout follow the public API and the archive documented by chat-demo `5d5dd754`. `NOTICE` carries that project's MIT license and copyright. Voice is absent. The system prompt does not say the assistant was created by DeepSeek.
 3. **safety_check.** Default is `high`, including on a public static host. Settings can select `low`, with a warning. The design notes left the default open; the ecosystem notes require `high` for a public site.
 4. **Server and the native shells.** The self-hosted server, the Android shell, and the iOS shell are in the tree. iOS CI builds an unsigned simulator app. TestFlight is documented and not automated.

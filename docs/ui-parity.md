@@ -1,6 +1,6 @@
 # UI parity
 
-Sizes and motion come from `official-dump/home_files/main.dc093a796f.css`. Brand stays the Harbor mark, the “Harbor for DeepSeek” wordmark, and accent `#3964fe` (`--dsw-static-deepseek-500`). No whale, no DeepSeek wordmark font.
+Sizes and motion come from `official-dump/home_files/main.dc093a796f.css`. Brand stays the Haven mark, the “DeepAPI” wordmark, and accent `#3964fe` (`--dsw-static-deepseek-500`). No whale, no DeepSeek wordmark font.
 
 Side-by-side frames for the logged-in stills are in `docs/parity/compare/`. Ours are `docs/parity/ours/<state>.png`. Behavior details follow `official-dump/behavior-spec.md`: sidebar 261px and a 0.3s collapse, Ctrl+J on 开启新对话, inline user edit, `n / m` beside the six actions, a 反馈 dialog, 朗读 busy state, code header 复制, mermaid 下载 SVG/PNG, and 已选择 N 个对话. Mobile, offline, and the stop aftermath use the same tokens where the spec says the live site was not observed.
 

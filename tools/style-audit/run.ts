@@ -158,7 +158,7 @@ const install = async (page: Page) => {
 
 const unlock = async (page: Page) => {
   const narrow = (page.viewportSize()?.width || 1440) < 500
-  await page.addInitScript((flag) => sessionStorage.setItem('harbor-audit-greeting', flag ? 'welcomeBack' : 'welcomeAlt'), narrow)
+  await page.addInitScript((flag) => sessionStorage.setItem('deepapi-audit-greeting', flag ? 'welcomeBack' : 'welcomeAlt'), narrow)
   await page.goto(`${base}/`)
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-ack').check()
@@ -247,7 +247,7 @@ const states: StateSpec[] = [
       'Wait until the returning greeting is visible and the composer is empty.',
     ],
     run: async (page, mobile) => {
-      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
+      await page.addInitScript(() => sessionStorage.setItem('deepapi-audit-greeting', 'welcomeAlt'))
       arm('ok')
       await unlock(page)
       await send(page, '你好')
@@ -328,7 +328,7 @@ const states: StateSpec[] = [
     id: 'search-dialog', rows: [34, 60], viewports: all, official: true,
     steps: ['On the home screen, press Ctrl+K (⌘K on macOS). Leave the search dialog open. Do not type a query.'],
     run: async (page, mobile) => {
-      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
+      await page.addInitScript(() => sessionStorage.setItem('deepapi-audit-greeting', 'welcomeAlt'))
       arm('ok')
       await unlock(page)
       if (!mobile) {
@@ -616,9 +616,9 @@ const writeNeeded = (rows: Array<{ id: string; viewport: string; count: number; 
 }
 
 const ensureServer = async () => {
-  const build = spawnSync('pnpm', ['--filter', '@harbor/web', 'build'], { cwd: root, stdio: 'inherit' })
+  const build = spawnSync('pnpm', ['--filter', '@deepapi/web', 'build'], { cwd: root, stdio: 'inherit' })
   if (build.status !== 0) throw new Error('web build failed')
-  const child = spawn('pnpm', ['--filter', '@harbor/web', 'exec', 'vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
+  const child = spawn('pnpm', ['--filter', '@deepapi/web', 'exec', 'vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
     cwd: root,
     stdio: 'inherit',
     detached: true,

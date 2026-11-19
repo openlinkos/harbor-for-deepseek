@@ -1,16 +1,46 @@
 export type RemoteSession = { base: string; token: string; username: string }
 
-const openStore = () =>
+const DB = 'deepapi-native'
+const LEGACY = 'harbor-native'
+
+const named = async () => {
+  if (typeof indexedDB.databases !== 'function') return [] as string[]
+  const rows = await indexedDB.databases()
+  return rows.map((row) => row.name).filter((name): name is string => Boolean(name))
+}
+
+const openNamed = (name: string) =>
   new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open('harbor-native', 1)
+    const request = indexedDB.open(name, 1)
     request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains('kv')) {
-        request.result.createObjectStore('kv')
-      }
+      if (!request.result.objectStoreNames.contains('kv')) request.result.createObjectStore('kv')
     }
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
   })
+
+const openStore = async () => {
+  const names = await named()
+  if (names.includes(LEGACY) && !names.includes(DB)) {
+    const source = await openNamed(LEGACY)
+    const target = await openNamed(DB)
+    const value = await new Promise<RemoteSession | undefined>((resolve, reject) => {
+      const request = source.transaction('kv').objectStore('kv').get('remote')
+      request.onsuccess = () => resolve(request.result as RemoteSession | undefined)
+      request.onerror = () => reject(request.error)
+    })
+    if (value) {
+      await new Promise<void>((resolve, reject) => {
+        const request = target.transaction('kv', 'readwrite').objectStore('kv').put(value, 'remote')
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
+    }
+    source.close()
+    target.close()
+  }
+  return openNamed(DB)
+}
 
 export const readRemoteSession = async (): Promise<RemoteSession | null> => {
   const db = await openStore()

@@ -1,8 +1,8 @@
 # Android
 
-Android 上的 Harbor 是同一个网页，装在 Capacitor 壳里（`org.linkos.harbor`）。默认仍是自带 Key：Key 和对话留在设备上，导出和导入走系统分享面板，对话请求直接发往 `https://api.deepseek.com`。
+Android 上的 DeepAPI 是同一个网页，装在 Capacitor 壳里（`org.linkos.harbor`）。默认仍是自带 Key：Key 和对话留在设备上，导出和导入走系统分享面板，对话请求直接发往 `https://api.deepseek.com`。
 
-公开站 `https://hfd.linkos.org` 没有改。它的内容安全策略仍然只允许连接自己和 `https://api.deepseek.com`。APK 用的是这份网站的副本（`apps/mobile/www`），副本的 `connect-src` 额外允许 `https:`，这样应用里才能填写你自己的 Harbor 地址。Cloudflare Pages 不会发布这个副本。
+公开站 `https://deepapi.linkos.org` 没有改。它的内容安全策略仍然只允许连接自己和 `https://api.deepseek.com`。APK 用的是这份网站的副本（`apps/mobile/www`），副本的 `connect-src` 额外允许 `https:`，这样应用里才能填写你自己的 DeepAPI 地址。Cloudflare Pages 不会发布这个副本。
 
 ## 服务器模式
 
@@ -26,7 +26,7 @@ Android 上的 Harbor 是同一个网页，装在 Capacitor 壳里（`org.linkos
 pnpm install
 pnpm build
 node scripts/prepare-mobile.mjs --lan
-pnpm --filter @harbor/mobile exec cap sync android
+pnpm --filter @deepapi/mobile exec cap sync android
 cd apps/mobile/android && ./gradlew assembleDebug
 ```
 

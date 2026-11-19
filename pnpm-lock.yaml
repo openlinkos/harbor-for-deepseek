@@ -51,16 +51,16 @@ importers:
 
   apps/server:
     dependencies:
-      '@harbor/api-client':
+      '@deepapi/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@harbor/pricing':
+      '@deepapi/pricing':
         specifier: workspace:*
         version: link:../../packages/pricing
-      '@harbor/sse':
+      '@deepapi/sse':
         specifier: workspace:*
         version: link:../../packages/sse
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../../packages/types
       '@hono/node-server':
@@ -109,28 +109,28 @@ importers:
       '@fontsource/inter':
         specifier: 5.2.5
         version: 5.2.5
-      '@harbor/api-client':
+      '@deepapi/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@harbor/archive-native':
+      '@deepapi/archive-native':
         specifier: workspace:*
         version: link:../../packages/archive-native
-      '@harbor/archive-v3':
+      '@deepapi/archive-v3':
         specifier: workspace:*
         version: link:../../packages/archive-v3
-      '@harbor/i18n':
+      '@deepapi/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@harbor/pricing':
+      '@deepapi/pricing':
         specifier: workspace:*
         version: link:../../packages/pricing
-      '@harbor/sse':
+      '@deepapi/sse':
         specifier: workspace:*
         version: link:../../packages/sse
-      '@harbor/storage':
+      '@deepapi/storage':
         specifier: workspace:*
         version: link:../../packages/storage
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../../packages/types
       highlight.js:
@@ -191,10 +191,10 @@ importers:
 
   packages/api-client:
     dependencies:
-      '@harbor/sse':
+      '@deepapi/sse':
         specifier: workspace:*
         version: link:../sse
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -207,7 +207,7 @@ importers:
 
   packages/archive-native:
     dependencies:
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -220,7 +220,7 @@ importers:
 
   packages/archive-v3:
     dependencies:
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
       fflate:
@@ -245,7 +245,7 @@ importers:
 
   packages/pricing:
     dependencies:
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -258,7 +258,7 @@ importers:
 
   packages/sse:
     dependencies:
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:
@@ -271,7 +271,7 @@ importers:
 
   packages/storage:
     dependencies:
-      '@harbor/types':
+      '@deepapi/types':
         specifier: workspace:*
         version: link:../types
       idb:

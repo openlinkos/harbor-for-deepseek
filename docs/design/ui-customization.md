@@ -68,7 +68,7 @@
 | 名字 | 现在的节点 | 可否被界面包改 |
 | --- | --- | --- |
 | `sidebar` | `aside.sidebar` | 可以。宽度只在宽于 767px 时生效 |
-| `sidebar.brand` | `.brand-name` | 可以改颜色和间距。文字「Harbor for DeepSeek」保持原样 |
+| `sidebar.brand` | `.brand-name` | 可以改颜色和间距。文字「DeepAPI」保持原样 |
 | `sidebar.new-chat` | `.new-chat` | 可以 |
 | `sidebar.list` | `.side-scroll` | 可以 |
 | `sidebar.user` | `.user-bar` | 可以 |
@@ -264,8 +264,8 @@
 
 ## 和分享、自托管的边界
 
-界面包可以导出成文件，也可以经 [分享服务](share-service.md) 发出去。分享是另一次明确操作。已决定：聊天页的 `connect-src` 会写上 `https://hfd.linkos.io`，但只有用户确认分享之后才向该域名发请求。改界面的请求仍只去 `https://api.deepseek.com`。
+界面包可以导出成文件，也可以经 [分享服务](share-service.md) 发出去。分享是另一次明确操作。已决定：聊天页的 `connect-src` 会写上 `https://deepapi.linkos.io`，但只有用户确认分享之后才向该域名发请求。改界面的请求仍只去 `https://api.deepseek.com`。
 
 自托管服务器（`apps/server`，Postgres，邀请账号，Key 池）不保存、不同步界面包。服务器模式和本地模式用同一套浏览器存储。换浏览器就重新导入，这和今天「本地模式的对话不自动离开这台设备」一致。
 
-公开站 `hfd.linkos.org` 继续只发静态文件。界面包不经过它。
+公开站 `deepapi.linkos.org` 继续只发静态文件。界面包不经过它。

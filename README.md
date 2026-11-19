@@ -1,22 +1,22 @@
-# Harbor for DeepSeek
+# DeepAPI
 
 [中文](README.zh-CN.md)
 
-![Harbor for DeepSeek](brand/logo-128.png)
+![DeepAPI](brand/logo-128.png)
 
-Harbor for DeepSeek is an open-source (MIT) chat client for the [DeepSeek API](https://platform.deepseek.com/). You bring your own key. The key and the conversations stay in this browser. The page is static: it does not send them to Harbor for DeepSeek, and `https://hfd.linkos.org` does not run a chat backend.
+DeepAPI is an open-source (MIT) chat client for the [DeepSeek API](https://platform.deepseek.com/). You bring your own key. The key and the conversations stay in this browser. The page is static: it does not send them to DeepAPI, and `https://deepapi.linkos.org` does not run a chat backend.
 
-![Harbor, with reasoning open](docs/screenshots/03-reasoning.png)
+![DeepAPI, with reasoning open](docs/screenshots/03-reasoning.png)
 
 ## Two modes
 
-**Lightweight.** Open [hfd.linkos.org](https://hfd.linkos.org), or build the static page yourself. The key and the conversations stay on this device. You can export and import them. There is no server in this mode.
+**Lightweight.** Open [deepapi.linkos.org](https://deepapi.linkos.org), or build the static page yourself. The key and the conversations stay on this device. You can export and import them. There is no server in this mode.
 
 **Server.** Optional. `docker compose up` starts PostgreSQL and one app container you run yourself. An admin adds a pool of API keys, sees balance, and invites accounts. People who log in there can sync chats across devices. Details: [docs/self-hosting.md](docs/self-hosting.md).
 
 ## Add a key
 
-1. Open <https://hfd.linkos.org>.
+1. Open <https://deepapi.linkos.org>.
 2. Create a key at <https://platform.deepseek.com/api_keys>. A dedicated key with a spending limit is the practical choice.
 3. Paste it, confirm the notice on the page, and save it on this device.
 4. Send a message. The browser calls `https://api.deepseek.com` directly.
@@ -45,7 +45,7 @@ A self-hosted server is described in [docs/self-hosting.md](docs/self-hosting.md
 
 A key in a browser can be read by a malicious extension or by a script injection. The platform terms say not to put a key in client-side code. Use a dedicated key with a spending limit if you use the public page. Details: [SECURITY.md](SECURITY.md).
 
-Messages are sent to DeepSeek, which generates the reply. Harbor does not file or label on your behalf.
+Messages are sent to DeepSeek, which generates the reply. DeepAPI does not file or label on your behalf.
 
 ## Quick start
 
@@ -67,11 +67,11 @@ Deployment of the static site, including Cloudflare Pages: [docs/deploy.md](docs
 
 ## Android
 
-The app is the same interface. Chat still goes to `https://api.deepseek.com` unless you type a Harbor server you run and log in. Export and import use the share sheet. Pull requests build a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets exist. Details: [docs/android.md](docs/android.md). The iOS shell is the same app. Pull requests build an unsigned simulator app. TestFlight is documented and is not signed in CI: [docs/ios.md](docs/ios.md).
+The app is the same interface. Chat still goes to `https://api.deepseek.com` unless you type a DeepAPI server you run and log in. Export and import use the share sheet. Pull requests build a debug APK. A `v*` tag attaches an APK to the GitHub Release, signed only when the keystore secrets exist. Details: [docs/android.md](docs/android.md). The iOS shell is the same app. Pull requests build an unsigned simulator app. TestFlight is documented and is not signed in CI: [docs/ios.md](docs/ios.md).
 
 ## Self-hosting
 
-Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD`, `KEY_ENCRYPTION_SECRET`, and the first admin. `docker compose up -d` then starts Postgres and one app container from `ghcr.io/openlinkos/harbor-for-deepseek`. The admin adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details: [docs/self-hosting.md](docs/self-hosting.md).
+Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD`, `KEY_ENCRYPTION_SECRET`, and the first admin. `docker compose up -d` then starts Postgres and one app container from `ghcr.io/openlinkos/deepapi`. The admin adds API keys, invite codes, and per-person daily quotas. Friends log in on that same address. Details: [docs/self-hosting.md](docs/self-hosting.md).
 
 If the official API later stops sending CORS headers, the static page will stop working. A proxy is not included. Do not add one on the public host without saying so.
 
@@ -92,12 +92,12 @@ The interface is new. Protocol behavior and the v3 archive follow the public API
 
 [MIT](LICENSE) © 2026 OpenLinkOS
 
-`pnpm build` copies [LICENSE](LICENSE) and [NOTICE](NOTICE) into `apps/web/dist`. Protocol behavior and the v3 archive follow the public API and the layout documented by [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo) (MIT, `Copyright (c) 2026 DeepSeek`). That copyright and license are in NOTICE. Harbor for DeepSeek does not use that project's name, logo, or wordmark. MIT does not grant trademark rights.
+`pnpm build` copies [LICENSE](LICENSE) and [NOTICE](NOTICE) into `apps/web/dist`. Protocol behavior and the v3 archive follow the public API and the layout documented by [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo) (MIT, `Copyright (c) 2026 DeepSeek`). That copyright and license are in NOTICE. DeepAPI does not use that project's name, logo, or wordmark. MIT does not grant trademark rights.
 
 ---
 
-Harbor for DeepSeek · Open source by [OpenLinkOS](https://openlinkos.com/)
+DeepAPI · Open source by [OpenLinkOS](https://openlinkos.com/)
 
-[GitHub](https://github.com/openlinkos/harbor-for-deepseek) · [License](LICENSE) · [OpenLinkOS](https://openlinkos.com/)
+[GitHub](https://github.com/openlinkos/deepapi) · [License](LICENSE) · [OpenLinkOS](https://openlinkos.com/)
 
 DeepSeek is a trademark of its owner. This project is not affiliated with DeepSeek.

@@ -137,7 +137,7 @@ const isWordmark = (node: StyleNode, side: 'official' | 'ours') => {
   if (node.rect.y > 140 || node.rect.x > 280) return false
   const text = accessibleName(node)
   if (side === 'official') return /deepseek/i.test(text) || (node.tag === 'svg' && node.rect.w > 80 && node.rect.y < 50)
-  return /harbor/i.test(text) || /for deepseek/i.test(text)
+  return /deepapi/i.test(text)
 }
 
 const isLogo = (node: StyleNode) =>

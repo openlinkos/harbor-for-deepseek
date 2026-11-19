@@ -1,4 +1,4 @@
-import { CONTENT_SECURITY_POLICY as SERVER_CSP } from '@harbor/api-client'
+import { CONTENT_SECURITY_POLICY as SERVER_CSP } from '@deepapi/api-client'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { CONTENT_SECURITY_POLICY } from './csp.js'

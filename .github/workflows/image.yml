@@ -32,6 +32,9 @@ jobs:
           provenance: false
           sbom: false
           tags: |
+            ghcr.io/openlinkos/deepapi:latest
+            ghcr.io/openlinkos/deepapi:${{ github.sha }}
+            ghcr.io/openlinkos/deepapi:${{ github.ref_name }}
             ghcr.io/openlinkos/harbor-for-deepseek:latest
             ghcr.io/openlinkos/harbor-for-deepseek:${{ github.sha }}
             ghcr.io/openlinkos/harbor-for-deepseek:${{ github.ref_name }}

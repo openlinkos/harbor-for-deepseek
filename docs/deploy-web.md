@@ -1,11 +1,11 @@
 # Deploy the public static site
 
-This image is only the lightweight web app for `https://hfd.linkos.org`. It does not include the self-hosted server. That image stays in `deploy/Dockerfile`.
+This image is only the lightweight web app for `https://deepapi.linkos.org`. It does not include the self-hosted server. That image stays in `deploy/Dockerfile`. `https://hfd.linkos.org` answers 301 to `https://deepapi.linkos.org` and keeps the path and query.
 
-The package is `ghcr.io/openlinkos/harbor-web`. GitHub creates it as private on the first push. An owner should make it public so clusters can pull it without a token: open the package **harbor-web** under the `openlinkos` org, Package settings, Change visibility, Public. A token with `packages: write` can also do:
+The package is `ghcr.io/openlinkos/deepapi-web`. The same build is also pushed as `ghcr.io/openlinkos/harbor-web` for one release. GitHub creates a package as private on the first push. An owner should make **deepapi-web** public so clusters can pull it without a token. A token with `packages: write` can also do:
 
 ```bash
-gh api --method PATCH /orgs/openlinkos/packages/container/harbor-web -f visibility=public
+gh api --method PATCH /orgs/openlinkos/packages/container/deepapi-web -f visibility=public
 ```
 
 ## Build
@@ -54,10 +54,10 @@ If the repository secret `HARBOR_KUBECONFIG` is set (raw kubeconfig text, or bas
 
 ## DNS and TLS
 
-`hfd.linkos.org` is a Cloudflare DNS-only CNAME. The record is not proxied:
+`deepapi.linkos.org` is a Cloudflare DNS-only CNAME. The record is not proxied:
 
 ```text
-hfd.linkos.org.  CNAME  70c9d096.quic.ing.
+deepapi.linkos.org.  CNAME  70c9d096.quic.ing.
 ```
 
 `70c9d096.quic.ing` is the GoEdge CDN (`cdn-uspre.quic.ing`). TLS terminates at GoEdge. GoEdge manages the certificate and renews it. Cloudflare does not cache this host and does not see the HTTP requests.

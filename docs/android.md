@@ -1,8 +1,8 @@
 # Android
 
-Harbor on Android is the same web app inside a Capacitor shell (`org.linkos.harbor`). The default is still bring-your-own-key: the key and the chats stay on the device, export and import use the system share sheet, and chat requests go straight to `https://api.deepseek.com`.
+DeepAPI on Android is the same web app inside a Capacitor shell (`org.linkos.harbor`). The default is still bring-your-own-key: the key and the chats stay on the device, export and import use the system share sheet, and chat requests go straight to `https://api.deepseek.com`.
 
-The public site at `https://hfd.linkos.org` is unchanged. Its Content-Security-Policy still allows connections only to itself and `https://api.deepseek.com`. The APK is built from a copy of that site (`apps/mobile/www`) whose `connect-src` also allows `https:` so the app can call a Harbor server you type in. That copy is not what Cloudflare Pages serves.
+The public site at `https://deepapi.linkos.org` is unchanged. Its Content-Security-Policy still allows connections only to itself and `https://api.deepseek.com`. The APK is built from a copy of that site (`apps/mobile/www`) whose `connect-src` also allows `https:` so the app can call a DeepAPI server you type in. That copy is not what Cloudflare Pages serves.
 
 ## Server mode
 
@@ -26,7 +26,7 @@ The debug APK used in pull-request CI already allows cleartext to `localhost`, `
 pnpm install
 pnpm build
 node scripts/prepare-mobile.mjs --lan
-pnpm --filter @harbor/mobile exec cap sync android
+pnpm --filter @deepapi/mobile exec cap sync android
 cd apps/mobile/android && ./gradlew assembleDebug
 ```
 

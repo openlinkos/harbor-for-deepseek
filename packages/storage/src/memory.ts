@@ -1,5 +1,5 @@
-import { defaultSettings } from '@harbor/types'
-import type { Conversation, Message, SealedSecret, Settings, Tombstone } from '@harbor/types'
+import { defaultSettings } from '@deepapi/types'
+import type { Conversation, Message, SealedSecret, Settings, Tombstone } from '@deepapi/types'
 
 export type Repository = {
   loadSettings(): Promise<Settings>

@@ -1,6 +1,6 @@
 # iOS
 
-Harbor on iOS is the same Capacitor shell as Android (`org.linkos.harbor`). The default is still a key on the device. Chat goes to `https://api.deepseek.com` until you type a Harbor server you run and log in. The server address, bearer token, and opt-in sync are the same as on Android. See [android.md](android.md).
+DeepAPI on iOS is the same Capacitor shell as Android (`org.linkos.harbor`). The default is still a key on the device. Chat goes to `https://api.deepseek.com` until you type a DeepAPI server you run and log in. The server address, bearer token, and opt-in sync are the same as on Android. See [android.md](android.md).
 
 The page origin inside the iOS shell is `capacitor://localhost`. That origin is on the server’s default CORS list. An admin can change the list.
 
@@ -22,7 +22,7 @@ Pull requests build an unsigned iOS Simulator app on a macOS runner. The job doe
 pnpm install
 pnpm build
 node scripts/prepare-mobile.mjs
-pnpm --filter @harbor/mobile exec cap sync ios
+pnpm --filter @deepapi/mobile exec cap sync ios
 cd apps/mobile/ios/App
 xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug \
   -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \

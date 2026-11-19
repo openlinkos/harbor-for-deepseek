@@ -1,4 +1,4 @@
-# 自托管 Harbor for DeepSeek
+# 自托管 DeepAPI
 
 服务器模式把 API Key 放在这台机器上。本地模式只留在浏览器里，不访问这台服务器。
 
@@ -101,7 +101,7 @@ Compose 项目名是 `harbor`，数据库卷是 `harbor_pgdata`。改名之前�
 
 更早的 compose 把 `master.key` 和 `db-password` 写在数据卷里。这一版不读这两个文件。升级前把它们写入 `.env`：`KEY_ENCRYPTION_SECRET` 用那 32 字节的十六进制，`POSTGRES_PASSWORD` 用原来的数据库口令。
 
-镜像发布在 `ghcr.io/openlinkos/harbor-for-deepseek`，包含 `linux/amd64` 和 `linux/arm64`。
+镜像发布在 `ghcr.io/openlinkos/deepapi`，包含 `linux/amd64` 和 `linux/arm64`。
 
 ## 备份与恢复
 
@@ -114,9 +114,9 @@ docker compose exec -T db pg_dump -U harbor -d harbor -Fc > harbor.dump
 恢复：
 
 ```bash
-docker compose stop harbor
+docker compose stop deepapi
 docker compose exec -T db pg_restore -U harbor -d harbor --clean --if-exists < harbor.dump
-docker compose start harbor
+docker compose start deepapi
 ```
 
 Compose 项目名是 `harbor` 时，数据库卷名是 `harbor_pgdata`。改过项目名就用 `docker volume ls` 核对。

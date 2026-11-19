@@ -1,7 +1,7 @@
 import { reduceEvents } from './reduce.js'
 import { readStreamEvent } from './parse.js'
 import { ServerSentEventDecoder } from './decode.js'
-import type { StreamEvent } from '@harbor/types'
+import type { StreamEvent } from '@deepapi/types'
 
 /** Redacted shapes from the design notes, appendix B. No secrets. */
 

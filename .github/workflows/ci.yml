@@ -39,11 +39,11 @@ jobs:
       - run: pnpm test
       - run: pnpm scan-secrets
       - run: pnpm build
-      - run: pnpm --filter @harbor/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @deepapi/web exec playwright install --with-deps chromium
       - run: pnpm e2e
       - run: node scripts/prepare-mobile.mjs --lan
-      - run: pnpm --filter @harbor/web exec playwright test -c playwright.android.config.ts
-      - run: pnpm --filter @harbor/server build
+      - run: pnpm --filter @deepapi/web exec playwright test -c playwright.android.config.ts
+      - run: pnpm --filter @deepapi/server build
       - run: pnpm e2e:server
 
   image:
@@ -69,12 +69,12 @@ jobs:
       - name: App logs omit the key and the message
         if: always()
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.e2e.yml logs --no-color harbor > /tmp/harbor-logs.txt
-          if grep -F 'sk-mockpoolsecretvalue' /tmp/harbor-logs.txt; then
+          docker compose -f docker-compose.yml -f docker-compose.e2e.yml logs --no-color deepapi > /tmp/deepapi-logs.txt
+          if grep -F 'sk-mockpoolsecretvalue' /tmp/deepapi-logs.txt; then
             echo 'log contained the upstream key' >&2
             exit 1
           fi
-          if grep -F 'sync-check-phrase' /tmp/harbor-logs.txt; then
+          if grep -F 'sync-check-phrase' /tmp/deepapi-logs.txt; then
             echo 'log contained message text' >&2
             exit 1
           fi
@@ -129,7 +129,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs --lan
-      - run: pnpm --filter @harbor/mobile exec cap sync android
+      - run: pnpm --filter @deepapi/mobile exec cap sync android
       - name: Assemble a debug APK
         working-directory: apps/mobile/android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
@@ -153,7 +153,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs
-      - run: pnpm --filter @harbor/mobile exec cap sync ios
+      - run: pnpm --filter @deepapi/mobile exec cap sync ios
       - name: Build an unsigned simulator app
         working-directory: apps/mobile/ios/App
         run: >

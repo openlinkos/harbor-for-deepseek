@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/pricing",
+  "name": "@deepapi/pricing",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@harbor/types": "workspace:*"
+    "@deepapi/types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.6.3",

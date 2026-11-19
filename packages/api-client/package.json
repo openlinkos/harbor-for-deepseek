@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/api-client",
+  "name": "@deepapi/api-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,8 +12,8 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@harbor/sse": "workspace:*",
-    "@harbor/types": "workspace:*"
+    "@deepapi/sse": "workspace:*",
+    "@deepapi/types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.6.3",

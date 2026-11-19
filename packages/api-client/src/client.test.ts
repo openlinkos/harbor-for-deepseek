@@ -1,5 +1,5 @@
-import { eventsToSse, fileObjectFixture, thinkingEvents } from '@harbor/sse'
-import type { Message } from '@harbor/types'
+import { eventsToSse, fileObjectFixture, thinkingEvents } from '@deepapi/sse'
+import type { Message } from '@deepapi/types'
 import { describe, expect, it } from 'vitest'
 import { createClient } from './client.js'
 import { buildRequest, clampExpireSeconds, purposeForFile, toApiMessages } from './request.js'

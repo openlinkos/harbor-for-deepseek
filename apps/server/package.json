@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/server",
+  "name": "@deepapi/server",
   "version": "0.2.0",
   "private": true,
   "type": "module",
@@ -12,10 +12,10 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@harbor/api-client": "workspace:*",
-    "@harbor/pricing": "workspace:*",
-    "@harbor/sse": "workspace:*",
-    "@harbor/types": "workspace:*",
+    "@deepapi/api-client": "workspace:*",
+    "@deepapi/pricing": "workspace:*",
+    "@deepapi/sse": "workspace:*",
+    "@deepapi/types": "workspace:*",
     "@hono/node-server": "1.13.7",
     "hono": "4.6.14",
     "postgres": "3.4.5"

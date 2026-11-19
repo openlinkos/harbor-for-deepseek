@@ -39,7 +39,9 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/openlinkos/harbor-web
+          images: |
+            ghcr.io/openlinkos/deepapi-web
+            ghcr.io/openlinkos/harbor-web
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=short
@@ -84,5 +86,5 @@ jobs:
           export KUBECONFIG="$HOME/.kube/config"
           short="$(printf '%s' "$SHORT_SHA" | cut -c1-7)"
           kubectl apply -k deploy/web/k8s
-          kubectl -n harbor set image deployment/harbor-web web="ghcr.io/openlinkos/harbor-web:sha-${short}"
+          kubectl -n harbor set image deployment/harbor-web web="ghcr.io/openlinkos/deepapi-web:sha-${short}"
           kubectl -n harbor rollout status deployment/harbor-web --timeout=180s

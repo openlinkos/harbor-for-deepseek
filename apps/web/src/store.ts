@@ -1,14 +1,14 @@
-import { buildRequest, clampExpireSeconds, createClient, purposeForFile } from '@harbor/api-client'
-import { exportNative, planNativeImport, readNative } from '@harbor/archive-native'
-import { exportV3, importV3 } from '@harbor/archive-v3'
-import { estimateCost, sumUsage } from '@harbor/pricing'
-import { createDraft, reduceEvent } from '@harbor/sse'
-import { openIndexedRepository, openSecret, sealSecret } from '@harbor/storage'
+import { buildRequest, clampExpireSeconds, createClient, purposeForFile } from '@deepapi/api-client'
+import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
+import { exportV3, importV3 } from '@deepapi/archive-v3'
+import { estimateCost, sumUsage } from '@deepapi/pricing'
+import { createDraft, reduceEvent } from '@deepapi/sse'
+import { openIndexedRepository, openSecret, sealSecret } from '@deepapi/storage'
 import { isNativeApp, shareDownload } from './native.js'
 import { readRemoteSession, writeRemoteSession } from './nativeSession.js'
 import { api, clearRemoteSession, hostedPage, readRun, setCsrf, setRemoteSession, type ServerUser } from './remote.js'
 import { validateServerUrl } from './serverUrl.js'
-import type { Repository } from '@harbor/storage'
+import type { Repository } from '@deepapi/storage'
 import {
   activePath,
   childIds,
@@ -19,7 +19,7 @@ import {
   type Message,
   type Settings,
   type Usage,
-} from '@harbor/types'
+} from '@deepapi/types'
 import { create } from 'zustand'
 
 const client = createClient()
@@ -275,8 +275,8 @@ export const useHarbor = create<HarborState>((set, get) => ({
         set({ serverBase: saved.base, serverUser: { id: '', username: saved.username, role: 'member' } })
         try {
           const me = await api<{ user: ServerUser }>('/api/me')
-          set({ serverUser: me.user, serverMode: sessionStorage.getItem('harbor-mode') !== 'local' })
-          if (sessionStorage.getItem('harbor-mode') !== 'local') {
+          set({ serverUser: me.user, serverMode: sessionStorage.getItem('deepapi-mode') !== 'local' })
+          if (sessionStorage.getItem('deepapi-mode') !== 'local') {
             await loadServerChats(set)
           }
         } catch {
@@ -636,14 +636,14 @@ export const useHarbor = create<HarborState>((set, get) => ({
   async exportJson() {
     const payload = exportNative(await collect(), nowIso())
     download(
-      `harbor-${payload.exportedAt.slice(0, 10)}.json`,
+      `deepapi-${payload.exportedAt.slice(0, 10)}.json`,
       new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
     )
   },
 
   async exportZip() {
     const bytes = exportV3(await collect())
-    download(`harbor-${nowIso().slice(0, 10)}.zip`, new Blob([bytes], { type: 'application/zip' }))
+    download(`deepapi-${nowIso().slice(0, 10)}.zip`, new Blob([bytes], { type: 'application/zip' }))
   },
 
   async importJson(file, asCopy) {
@@ -672,7 +672,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       body: JSON.stringify({ username, password }),
     })
     setCsrf(result.csrf)
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ setupRequired: false, serverUser: result.user, serverMode: true, showAdmin: result.user.role === 'admin', conversations: [], messages: [], activeId: null })
   },
 
@@ -682,7 +682,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       body: JSON.stringify({ username, password }),
     })
     setCsrf(result.csrf)
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverUser: result.user, serverMode: true, showLogin: false, showAdmin: false })
     await loadServerChats(set)
   },
@@ -693,7 +693,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       body: JSON.stringify({ code, username, password }),
     })
     setCsrf(result.csrf)
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverUser: result.user, serverMode: true, showLogin: false })
     await loadServerChats(set)
   },
@@ -705,19 +705,19 @@ export const useHarbor = create<HarborState>((set, get) => ({
     if (get().native) {
       await writeRemoteSession(null)
     }
-    sessionStorage.removeItem('harbor-mode')
+    sessionStorage.removeItem('deepapi-mode')
     set({ serverUser: null, serverMode: false, serverBase: '', showAdmin: false, showLogin: get().native ? false : true })
     await reloadLocal(set)
   },
 
   async enterServerMode() {
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverMode: true })
     await loadServerChats(set)
   },
 
   async enterLocalMode() {
-    sessionStorage.setItem('harbor-mode', 'local')
+    sessionStorage.setItem('deepapi-mode', 'local')
     set({ serverMode: false, showAdmin: false })
     await reloadLocal(set)
   },
@@ -764,7 +764,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     })
     setRemoteSession(origin, result.token!)
     await writeRemoteSession({ base: origin, token: result.token!, username: result.user!.username })
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverBase: origin, serverUser: result.user!, serverMode: true, showLogin: false, native: isNativeApp() })
     await loadServerChats(set)
   },
@@ -785,7 +785,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     })
     setRemoteSession(origin, result.token!)
     await writeRemoteSession({ base: origin, token: result.token!, username: result.user!.username })
-    sessionStorage.setItem('harbor-mode', 'server')
+    sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverBase: origin, serverUser: result.user!, serverMode: true, showLogin: false, native: isNativeApp() })
     await loadServerChats(set)
   },
@@ -829,7 +829,7 @@ const applyImport = async (
   const existing = new Set((await store.listConversations()).map((item) => item.id))
   const plan = planNativeImport(
     existing,
-    { format: 'harbor', version: 1, exportedAt: nowIso(), app: 'harbor', conversations: incoming },
+    { format: 'deepapi', version: 1, exportedAt: nowIso(), app: 'deepapi', conversations: incoming },
     asCopy ? 'copy' : 'merge',
   )
   for (const conversation of plan.conversations) {
@@ -1042,7 +1042,7 @@ const probeHost = async (set: Setter, get: () => HarborState) => {
   try {
     const me = await api<{ user: ServerUser; csrf: string; quota: ServerQuota }>('/api/me')
     setCsrf(me.csrf)
-    const useServer = sessionStorage.getItem('harbor-mode') !== 'local'
+    const useServer = sessionStorage.getItem('deepapi-mode') !== 'local'
     set({ serverUser: me.user, serverMode: useServer, quota: me.quota, showAdmin: false })
     if (useServer) {
       await loadServerChats(set)

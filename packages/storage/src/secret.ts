@@ -1,4 +1,4 @@
-import type { SealedSecret } from '@harbor/types'
+import type { SealedSecret } from '@deepapi/types'
 
 /** OWASP-aligned PBKDF2-SHA-256 iteration count for a one-shot unlock. */
 export const PBKDF2_ITERATIONS = 600_000

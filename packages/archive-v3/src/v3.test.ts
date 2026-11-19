@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Conversation, Message } from '@harbor/types'
+import type { Conversation, Message } from '@deepapi/types'
 import { exportV3, importV3 } from './index.js'
 
 const sample = (): Conversation & { messages: Message[] } => ({

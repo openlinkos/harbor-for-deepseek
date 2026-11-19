@@ -1,7 +1,7 @@
-import { buildRequest, clampExpireSeconds, CONTENT_SECURITY_POLICY, DEFAULT_FILE_EXPIRE_SECONDS } from '@harbor/api-client'
-import { estimateCost } from '@harbor/pricing'
-import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@harbor/sse'
-import type { ContentBlock, Message, Usage } from '@harbor/types'
+import { buildRequest, clampExpireSeconds, CONTENT_SECURITY_POLICY, DEFAULT_FILE_EXPIRE_SECONDS } from '@deepapi/api-client'
+import { estimateCost } from '@deepapi/pricing'
+import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@deepapi/sse'
+import type { ContentBlock, Message, Usage } from '@deepapi/types'
 import { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import { createReadStream, statSync } from 'node:fs'
@@ -502,7 +502,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       }
     }
     return c.json({
-      product_name: 'Harbor for DeepSeek',
+      product_name: 'DeepAPI',
       setup_required: setupRequired,
       mode: 'server',
       bootstrap,
@@ -1666,10 +1666,10 @@ app.get('/api/admin/settings', async (c) => {
 
   const serveIndex = async (c: { html: (body: string) => Response | Promise<Response> }) => {
     if (!options.staticDir) {
-      return c.html('<!doctype html><title>Harbor for DeepSeek</title>')
+      return c.html('<!doctype html><title>DeepAPI</title>')
     }
     const html = await readFile(`${options.staticDir}/index.html`, 'utf8')
-    return c.html(html.replace('</head>', '<meta name="harbor-server" content="1"></head>'))
+    return c.html(html.replace('</head>', '<meta name="deepapi-server" content="1"></head>'))
   }
 
   app.get('/', (c) => serveIndex(c))

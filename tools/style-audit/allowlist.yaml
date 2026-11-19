@@ -11,7 +11,7 @@ exceptions:
     reason: known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.
   - id: brand-wordmark
     brand: wordmark
-    reason: brand — DeepSeek logo/wordmark maps to the Harbor wordmark.
+    reason: brand — DeepSeek logo/wordmark maps to the DeepAPI wordmark.
   - id: brand-logo
     brand: logo
     reason: brand — DeepSeek logo maps to the Harbor mark.
@@ -24,8 +24,8 @@ exceptions:
     reason: brand — chat list rows align by vertical position. Titles are local data and are not a style mismatch.
   - id: brand-wordmark-unmatched
     unmatched: ours
-    text: "Harbor|for DeepSeek"
-    reason: brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.
+    text: "DeepAPI"
+    reason: brand — the DeepAPI wordmark has no official counterpart beyond the mapped pair.
   - id: brand-footer-unmatched-ours
     unmatched: ours
     text: "本地模式|密钥与对话"
@@ -37,8 +37,8 @@ exceptions:
     reason: brand — official account email or name in the sidebar footer.
   - id: brand-terms-footer
     unmatched: ours
-    text: "contentinfo|GitHub|许可证|OpenLinkOS|openlinkos/harbor-for-de|platform.deepseek.com"
-    reason: brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.
+    text: "contentinfo|GitHub|许可证|OpenLinkOS|openlinkos/deepapi|platform.deepseek.com"
+    reason: brand — the 服务协议 tab keeps the DeepAPI footer, including the trademark note.
   - id: accent-3964fe
     property: "color|background-color|border-top-color|border-right-color|border-bottom-color|border-left-color|fill|stroke"
     ours: "#3964fe"
