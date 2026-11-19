@@ -20,11 +20,14 @@ const sse = (text, title) => [
   { type: 'message_stop' },
 ].map((event) => `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`).join('')
 
+const WIDTH = Number(process.env.W || 1920)
+const HEIGHT = Number(process.env.H || 1072)
+const VP = `${WIDTH}x${HEIGHT}`
 const browser = await chromium.launch()
 const log = []
 const runOne = async (id, theme, setup) => {
   const ctx = await browser.newContext({
-    viewport: { width: 1920, height: 1072 },
+    viewport: { width: WIDTH, height: HEIGHT },
     locale: 'zh-CN',
     bypassCSP: true,
     colorScheme: theme,
@@ -45,11 +48,11 @@ const runOne = async (id, theme, setup) => {
   })
   try {
     await setup(page)
-    await page.mouse.move(900, 400)
+    await page.mouse.move(8, 8)
     await page.waitForTimeout(400)
     await page.addScriptTag({ content: CAP })
     const data = await page.evaluate((state) => globalThis.captureStyleAudit({ label: 'ours', state, download: false }), id)
-    writeFileSync(`${OUT}/ours-${id}-${theme}-1920x1072.json`, JSON.stringify(data))
+    writeFileSync(`${OUT}/ours-${id}-${theme}-${VP}.json`, JSON.stringify(data))
     log.push(`${id} ${theme} ok els=${data.elements.length}`)
   } catch (error) {
     log.push(`${id} ${theme} FAIL ${String(error.message).split('\n')[0].slice(0, 180)}`)
@@ -89,14 +92,15 @@ const openSettings = async (page, tab) => {
   await page.waitForTimeout(200)
 }
 
-await runOne('multi-select', 'light', async (page) => {
+const themes = new Set((process.env.THEMES || 'light,dark').split(','))
+if (themes.has('light')) await runOne('multi-select', 'light', async (page) => {
   await unlock(page)
   await send(page, '你好')
   await page.getByTestId('new-chat').click()
   await send(page, '你好呀')
   await page.getByRole('button', { name: '多选' }).first().click()
 })
-await runOne('multi-select', 'dark', async (page) => {
+if (themes.has('dark')) await runOne('multi-select', 'dark', async (page) => {
   await unlock(page)
   await send(page, '你好')
   await page.getByTestId('new-chat').click()
@@ -111,10 +115,29 @@ await runOne('multi-select-checked', 'light', async (page) => {
   await page.getByRole('button', { name: '多选' }).first().click()
   await page.getByRole('checkbox').first().click()
 })
-await runOne('home-with-history', 'dark', async (page) => { await withHistory(page) })
-await runOne('answer', 'dark', async (page) => { await unlock(page); await send(page, '你好呀') })
-await runOne('user-menu', 'dark', async (page) => { await onAnswer(page); await page.getByTestId('user-menu').click() })
-await runOne('settings-general', 'dark', async (page) => { await openSettings(page) })
-await runOne('settings-account', 'dark', async (page) => { await openSettings(page, '账号管理') })
+if (themes.has('dark')) {
+  await runOne('home-with-history', 'dark', async (page) => { await withHistory(page) })
+  await runOne('answer', 'dark', async (page) => { await unlock(page); await send(page, '你好呀') })
+  await runOne('user-menu', 'dark', async (page) => { await onAnswer(page); await page.getByTestId('user-menu').click() })
+  await runOne('settings-general', 'dark', async (page) => { await openSettings(page) })
+  await runOne('settings-account', 'dark', async (page) => { await openSettings(page, '账号管理') })
+}
+if (themes.has('light')) {
+  await runOne('home-with-history', 'light', async (page) => { await withHistory(page) })
+  await runOne('answer', 'light', async (page) => { await unlock(page); await send(page, '你好呀') })
+  await runOne('user-menu', 'light', async (page) => { await withHistory(page); await page.getByTestId('user-menu').click() })
+  await runOne('settings-general', 'light', async (page) => {
+    await withHistory(page)
+    await page.getByTestId('user-menu').click()
+    await page.getByTestId('settings-open').click()
+    await page.getByRole('button', { name: '通用设置' }).waitFor()
+  })
+  await runOne('settings-account', 'light', async (page) => {
+    await withHistory(page)
+    await page.getByTestId('user-menu').click()
+    await page.getByTestId('settings-open').click()
+    await page.getByRole('button', { name: '账号管理' }).click()
+  })
+}
 await browser.close()
 console.log(log.join('\n'))

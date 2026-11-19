@@ -11,6 +11,7 @@ import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor, type HarborState } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
+import { GLYPHS, type GlyphName } from './glyphs.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -47,21 +48,53 @@ export const SiteFooter = () => {
   )
 }
 
-const FillIcon = ({ paths, size = 16 }: { paths: string[]; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16' }: { paths: readonly string[]; size?: number; viewBox?: string }) => (
+  <svg width={size} height={size} viewBox={viewBox} fill="currentColor" aria-hidden="true">
     {paths.map((d) => <path key={d.slice(0, 24)} d={d} fill="currentColor" />)}
   </svg>
 )
+const Glyph = ({ name, size = 16 }: { name: GlyphName; size?: number }) => {
+  const glyph = GLYPHS[name]
+  return <FillIcon paths={glyph.paths} viewBox={glyph.vb} size={size} />
+}
 const MORE_DOTS = [
   'M4.55146 8.00001C4.55146 8.63513 4.03659 9.15001 3.40146 9.15001C2.76634 9.15001 2.25146 8.63513 2.25146 8.00001C2.25146 7.36488 2.76634 6.85001 3.40146 6.85001C4.03659 6.85001 4.55146 7.36488 4.55146 8.00001Z',
   'M9.1476 8.00001C9.1476 8.63513 8.63273 9.15001 7.9976 9.15001C7.36248 9.15001 6.8476 8.63513 6.8476 8.00001C6.8476 7.36488 7.36248 6.85001 7.9976 6.85001C8.63273 6.85001 9.1476 7.36488 9.1476 8.00001Z',
   'M13.7486 8.00001C13.7486 8.63513 13.2338 9.15001 12.5986 9.15001C11.9635 9.15001 11.4486 8.63513 11.4486 8.00001C11.4486 7.36488 11.9635 6.85001 12.5986 6.85001C13.2338 6.85001 13.7486 7.36488 13.7486 8.00001Z',
 ]
-const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke ?? (size >= 20 ? 2 : 1.7)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d={d} />
-  </svg>
-)
+const ICON_GLYPH: Record<string, GlyphName> = {
+  'M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2': 'thinking',
+  'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18': 'search',
+  'M12 19V5M6 11l6-6 6 6': 'send',
+  'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3': 'search',
+  'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18': 'sidebar',
+  'M6 6l12 12M18 6 6 18': 'close',
+  'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8': 'newChat',
+  'M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01': 'multi',
+  'M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z': 'pin',
+  'M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13': 'trash',
+  'M6 9l6 6 6-6': 'chevron',
+  'M9 6l6 6-6 6': 'chevron',
+  'M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4': 'pencil',
+  'M4 20h4l10-10-4-4L4 16v4zM13 7l4 4': 'pencil',
+  'M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11': 'copy',
+  'M4 12v8h16v-8M12 16V4M8 8l4-4 4 4': 'share',
+  'M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3': 'share',
+  'M7 17 17 7M9 7h8v8': 'share',
+  'M12 5v14M5 12h14': 'plus',
+  'M8 12h8M12 8v8': 'plus',
+  'M6 4h9l3 3v13H6z': 'attach',
+  'M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8': 'attach',
+}
+const Icon = ({ d, size = 16 }: { d: string; size?: number; stroke?: number }) => {
+  const name = ICON_GLYPH[d]
+  if (name) return <Glyph name={name} size={size} />
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={1.7} aria-hidden="true">
+      <path d={d} />
+    </svg>
+  )
+}
 
 const focusComposer = () => {
   window.requestAnimationFrame(() => {
@@ -173,7 +206,7 @@ export const KeyGate = () => {
           <Wordmark />
         </span>
         <span className="landing-tools">
-          <a className="landing-app" href="https://github.com/openlinkos/deepapi/releases">{t('downloadApp')}</a>
+          <a className="landing-app" href="https://github.com/openlinkos/deepapi/releases">{t('getApp')}</a>
           <LanguageSwitch locale={locale} onChange={setLocale} />
         </span>
       </header>
@@ -219,29 +252,18 @@ export const KeyGate = () => {
               />
               <div className="composer-tools">
                 <div className="chips">
-                  <button type="button" className={think ? 'chip on' : 'chip'} onClick={() => setThink((value) => !value)}>
+                  <div className={think ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => setThink((value) => !value)}>
                     <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
-                  </button>
-                  <button type="button" className={search ? 'chip on' : 'chip'} onClick={() => setSearch((value) => !value)}>
+                  </div>
+                  <div className={search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => setSearch((value) => !value)}>
                     <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
-                  </button>
+                  </div>
                 </div>
                 <button className={`send ${draft.trim() ? 'ready' : ''}`} data-testid="landing-send" type="submit" aria-label={t('send')}>
                   <Icon d="M12 19V5M6 11l6-6 6 6" />
                 </button>
               </div>
             </form>
-            <div className="landing-pills">
-              <button type="button" className="landing-pill" data-testid="start-chat" onClick={() => setKeyOpen(true)}>
-                <Icon d="M8 12h8M12 8v8" /> {t('startChat')}
-              </button>
-              <a className="landing-pill" href={PLATFORM} target="_blank" rel="noreferrer noopener">
-                <Icon d="M8 7h8v10H8zM10 7V5h4v2" /> {t('apiPlatform')}
-              </a>
-              <a className="landing-pill" href={REPO} target="_blank" rel="noreferrer noopener">
-                <Icon d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 00-.9-2.6c3-.3 6.1-1.5 6.1-6.6a4.7 4.7 0 00-1.3-3.3 4.4 4.4 0 00-.1-3.2s-1-.3-3.3 1.2a11.4 11.4 0 00-6 0C6.2 1.1 5.2 1.4 5.2 1.4a4.4 4.4 0 00-.1 3.2 4.7 4.7 0 00-1.3 3.3c0 5.1 3.1 6.3 6.1 6.6a3.4 3.4 0 00-.9 2.6V21" /> {t('github')}
-              </a>
-            </div>
             {hosted ? (
               <button className="landing-pill" type="button" data-testid="open-login" onClick={openLogin}>
                 {t('loginTitle')}
@@ -346,7 +368,7 @@ const VOICES = ['贝壳', '白浪', '海星', '暗潮']
 
 const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
   const [open, setOpen] = useState(false)
-  const trigger = useRef<HTMLButtonElement>(null)
+  const trigger = useRef<HTMLDivElement>(null)
   const [box, setBox] = useState({ top: 0, right: 0 })
   const show = () => {
     const rect = trigger.current?.getBoundingClientRect()
@@ -355,7 +377,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
   }
   return (
     <div className="pill-menu">
-      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></button>
+      <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
         <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, minHeight: menuClass === 'lang-menu' ? Math.max(240, window.innerHeight - box.top - 8) : undefined }}>
           {options.map((option, index) => (
@@ -928,7 +950,7 @@ export const Shell = () => {
 
   return (
     <SourcesPanel.Provider value={setPanel}>
-    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''}`}>
+    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
@@ -937,9 +959,9 @@ export const Shell = () => {
             <Wordmark />
           </span>
           <span className="sider-icons">
-            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
+            {selecting ? null : <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
-            </button>
+            </button>}
             <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
@@ -953,10 +975,10 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-          <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }}>
+          <div className="new-chat" data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
             <kbd className="kbd">{shortcutHint()}</kbd>
-          </button>
+          </div>
         )}
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
@@ -996,9 +1018,9 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-        <div className="user-bar">
+        <a className="user-bar" href="#account" onClick={(event) => event.preventDefault()}>
           <span className="avatar" aria-hidden="true">
-            {initial || <Icon d="M4 5h16v11H4zM2 19h20" />}
+            {initial || 'D'}
           </span>
           <span className="user-copy">
             <span className="user-label">{who}</span>
@@ -1008,13 +1030,13 @@ export const Shell = () => {
           </button>
           {userMenu ? (
             <div className="menu user-menu">
-              <a href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">{t('downloadMobile')}</a>
-              <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</button>
-              <a href="https://github.com/openlinkos/deepapi/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
-              <button type="button" onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}>{t('logout')}</button>
+              <div role="menuitem" tabIndex={0} onClick={() => window.open('https://github.com/openlinkos/deepapi/releases', '_blank', 'noopener')}>{t('downloadMobile')}</div>
+              <div role="menuitem" tabIndex={0} data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</div>
+              <div role="menuitem" tabIndex={0} onClick={() => window.open('https://github.com/openlinkos/deepapi/issues', '_blank', 'noopener')}>{t('helpFeedback')}</div>
+              <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}><Glyph name="close" size={16} />{t('logout')}</div>
             </div>
           ) : null}
-        </div>
+        </a>
         )}
       </aside>
       {collapsed ? (
@@ -1045,6 +1067,7 @@ export const Shell = () => {
         </form>
       ) : null}
       <section className="stage">
+        {path.length > 0 ? <div className="top-fill" aria-hidden="true" /> : null}
         <header className="topbar">
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
             <Icon size={24} d="M3 9h13M3 16h18" />
@@ -1165,6 +1188,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [confirming, setConfirming] = useState(false)
   return (
     <a className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`} href={`#${conversation.id}`} onClick={(event) => { event.preventDefault(); if (picking) onPick?.() }}>
+      <div className="chat-row">
       {picking ? (
         <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('newChat')}>
           {picked ? <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.1 11.3 2.7 7.9l1.4-1.4 2 2 5.2-5.2 1.4 1.4z" /></svg> : null}
@@ -1182,6 +1206,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
       }}><FillIcon paths={MORE_DOTS} /></button>}
+      </div>
       {open ? createPortal(
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
@@ -1218,7 +1243,10 @@ const Empty = () => {
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
   // Official home-with-history text: 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
-  const line = t(hasHistory ? (narrow ? 'welcomeBack' : 'welcomeAlt') : 'welcomeMessage')
+  const wide = typeof window !== 'undefined' && window.matchMedia('(min-width: 1600px)').matches
+  // Official home-with-history text, by the capture for that viewport:
+  // 1920 dark 「你好，我能帮什么忙吗？」, 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
+  const line = t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
   return (
     <div className="home">
       <h2 className="greeting"><Mark /><span>{line}</span></h2>
@@ -1241,6 +1269,7 @@ const Composer = () => {
   const [iconOnly, setIconOnly] = useState(false)
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const activeId = useHarbor((state) => state.activeId)
   useEffect(() => {
     focusComposer()
@@ -1289,6 +1318,8 @@ const Composer = () => {
   }
   return (
     <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
+      <div className="composer-fill" aria-hidden="true" />
+      <div className="composer-fill-alt" aria-hidden="true" />
       {drafts.length ? (
         <ul className="drafts">
           {drafts.map((file) => (
@@ -1331,21 +1362,21 @@ const Composer = () => {
       <div className="composer-tools">
         <div className="chips" ref={chips}>
           <span className="chip-wrap">
-            <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-              <svg className="chip-icon" width="20" height="20" viewBox="2 1 20 20" aria-hidden="true"><path fill="currentColor" d="M12 2.2 13.7 8 19.5 9.7 13.7 11.4 12 17.2 10.3 11.4 4.5 9.7 10.3 8 12 2.2Zm6.1 10.3.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2ZM6.3 14.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6.6-1.5Z" /></svg>
+            <div data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+              <Glyph name="thinking" size={14} />
               <span className="chip-label">{t('thinking')}</span>
-            </button>
+            </div>
           </span>
-          <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
-            <Icon size={20} stroke={2.2} d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
+            <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
-          </button>
+          </div>
         </div>
         <div className="tool-right">
-          <label className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')}>
-            <Icon size={20} stroke={2} d="M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8" />
-            <input data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
-          </label>
+          <button type="button" className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')} disabled={!flash} onClick={() => fileRef.current?.click()}>
+            <Glyph name="attach" size={16} />
+          </button>
+          <input ref={fileRef} data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
@@ -1435,6 +1466,7 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('language')}</span>
             <AnchoredMenu
+              testId="language-trigger"
               menuClass="lang-menu"
               label={settings.locale === 'en' ? 'English' : '简体中文'}
               selected={settings.locale === 'en' ? 'English' : '简体中文'}

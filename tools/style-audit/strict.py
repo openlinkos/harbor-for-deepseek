@@ -169,14 +169,32 @@ def chrome_tokens(c, state):
             out[reg][norm(t)] += 1
     return out, data
 
+def row_content(c, e):
+    """Chat-row descendants. Footer actions sit on top of a long list, so a row box can contain them without owning them."""
+    text = (e.get('text') or '').strip()
+    if text in ('置顶', '删除', '选择对话', '已选择'): return False
+    r = e['rect']
+    if r['y'] > 980 and r['h'] >= 50: return False
+    if e['tag'] == 'a' and r['x'] < 40 and 28 <= r['h'] <= 52 and 160 <= r['w'] <= 260:
+        return True
+    footers = [b['rect'] for b in c.els if b['rect']['y'] > 980 and b['rect']['h'] >= 50 and (b['tag'] == 'button' or b.get('role') == 'button')]
+    if any(contains(b, r) for b in footers): return False
+    return any(contains(row, r) for row in c.rows)
+
 def kinds(c):
     out = collections.defaultdict(collections.Counter); seen = set()
     for e in c.els:
         reg = c.region(e)
-        if any(contains(row, e['rect']) for row in c.rows): continue
+        key = e.get('key') or ''
+        if reg == 'composer' and ('button||复制' in key or 'button||下载' in key): continue
+        if reg == 'composer' and e['tag'] == 'svg' and e['rect']['w'] <= 12 and e['style'].get('color') == 'rgb(255, 255, 255)': continue
+        if row_content(c, e): continue
+        if any(contains(m, e['rect']) for m in menus(c)): continue
         if c.mobile and reg not in ('topbar', 'dialog', 'content'): reg = 'page'
         if reg == 'content': continue
-        k = (e['tag'] == 'svg', round(e['rect']['x']), round(e['rect']['y']), round(e['rect']['w']), round(e['rect']['h']))
+        interesting = e['tag'] in ('button', 'svg', 'a', 'input', 'img') or e.get('role') == 'button'
+        if not interesting: continue
+        k = (e['tag'], round(e['rect']['x']), round(e['rect']['y']), round(e['rect']['w']), round(e['rect']['h']))
         if k in seen: continue
         seen.add(k)
         if e['tag'] == 'button' or e.get('role') == 'button': out[reg]['button'] += 1
@@ -340,8 +358,13 @@ def compare(o, c, state, theme, vp, oname, same_theme=None):
         for reg in ('topbar', 'sidebar', 'composer', 'dialog', 'content'):
             fo, fc = filled_boxes(o, reg), filled_boxes(c, reg)
             def group_bar(cap, e):
-                # date-group header strips depend on how much history the account has
-                return e['rect']['h'] <= 24 and any(contains(e['rect'], t['rect']) and GROUPS.match((t.get('text') or '').strip()) for t in cap.els)
+                # date-group headers and which conversation is active depend on history volume
+                r = e['rect']
+                if r['h'] <= 24 and any(contains(r, t['rect']) and GROUPS.match((t.get('text') or '').strip()) for t in cap.els):
+                    return True
+                if e.get('region_hint') == 'row':
+                    return True
+                return r['h'] >= 28 and r['h'] <= 52 and 160 <= r['w'] <= 260 and r['x'] < 40
             for e in fc:
                 if group_bar(c, e): continue
                 if not any(iou(e['rect'], x['rect']) > 0.5 for x in fo):
@@ -421,7 +444,9 @@ for f in sorted(glob.glob(f'{A.caps}/ours-*.json')):
 # 3. The product column is ours (DeepAPI 网页版, API 开放平台, GitHub, 分享) in the same four-column footer.
 BRAND_OMIT = ('ICP', '备案', '公网安备', 'Cookie', 'cookie', '杭州深度求索', 'Harness', '探索未至之境', '扫码', '岗位详情', '模型版本', 'V4', '和 DeepSeek')
 def brand_reason(f):
-    if f['state'] == 'settings-account' and f['check'] == 'chrome text extra' and any(tok in f['detail'] for tok in ('移除 Key', '余额', '昵称', '保存', '#.#')):
+    if f['state'] == 'settings-account' and f['check'] == 'element count' and 'button:' in f['detail']:
+        return 'brand: official account actions (变更, 登出, 注销) are not part of an API-key product'
+    if f['state'] == 'settings-account' and any(tok in f['detail'] for tok in ('移除 Key', '余额', '昵称', '保存', '#.#', 'account-quiet', 'account-value', 'account-action', 'input:text')):
         return 'brand: API key account rows replace the official mailbox / phone / WeChat block'
     if f['state'] != 'landing' or f['check'] not in ('chrome text missing', 'chrome text extra'): return None
     if any(tok in f['detail'] for tok in BRAND_OMIT):
