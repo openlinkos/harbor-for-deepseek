@@ -92,9 +92,9 @@ for (const point of points) {
       }
 
       if (mobile) {
-        await expect(page.locator('.chip-label').first()).toBeHidden()
-        await expect(page.getByTestId('toggle-thinking')).toHaveCSS('width', '40px')
-        await expect(page.getByTestId('toggle-thinking')).toHaveCSS('height', '40px')
+        await expect(page.locator('.chip-label').first()).toBeVisible()
+        await expect(page.getByTestId('toggle-thinking')).toHaveCSS('height', '34px')
+        await expect(page.getByTestId('toggle-thinking')).toContainText('深度思考')
         await expect(page.locator('.sidebar')).toBeHidden()
       } else {
         await expect(page.locator('.chip-label').first()).toBeVisible()
@@ -172,6 +172,7 @@ for (const point of points) {
         await page.locator('.item-menu-scrim').click({ position: { x: 200, y: 120 } })
         await page.getByTestId('new-chat').click()
       } else {
+        await page.locator('.chat-link').first().hover()
         await page.locator('.chat-link .more').first().click()
         await expect(page.locator('.item-menu')).toBeVisible()
         await expect(page.locator('.item-menu.sheet')).toHaveCount(0)

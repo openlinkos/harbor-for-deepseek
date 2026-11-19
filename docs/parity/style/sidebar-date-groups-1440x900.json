@@ -1,0 +1,188 @@
+{
+  "state": "sidebar-date-groups",
+  "viewport": "1440x900",
+  "officialVisible": 65,
+  "matched": 28,
+  "matchedEqual": 28,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 6,
+  "allowlisted": 19,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 6,
+  "mismatches": [
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "y",
+      "official": "21",
+      "ours": "25",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "w",
+      "official": "143",
+      "ours": "48.2",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "h",
+      "official": "23",
+      "ours": "15",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "15px",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "font-weight",
+      "official": "400",
+      "ours": "650",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "line-height",
+      "official": "normal",
+      "ours": "15px",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "letter-spacing",
+      "official": "normal",
+      "ours": "-0.3px",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > wordmark 1",
+      "property": "color",
+      "official": "rgb(128, 0, 128)",
+      "ours": "rgb(15, 17, 21)",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "y",
+      "official": "859.5",
+      "ours": "848.91",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "w",
+      "official": "129.13",
+      "ours": "148",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "h",
+      "official": "17",
+      "ours": "23.8",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "line-height",
+      "official": "normal",
+      "ours": "23.8px",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "color",
+      "official": "rgb(97, 102, 107)",
+      "ours": "rgb(15, 17, 21)",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > icon 22×22 @12,22",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "allowed",
+      "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
+      "id": "brand-header-mark"
+    },
+    {
+      "key": "sidebar > span ‘for DeepSeek’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "for DeepSeek",
+      "status": "allowed",
+      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
+      "id": "brand-wordmark-unmatched"
+    },
+    {
+      "key": "sidebar > span @18,852 32×32",
+      "property": "unmatched",
+      "official": "",
+      "ours": "span",
+      "status": "allowed",
+      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
+      "id": "brand-footer-unmatched-ours"
+    },
+    {
+      "key": "sidebar > icon 16×16 @26,860",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "allowed",
+      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
+      "id": "brand-footer-unmatched-ours"
+    },
+    {
+      "key": "sidebar > small ‘密钥与对话仅保存在本设备’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "密钥与对话仅保存在本设备",
+      "status": "allowed",
+      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
+      "id": "brand-footer-unmatched-ours"
+    },
+    {
+      "key": "sidebar > button ‘菜单’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "菜单",
+      "status": "allowed",
+      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
+      "id": "brand-footer-unmatched-ours"
+    }
+  ],
+  "unexplained": 0,
+  "pass": true
+}

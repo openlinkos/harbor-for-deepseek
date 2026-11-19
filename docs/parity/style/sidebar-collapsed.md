@@ -1,8 +1,23 @@
-# sidebar-collapsed
+# sidebar-collapsed 1440x900
 
-Official capture is not available yet, so this state is not scored.
+Result: PASS (0 unexplained)
 
-- 1440x900: 56 elements captured
-- 1920x1072: 56 elements captured
+- Matched elements: 22
+- Unmatched official: 0
+- Unmatched ours: 0
 
-See `needed.md` for the official click steps.
+| Status | Key | Property | Official | Ours | Reason |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | none |
+
+# sidebar-collapsed 1920x1072
+
+Result: PASS (0 unexplained)
+
+- Matched elements: 22
+- Unmatched official: 0
+- Unmatched ours: 0
+
+| Status | Key | Property | Official | Ours | Reason |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | none |

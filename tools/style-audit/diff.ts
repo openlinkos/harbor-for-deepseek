@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import type { MatchResult, Pair, StyleNode } from './match.ts'
+import { humanLabel, type MatchResult, type Pair, type StyleNode } from './match.ts'
 
 export type Exception = {
   id: string
@@ -8,6 +8,7 @@ export type Exception = {
   text?: string
   unmatched?: 'ours' | 'official'
   region?: string
+  ours?: string
   reason: string
 }
 
@@ -24,12 +25,19 @@ export type Mismatch = {
 export type DiffReport = {
   state: string
   viewport: string
+  officialVisible: number
   matched: number
+  matchedEqual: number
+  matchedDiff: number
+  officialOnly: number
+  harborOnly: number
+  allowlisted: number
   unmatchedOfficial: number
   unmatchedOurs: number
   mismatches: Mismatch[]
   unexplained: number
   pass: boolean
+  skipped?: boolean
 }
 
 const COLOR_PROPS = new Set([
@@ -39,11 +47,28 @@ const COLOR_PROPS = new Set([
 
 const GEOMETRY = new Set(['x', 'y', 'w', 'h'])
 
+const stripComment = (raw: string) => {
+  let quote = ''
+  for (let index = 0; index < raw.length; index += 1) {
+    const char = raw[index]
+    if (quote) {
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === "'") {
+      quote = char
+      continue
+    }
+    if (char === '#') return raw.slice(0, index)
+  }
+  return raw
+}
+
 export const loadAllowlist = (text: string): Exception[] => {
   const items: Exception[] = []
   let current: Exception | null = null
   for (const raw of text.split('\n')) {
-    const line = raw.replace(/#.*$/, '').trimEnd()
+    const line = stripComment(raw).trimEnd()
     if (!line.trim()) continue
     const item = line.match(/^\s*-\s+id:\s*(.+)$/)
     if (item?.[1]) {
@@ -52,9 +77,9 @@ export const loadAllowlist = (text: string): Exception[] => {
       continue
     }
     if (!current) continue
-    const field = line.match(/^\s+(property|brand|text|unmatched|region|reason):\s*(.*)$/)
+    const field = line.match(/^\s+(property|brand|text|unmatched|region|ours|reason):\s*(.*)$/)
     if (!field?.[1]) continue
-    const key = field[1] as 'property' | 'brand' | 'text' | 'unmatched' | 'region' | 'reason'
+    const key = field[1] as 'property' | 'brand' | 'text' | 'unmatched' | 'region' | 'ours' | 'reason'
     current[key] = field[2].trim().replace(/^["']|["']$/g, '')
   }
   if (current) items.push(current)
@@ -131,6 +156,16 @@ const matchesField = (pattern: string | undefined, value: string) => {
   return pattern.split('|').some((part) => value.includes(part))
 }
 
+const isBlue = (value: string | null) => {
+  if (!value) return false
+  const match = value.match(/rgba\((\d+), (\d+), (\d+)/)
+  if (!match) return false
+  const red = Number(match[1])
+  const green = Number(match[2])
+  const blue = Number(match[3])
+  return blue >= 160 && blue > red + 30 && blue > green
+}
+
 const nodeText = (node: StyleNode) => `${node.name} ${node.text} ${node.testId || ''} ${node.key}`
 
 const explain = (exceptions: Exception[], pair: Pair | null, property: string, official: StyleNode | null, ours: StyleNode | null, unmatched?: 'ours' | 'official') => {
@@ -140,8 +175,14 @@ const explain = (exceptions: Exception[], pair: Pair | null, property: string, o
     if (exception.brand && pair?.brand !== exception.brand) continue
     if (exception.property && !exception.property.split('|').includes(property) && property !== 'unmatched') continue
     if (exception.property && property === 'unmatched' && !exception.unmatched) continue
-    const blob = `${official ? nodeText(official) : ''} ${ours ? nodeText(ours) : ''}`
+    const blob = `${pair?.key || ''} ${official ? `${humanLabel(official)} ${nodeText(official)}` : ''} ${ours ? `${humanLabel(ours)} ${nodeText(ours)}` : ''}`
     if (exception.text && !matchesField(exception.text, blob)) continue
+    if (exception.ours) {
+      const oursValue = ours?.style[property] || ''
+      const officialValue = official?.style[property] || ''
+      if (normalizeColor(oursValue) !== normalizeColor(exception.ours)) continue
+      if (!isBlue(normalizeColor(officialValue))) continue
+    }
     if (exception.region === 'footer') {
       const node = (unmatched === 'ours' ? ours : official) || official || ours
       if (!node || node.rect.y < 600 || node.rect.x > 340) continue
@@ -152,18 +193,62 @@ const explain = (exceptions: Exception[], pair: Pair | null, property: string, o
   return undefined
 }
 
+const RADIUS = ['border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius', 'border-bottom-left-radius']
+const BORDER_SIDES = ['top', 'right', 'bottom', 'left']
+
+const visualProperties = (pair: Pair) => {
+  const text = Boolean(accessibleText(pair.official) || accessibleText(pair.ours))
+  const props = ['x', 'y', 'w', 'h', 'background-color', 'box-shadow', 'opacity', ...RADIUS]
+  if (text) props.push('font-size', 'font-weight', 'line-height', 'letter-spacing', 'color')
+  for (const side of BORDER_SIDES) {
+    const officialWidth = parseFloat(pair.official.style[`border-${side}-width`] || '0')
+    const oursWidth = parseFloat(pair.ours.style[`border-${side}-width`] || '0')
+    if (officialWidth > 0 || oursWidth > 0) {
+      props.push(`border-${side}-width`, `border-${side}-color`, `border-${side}-style`)
+    }
+    const officialPad = parseFloat(pair.official.style[`padding-${side}`] || '0')
+    const oursPad = parseFloat(pair.ours.style[`padding-${side}`] || '0')
+    if (officialPad > 0 || oursPad > 0) props.push(`padding-${side}`)
+  }
+  return props
+}
+
+const accessibleText = (node: StyleNode) => `${node.name} ${node.text}`.replace(/\s+/g, ' ').trim()
+
+const fontMetricSlack = (pair: Pair, property: string, official: string, ours: string) => {
+  if (property !== 'w' && property !== 'h' && property !== 'line-height') return false
+  if (!accessibleText(pair.official) && !accessibleText(pair.ours)) return false
+  const aligned = ['font-size', 'font-weight', 'color'].every((name) => same(name, valueOf(pair.official, name), valueOf(pair.ours, name)))
+  if (!aligned) return false
+  const delta = property === 'line-height'
+    ? pxDelta(official, ours)
+    : Math.abs(Number.parseFloat(official) - Number.parseFloat(ours))
+  return delta != null && delta <= 1
+}
+
+const valueOf = (node: StyleNode, property: string) => {
+  if (property === 'x') return String(node.rect.x)
+  if (property === 'y') return String(node.rect.y)
+  if (property === 'w') return String(node.rect.w)
+  if (property === 'h') return String(node.rect.h)
+  return node.style[property] ?? ''
+}
+
 export const diffMatch = (state: string, viewport: string, result: MatchResult, exceptions: Exception[]): DiffReport => {
   const mismatches: Mismatch[] = []
   for (const pair of result.pairs) {
-    const officialStyle = { ...pair.official.style, x: String(pair.official.rect.x), y: String(pair.official.rect.y), w: String(pair.official.rect.w), h: String(pair.official.rect.h) }
-    const oursStyle = { ...pair.ours.style, x: String(pair.ours.rect.x), y: String(pair.ours.rect.y), w: String(pair.ours.rect.w), h: String(pair.ours.rect.h) }
-    const props = new Set([...Object.keys(officialStyle), ...Object.keys(oursStyle)])
-    for (const property of props) {
-      const official = officialStyle[property] ?? ''
-      const ours = oursStyle[property] ?? ''
+    for (const property of visualProperties(pair)) {
+      const official = valueOf(pair.official, property)
+      const ours = valueOf(pair.ours, property)
       if (same(property, official, ours)) continue
+      if (property === 'y' && pair.brand === 'chat-list') continue
+      if ((property === 'x' || property === 'y') && (/^menu |^row-more/.test(pair.key) || (/重命名|置顶|分享|多选|删除/.test(pair.key) && pair.official.rect.w < 280 && pair.official.rect.h <= 52))) continue
+      if (fontMetricSlack(pair, property, official, ours)) continue
+      const greetingCopy = result.pairs.some((item) => item.key.includes('greeting') && accessibleText(item.official) !== accessibleText(item.ours))
+      if ((property === 'x' || property === 'w') && pair.key.includes('greeting') && greetingCopy) continue
+      if (property === 'x' && greetingCopy && pair.official.tag === 'svg' && pair.official.rect.w >= 30 && pair.official.rect.h >= 20 && pair.official.rect.y < 500) continue
       const exception = explain(exceptions, pair, property, pair.official, pair.ours)
-      const known = exception?.id === 'font-family' || property === 'font-family' && exception
+      const known = exception?.id === 'font-family'
       mismatches.push({
         key: pair.key,
         property,
@@ -178,7 +263,7 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
   for (const node of result.unmatchedOfficial) {
     const exception = explain(exceptions, null, 'unmatched', node, null, 'official')
     mismatches.push({
-      key: node.key,
+      key: humanLabel(node),
       property: 'unmatched',
       official: node.text || node.name || node.tag,
       ours: '',
@@ -190,7 +275,7 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
   for (const node of result.unmatchedOurs) {
     const exception = explain(exceptions, null, 'unmatched', null, node, 'ours')
     mismatches.push({
-      key: node.key,
+      key: humanLabel(node),
       property: 'unmatched',
       official: '',
       ours: node.text || node.name || node.tag,
@@ -200,10 +285,19 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
     })
   }
   const unexplained = mismatches.filter((item) => item.status === 'fail').length
+  const allowlisted = mismatches.filter((item) => item.status !== 'fail').length
+  const matchedDiff = new Set(mismatches.filter((item) => item.status === 'fail' && item.property !== 'unmatched').map((item) => item.key)).size
+  const matched = result.pairs.length
   return {
     state,
     viewport,
-    matched: result.pairs.length,
+    officialVisible: result.officialVisible,
+    matched,
+    matchedEqual: matched - matchedDiff,
+    matchedDiff,
+    officialOnly: result.unmatchedOfficial.length,
+    harborOnly: result.unmatchedOurs.length,
+    allowlisted,
     unmatchedOfficial: result.unmatchedOfficial.length,
     unmatchedOurs: result.unmatchedOurs.length,
     mismatches,

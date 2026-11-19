@@ -1,0 +1,16 @@
+{
+  "state": "sidebar-collapsed",
+  "viewport": "1440x900",
+  "officialVisible": 23,
+  "matched": 22,
+  "matchedEqual": 22,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 0,
+  "allowlisted": 0,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 0,
+  "mismatches": [],
+  "unexplained": 0,
+  "pass": true
+}

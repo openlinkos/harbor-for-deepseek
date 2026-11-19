@@ -1,0 +1,424 @@
+{
+  "state": "home-with-history",
+  "viewport": "390x844",
+  "officialVisible": 23,
+  "matched": 8,
+  "matchedEqual": 3,
+  "matchedDiff": 5,
+  "officialOnly": 13,
+  "harborOnly": 9,
+  "allowlisted": 4,
+  "unmatchedOfficial": 13,
+  "unmatchedOurs": 9,
+  "mismatches": [
+    {
+      "key": "sidebar > mark 1",
+      "property": "x",
+      "official": "22",
+      "ours": "16",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "y",
+      "official": "24",
+      "ours": "16",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "w",
+      "official": "20",
+      "ours": "24",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "h",
+      "official": "20",
+      "ours": "24",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "control ‘智能搜索’",
+      "property": "x",
+      "official": "147.02",
+      "ours": "143",
+      "status": "fail"
+    },
+    {
+      "key": "control ‘智能搜索’",
+      "property": "y",
+      "official": "423.5",
+      "ours": "494.5",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘智能搜索’",
+      "property": "x",
+      "official": "176.02",
+      "ours": "172",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘智能搜索’",
+      "property": "y",
+      "official": "428.5",
+      "ours": "499.5",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "x",
+      "official": "10",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "x",
+      "official": "336",
+      "ours": "340",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "font-weight",
+      "official": "500",
+      "ours": "400",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(26, 26, 26)",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @336,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @348,24",
+      "property": "x",
+      "official": "348",
+      "ours": "350",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @348,24",
+      "property": "y",
+      "official": "24",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @348,24",
+      "property": "w",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @348,24",
+      "property": "h",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @224,16 104×36",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @224,16 104×36",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @239,27",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘下载应用’",
+      "property": "unmatched",
+      "official": "下载应用",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 30×22 @75,313",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @32,365 326×106",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @33,370 324×42",
+      "property": "unmatched",
+      "official": "textarea",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @45,424 92×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @56,434",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @267,424 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @311,424 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @311,424 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 16×16 @320,433",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 21×21 @59,354",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘欢迎回来，想从哪里开始？’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "欢迎回来，想从哪里开始？",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,406 358×144",
+      "property": "unmatched",
+      "official": "",
+      "ours": "div",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @29,423 332×60",
+      "property": "unmatched",
+      "official": "",
+      "ours": "textarea",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @41,495 92×34",
+      "property": "unmatched",
+      "official": "",
+      "ours": "button",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @52,505",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > label ‘添加文件’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "添加文件",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @315,495 34×34",
+      "property": "unmatched",
+      "official": "",
+      "ours": "button",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 16×16 @324,504",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    }
+  ],
+  "unexplained": 53,
+  "pass": false
+}

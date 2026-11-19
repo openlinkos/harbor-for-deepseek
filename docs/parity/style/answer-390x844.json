@@ -1,0 +1,1319 @@
+{
+  "state": "answer",
+  "viewport": "390x844",
+  "officialVisible": 107,
+  "matched": 16,
+  "matchedEqual": 3,
+  "matchedDiff": 13,
+  "officialOnly": 77,
+  "harborOnly": 18,
+  "allowlisted": 21,
+  "unmatchedOfficial": 77,
+  "unmatchedOurs": 18,
+  "mismatches": [
+    {
+      "key": "sidebar > mark 1",
+      "property": "x",
+      "official": "22",
+      "ours": "16",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "y",
+      "official": "24",
+      "ours": "16",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "w",
+      "official": "20",
+      "ours": "24",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "sidebar > mark 1",
+      "property": "h",
+      "official": "20",
+      "ours": "24",
+      "status": "allowed",
+      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
+      "id": "brand-logo"
+    },
+    {
+      "key": "control ‘智能搜索’",
+      "property": "x",
+      "official": "131.02",
+      "ours": "143",
+      "status": "fail"
+    },
+    {
+      "key": "control ‘智能搜索’",
+      "property": "y",
+      "official": "769",
+      "ours": "726.31",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘智能搜索’",
+      "property": "x",
+      "official": "160.02",
+      "ours": "172",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘智能搜索’",
+      "property": "y",
+      "official": "774",
+      "ours": "731.31",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "line-height",
+      "official": "20px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "line-height",
+      "official": "20px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 2",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more > icon 3",
+      "property": "w",
+      "official": "16",
+      "ours": "14",
+      "status": "fail"
+    },
+    {
+      "key": "row-more > icon 3",
+      "property": "h",
+      "official": "16",
+      "ours": "14",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "x",
+      "official": "298.13",
+      "ours": "294",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "y",
+      "official": "118.22",
+      "ours": "116",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "w",
+      "official": "7.28",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "h",
+      "official": "14",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘)’",
+      "property": "color",
+      "official": "rgb(56, 58, 66)",
+      "ours": "rgb(92, 97, 102)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "x",
+      "official": "10",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "x",
+      "official": "331",
+      "ours": "340",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "font-weight",
+      "official": "500",
+      "ours": "400",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(26, 26, 26)",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @343,24",
+      "property": "x",
+      "official": "343",
+      "ours": "350",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @343,24",
+      "property": "y",
+      "official": "24",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @343,24",
+      "property": "w",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @343,24",
+      "property": "h",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "y",
+      "official": "816",
+      "ours": "809.31",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "h",
+      "official": "28",
+      "ours": "18.69",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "background-color",
+      "official": "rgb(255, 255, 255)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "line-height",
+      "official": "16px",
+      "ours": "18.7px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "padding-top",
+      "official": "6px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "padding-bottom",
+      "official": "6px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @289,24",
+      "property": "x",
+      "official": "289",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @289,24",
+      "property": "y",
+      "official": "24",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @289,24",
+      "property": "w",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 20×20 @289,24",
+      "property": "h",
+      "official": "20",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "x",
+      "official": "56",
+      "ours": "57",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "y",
+      "official": "252.22",
+      "ours": "227.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "w",
+      "official": "281.69",
+      "ours": "297",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "h",
+      "official": "20",
+      "ours": "23.09",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "font-size",
+      "official": "16px",
+      "ours": "14px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "line-height",
+      "official": "28px",
+      "ours": "23.1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(154, 160, 166)",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @358,140",
+      "property": "x",
+      "official": "358",
+      "ours": "332",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @358,140",
+      "property": "y",
+      "official": "140.22",
+      "ours": "116",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @358,140",
+      "property": "w",
+      "official": "12",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @358,140",
+      "property": "h",
+      "official": "12",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div ‘快排介绍’",
+      "property": "unmatched",
+      "official": "快排介绍",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @277,12 44×44",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,-162 350×314",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘python’",
+      "property": "unmatched",
+      "official": "python",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @236,66 63×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘复制’",
+      "property": "unmatched",
+      "official": "复制",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @301,66 63×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘left x x arr x pivot’",
+      "property": "unmatched",
+      "official": "left x x arr x pivot",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘=’",
+      "property": "unmatched",
+      "official": "=",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘[’",
+      "property": "unmatched",
+      "official": "[",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘for’",
+      "property": "unmatched",
+      "official": "for",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘in’",
+      "property": "unmatched",
+      "official": "in",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘if’",
+      "property": "unmatched",
+      "official": "if",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘<’",
+      "property": "unmatched",
+      "official": "<",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘mid x x arr x pivot’",
+      "property": "unmatched",
+      "official": "mid x x arr x pivot",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘=’",
+      "property": "unmatched",
+      "official": "=",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘[’",
+      "property": "unmatched",
+      "official": "[",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘for’",
+      "property": "unmatched",
+      "official": "for",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘in’",
+      "property": "unmatched",
+      "official": "in",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘if’",
+      "property": "unmatched",
+      "official": "if",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘==’",
+      "property": "unmatched",
+      "official": "==",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘right x x arr x pivot’",
+      "property": "unmatched",
+      "official": "right x x arr x pivot",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘=’",
+      "property": "unmatched",
+      "official": "=",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘[’",
+      "property": "unmatched",
+      "official": "[",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘for’",
+      "property": "unmatched",
+      "official": "for",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘in’",
+      "property": "unmatched",
+      "official": "in",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘if’",
+      "property": "unmatched",
+      "official": "if",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘>’",
+      "property": "unmatched",
+      "official": ">",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "unmatched",
+      "official": "quick_sortleft mid quick",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘return’",
+      "property": "unmatched",
+      "official": "return",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘(’",
+      "property": "unmatched",
+      "official": "(",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘)’",
+      "property": "unmatched",
+      "official": ")",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘+’",
+      "property": "unmatched",
+      "official": "+",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘(’",
+      "property": "unmatched",
+      "official": "(",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘)’",
+      "property": "unmatched",
+      "official": ")",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘print’",
+      "property": "unmatched",
+      "official": "print",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘(’",
+      "property": "unmatched",
+      "official": "(",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘(’",
+      "property": "unmatched",
+      "official": "(",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘[’",
+      "property": "unmatched",
+      "official": "[",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘3’",
+      "property": "unmatched",
+      "official": "3",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘,’",
+      "property": "unmatched",
+      "official": ",",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘6’",
+      "property": "unmatched",
+      "official": "6",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘,’",
+      "property": "unmatched",
+      "official": ",",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘1’",
+      "property": "unmatched",
+      "official": "1",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘,’",
+      "property": "unmatched",
+      "official": ",",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘8’",
+      "property": "unmatched",
+      "official": "8",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘,’",
+      "property": "unmatched",
+      "official": ",",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘2’",
+      "property": "unmatched",
+      "official": "2",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘,’",
+      "property": "unmatched",
+      "official": ",",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘5’",
+      "property": "unmatched",
+      "official": "5",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @20,140",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：常用选法包括首元素、尾元素、中间元素或随’",
+      "property": "unmatched",
+      "official": "第三级：常用选法包括首元素、尾元素、中间元素或随",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "unmatched",
+      "official": "第三级：小于 pivot 放左边，大于 pivo",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：对左右子数组分别递归调用快速排序’",
+      "property": "unmatched",
+      "official": "第二级：对左右子数组分别递归调用快速排序",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "unmatched",
+      "official": "第三级：当子数组长度为 0 或 1 时停止递归，",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @14,648 28×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 16×16 @20,654",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > button @52,648 28×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 16×16 @58,654",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > button @90,648 28×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 16×16 @96,654",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > button @128,648 28×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 16×16 @134,654",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > div @16,710 358×106",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > textbox @17,715 356×42",
+      "property": "unmatched",
+      "official": "textarea",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > div @29,769 92×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 14×14 @40,779",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > icon 14×14 @142,779",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "main > button @283,769 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "main > button @327,769 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "main > div @327,769 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "main > icon 16×16 @336,778",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "sidebar > heading ‘对照’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "对照",
+      "status": "fail"
+    },
+    {
+      "key": "main > button ‘开启新对话’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "开启新对话",
+      "status": "fail"
+    },
+    {
+      "key": "main > button ‘编辑’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "编辑",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @43,214 311×51",
+      "property": "unmatched",
+      "official": "",
+      "ours": "div",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > p ‘8’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @42,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @80,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @118,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @156,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @194,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 20×20 @232,328",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,637 358×144",
+      "property": "unmatched",
+      "official": "",
+      "ours": "div",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @29,654 332×60",
+      "property": "unmatched",
+      "official": "",
+      "ours": "textarea",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @41,726 92×34",
+      "property": "unmatched",
+      "official": "",
+      "ours": "button",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @52,736",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > label ‘添加文件’",
+      "property": "unmatched",
+      "official": "",
+      "ours": "添加文件",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @315,726 34×34",
+      "property": "unmatched",
+      "official": "",
+      "ours": "button",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 16×16 @324,735",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    }
+  ],
+  "unexplained": 159,
+  "pass": false
+}

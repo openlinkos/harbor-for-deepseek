@@ -1,0 +1,16 @@
+{
+  "state": "search-dialog",
+  "viewport": "1920x1072",
+  "officialVisible": 29,
+  "matched": 28,
+  "matchedEqual": 28,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 0,
+  "allowlisted": 0,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 0,
+  "mismatches": [],
+  "unexplained": 0,
+  "pass": true
+}

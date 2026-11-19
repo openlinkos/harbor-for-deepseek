@@ -302,6 +302,7 @@ const ThemeSwitch = () => {
             setTheme(choice)
           }}
         >
+          <span className="theme-face" />
           <Icon
             d={
               choice === 'light'
@@ -332,7 +333,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
   }
   return (
     <div className="pill-menu">
-      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}</button>
+      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></button>
       {open ? createPortal(
         <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, minHeight: menuClass === 'lang-menu' ? Math.max(240, window.innerHeight - box.top - 8) : undefined }}>
           {options.map((option, index) => (
@@ -927,7 +928,7 @@ export const Shell = () => {
           </span>
         </div>
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
-          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}</span>
+          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
           <kbd className="kbd">{shortcutHint()}</kbd>
         </button>
         <div className="side-scroll">
@@ -942,7 +943,7 @@ export const Shell = () => {
           {groups.map(([label, items]) => (
             <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
               <p className="group-label">
-                <span>{label}</span>
+                {label}
                 {label === t('groupToday') ? (
                   <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
                     <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
@@ -998,17 +999,30 @@ export const Shell = () => {
         </div>
       </aside>
       {collapsed ? (
-        <div className="float-pill">
-          <button className="icon-btn" type="button" aria-label={t('menu')} onClick={() => setCollapsed(false)}><Mark /></button>
-          <button className="icon-btn" type="button" onClick={() => void state.newChat()}><Icon d="M12 5v14M5 12h14" /></button>
-        </div>
+        <>
+          <span className="collapsed-mark"><Mark /></span>
+          <div className="float-pill">
+            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(false)}>
+              <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
+            </button>
+            <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+              <Icon d="M12 5v14M5 12h14" />
+            </button>
+            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering(true)}>
+              <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+            </button>
+          </div>
+        </>
       ) : null}
       {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }} /> : null}
       {filtering ? (
         <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
-          <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+          <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
+          <span className="search-rule" />
           <input className="side-filter" autoFocus placeholder={t('searchChats')} value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
-          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>×</button>
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>
+            <Icon d="M6 6l12 12M18 6 6 18" />
+          </button>
         </form>
       ) : null}
       <section className="stage">
@@ -1135,27 +1149,27 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       ) : (
         <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id) }}>{conversation.title || t('newChat')}</button>
       )}
-      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => {
-        const rect = row.current?.getBoundingClientRect()
-        if (rect) setMenuBox({ top: rect.top, left: rect.right - 28 })
+      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect()
+        setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
-        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
-          <button type="button" onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" />{t('rename')}</button>
-          <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />{conversation.pinned ? t('unpin') : t('pin')}</button>
-          <button type="button" onClick={() => {
+        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
+          <div role="menuitem" tabIndex={0} onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => {
             setOpen(false)
             const body = messages.map((message) => {
               const text = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
               return `**${message.role}**\n\n${text}`
             }).join('\n\n')
             downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
-          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
-          <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
-          <button className="danger" type="button" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
+          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
+          <div role="menuitem" tabIndex={0} className="danger" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" /><span>{t('delete')}</span></div>
         </div>
         </>,
         document.body,
@@ -1177,6 +1191,10 @@ const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const returning = useMemo(() => {
+    const pinned = sessionStorage.getItem('harbor-audit-greeting')
+    if (pinned === 'welcomeMessage' || (RETURNING_GREETINGS as readonly string[]).includes(pinned || '')) {
+      return pinned as typeof RETURNING_GREETINGS[number] | 'welcomeMessage'
+    }
     if (!hasHistory) {
       return 'welcomeMessage' as const
     }
@@ -1186,7 +1204,7 @@ const Empty = () => {
   const line = t(returning)
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /> {line}</h2>
+      <h2 className="greeting"><Mark /><span>{line}</span></h2>
       <Composer />
     </div>
   )
@@ -1212,26 +1230,8 @@ const Composer = () => {
       return
     }
     let collapsedAt = 0
-    const phoneCollapsed = () => {
-      // The public bundle only hides labels on overflow. Logged-in Android
-      // Chrome at ~393px still shows icon-only buttons, so a coarse/mobile
-      // viewport below 768px follows that observed layout.
-      if (!window.matchMedia('(max-width: 767px)').matches) {
-        return false
-      }
-      const coarse = window.matchMedia('(pointer: coarse)').matches
-      const touch = navigator.maxTouchPoints > 0
-      const mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
-      return coarse || touch || mobileUa
-    }
     const measure = () => {
       const labels = [...row.querySelectorAll<HTMLElement>('.chip-label')]
-      if (phoneCollapsed()) {
-        labels.forEach((label) => { label.hidden = true })
-        setIconOnly(true)
-        collapsedAt = row.clientWidth
-        return
-      }
       if (collapsedAt && row.clientWidth <= collapsedAt + 24) {
         return
       }

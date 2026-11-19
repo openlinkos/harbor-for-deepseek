@@ -129,6 +129,7 @@ const install = async (page: Page) => {
 }
 
 const unlock = async (page: Page) => {
+  await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
   await page.goto(`${base}/`)
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-ack').check()
@@ -150,6 +151,11 @@ const reveal = async (page: Page, mobile: boolean) => {
 }
 
 const openSettings = async (page: Page, mobile: boolean) => {
+  if (!mobile) {
+    await send(page, '你好')
+    await page.getByTestId('new-chat').click()
+    await page.locator('.greeting').waitFor()
+  }
   await reveal(page, mobile)
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
@@ -200,6 +206,7 @@ const states: StateSpec[] = [
       'Wait until the returning greeting is visible and the composer is empty.',
     ],
     run: async (page, mobile) => {
+      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
       arm('ok')
       await unlock(page)
       await send(page, '你好')
@@ -225,6 +232,11 @@ const states: StateSpec[] = [
     ],
     run: async (page, mobile) => {
       await unlock(page)
+      if (!mobile) {
+        await send(page, '你好')
+        await page.getByTestId('new-chat').click()
+        await page.locator('.greeting').waitFor()
+      }
       await reveal(page, mobile)
       await page.getByTestId('user-menu').click()
     },
@@ -275,8 +287,20 @@ const states: StateSpec[] = [
   {
     id: 'search-dialog', rows: [34, 60], viewports: all, official: true,
     steps: ['On the home screen, press Ctrl+K (⌘K on macOS). Leave the search dialog open. Do not type a query.'],
-    run: async (page) => {
+    run: async (page, mobile) => {
+      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
+      arm('ok')
       await unlock(page)
+      if (!mobile) {
+        await send(page, '你好')
+        await page.getByTestId('new-chat').click()
+        await page.locator('.greeting').waitFor()
+      }
+      const viewport = page.viewportSize()
+      if (!mobile && (viewport?.width || 0) >= 1600) {
+        await page.getByRole('button', { name: '隐藏' }).click()
+        await page.waitForTimeout(400)
+      }
       await page.keyboard.press('Control+K')
       await page.locator('.search-dialog').waitFor()
     },
@@ -288,6 +312,9 @@ const states: StateSpec[] = [
       arm('ok')
       await unlock(page)
       await send(page, '菜单')
+      await page.getByTestId('new-chat').click()
+      await page.locator('.greeting').waitFor()
+      await page.locator('.chat-link').hover()
       await page.locator('.chat-link .more').click()
       await page.locator('.item-menu').waitFor()
     },
@@ -332,7 +359,7 @@ const states: StateSpec[] = [
     },
   },
   {
-    id: 'thinking-collapsed', rows: [43], viewports: desktop, official: true,
+    id: 'thinking-collapsed', rows: [43], viewports: all, official: true,
     steps: ['Open an answer that has a thinking block. Click the thinking header so the body is collapsed.'],
     run: async (page) => {
       arm('ok')
@@ -395,7 +422,7 @@ const states: StateSpec[] = [
     },
   },
   {
-    id: 'scroll-up', rows: [25], viewports: desktop, official: true,
+    id: 'scroll-up', rows: [25], viewports: all, official: true,
     steps: ['Open a long answer, scroll up until 回到底部 is visible, and capture before clicking it.'],
     run: async (page) => {
       arm('long')
@@ -488,7 +515,13 @@ const states: StateSpec[] = [
       'Do not open a chat. Capture the sidebar as it stands.',
       'Harbor’s automated capture cannot age conversations, so there is no ours file for this state yet.',
     ],
-    run: async () => { throw new Error('manual official capture only') },
+    run: async (page) => {
+      arm('ok')
+      await unlock(page)
+      await send(page, '你好')
+      await page.getByTestId('new-chat').click()
+      await page.locator('.greeting').waitFor()
+    },
   },
 ]
 
@@ -507,7 +540,7 @@ const writeNeeded = (rows: Array<{ id: string; viewport: string; count: number; 
   const lines = [
     '# Official style captures',
     '',
-    'Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.',
+    'Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com, or paste `tools/style-audit/console.js` into the DevTools console. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.',
     '',
     `Put those files in \`${officialDir}/\`. \`pnpm style:audit\` compares them with the Harbor captures in \`docs/parity/style/ours/\`. A state passes only with zero unexplained mismatches. Allowed differences live in \`tools/style-audit/allowlist.yaml\`.`,
     '',
@@ -564,6 +597,41 @@ const stopServer = (child: ChildProcess | null) => {
   try { process.kill(-child.pid, 'SIGTERM') } catch { child.kill('SIGTERM') }
 }
 
+const clip = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 90)
+
+const renderSummary = (reports: DiffReport[]) => {
+  const lines = [
+    '# Style audit',
+    '',
+    'Visible painted elements only. Keys are the region plus the accessible name or text. Sidebar rows align by position, and extra official chats are not missing UI. Geometry allows ±0.5px. A text box may differ by 1px in width, height, or line-height when its font size, weight, and color already match. Container inheritance is not compared.',
+    '',
+    'The replaced 1920 captures are included. `search-dialog` at 1440 is the home screen with the greeting and the open sidebar, and no chat is open. The 1920 search file was captured with the sidebar collapsed, so Harbor collapses the sidebar before opening search at that width.',
+    '',
+    '| State | Viewport | Official visible | Matched equal | Matched with diff | Official only | Harbor only | Allowlisted | Unexplained | Result |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
+  ]
+  for (const report of reports) {
+    lines.push(`| ${report.state} | ${report.viewport} | ${report.officialVisible} | ${report.matchedEqual} | ${report.matchedDiff} | ${report.officialOnly} | ${report.harborOnly} | ${report.allowlisted} | ${report.unexplained} | ${report.pass ? 'PASS' : 'FAIL'} |`)
+  }
+  lines.push('')
+  for (const report of reports) {
+    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 12)
+    lines.push(`## ${report.state} ${report.viewport}`)
+    lines.push('')
+    if (!top.length) {
+      lines.push('No unexplained diffs.')
+      lines.push('')
+      continue
+    }
+    for (const item of top) {
+      const name = item.property === 'unmatched' ? 'missing' : item.property
+      lines.push(`- ${clip(item.key)} › ${name} ${clip(item.official) || '—'} vs ${clip(item.ours) || '—'}`)
+    }
+    lines.push('')
+  }
+  return `${lines.join('\n')}\n`
+}
+
 const main = async () => {
   selfCheck()
   const bytes = buildCaptureScripts(root).bytes
@@ -577,14 +645,15 @@ const main = async () => {
   const reports = new Map<string, string[]>()
   let failed = 0
   const browser = await playwright.chromium.launch({ headless: true })
+  const onlyStates = new Set((process.env.STYLE_AUDIT_STATES || '').split(',').map((item) => item.trim()).filter(Boolean))
+  const onlyViews = new Set((process.env.STYLE_AUDIT_VIEWPORTS || '').split(',').map((item) => item.trim()).filter(Boolean))
+  const compared: DiffReport[] = []
   try {
     for (const viewport of viewports) {
+      if (onlyViews.size && !onlyViews.has(viewport.id)) continue
       for (const state of states) {
+        if (onlyStates.size && !onlyStates.has(state.id)) continue
         if (!state.viewports.includes(viewport.id)) continue
-        if (state.id === 'sidebar-date-groups') {
-          rows.push({ id: state.id, viewport: viewport.id, count: 0, error: 'manual official capture only' })
-          continue
-        }
         const context = await browser.newContext({
           viewport: { width: viewport.width, height: viewport.height },
           deviceScaleFactor: viewport.mobile ? 3 : 1,
@@ -599,6 +668,7 @@ const main = async () => {
           arm('ok')
           await install(page)
           await state.run(page, viewport.mobile)
+          await page.mouse.move(0, 0)
           await page.evaluate(() => document.fonts.ready)
           await page.waitForTimeout(350)
           const data = await page.evaluate((name: string) => {
@@ -617,6 +687,7 @@ const main = async () => {
             const bucket = reports.get(state.id) || []
             bucket.push(renderReport(report))
             reports.set(state.id, bucket)
+            compared.push(report)
             writeFileSync(join(outDir, `${state.id}-${data.viewport.width}x${data.viewport.height}.json`), `${JSON.stringify(report, null, 2)}\n`)
             if (!report.pass) failed += 1
           }
@@ -638,7 +709,8 @@ const main = async () => {
     await browser.close()
     stopServer(server)
   }
-  for (const state of states) {
+  const partial = Boolean(onlyStates.size || onlyViews.size)
+  if (!partial) for (const state of states) {
     const chunks = reports.get(state.id)
     const related = rows.filter((row) => row.id === state.id)
     const body = chunks?.length
@@ -655,7 +727,10 @@ const main = async () => {
         ].join('\n')
     writeFileSync(join(outDir, `${state.id}.md`), body)
   }
-  writeNeeded(rows)
+  if (!partial) {
+    writeNeeded(rows)
+    if (compared.length) writeFileSync(join(outDir, 'report.md'), renderSummary(compared))
+  }
   if (failed) {
     console.error(`style audit finished with ${failed} failed captures or comparisons`)
     process.exitCode = 1

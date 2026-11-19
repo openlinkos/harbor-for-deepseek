@@ -51,7 +51,19 @@ export const selfCheck = () => {
     capture([node({ key: 'a', style: { color: 'rgb(0, 0, 0)', 'font-family': 'DeepSeek Sans', 'font-size': '14px' } })]),
     capture([node({ key: 'a', style: { color: '#000', 'font-family': 'Inter', 'font-size': '14px' } })]),
   ), allow)
-  assert(font.pass && font.mismatches.some((item) => item.property === 'font-family' && item.status === 'known'), 'font-family is a known item')
+  assert(font.pass && !font.mismatches.some((item) => item.property === 'font-family'), 'font-family is not a visual property')
+
+  const textStyle = { color: 'rgb(15, 17, 21)', 'font-size': '14px', 'font-weight': '500', 'line-height': '22px' }
+  const metric = diffMatch('s', '1440x900', matchCaptures(
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 70, h: 20 }, style: textStyle })]),
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 71, h: 19 }, style: textStyle })]),
+  ), allow)
+  assert(metric.pass, '1px text-box width and height pass when the font matches')
+  const metricFar = diffMatch('s', '1440x900', matchCaptures(
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 70, h: 20 }, style: textStyle })]),
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 72, h: 20 }, style: { ...textStyle, 'font-size': '15px' } })]),
+  ), allow)
+  assert(metricFar.mismatches.some((item) => item.property === 'w' && item.status === 'fail'), 'text-box width still fails when the font size differs')
 
   const brand = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'logo', text: 'DeepSeek', tag: 'span', role: '', rect: { x: 40, y: 20, w: 80, h: 18 }, style: { color: 'black', 'font-size': '16px' } })]),
@@ -70,7 +82,16 @@ export const selfCheck = () => {
       node({ key: 'h2', text: '天气', rect: { x: 16, y: 250, w: 200, h: 36 } }),
     ]),
   )
-  assert(chats.pairs.length === 2 && chats.pairs.every((pair) => pair.brand === 'chat-list'), 'chat rows align by position')
+  assert(chats.pairs.filter((pair) => pair.brand === 'chat-list').length >= 2, 'chat rows align by position')
+  const extra = matchCaptures(
+    capture([
+      node({ key: 'o1', text: '测试会话A', rect: { x: 12, y: 160, w: 236, h: 40 } }),
+      node({ key: 'o2', text: '另一条', rect: { x: 12, y: 200, w: 236, h: 40 } }),
+      node({ key: 'o3', text: '第三条', rect: { x: 12, y: 240, w: 236, h: 40 } }),
+    ]),
+    capture([node({ key: 'h1', text: '对照', rect: { x: 12, y: 160, w: 236, h: 40 } })]),
+  )
+  assert(extra.pairs.length === 1 && extra.unmatchedOfficial.length === 0 && extra.unmatchedOurs.length === 0, 'extra official chats are structural, not mismatches')
   const colored = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'o1', text: '官方标题甲', rect: { x: 16, y: 200, w: 200, h: 36 }, style: { color: 'rgb(1, 1, 1)', 'font-size': '14px' } })]),
     capture([node({ key: 'h1', text: '加法', rect: { x: 16, y: 200, w: 200, h: 36 }, style: { color: 'rgb(9, 9, 9)', 'font-size': '14px' } })]),

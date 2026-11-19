@@ -2,6 +2,10 @@
 # is listed here. Brand pairs are aligned in match.ts; these entries are the
 # explicit reason, not a pixel mask.
 exceptions:
+  - id: brand-header-mark
+    unmatched: ours
+    text: "icon 22×22"
+    reason: brand — the Harbor mark is the separate glyph beside the wordmark.
   - id: font-family
     property: font-family
     reason: known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.
@@ -31,6 +35,10 @@ exceptions:
     text: "@"
     region: footer
     reason: brand — official account email or name in the sidebar footer.
+  - id: accent-3964fe
+    property: "color|background-color|border-top-color|border-right-color|border-bottom-color|border-left-color|fill|stroke"
+    ours: "#3964fe"
+    reason: owner rule — Harbor keeps #3964fe where the official UI uses its blue.
   - id: toggles-default-on
     text: "深度思考|智能搜索|思考|搜索|Thinking|Search|toggle-thinking|toggle-search"
     property: "background-color|color|border-top-color|border-right-color|border-bottom-color|border-left-color|border-top-width|border-right-width|border-bottom-width|border-left-width|box-shadow"
