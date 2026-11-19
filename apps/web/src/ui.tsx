@@ -668,7 +668,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   )
 }
 
-const MessageRow = ({ message, conversation }: { message: Message; conversation: Conversation }) => {
+const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const messages = useHarbor((state) => state.messages)
   const selectSibling = useHarbor((state) => state.selectSibling)
@@ -747,11 +747,9 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             </span>
           ) : null}
           <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
-          {conversation.activeLeafId === message.id ? (
-            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <FillIcon paths={[...ACTION_ICONS.regen]} />
-            </button>
-          ) : null}
+          <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+            <FillIcon paths={[...ACTION_ICONS.regen]} />
+          </button>
           <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /></button>
           <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { const utter = new SpeechSynthesisUtterance(textOf); utter.lang = 'zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(utter) }}><FillIcon paths={[...ACTION_ICONS.speak]} /></button>
@@ -1110,7 +1108,7 @@ export const Shell = () => {
               }}
             >
               <div className="chat-column">
-                {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
+                {path.map((message) => conversation ? <MessageRow key={message.id} message={message} /> : null)}
                 <div ref={endRef} />
               </div>
               <div className="composer-wrap">
