@@ -225,7 +225,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await expect(page.getByTestId('assistant-text')).toContainText('8')
   await expect(page.getByTestId('thinking')).toContainText('已思考')
   await page.screenshot({ path: join(shots, 'm-thinking.png') })
-  await page.getByRole('button', { name: '开启新对话' }).click()
+  await page.getByTestId('top-new').click()
   await page.getByTestId('toggle-thinking').click()
   await page.getByTestId('composer').fill('冰岛现在大约多少人口？')
   await page.getByTestId('send').click()

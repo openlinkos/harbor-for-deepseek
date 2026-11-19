@@ -56,7 +56,7 @@ The composer addresses Harbor, not DeepSeek. That is the product name. Everythin
 | 46 | Action row | Six icons and no token line under the answer | `action row` |
 | 47 | Disclaimer | Conversations show 「内容由 AI 生成，请仔细甄别」 | `disclaimer` |
 | 48 | Reduced motion | The stylesheet short-circuits animation when requested | `reduced motion` |
-| 49 | Home greeting | Static fallback 「今天有什么可以帮到你？」. The 欢迎回来 lines are remote `welcome_msg`, not in the JS bundle | `welcome back` |
+| 49 | Home greeting | No history: 「今天有什么可以帮到你？」. With history, one of the two observed returning lines, chosen per mount | `welcome back` |
 | 50 | New-chat hint | The button shows Ctrl J and Ctrl/Cmd+J starts a chat | `keyboard and search` |
 | 51 | Sidebar width and collapse | 261px, collapse over 0.3s | `sidebar motion` |
 | 52 | Inline edit | The user bubble becomes an editor with 取消 and 发送 | `edit and copy` |

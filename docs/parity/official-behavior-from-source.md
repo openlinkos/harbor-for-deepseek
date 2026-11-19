@@ -43,7 +43,8 @@ Counted by exact prelude:
 - Transition: `transform` and `max-width` use `var(--ds-transition-duration-slow)` and `var(--ds-ease-in-out)`. Those tokens are `.3s` and `cubic-bezier(.4, 0, .2, 1)`. A companion fades `opacity` over the same slow token. One inner piece uses `transform .2s steps(1, end)`.
 - Scrim (`. _4cbcd96`): `background-color: rgba(0, 0, 0, .4)`, `z-index: 1001`. The sider is `z-index: 1002` while the drawer is the mobile fixed layer. At `min-width: 768px` the scrim is `opacity: 0; pointer-events: none`.
 - A phone measurement of about 72% of a 465px-wide screenshot is not what this CSS sets. The source width is 261px, so the drawer stays 261px.
-- Message column: `:root { --message-list-padding-horizontal: 44px; --message-list-max-width: 840px }`. Under 1024px both become `36px` and `712px`.
+- Message column: `:root { --message-list-padding-horizontal: 44px; --message-list-max-width: 840px }`. Under 1024px both become `36px` and `712px`. There is no further override at 768px or 440px.
+- Composer bar (`. _871cbca`): `margin: auto 32px 0` and `padding: 0 calc((100% - var(--message-list-max-width)) / 2)`. Under 768px the side margins become `16px`. Under 440px the padding becomes `0`. On a 390px phone the composer inset is that 16px margin, not the 36px message-list padding. Harbor uses 16px for the composer and the empty home column, and keeps the 36px margin on the message transcript.
 - Under 440px the user bubble (`.fbb737a4`) is `max-width: calc(100% - 68px)`.
 - Under 440px the home title (`. _5758a85 ._6c7e7df`) is `font-size: 20px; font-weight: 500; line-height: 28px`, and the logo (`.ce41ed1b`) is `transform: scale(.88)`.
 - Under 768px one sheet (the rule on `._519be07`) is `width: 100vw; border-radius: 24px 24px 0 0; top: 20px; bottom: 0; transform: translateY(36px)`, and the open state is `transform: translateY(0)`.
@@ -71,7 +72,11 @@ The app JS (`yS` in `main.5a15ff2247.js`) measures the tool row on layout and on
 2. If `scrollWidth > clientWidth`, or any label’s height is greater than `1.5 * lineHeight`, hide every label.
 3. Otherwise show the labels.
 
-The icon passed into the toggle is `size: 14`. Harbor does the same measurement and, once collapsed, uses the 34×34 button, 18px radius, and 14px icon from the CSS tokens.
+The icon passed into the toggle is `size: 14`. The hide class `_51c583b` is only `display: none`. The only `classList.toggle` of that class is this measurement. `isMobile` (the UA flag exported as `Q.yA.isMobile`) is used for focus, Enter-to-newline, tooltips, and the mobile “download app” button. It does not hide these labels. There is no `pointer: coarse` check, width breakpoint, or feature flag on the toggles.
+
+The extra class `f79352dc` sets `padding: 10px` on `.ds-toggle-button`. With the 14px icon and the 34px height, a hidden label makes the border box 34×34. Radius 18px then reads as a circle.
+
+A logged-in Android Chrome window at about 393 CSS pixels still shows those two controls as icon-only circles even when the row has room. Harbor treats that as observed behavior: below 768px, when the pointer is coarse, the device reports touch points, or the UA is mobile, the labels stay hidden and each control is 34×34 with an 18px radius and a 14px icon. Wider layouts still use the overflow measurement above.
 
 ## Scroll follow
 
@@ -97,7 +102,9 @@ Selection in the home component:
 - Otherwise pick `messages[Math.floor(random * length)].text`. `Math.random()` is memoized once per mount.
 - If a file is attached, the model is not the default, or the random line is missing, the UI shows `welcomeMessageChat250808` (or the single-model `welcomeMsg` when only one switchable model exists).
 
-`欢迎回来，随时开始吧` and `欢迎回来，想从哪里开始？` are not in `main.js` or the CSS. They were seen on logged-in screenshots, so they belong to the remote `welcome_msg` payload. This client does not call the API for that payload. The home headline is the static fallback above.
+`欢迎回来，随时开始吧` and `欢迎回来，想从哪里开始？` are not in `main.js` or the CSS. They were seen on logged-in screenshots (desktop and phone), so they belong to the remote `welcome_msg` payload. This client does not call that API.
+
+Harbor substitutes the observed lines locally. With no conversations, the headline is the static fallback `今天有什么可以帮到你？` (English: `How can I help you?`). Once any conversation exists, each home mount picks one of the two returning lines at random: `欢迎回来，随时开始吧` or `欢迎回来，想从哪里开始？`. The English pair is `Welcome back. Where should we start?` and `Welcome back. What should we pick up?`. The pick is memoized for that mount.
 
 ## Motion tokens used while matching
 

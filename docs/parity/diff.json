@@ -1,19 +1,19 @@
 [
   {
     "state": "answer-rich-actionrow-copy-tooltip",
-    "mismatch": 4.25,
-    "status": "justify",
-    "note": "Same answer; CJK and code glyphs differ by the face."
-  },
-  {
-    "state": "answer-rich-actionrow-share-tooltip",
     "mismatch": 4.23,
     "status": "justify",
     "note": "Same answer; CJK and code glyphs differ by the face."
   },
   {
+    "state": "answer-rich-actionrow-share-tooltip",
+    "mismatch": 4.21,
+    "status": "justify",
+    "note": "Same answer; CJK and code glyphs differ by the face."
+  },
+  {
     "state": "answer-rich-code-copy-hover",
-    "mismatch": 4.22,
+    "mismatch": 4.21,
     "status": "justify",
     "note": "Same answer; CJK and code glyphs differ by the face."
   },
@@ -25,19 +25,19 @@
   },
   {
     "state": "answer-rich-table-math-code",
-    "mismatch": 4.3,
+    "mismatch": 4.29,
     "status": "justify",
     "note": "Same table, formula, and Python; glyphs differ by the face."
   },
   {
     "state": "answer-rich-thinking-collapsed",
-    "mismatch": 4.43,
+    "mismatch": 4.41,
     "status": "justify",
     "note": "Same answer; glyphs differ by the face."
   },
   {
     "state": "answer-rich-thinking-expanded-user-bubble",
-    "mismatch": 5.21,
+    "mismatch": 5.19,
     "status": "justify",
     "note": "Same thinking and answer; glyphs differ by the face."
   },
@@ -49,13 +49,13 @@
   },
   {
     "state": "answer-search-sources-panel",
-    "mismatch": 11.75,
+    "mismatch": 11.74,
     "status": "justify",
     "note": "Same answer and source cards; snippets and favicons differ by the face."
   },
   {
     "state": "answer-search-timeline-expanded-sources-open",
-    "mismatch": 9.75,
+    "mismatch": 9.58,
     "status": "justify",
     "note": "Same timeline and answer; glyphs differ by the face."
   },
@@ -127,13 +127,13 @@
   },
   {
     "state": "sidebar-item-menu",
-    "mismatch": 1.98,
+    "mismatch": 1.94,
     "status": "pass",
     "note": ""
   },
   {
     "state": "streaming-stop-button",
-    "mismatch": 3.26,
+    "mismatch": 3.25,
     "status": "justify",
     "note": "Stop control matches. Official is mid-generation of the weather answer; ours is the stop control before tokens arrive."
   },

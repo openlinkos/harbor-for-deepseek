@@ -1130,11 +1130,22 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   )
 }
 
+const RETURNING_GREETINGS = ['welcomeBack', 'welcomeAlt'] as const
+
 const Empty = () => {
   const t = useT()
+  const hasHistory = useHarbor((state) => state.conversations.length > 0)
+  const returning = useMemo(() => {
+    if (!hasHistory) {
+      return 'welcomeMessage' as const
+    }
+    const index = Math.floor(Math.random() * RETURNING_GREETINGS.length)
+    return RETURNING_GREETINGS[index] ?? 'welcomeBack'
+  }, [hasHistory])
+  const line = t(returning)
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /> {t('welcomeMessage')}</h2>
+      <h2 className="greeting"><Mark /> {line}</h2>
       <Composer />
     </div>
   )
@@ -1160,11 +1171,29 @@ const Composer = () => {
       return
     }
     let collapsedAt = 0
+    const phoneCollapsed = () => {
+      // The public bundle only hides labels on overflow. Logged-in Android
+      // Chrome at ~393px still shows icon-only buttons, so a coarse/mobile
+      // viewport below 768px follows that observed layout.
+      if (!window.matchMedia('(max-width: 767px)').matches) {
+        return false
+      }
+      const coarse = window.matchMedia('(pointer: coarse)').matches
+      const touch = navigator.maxTouchPoints > 0
+      const mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+      return coarse || touch || mobileUa
+    }
     const measure = () => {
+      const labels = [...row.querySelectorAll<HTMLElement>('.chip-label')]
+      if (phoneCollapsed()) {
+        labels.forEach((label) => { label.hidden = true })
+        setIconOnly(true)
+        collapsedAt = row.clientWidth
+        return
+      }
       if (collapsedAt && row.clientWidth <= collapsedAt + 24) {
         return
       }
-      const labels = [...row.querySelectorAll<HTMLElement>('.chip-label')]
       labels.forEach((label) => { label.hidden = false })
       const wrapped = labels.some((label) => {
         const line = Number.parseFloat(getComputedStyle(label).lineHeight)
