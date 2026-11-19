@@ -1367,7 +1367,7 @@ const Composer = () => {
               <span className="chip-label">{t('thinking')}</span>
             </div>
           </span>
-          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
+          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} aria-disabled={flash ? 'false' : 'true'} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
             <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
           </div>
@@ -1571,7 +1571,7 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('balance')}</span>
-            <span>{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
+            <span data-testid="balance-side">{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
           </div>
           <div className="settings-line">
             <span>{t('nickname')}</span>

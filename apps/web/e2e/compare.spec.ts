@@ -137,7 +137,7 @@ const shot = async (page: Page, name: string) => {
 const pinGreeting = async (page: Page) => {
   for (let attempt = 0; attempt < 24; attempt += 1) {
     const text = await page.locator('.greeting').innerText()
-    if (text.includes('欢迎回来，随时开始吧')) {
+    if (text.includes('你好，我能帮什么忙吗？')) {
       return
     }
     await page.getByRole('button', { name: '快排介绍' }).click()
@@ -145,7 +145,7 @@ const pinGreeting = async (page: Page) => {
     await page.getByTestId('new-chat').click()
     await expect(page.locator('.greeting')).toBeVisible()
   }
-  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+  await expect(page.locator('.greeting')).toContainText('你好，我能帮什么忙吗？')
 }
 
 test('capture official states at 1920x1072', async ({ page }) => {
@@ -190,10 +190,10 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '系统设置' })).toBeVisible()
   await expect(page.getByRole('button', { name: '深色' })).toHaveClass(/on/)
   await shot(page, 'settings-general.png')
-  await page.locator('.pill-menu').first().getByRole('button').click()
+  await page.getByTestId('language-trigger').click()
   await expect(page.getByRole('option', { name: 'English' })).toBeVisible()
   await shot(page, 'settings-general-language-dropdown.png')
-  await page.locator('.pill-menu').first().getByRole('button').first().click()
+  await page.getByTestId('language-trigger').click()
   await page.getByTestId('voice-select').click()
   await expect(page.getByRole('option', { name: '贝壳' })).toBeVisible()
   await shot(page, 'settings-general-voice-dropdown.png')
