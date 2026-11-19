@@ -216,7 +216,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.getByRole('button', { name: '账号管理' }).click()
   await page.getByTestId('nickname').fill('阿港')
   await page.getByTestId('avatar-initial').fill('港')
-  await page.getByRole('button', { name: '保存' }).click()
+  await page.getByRole('button', { name: '变更' }).first().click()
   await page.screenshot({ path: join(shots, 'm-settings.png') })
   await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
   await page.getByTestId('sidebar').getByRole('button', { name: '隐藏' }).click()

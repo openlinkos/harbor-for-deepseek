@@ -146,7 +146,7 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
     <div className="code-card">
       <div className="code-head">
         <span>{(language || 'text').toLowerCase()}</span>
-        <span>
+        <span className="code-tools">
           <button
             type="button"
             onClick={() => {
@@ -156,16 +156,20 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
               })
             }}
           >
-            {copied ? '✓ ' : ''}{label('复制', 'Copy')}
+            <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="4.2" y="3.2" width="7.2" height="9.6" rx="1.2" /><path d="M2.6 11.2V2.8h6.2" /></svg>
+            <span>{copied ? '✓' : label('复制', 'Copy')}</span>
           </button>
           <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
-            ↓
+            <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M7 2.5v7.2M4.2 7.2 7 10l2.8-2.8M2.5 13h9" /></svg>
+            <span>{label('下载', 'Download')}</span>
           </button>
         </span>
       </div>
       <pre className={long && !expanded ? 'collapsed' : ''}>
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
+      <svg className="code-corner" width="12" height="12" aria-hidden="true" />
+      <svg className="code-corner end" width="12" height="12" aria-hidden="true" />
       {long ? (
         <button type="button" className="code-fold" onClick={() => setExpanded((open) => !open)}>
           {expanded ? label('收起', 'Collapse') : label('展开', 'Expand')}

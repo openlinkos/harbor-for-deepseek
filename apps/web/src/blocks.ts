@@ -2,6 +2,29 @@ import type { ContentBlock, TextBlock } from '@harbor/types'
 
 const ONLY_PUNCT = /^[\s。．.!?！？…,，、；;：:]+$/u
 
+const MARKER_LINE = /^[ \t]*[-*][ \t]*((?:〔\d+〕|\[\d+\]|\(\d+\))+)[ \t]*$/
+const PUNCT_LINE = /^[ \t]*(?:[-*][ \t]*)?[。．.!?！？…]+[ \t]*$/
+
+/** Drop list items that are only a citation marker or a stray full stop, and keep the marker on the previous line. */
+export const tidyMarkdown = (value: string): string => {
+  const kept: string[] = []
+  for (const line of value.split('\n')) {
+    const marker = MARKER_LINE.exec(line)
+    if (marker?.[1] && kept.length) {
+      kept[kept.length - 1] = `${kept[kept.length - 1].replace(/[ \t]+$/, '')}${marker[1]}`
+      continue
+    }
+    if (PUNCT_LINE.test(line)) {
+      if (kept.length && !PUNCT_LINE.test(kept[kept.length - 1])) {
+        kept[kept.length - 1] = `${kept[kept.length - 1].replace(/[ \t]+$/, '')}${line.trim().replace(/^[-*]\s*/, '')}`
+      }
+      continue
+    }
+    kept.push(line)
+  }
+  return kept.join('\n').replace(/\n{3,}/g, '\n\n')
+}
+
 const tidyText = (value: string): string => {
   const match = /\n+[ \t]*([。．.!?！？…]+)[ \t]*$/u.exec(value)
   const mark = match?.[1]
@@ -31,7 +54,9 @@ export const presentBlocks = (blocks: ContentBlock[]): ContentBlock[] => {
       result[result.length - 1] = merged
       continue
     }
-    result.push(text === block.text ? block : { ...block, text })
+    const markdown = tidyMarkdown(text)
+    if (!markdown.trim()) continue
+    result.push(markdown === block.text ? block : { ...block, text: markdown })
   }
   return result
 }

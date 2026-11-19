@@ -1,15 +1,15 @@
 {
   "state": "sidebar-item-menu",
   "viewport": "1920x1072",
-  "officialVisible": 87,
-  "matched": 39,
-  "matchedEqual": 39,
+  "officialVisible": 86,
+  "matched": 40,
+  "matchedEqual": 40,
   "matchedDiff": 0,
-  "officialOnly": 1,
-  "harborOnly": 7,
-  "allowlisted": 19,
-  "unmatchedOfficial": 1,
-  "unmatchedOurs": 7,
+  "officialOnly": 0,
+  "harborOnly": 5,
+  "allowlisted": 18,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 5,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -129,13 +129,6 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "sidebar > icon 16×16 @225,469",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > icon 22×22 @12,22",
       "property": "unmatched",
       "official": "",
@@ -143,22 +136,6 @@
       "status": "allowed",
       "reason": "brand — the Harbor mark is the separate glyph beside the wordmark.",
       "id": "brand-header-mark"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
-    },
-    {
-      "key": "sidebar > icon 16×16 @179,173",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
     },
     {
       "key": "sidebar > span @18,1024 32×32",
@@ -197,6 +174,6 @@
       "id": "brand-footer-unmatched-ours"
     }
   ],
-  "unexplained": 2,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

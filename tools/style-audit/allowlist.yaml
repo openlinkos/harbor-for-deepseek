@@ -35,6 +35,10 @@ exceptions:
     text: "@"
     region: footer
     reason: brand — official account email or name in the sidebar footer.
+  - id: brand-terms-footer
+    unmatched: ours
+    text: "contentinfo|GitHub|许可证|OpenLinkOS|openlinkos/harbor-for-de|platform.deepseek.com"
+    reason: brand — the 服务协议 tab keeps the Harbor footer, including the trademark note that this project is not affiliated with DeepSeek.
   - id: accent-3964fe
     property: "color|background-color|border-top-color|border-right-color|border-bottom-color|border-left-color|fill|stroke"
     ours: "#3964fe"

@@ -51,6 +51,16 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
   </svg>
 )
 
+const focusComposer = () => {
+  window.requestAnimationFrame(() => {
+    const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
+    if (!box) return
+    box.focus()
+    const end = box.value.length
+    box.setSelectionRange(end, end)
+  })
+}
+
 const shortcutHint = () => {
   if (typeof navigator === 'undefined') return 'Ctrl J'
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
@@ -498,11 +508,11 @@ const Thinking = ({ text }: { text: string }) => {
   return (
     <section className="thinking" data-testid="thinking">
       <button type="button" onClick={() => setOpen((value) => !value)}>
-        <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" />
+        <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
         {t('thoughtFor', { seconds })}
         <Icon d="M9 6l6 6-6 6" />
       </button>
-      {open ? <div className="thinking-body">{text}</div> : null}
+      {open ? <div className="thinking-body think-copy"><Markdown text={text} /></div> : null}
     </section>
   )
 }
@@ -579,14 +589,14 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       {steps.length ? (
         <section className="thinking" data-testid="thinking">
           <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-            <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" />
+            <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
             {t('thoughtFor', { seconds })}
             <span className={`chev ${open ? 'open' : ''}`}><Icon d="M9 6l6 6-6 6" /></span>
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
             <div className="thinking-body">
               {steps.map((step, index) => step.type === 'think' ? (
-                <p key={index} className="timeline-step">{step.text}</p>
+                <div key={index} className="timeline-step think-copy"><Markdown text={step.text} /></div>
               ) : step.type === 'search' ? (
                 <p key={index} className="timeline-step found-line">
                   <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
@@ -594,14 +604,16 @@ const AssistantTurn = ({ message }: { message: Message }) => {
                   <span className="favicons">{step.items.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
                 </p>
               ) : (
-                <div key={index} className="timeline-step">
-                  <p className="found-line">{t('browsedPages', { count: step.items.length })}</p>
-                  <div className="browse-chips">
-                    {step.items.map((item) => (
-                      <a key={item.url} href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
-                    ))}
-                  </div>
-                </div>
+                <p key={index} className="timeline-step found-line browse-line">
+                  <Icon d="M6 4h9l3 3v13H6z" />
+                  {t('browsedPages', { count: step.items.length })}
+                  {step.items.map((item) => (
+                    <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
+                      {item.title}
+                      <Icon size={12} d="M7 17 17 7M9 7h8v8" />
+                    </a>
+                  ))}
+                </p>
               ))}
             </div>
           </div>
@@ -612,6 +624,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
           <Markdown text={block.text} citations={block.citations} />
         </div>
       ))}
+      {texts.length ? <p className="answer-note">{t('answerNote')}</p> : null}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
           <span className="favicons">{sources.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
@@ -701,14 +714,14 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={16} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <Icon size={20} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+              <Icon size={16} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={20} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={20} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={16} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={16} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
             if (!textOf || !('speechSynthesis' in window)) return
             const utterance = new SpeechSynthesisUtterance(textOf)
@@ -721,8 +734,8 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             window.speechSynthesis.cancel()
             setSpeaking(true)
             window.speechSynthesis.speak(utterance)
-          }}>{speaking ? <Icon size={20} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={20} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={20} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          }}>{speaking ? <Icon size={16} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={16} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -856,12 +869,14 @@ export const Shell = () => {
       const meta = event.metaKey || event.ctrlKey
       const target = event.target as HTMLElement | null
       const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      const inComposer = target?.dataset.testid === 'composer'
       if (meta && event.key.toLowerCase() === 'k') {
         event.preventDefault()
         setFiltering(true)
-      } else if (meta && event.key.toLowerCase() === 'j' && !typing) {
+      } else if (meta && event.key.toLowerCase() === 'j' && (!typing || inComposer)) {
         event.preventDefault()
         void state.newChat()
+        focusComposer()
       } else if (event.key === 'Escape') {
         setPanel(null)
         setUserMenu(false)
@@ -869,6 +884,7 @@ export const Shell = () => {
         if (state.settingsOpen) {
           state.setSettingsOpen(false)
         }
+        focusComposer()
       }
     }
     window.addEventListener('keydown', onKey)
@@ -927,7 +943,7 @@ export const Shell = () => {
             </button>
           </span>
         </div>
-        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
+        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }}>
           <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
           <kbd className="kbd">{shortcutHint()}</kbd>
         </button>
@@ -1005,7 +1021,7 @@ export const Shell = () => {
             <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(false)}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
-            <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+            <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
               <Icon d="M12 5v14M5 12h14" />
             </button>
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering(true)}>
@@ -1014,13 +1030,13 @@ export const Shell = () => {
           </div>
         </>
       ) : null}
-      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }} /> : null}
+      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }} /> : null}
       {filtering ? (
         <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
           <input className="side-filter" autoFocus placeholder={t('searchChats')} value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
-          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
         </form>
@@ -1036,12 +1052,16 @@ export const Shell = () => {
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
           <span className="top-actions">
-            <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+            <a className="download-app" href="https://github.com/openlinkos/harbor-for-deepseek/releases" target="_blank" rel="noreferrer noopener">
+              <Icon d="M12 4v10M8 10l4 4 4-4M5 18h14" />
+              <span>{t('downloadApp')}</span>
+            </a>
+            <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
               <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
             {path.length > 0 ? (
               <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor for DeepSeek', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
-                <Icon size={22} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
+                <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
               </button>
             ) : null}
           </span>
@@ -1147,11 +1167,11 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
-        <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id) }}>{conversation.title || t('newChat')}</button>
+        <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id); focusComposer() }}>{conversation.title || t('newChat')}</button>
       )}
       <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
-        setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
+        setMenuBox({ top: rect.top, left: rect.left - 10 })
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
@@ -1224,6 +1244,10 @@ const Composer = () => {
   const [iconOnly, setIconOnly] = useState(false)
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
+  const activeId = useHarbor((state) => state.activeId)
+  useEffect(() => {
+    focusComposer()
+  }, [activeId])
   useEffect(() => {
     const row = chips.current
     if (!row) {
@@ -1264,6 +1288,7 @@ const Composer = () => {
     const value = text
     setText('')
     void send(value)
+    focusComposer()
   }
   return (
     <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
@@ -1288,10 +1313,22 @@ const Composer = () => {
         value={text}
         onChange={(event) => setText(event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.shiftKey) {
+          if (event.key !== 'Enter') return
+          if (!event.shiftKey) {
             event.preventDefault()
             submit()
+            return
           }
+          event.preventDefault()
+          const node = event.currentTarget
+          const start = node.selectionStart ?? text.length
+          const end = node.selectionEnd ?? start
+          const next = `${text.slice(0, start)}\n${text.slice(end)}`
+          setText(next)
+          window.requestAnimationFrame(() => {
+            node.selectionStart = start + 1
+            node.selectionEnd = start + 1
+          })
         }}
       />
       <div className="composer-tools">
@@ -1384,7 +1421,7 @@ const Settings = () => {
             const modal = document.querySelector('.settings-modal')
             modal?.classList.add('closing')
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-            window.setTimeout(() => setSettingsOpen(false), reduce ? 0 : 100)
+            window.setTimeout(() => { setSettingsOpen(false); focusComposer() }, reduce ? 0 : 100)
           }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
@@ -1483,41 +1520,67 @@ const Settings = () => {
           </section>
         </details>
         <section className="settings-account">
-          <h3>{t('tabProfile')}</h3>
-          <p className="hint">{t('localStay')}</p>
-          <label>
-            {t('nickname')}
-            <input data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-          </label>
-          <label>
-            {t('avatarInitial')}
-            <input data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
-          </label>
-          <button type="button" className="primary" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
+          <div className="settings-line">
+            <span>{t('accountEmail')}</span>
+            <input className="account-value" data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+          </div>
+          <div className="settings-line">
+            <span>{t('accountPhone')}</span>
+            <span className="account-chip wide">
+              <input className="account-value" data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+              <button type="button" className="account-action phone" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountChange')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountWechat')}</span>
+            <span className="account-chip">
+              <span className="account-pill">{t('accountUnbound')}</span>
+              <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountBind')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountMinor')}</span>
+            <span className="account-chip">
+              <span className="account-pill">{t('accountOff')}</span>
+              <button type="button" className="account-action"><span>{t('accountChange')}</span></button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountDevices')}</span>
+            <button type="button" className="account-quiet">{t('accountManage')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountSignOutAll')}</span>
+            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountSignOut')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('accountDelete')}</span>
+            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountDeleteAction')}</button>
+          </div>
         </section>
         <section className="settings-data">
-          <div className="settings-line">
-            <div>
-              <strong>{t('improveToggle')}</strong>
+          <div className="settings-line stack">
+            <div className="settings-copy">
+              <span>{t('improveToggle')}</span>
               <p className="hint">{t('improveBody')}</p>
             </div>
-            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }} />
+            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }}><span className="knob" /></button>
           </div>
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
-            <button type="button" onClick={() => setSharedNote(true)}>{t('manage')}</button>
+            <button type="button" className="account-quiet" onClick={() => setSharedNote(true)}>{t('manage')}</button>
           </div>
           {sharedNote ? <p className="hint">{t('noShared')}</p> : null}
-          <div className="settings-line">
-            <div>
-              <strong>{t('exportAll')}</strong>
+          <div className="settings-line stack">
+            <div className="settings-copy wide">
+              <span>{t('exportAll')}</span>
               <p className="hint">{t('exportAllBody')}</p>
             </div>
-            <button type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
+            <button type="button" className="account-quiet" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
           </div>
           <div className="settings-line">
             <span>{t('deleteAll')}</span>
-            <button type="button" className="danger outline" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
+            <button type="button" className="account-danger" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
             {confirmAll ? (
               <ConfirmDialog
                 label={t('deleteConfirm')}
@@ -1735,11 +1798,11 @@ const Settings = () => {
         <section className="settings-legal">
           <div className="settings-line">
             <span>{t('terms')}</span>
-            <a href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE">{t('view')}</a>
+            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE"><span>{t('view')}</span></a>
           </div>
           <div className="settings-line">
             <span>{t('privacyPolicy')}</span>
-            <a href="https://github.com/openlinkos/harbor-for-deepseek">{t('view')}</a>
+            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek"><span>{t('view')}</span></a>
           </div>
           <SiteFooter />
           <p className="hint">

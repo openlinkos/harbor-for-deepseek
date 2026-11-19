@@ -68,6 +68,32 @@ const rich = [
 ].join('\n')
 
 const longAnswer = Array.from({ length: 24 }, (_, index) => `第 ${index + 1} 段。把这条回答撑到超过一屏，便于回到底部。`).join('\n\n')
+const answerEssay = [
+  '返回一个定时器 ID，可用于取消：',
+  '',
+  '```js',
+  'const timerId = setTimeout(captureStyleAudit, 10000)',
+  'clearTimeout(timerId)',
+  '```',
+  '',
+  '注意：',
+  '',
+  '1. `captureStyleAudit` 必须已经定义，否则这行代码执行时会立即报 `ReferenceError`。',
+  '2. 10 秒后调用时默认不传参数。',
+  '3. 如果函数依赖 `this`，直接传入可能会丢失上下文，建议写成：',
+  '',
+  '```js',
+  'setTimeout(() => captureStyleAudit(), 10000)',
+  '```',
+  '',
+  '4. 如果需要传参：',
+  '',
+  '```js',
+  'setTimeout(() => captureStyleAudit(arg1, arg2), 10000)',
+  '```',
+  '',
+  '简单说：**10 秒后执行一次** `captureStyleAudit()`。',
+].join('\n')
 const longCode = `\`\`\`ts\n${Array.from({ length: 20 }, (_, index) => `const line${index} = ${index}`).join('\n')}\n\`\`\``
 
 type Mode = 'ok' | 'hold' | 'error' | 'rich' | 'long' | 'code' | 'versions'
@@ -123,13 +149,14 @@ const install = async (page: Page) => {
       return
     }
     calls += 1
-    const text = mode === 'rich' ? rich : mode === 'long' ? longAnswer : mode === 'code' ? longCode : mode === 'versions' && calls > 1 ? '第二版' : '8'
+    const text = mode === 'rich' ? rich : mode === 'long' ? longAnswer : mode === 'code' ? longCode : mode === 'versions' && calls > 1 ? '第二版' : answerEssay
     await route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(text, mode === 'versions' ? '版本' : '对照') })
   })
 }
 
 const unlock = async (page: Page) => {
-  await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
+  const narrow = (page.viewportSize()?.width || 1440) < 500
+  await page.addInitScript((flag) => sessionStorage.setItem('harbor-audit-greeting', flag ? 'welcomeBack' : 'welcomeAlt'), narrow)
   await page.goto(`${base}/`)
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-ack').check()
@@ -257,12 +284,11 @@ const states: StateSpec[] = [
   },
   {
     id: 'settings-data', rows: [36, 59], viewports: all, official: true,
-    steps: ['Open 系统设置, click 数据管理, and expand the extra data section if it is collapsed.'],
+    steps: ['Open 系统设置 and click 数据管理. Leave the extra data section collapsed; official does not show it.'],
     run: async (page, mobile) => {
       await unlock(page)
       await openSettings(page, mobile)
       await page.getByRole('button', { name: '数据管理' }).click()
-      await page.getByTestId('settings-more-data').evaluate((el) => { (el as HTMLDetailsElement).open = true })
     },
   },
   {
