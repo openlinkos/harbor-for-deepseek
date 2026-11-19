@@ -485,6 +485,32 @@ test('390 balance label stays on one line', async ({ page }) => {
   expect(box!.width).toBeGreaterThan(27)
 })
 
+test('390 balance refresh stays on the value line', async ({ page }) => {
+  await install(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('menu').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByRole('button', { name: '账号管理' }).click()
+  const centers = await page.evaluate(() => {
+    const mid = (selector: string) => {
+      const rect = document.querySelector(selector)!.getBoundingClientRect()
+      return rect.top + rect.height / 2
+    }
+    return {
+      value: mid('[data-testid="balance-value"]'),
+      button: mid('[data-testid="refresh-balance"]'),
+      label: mid('[data-testid="balance-label"]'),
+    }
+  })
+  expect(Math.abs(centers.button - centers.value)).toBeLessThanOrEqual(4)
+  expect(Math.abs(centers.label - centers.value)).toBeLessThanOrEqual(4)
+})
+
 test('balance hint keeps a gap from the value', async ({ page }) => {
   await install(page)
   await page.goto('/')

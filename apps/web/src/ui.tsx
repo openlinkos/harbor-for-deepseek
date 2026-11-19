@@ -1593,14 +1593,14 @@ const Settings = () => {
               <span data-testid="balance-side">
                 {balanceError || !balanceInfo
                   ? t('balanceFailed')
-                  : <>
-                      <span data-testid="balance-value">{balanceInfo.total_balance} {balanceInfo.currency} {balance.is_available ? t('available') : t('unavailable')}</span>
-                      <span className="hint" data-testid="balance-hint">
-                        {t('granted')} {balanceInfo.granted_balance}
-                        {' · '}{t('toppedUp')} {balanceInfo.topped_up_balance}
-                      </span>
-                    </>}
+                  : <span data-testid="balance-value">{balanceInfo.total_balance} {balanceInfo.currency} {balance.is_available ? t('available') : t('unavailable')}</span>}
               </span>
+              {!balanceError && balanceInfo ? (
+                <span className="hint" data-testid="balance-hint">
+                  {t('granted')} {balanceInfo.granted_balance}
+                  {' · '}{t('toppedUp')} {balanceInfo.topped_up_balance}
+                </span>
+              ) : null}
               {serverMode ? null : (
                 <button type="button" className="account-quiet" data-testid="refresh-balance" onClick={() => void refreshBalance()}>{t('refresh')}</button>
               )}

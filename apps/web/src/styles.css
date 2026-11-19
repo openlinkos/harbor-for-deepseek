@@ -1368,6 +1368,15 @@ body[data-ds-dark-theme] .settings-main button:not(.chip) { background: var(--ds
 .settings-line > span:first-child { flex-shrink: 0; white-space: nowrap; }
 .settings-line.balance-line { height: auto; align-items: center; }
 .settings-line.balance-line > span:first-child { height: 22px; line-height: 22px; }
+.settings-line.balance-line .account-side { column-gap: 0; row-gap: 0; }
+.settings-line.balance-line .account-side > .hint { margin-left: 8px; }
+.settings-line.balance-line .account-side > button { margin-left: 12px; }
+@media (max-width: 767px) {
+  .settings-line.balance-line:has(button) { align-items: flex-start; }
+  .settings-line.balance-line:has(button) > span:first-child { margin-top: 7px; }
+  .settings-line.balance-line .account-side > button { order: 1; }
+  .settings-line.balance-line .account-side > .hint { order: 2; }
+}
 .settings-account, .settings-data, .settings-legal { margin-top: -10px; }
 .legal-copy { max-width: 640px; }
 .legal-copy h3 { margin: 16px 0 8px; font-size: 16px; }
