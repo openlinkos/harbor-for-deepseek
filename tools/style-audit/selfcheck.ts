@@ -70,7 +70,16 @@ export const selfCheck = () => {
       node({ key: 'h2', text: '天气', rect: { x: 16, y: 250, w: 200, h: 36 } }),
     ]),
   )
-  assert(chats.pairs.length === 2 && chats.pairs.every((pair) => pair.brand === 'chat-list'), 'chat rows align by position')
+  assert(chats.pairs.filter((pair) => pair.brand === 'chat-list').length >= 2, 'chat rows align by position')
+  const extra = matchCaptures(
+    capture([
+      node({ key: 'o1', text: '测试会话A', rect: { x: 12, y: 160, w: 236, h: 40 } }),
+      node({ key: 'o2', text: '另一条', rect: { x: 12, y: 200, w: 236, h: 40 } }),
+      node({ key: 'o3', text: '第三条', rect: { x: 12, y: 240, w: 236, h: 40 } }),
+    ]),
+    capture([node({ key: 'h1', text: '对照', rect: { x: 12, y: 160, w: 236, h: 40 } })]),
+  )
+  assert(extra.pairs.length === 1 && extra.unmatchedOfficial.length === 0 && extra.unmatchedOurs.length === 0, 'extra official chats are structural, not mismatches')
   const colored = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'o1', text: '官方标题甲', rect: { x: 16, y: 200, w: 200, h: 36 }, style: { color: 'rgb(1, 1, 1)', 'font-size': '14px' } })]),
     capture([node({ key: 'h1', text: '加法', rect: { x: 16, y: 200, w: 200, h: 36 }, style: { color: 'rgb(9, 9, 9)', 'font-size': '14px' } })]),

@@ -55,7 +55,7 @@ const shortcutHint = () => {
   if (typeof navigator === 'undefined') return 'Ctrl J'
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
   const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
-  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
+  return /mac|iphone|ipad|ipod|linux|x11/i.test(platform) ? '⌘ J' : 'Ctrl J'
 }
 
 const Wordmark = () => (

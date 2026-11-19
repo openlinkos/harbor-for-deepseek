@@ -70,14 +70,45 @@ const isFooter = (node: StyleNode, side: 'official' | 'ours', height: number) =>
   return node.rect.y > height - 180 && /@/.test(text)
 }
 
+const inSidebar = (node: StyleNode) => node.rect.x < 48 && node.rect.x + node.rect.w < 340
+
 const isChatRow = (node: StyleNode) => {
-  if (node.tag !== 'button' || node.pseudo) return false
-  if (node.rect.x > 320 || node.rect.w < 80) return false
-  if (node.rect.h < 18 || node.rect.h > 64) return false
-  const text = node.text.trim()
-  if (text.length < 1) return false
-  if (/开启新对话|new chat/i.test(text)) return false
+  if (node.pseudo || node.rect.y < 120) return false
+  if (!inSidebar(node)) return false
+  if (node.rect.w < 180 || node.rect.h < 36 || node.rect.h > 48) return false
+  if (node.tag !== 'a' && node.tag !== 'div' && node.tag !== 'button') return false
+  if (node.style.display === 'grid' || node.style.color === 'rgb(128, 0, 128)') return false
+  const text = textOf(node)
+  if (/开启新对话|new chat|深度思考|智能搜索/i.test(text)) return false
   return true
+}
+
+const isGroupLabel = (node: StyleNode) => {
+  if (node.pseudo || !inSidebar(node)) return false
+  if (node.rect.h < 14 || node.rect.h > 28 || node.rect.w < 160) return false
+  const text = node.text.trim()
+  return text.length > 0 && text.length <= 16 && /置顶|今天|昨天|天内|^\d{4}-\d{2}$/.test(text)
+}
+
+const contained = (parent: StyleNode, node: StyleNode) => {
+  const outer = parent.rect
+  const inner = node.rect
+  return inner.x >= outer.x - 1 && inner.y >= outer.y - 1 && inner.x + inner.w <= outer.x + outer.w + 2 && inner.y + inner.h <= outer.y + outer.h + 2
+}
+
+const distinctRows = (nodes: StyleNode[]) => {
+  const sorted = [...nodes].sort(byPos)
+  const kept: StyleNode[] = []
+  for (const node of sorted) {
+    if (kept.some((row) => contained(row, node))) continue
+    kept.push(node)
+  }
+  return kept
+}
+
+const withoutRows = (pool: StyleNode[], rows: StyleNode[]) => {
+  if (!rows.length) return pool
+  return pool.filter((node) => !rows.some((row) => node === row || contained(row, node) || node.key.startsWith(`${row.key} > `) || node.key.startsWith(`${row.key}::`)))
 }
 
 const take = (pool: StyleNode[], chosen: StyleNode[]) => {
@@ -142,10 +173,19 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   officialPool = take(officialPool, footer.pairs.map((pair) => pair.official))
   oursPool = take(oursPool, footer.pairs.map((pair) => pair.ours))
 
-  const chat = zipBrand(officialPool.filter(isChatRow), oursPool.filter(isChatRow), 'chat-list')
+  const officialRows = distinctRows(officialPool.filter(isChatRow))
+  const oursRows = distinctRows(oursPool.filter(isChatRow))
+  const chat = zipBrand(officialRows, oursRows, 'chat-list')
   pairs.push(...chat.pairs)
-  officialPool = take(officialPool, chat.pairs.map((pair) => pair.official))
-  oursPool = take(oursPool, chat.pairs.map((pair) => pair.ours))
+  officialPool = withoutRows(officialPool, officialRows)
+  oursPool = withoutRows(oursPool, oursRows)
+
+  const officialGroups = distinctRows(officialPool.filter(isGroupLabel))
+  const oursGroups = distinctRows(oursPool.filter(isGroupLabel))
+  const groups = zipBrand(officialGroups, oursGroups, 'chat-list')
+  pairs.push(...groups.pairs)
+  officialPool = take(officialPool, officialGroups)
+  oursPool = take(oursPool, oursGroups)
 
   const oursByKey = new Map<string, StyleNode[]>()
   for (const node of oursPool) {
@@ -192,6 +232,8 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   for (const left of officialPool) {
     for (const right of oursPool) {
       if (left.tag !== right.tag) continue
+      if (left.rect.w > 500 && left.rect.h > 400) continue
+      if (left.style.color === 'rgb(128, 0, 128)' && right.style.color !== left.style.color) continue
       const score = iou(left.rect, right.rect)
       if (score >= 0.5) candidates.push({ score, official: left, ours: right })
     }

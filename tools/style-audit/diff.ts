@@ -8,6 +8,7 @@ export type Exception = {
   text?: string
   unmatched?: 'ours' | 'official'
   region?: string
+  ours?: string
   reason: string
 }
 
@@ -39,11 +40,28 @@ const COLOR_PROPS = new Set([
 
 const GEOMETRY = new Set(['x', 'y', 'w', 'h'])
 
+const stripComment = (raw: string) => {
+  let quote = ''
+  for (let index = 0; index < raw.length; index += 1) {
+    const char = raw[index]
+    if (quote) {
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === "'") {
+      quote = char
+      continue
+    }
+    if (char === '#') return raw.slice(0, index)
+  }
+  return raw
+}
+
 export const loadAllowlist = (text: string): Exception[] => {
   const items: Exception[] = []
   let current: Exception | null = null
   for (const raw of text.split('\n')) {
-    const line = raw.replace(/#.*$/, '').trimEnd()
+    const line = stripComment(raw).trimEnd()
     if (!line.trim()) continue
     const item = line.match(/^\s*-\s+id:\s*(.+)$/)
     if (item?.[1]) {
@@ -52,9 +70,9 @@ export const loadAllowlist = (text: string): Exception[] => {
       continue
     }
     if (!current) continue
-    const field = line.match(/^\s+(property|brand|text|unmatched|region|reason):\s*(.*)$/)
+    const field = line.match(/^\s+(property|brand|text|unmatched|region|ours|reason):\s*(.*)$/)
     if (!field?.[1]) continue
-    const key = field[1] as 'property' | 'brand' | 'text' | 'unmatched' | 'region' | 'reason'
+    const key = field[1] as 'property' | 'brand' | 'text' | 'unmatched' | 'region' | 'ours' | 'reason'
     current[key] = field[2].trim().replace(/^["']|["']$/g, '')
   }
   if (current) items.push(current)
@@ -131,6 +149,16 @@ const matchesField = (pattern: string | undefined, value: string) => {
   return pattern.split('|').some((part) => value.includes(part))
 }
 
+const isBlue = (value: string | null) => {
+  if (!value) return false
+  const match = value.match(/rgba\((\d+), (\d+), (\d+)/)
+  if (!match) return false
+  const red = Number(match[1])
+  const green = Number(match[2])
+  const blue = Number(match[3])
+  return blue >= 160 && blue > red + 30 && blue > green
+}
+
 const nodeText = (node: StyleNode) => `${node.name} ${node.text} ${node.testId || ''} ${node.key}`
 
 const explain = (exceptions: Exception[], pair: Pair | null, property: string, official: StyleNode | null, ours: StyleNode | null, unmatched?: 'ours' | 'official') => {
@@ -142,6 +170,12 @@ const explain = (exceptions: Exception[], pair: Pair | null, property: string, o
     if (exception.property && property === 'unmatched' && !exception.unmatched) continue
     const blob = `${official ? nodeText(official) : ''} ${ours ? nodeText(ours) : ''}`
     if (exception.text && !matchesField(exception.text, blob)) continue
+    if (exception.ours) {
+      const oursValue = ours?.style[property] || ''
+      const officialValue = official?.style[property] || ''
+      if (normalizeColor(oursValue) !== normalizeColor(exception.ours)) continue
+      if (!isBlue(normalizeColor(officialValue))) continue
+    }
     if (exception.region === 'footer') {
       const node = (unmatched === 'ours' ? ours : official) || official || ours
       if (!node || node.rect.y < 600 || node.rect.x > 340) continue
@@ -162,6 +196,13 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
       const official = officialStyle[property] ?? ''
       const ours = oursStyle[property] ?? ''
       if (same(property, official, ours)) continue
+      if (property === 'outline' && official.includes(' none') && ours.includes(' none')) continue
+      if (property.startsWith('border-') && property.endsWith('-color')) {
+        const side = property.slice('border-'.length, -'-color'.length)
+        const officialWidth = pair.official.style[`border-${side}-width`] || '0px'
+        const oursWidth = pair.ours.style[`border-${side}-width`] || '0px'
+        if (officialWidth === '0px' && oursWidth === '0px') continue
+      }
       const exception = explain(exceptions, pair, property, pair.official, pair.ours)
       const known = exception?.id === 'font-family' || property === 'font-family' && exception
       mismatches.push({

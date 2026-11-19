@@ -30,9 +30,9 @@ Matrix rows: 11, 12, 40, 42, 49, 50
 
 Files:
 
-- `style-official-home-no-history-1440x900.json` (ours: 51 elements)
-- `style-official-home-no-history-1920x1072.json` (ours: 51 elements)
-- `style-official-home-no-history-390x844.json` (ours: 28 elements)
+- `style-official-home-no-history-1440x900.json` (ours: not captured)
+- `style-official-home-no-history-1920x1072.json` (ours: not captured)
+- `style-official-home-no-history-390x844.json` (ours: not captured)
 
 ## home-with-history
 
@@ -44,9 +44,9 @@ Matrix rows: 1, 49
 
 Files:
 
-- `style-official-home-with-history-1440x900.json` (ours: 59 elements)
-- `style-official-home-with-history-1920x1072.json` (ours: 59 elements)
-- `style-official-home-with-history-390x844.json` (ours: 28 elements)
+- `style-official-home-with-history-1440x900.json` (ours: 59 elements, FAIL)
+- `style-official-home-with-history-1920x1072.json` (ours: 59 elements, FAIL)
+- `style-official-home-with-history-390x844.json` (ours: not captured)
 
 ## composer-focus
 
@@ -56,9 +56,9 @@ Matrix rows: 2
 
 Files:
 
-- `style-official-composer-focus-1440x900.json` (ours: 51 elements)
-- `style-official-composer-focus-1920x1072.json` (ours: 51 elements)
-- `style-official-composer-focus-390x844.json` (ours: 28 elements)
+- `style-official-composer-focus-1440x900.json` (ours: not captured)
+- `style-official-composer-focus-1920x1072.json` (ours: not captured)
+- `style-official-composer-focus-390x844.json` (ours: not captured)
 
 ## user-menu
 
@@ -70,9 +70,9 @@ Matrix rows: 40
 
 Files:
 
-- `style-official-user-menu-1440x900.json` (ours: 59 elements)
-- `style-official-user-menu-1920x1072.json` (ours: 59 elements)
-- `style-official-user-menu-390x844.json` (ours: 62 elements)
+- `style-official-user-menu-1440x900.json` (ours: 59 elements, FAIL)
+- `style-official-user-menu-1920x1072.json` (ours: 59 elements, FAIL)
+- `style-official-user-menu-390x844.json` (ours: not captured)
 
 ## settings-general
 
@@ -82,9 +82,9 @@ Matrix rows: 36, 37, 44
 
 Files:
 
-- `style-official-settings-general-1440x900.json` (ours: 103 elements)
-- `style-official-settings-general-1920x1072.json` (ours: 103 elements)
-- `style-official-settings-general-390x844.json` (ours: 106 elements)
+- `style-official-settings-general-1440x900.json` (ours: 103 elements, FAIL)
+- `style-official-settings-general-1920x1072.json` (ours: 103 elements, FAIL)
+- `style-official-settings-general-390x844.json` (ours: not captured)
 
 ## settings-account
 
@@ -94,9 +94,9 @@ Matrix rows: 36
 
 Files:
 
-- `style-official-settings-account-1440x900.json` (ours: 75 elements)
-- `style-official-settings-account-1920x1072.json` (ours: 75 elements)
-- `style-official-settings-account-390x844.json` (ours: 78 elements)
+- `style-official-settings-account-1440x900.json` (ours: 75 elements, FAIL)
+- `style-official-settings-account-1920x1072.json` (ours: 75 elements, FAIL)
+- `style-official-settings-account-390x844.json` (ours: not captured)
 
 ## settings-data
 
@@ -106,9 +106,9 @@ Matrix rows: 36, 59
 
 Files:
 
-- `style-official-settings-data-1440x900.json` (ours: 128 elements)
-- `style-official-settings-data-1920x1072.json` (ours: 128 elements)
-- `style-official-settings-data-390x844.json` (ours: 131 elements)
+- `style-official-settings-data-1440x900.json` (ours: 128 elements, FAIL)
+- `style-official-settings-data-1920x1072.json` (ours: 128 elements, FAIL)
+- `style-official-settings-data-390x844.json` (ours: not captured)
 
 ## settings-terms
 
@@ -118,9 +118,9 @@ Matrix rows: 36
 
 Files:
 
-- `style-official-settings-terms-1440x900.json` (ours: 86 elements)
-- `style-official-settings-terms-1920x1072.json` (ours: 86 elements)
-- `style-official-settings-terms-390x844.json` (ours: 89 elements)
+- `style-official-settings-terms-1440x900.json` (ours: 86 elements, FAIL)
+- `style-official-settings-terms-1920x1072.json` (ours: 86 elements, FAIL)
+- `style-official-settings-terms-390x844.json` (ours: not captured)
 
 ## settings-english
 
@@ -130,8 +130,8 @@ Matrix rows: 38
 
 Files:
 
-- `style-official-settings-english-1440x900.json` (ours: 103 elements)
-- `style-official-settings-english-1920x1072.json` (ours: 103 elements)
+- `style-official-settings-english-1440x900.json` (ours: not captured)
+- `style-official-settings-english-1920x1072.json` (ours: not captured)
 
 ## search-dialog
 
@@ -141,9 +141,9 @@ Matrix rows: 34, 60
 
 Files:
 
-- `style-official-search-dialog-1440x900.json` (ours: 56 elements)
-- `style-official-search-dialog-1920x1072.json` (ours: 56 elements)
-- `style-official-search-dialog-390x844.json` (ours: 33 elements)
+- `style-official-search-dialog-1440x900.json` (ours: 56 elements, FAIL)
+- `style-official-search-dialog-1920x1072.json` (ours: 56 elements, FAIL)
+- `style-official-search-dialog-390x844.json` (ours: not captured)
 
 ## sidebar-item-menu
 
@@ -153,8 +153,8 @@ Matrix rows: 30, 31, 32, 66
 
 Files:
 
-- `style-official-sidebar-item-menu-1440x900.json` (ours: 112 elements)
-- `style-official-sidebar-item-menu-1920x1072.json` (ours: 112 elements)
+- `style-official-sidebar-item-menu-1440x900.json` (ours: 112 elements, FAIL)
+- `style-official-sidebar-item-menu-1920x1072.json` (ours: 112 elements, FAIL)
 
 ## sidebar-collapsed
 
@@ -164,8 +164,8 @@ Matrix rows: 45, 51
 
 Files:
 
-- `style-official-sidebar-collapsed-1440x900.json` (ours: 56 elements)
-- `style-official-sidebar-collapsed-1920x1072.json` (ours: 56 elements)
+- `style-official-sidebar-collapsed-1440x900.json` (ours: 56 elements, FAIL)
+- `style-official-sidebar-collapsed-1920x1072.json` (ours: 56 elements, FAIL)
 
 ## answer
 
@@ -175,9 +175,9 @@ Matrix rows: 5, 7, 8, 10, 13, 46, 47
 
 Files:
 
-- `style-official-answer-1440x900.json` (ours: 101 elements)
-- `style-official-answer-1920x1072.json` (ours: 101 elements)
-- `style-official-answer-390x844.json` (ours: 69 elements)
+- `style-official-answer-1440x900.json` (ours: 101 elements, FAIL)
+- `style-official-answer-1920x1072.json` (ours: 101 elements, FAIL)
+- `style-official-answer-390x844.json` (ours: not captured)
 
 ## answer-markdown
 
@@ -188,9 +188,9 @@ Matrix rows: 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 56, 57
 
 Files:
 
-- `style-official-answer-markdown-1440x900.json` (ours: 180 elements)
-- `style-official-answer-markdown-1920x1072.json` (ours: 178 elements)
-- `style-official-answer-markdown-390x844.json` (ours: 148 elements)
+- `style-official-answer-markdown-1440x900.json` (ours: not captured)
+- `style-official-answer-markdown-1920x1072.json` (ours: not captured)
+- `style-official-answer-markdown-390x844.json` (ours: not captured)
 
 ## streaming
 
@@ -200,9 +200,9 @@ Matrix rows: 3, 4, 61, 67
 
 Files:
 
-- `style-official-streaming-1440x900.json` (ours: 72 elements)
-- `style-official-streaming-1920x1072.json` (ours: 72 elements)
-- `style-official-streaming-390x844.json` (ours: 40 elements)
+- `style-official-streaming-1440x900.json` (ours: not captured)
+- `style-official-streaming-1920x1072.json` (ours: not captured)
+- `style-official-streaming-390x844.json` (ours: not captured)
 
 ## thinking-collapsed
 
@@ -212,8 +212,8 @@ Matrix rows: 43
 
 Files:
 
-- `style-official-thinking-collapsed-1440x900.json` (ours: 101 elements)
-- `style-official-thinking-collapsed-1920x1072.json` (ours: 101 elements)
+- `style-official-thinking-collapsed-1440x900.json` (ours: 101 elements, FAIL)
+- `style-official-thinking-collapsed-1920x1072.json` (ours: 101 elements, FAIL)
 
 ## feedback
 
@@ -223,8 +223,8 @@ Matrix rows: 54
 
 Files:
 
-- `style-official-feedback-1440x900.json` (ours: 113 elements)
-- `style-official-feedback-1920x1072.json` (ours: 113 elements)
+- `style-official-feedback-1440x900.json` (ours: not captured)
+- `style-official-feedback-1920x1072.json` (ours: not captured)
 
 ## edit
 
@@ -234,8 +234,8 @@ Matrix rows: 6, 52
 
 Files:
 
-- `style-official-edit-1440x900.json` (ours: 98 elements)
-- `style-official-edit-1920x1072.json` (ours: 98 elements)
+- `style-official-edit-1440x900.json` (ours: not captured)
+- `style-official-edit-1920x1072.json` (ours: not captured)
 
 ## versions
 
@@ -245,8 +245,8 @@ Matrix rows: 5, 53
 
 Files:
 
-- `style-official-versions-1440x900.json` (ours: 107 elements)
-- `style-official-versions-1920x1072.json` (ours: 107 elements)
+- `style-official-versions-1440x900.json` (ours: not captured)
+- `style-official-versions-1920x1072.json` (ours: not captured)
 
 ## attachment
 
@@ -256,8 +256,8 @@ Matrix rows: 29
 
 Files:
 
-- `style-official-attachment-1440x900.json` (ours: 55 elements)
-- `style-official-attachment-1920x1072.json` (ours: 55 elements)
+- `style-official-attachment-1440x900.json` (ours: not captured)
+- `style-official-attachment-1920x1072.json` (ours: not captured)
 
 ## theme-dark
 
@@ -267,8 +267,8 @@ Matrix rows: 37
 
 Files:
 
-- `style-official-theme-dark-1440x900.json` (ours: 51 elements)
-- `style-official-theme-dark-1920x1072.json` (ours: 51 elements)
+- `style-official-theme-dark-1440x900.json` (ours: not captured)
+- `style-official-theme-dark-1920x1072.json` (ours: not captured)
 
 ## scroll-up
 
@@ -278,8 +278,8 @@ Matrix rows: 25
 
 Files:
 
-- `style-official-scroll-up-1440x900.json` (ours: 126 elements)
-- `style-official-scroll-up-1920x1072.json` (ours: 126 elements)
+- `style-official-scroll-up-1440x900.json` (ours: 126 elements, FAIL)
+- `style-official-scroll-up-1920x1072.json` (ours: 126 elements, FAIL)
 
 ## long-code
 
@@ -289,8 +289,8 @@ Matrix rows: 65
 
 Files:
 
-- `style-official-long-code-1440x900.json` (ours: 150 elements)
-- `style-official-long-code-1920x1072.json` (ours: 150 elements)
+- `style-official-long-code-1440x900.json` (ours: not captured)
+- `style-official-long-code-1920x1072.json` (ours: not captured)
 
 ## error
 
@@ -300,8 +300,8 @@ Matrix rows: 26, 27, 28
 
 Files:
 
-- `style-official-error-1440x900.json` (ours: 93 elements)
-- `style-official-error-1920x1072.json` (ours: 93 elements)
+- `style-official-error-1440x900.json` (ours: not captured)
+- `style-official-error-1920x1072.json` (ours: not captured)
 
 ## multi-select
 
@@ -311,8 +311,8 @@ Matrix rows: 33, 58
 
 Files:
 
-- `style-official-multi-select-1440x900.json` (ours: 107 elements)
-- `style-official-multi-select-1920x1072.json` (ours: 107 elements)
+- `style-official-multi-select-1440x900.json` (ours: not captured)
+- `style-official-multi-select-1920x1072.json` (ours: not captured)
 
 ## read-aloud
 
@@ -322,8 +322,8 @@ Matrix rows: 9, 55
 
 Files:
 
-- `style-official-read-aloud-1440x900.json` (ours: 101 elements)
-- `style-official-read-aloud-1920x1072.json` (ours: 101 elements)
+- `style-official-read-aloud-1440x900.json` (ours: not captured)
+- `style-official-read-aloud-1920x1072.json` (ours: not captured)
 
 ## offline
 
@@ -333,8 +333,8 @@ Matrix rows: 64
 
 Files:
 
-- `style-official-offline-1440x900.json` (ours: 52 elements)
-- `style-official-offline-1920x1072.json` (ours: 52 elements)
+- `style-official-offline-1440x900.json` (ours: not captured)
+- `style-official-offline-1920x1072.json` (ours: not captured)
 
 ## reduced-motion
 
@@ -344,8 +344,8 @@ Matrix rows: 48
 
 Files:
 
-- `style-official-reduced-motion-1440x900.json` (ours: 51 elements)
-- `style-official-reduced-motion-1920x1072.json` (ours: 51 elements)
+- `style-official-reduced-motion-1440x900.json` (ours: not captured)
+- `style-official-reduced-motion-1920x1072.json` (ours: not captured)
 
 ## mobile-drawer
 
@@ -355,7 +355,7 @@ Matrix rows: 41, 63
 
 Files:
 
-- `style-official-mobile-drawer-390x844.json` (ours: 54 elements)
+- `style-official-mobile-drawer-390x844.json` (ours: not captured)
 
 ## mobile-item-sheet
 
@@ -365,7 +365,7 @@ Matrix rows: 63, 66
 
 Files:
 
-- `style-official-mobile-item-sheet-390x844.json` (ours: 116 elements)
+- `style-official-mobile-item-sheet-390x844.json` (ours: not captured)
 
 ## sidebar-date-groups
 
@@ -377,5 +377,5 @@ Matrix rows: 35, 62
 
 Files:
 
-- `style-official-sidebar-date-groups-1440x900.json` (ours capture failed: manual official capture only)
-- `style-official-sidebar-date-groups-1920x1072.json` (ours capture failed: manual official capture only)
+- `style-official-sidebar-date-groups-1440x900.json` (ours: 59 elements, FAIL)
+- `style-official-sidebar-date-groups-1920x1072.json` (ours: 59 elements, FAIL)

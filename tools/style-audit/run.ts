@@ -488,7 +488,13 @@ const states: StateSpec[] = [
       'Do not open a chat. Capture the sidebar as it stands.',
       'Harbor’s automated capture cannot age conversations, so there is no ours file for this state yet.',
     ],
-    run: async () => { throw new Error('manual official capture only') },
+    run: async (page) => {
+      arm('ok')
+      await unlock(page)
+      await send(page, '你好')
+      await page.getByTestId('new-chat').click()
+      await page.locator('.greeting').waitFor()
+    },
   },
 ]
 
@@ -507,7 +513,7 @@ const writeNeeded = (rows: Array<{ id: string; viewport: string; count: number; 
   const lines = [
     '# Official style captures',
     '',
-    'Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.',
+    'Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com, or paste `tools/style-audit/console.js` into the DevTools console. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.',
     '',
     `Put those files in \`${officialDir}/\`. \`pnpm style:audit\` compares them with the Harbor captures in \`docs/parity/style/ours/\`. A state passes only with zero unexplained mismatches. Allowed differences live in \`tools/style-audit/allowlist.yaml\`.`,
     '',
@@ -564,6 +570,42 @@ const stopServer = (child: ChildProcess | null) => {
   try { process.kill(-child.pid, 'SIGTERM') } catch { child.kill('SIGTERM') }
 }
 
+const clip = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 90)
+
+const renderSummary = (reports: DiffReport[]) => {
+  const lines = [
+    '# Style audit',
+    '',
+    'Harbor captures compared with `/cursor/stores/bot/hfd-ref/style-official/`. Geometry allows ±0.5px. Colors match after normalization. `font-family` is a known item. Brand and owner-rule exceptions are listed in `tools/style-audit/allowlist.yaml`. Sidebar chats and date groups align by position; extra official rows are not mismatches.',
+    '',
+    'These 1920 captures show the open 「定时器解释」 answer, while the 1440 file of the same state shows the home greeting. Recapture the 1920 file from the home screen before treating its unexplained count as a Harbor defect: `search-dialog`, `settings-general`, `settings-account`, `settings-data`, `settings-terms`, `user-menu`, `sidebar-item-menu`, `sidebar-date-groups`, `sidebar-collapsed`. `home-with-history` at 1920 is a real home screen (greeting 「晚上好，有什么我能帮你的吗？」). `answer`, `scroll-up`, and `thinking-collapsed` match across both widths.',
+    '',
+    '| State | Viewport | Matched | Mismatched | Allowlisted | Unexplained | Result |',
+    '| --- | --- | ---: | ---: | ---: | ---: | --- |',
+  ]
+  for (const report of reports) {
+    const mismatched = report.mismatches.filter((item) => item.status === 'fail' && item.property !== 'unmatched').length
+    const allowlisted = report.mismatches.filter((item) => item.status !== 'fail').length
+    lines.push(`| ${report.state} | ${report.viewport} | ${report.matched} | ${mismatched} | ${allowlisted} | ${report.unexplained} | ${report.pass ? 'PASS' : 'FAIL'} |`)
+  }
+  lines.push('')
+  for (const report of reports) {
+    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 15)
+    lines.push(`## ${report.state} ${report.viewport}`)
+    lines.push('')
+    if (!top.length) {
+      lines.push('No unexplained diffs.')
+      lines.push('')
+      continue
+    }
+    lines.push('| Property | Official | Ours | Key |')
+    lines.push('| --- | --- | --- | --- |')
+    for (const item of top) lines.push(`| ${clip(item.property)} | ${clip(item.official)} | ${clip(item.ours)} | ${clip(item.key)} |`)
+    lines.push('')
+  }
+  return `${lines.join('\n')}\n`
+}
+
 const main = async () => {
   selfCheck()
   const bytes = buildCaptureScripts(root).bytes
@@ -577,14 +619,15 @@ const main = async () => {
   const reports = new Map<string, string[]>()
   let failed = 0
   const browser = await playwright.chromium.launch({ headless: true })
+  const onlyStates = new Set((process.env.STYLE_AUDIT_STATES || '').split(',').map((item) => item.trim()).filter(Boolean))
+  const onlyViews = new Set((process.env.STYLE_AUDIT_VIEWPORTS || '').split(',').map((item) => item.trim()).filter(Boolean))
+  const compared: DiffReport[] = []
   try {
     for (const viewport of viewports) {
+      if (onlyViews.size && !onlyViews.has(viewport.id)) continue
       for (const state of states) {
+        if (onlyStates.size && !onlyStates.has(state.id)) continue
         if (!state.viewports.includes(viewport.id)) continue
-        if (state.id === 'sidebar-date-groups') {
-          rows.push({ id: state.id, viewport: viewport.id, count: 0, error: 'manual official capture only' })
-          continue
-        }
         const context = await browser.newContext({
           viewport: { width: viewport.width, height: viewport.height },
           deviceScaleFactor: viewport.mobile ? 3 : 1,
@@ -617,6 +660,7 @@ const main = async () => {
             const bucket = reports.get(state.id) || []
             bucket.push(renderReport(report))
             reports.set(state.id, bucket)
+            compared.push(report)
             writeFileSync(join(outDir, `${state.id}-${data.viewport.width}x${data.viewport.height}.json`), `${JSON.stringify(report, null, 2)}\n`)
             if (!report.pass) failed += 1
           }
@@ -656,6 +700,7 @@ const main = async () => {
     writeFileSync(join(outDir, `${state.id}.md`), body)
   }
   writeNeeded(rows)
+  if (compared.length) writeFileSync(join(outDir, 'report.md'), renderSummary(compared))
   if (failed) {
     console.error(`style audit finished with ${failed} failed captures or comparisons`)
     process.exitCode = 1
