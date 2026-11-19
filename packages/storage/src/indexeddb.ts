@@ -7,6 +7,7 @@ const DATA = 'deepapi'
 const SECRETS = 'deepapi-secrets'
 const LEGACY_DATA = 'harbor'
 const LEGACY_SECRETS = 'harbor-secrets'
+const DB_VERSION = 2
 
 const databaseNames = async () => {
   if (typeof indexedDB.databases !== 'function') return [] as string[]
@@ -16,9 +17,9 @@ const databaseNames = async () => {
 
 const copyDatabase = async (from: string, to: string, setup: (db: import('idb').IDBPDatabase) => void) => {
   const names = await databaseNames()
-  if (!names.includes(from) || names.includes(to)) return
+  if (!names.includes(from)) return
   const source = await openDB(from)
-  const target = await openDB(to, 1, { upgrade: setup })
+  const target = await openDB(to, DB_VERSION, { upgrade: setup })
   const stores = [...source.objectStoreNames]
   for (const name of stores) {
     if (!target.objectStoreNames.contains(name)) continue
@@ -62,7 +63,7 @@ export const migrateLegacyIndexedDb = async () => {
 
 export const openIndexedRepository = async (): Promise<Repository> => {
   await migrateLegacyIndexedDb()
-  const data = await openDB(DATA, 1, {
+  const data = await openDB(DATA, DB_VERSION, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('conversations')) {
         db.createObjectStore('conversations', { keyPath: 'id' })
@@ -79,7 +80,7 @@ export const openIndexedRepository = async (): Promise<Repository> => {
       }
     },
   })
-  const secrets = await openDB(SECRETS, 1, {
+  const secrets = await openDB(SECRETS, DB_VERSION, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('secrets')) {
         db.createObjectStore('secrets')

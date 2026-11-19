@@ -24,6 +24,11 @@ const openStore = async () => {
   if (names.includes(LEGACY) && !names.includes(DB)) {
     const source = await openNamed(LEGACY)
     const target = await openNamed(DB)
+    if (!source.objectStoreNames.contains('kv') || !target.objectStoreNames.contains('kv')) {
+      source.close()
+      target.close()
+      return openNamed(DB)
+    }
     const value = await new Promise<RemoteSession | undefined>((resolve, reject) => {
       const request = source.transaction('kv').objectStore('kv').get('remote')
       request.onsuccess = () => resolve(request.result as RemoteSession | undefined)

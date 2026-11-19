@@ -98,6 +98,10 @@ describe('secrets', () => {
 })
 
 describe('indexeddb repository', () => {
+  it('does nothing when the Harbor database was never created', async () => {
+    await migrateLegacyIndexedDb()
+  })
+
   it('copies chats and the sealed key from the Harbor databases', async () => {
     await new Promise<void>((resolve) => {
       const request = indexedDB.deleteDatabase('deepapi')

@@ -176,7 +176,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   const raw = readFileSync(exported, 'utf8')
   expect(raw).not.toContain('demo-local-key')
   expect(raw).toContain('简单加法')
-  expect(raw).toContain('"format": "harbor"')
+  expect(raw).toContain('"format": "deepapi"')
 
   await page.getByTestId('import-json').setInputFiles(exported)
   await expect(page.getByTestId('import-toast')).toContainText('跳过')

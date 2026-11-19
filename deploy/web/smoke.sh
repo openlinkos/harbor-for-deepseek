@@ -7,7 +7,7 @@ health="$(curl -fsS "$base/healthz")"
 printf '%s' "$health" | grep -q '^ok'
 
 home="$(curl -fsS "$base/")"
-printf '%s' "$home" | grep -q 'Harbor for DeepSeek'
+printf '%s' "$home" | grep -q 'DeepAPI'
 deep="$(curl -fsS "$base/some/deep/route")"
 test "$home" = "$deep"
 
@@ -29,6 +29,6 @@ asset_headers="$(curl -fsSI "$base$asset")"
 printf '%s' "$asset_headers" | grep -qi 'cache-control: public, max-age=31536000, immutable'
 
 curl -fsS "$base/LICENSE" | grep -q 'MIT License'
-curl -fsS "$base/NOTICE" | grep -q 'Harbor'
+curl -fsS "$base/NOTICE" | grep -q 'DeepAPI'
 
 echo "harbor-web smoke ok"
