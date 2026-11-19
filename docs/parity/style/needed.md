@@ -1,6 +1,6 @@
 # Official style captures
 
-Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.
+Run the bookmarklet at `tools/style-audit/bookmarklet.js` on https://chat.deepseek.com, or paste `tools/style-audit/console.js` into the DevTools console. It prompts for a state label. Enter `official/<state>`. It downloads `style-official-<state>-<width>x<height>.json` and copies the same JSON to the clipboard.
 
 Put those files in `/cursor/stores/bot/hfd-ref/style-official/`. `pnpm style:audit` compares them with the Harbor captures in `docs/parity/style/ours/`. A state passes only with zero unexplained mismatches. Allowed differences live in `tools/style-audit/allowlist.yaml`.
 
