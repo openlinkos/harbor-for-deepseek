@@ -1035,12 +1035,16 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   padding: 20px;
   box-shadow: var(--dsw-shadow-lv3);
 }
-.key-card { width: min(440px, 100%); padding: 28px 24px 22px; border: 1px solid var(--dsw-alias-border-l1); }
+.key-card { width: min(440px, 100%); padding: 28px 24px 22px; border: 1px solid var(--dsw-alias-border-l1); box-sizing: border-box; }
+@media (max-width: 767px) {
+  [data-testid='key-dialog'] { align-items: center; padding: 16px; overflow: auto; }
+  [data-testid='key-dialog'] .key-card { width: min(440px, 100%); max-height: calc(100dvh - 32px); }
+}
 body[data-ds-dark-theme] .key-card { background: #2a2b2f; border-color: #3a3b40; }
 .key-card h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
 .key-lead { margin: 0 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 1.6; }
 .key-field { position: relative; display: block; }
-.key-field input { width: 100%; padding-right: 44px; }
+.key-field input { width: 100%; padding-right: 44px; box-sizing: border-box; height: 44px; }
 .eye {
   position: absolute;
   right: 6px;
@@ -1967,6 +1971,10 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   transition-delay: var(--ds-transition-duration-fast);
 }
 .menu { transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-in-out); }
+@media (max-width: 767px) {
+  [data-testid='key-dialog'] { align-items: center; padding: 16px; overflow: auto; }
+  [data-testid='key-dialog'] .key-card { box-sizing: border-box; width: min(440px, 100%); max-height: calc(100dvh - 32px); }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
