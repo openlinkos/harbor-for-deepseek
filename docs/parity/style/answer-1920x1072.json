@@ -1,228 +1,18 @@
 {
   "state": "answer",
   "viewport": "1920x1072",
-  "matched": 11,
-  "unmatchedOfficial": 389,
-  "unmatchedOurs": 90,
+  "officialVisible": 184,
+  "matched": 22,
+  "matchedEqual": 2,
+  "matchedDiff": 20,
+  "officialOnly": 47,
+  "harborOnly": 39,
+  "allowlisted": 19,
+  "unmatchedOfficial": 47,
+  "unmatchedOurs": 39,
   "mismatches": [
     {
-      "key": "brand:account-footer:0",
-      "property": "display",
-      "official": "block",
-      "ours": "flex",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "position",
-      "official": "static",
-      "ours": "relative",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "width",
-      "official": "129.125px",
-      "ours": "236px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "height",
-      "official": "17px",
-      "ours": "50.0938px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "min-width",
-      "official": "0px",
-      "ours": "auto",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "min-height",
-      "official": "auto",
-      "ours": "44px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "margin-left",
-      "official": "8px",
-      "ours": "0px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "padding-top",
-      "official": "0px",
-      "ours": "6px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "padding-right",
-      "official": "0px",
-      "ours": "4px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "padding-bottom",
-      "official": "0px",
-      "ours": "6px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "padding-left",
-      "official": "0px",
-      "ours": "4px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "gap",
-      "official": "normal",
-      "ours": "8px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "row-gap",
-      "official": "normal",
-      "ours": "8px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "column-gap",
-      "official": "normal",
-      "ours": "8px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "color",
-      "official": "rgb(97, 102, 107)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "16px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "line-height",
-      "official": "normal",
-      "ours": "27.2px",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "white-space",
-      "official": "nowrap",
-      "ours": "normal",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "overflow",
-      "official": "hidden",
-      "ours": "visible",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "overflow-x",
-      "official": "hidden",
-      "ours": "visible",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "overflow-y",
-      "official": "hidden",
-      "ours": "visible",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
-      "property": "cursor",
-      "official": "pointer",
-      "ours": "auto",
-      "status": "allowed",
-      "reason": "brand — the official account footer maps to the 本地模式 footer.",
-      "id": "brand-account-footer"
-    },
-    {
-      "key": "brand:account-footer:0",
+      "key": "sidebar > account 1",
       "property": "x",
       "official": "58",
       "ours": "12",
@@ -231,7 +21,7 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "brand:account-footer:0",
+      "key": "sidebar > account 1",
       "property": "y",
       "official": "1031.5",
       "ours": "1013.91",
@@ -240,7 +30,7 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "brand:account-footer:0",
+      "key": "sidebar > account 1",
       "property": "w",
       "official": "129.13",
       "ours": "236",
@@ -249,7 +39,7 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "brand:account-footer:0",
+      "key": "sidebar > account 1",
       "property": "h",
       "official": "17",
       "ours": "50.09",
@@ -258,3569 +48,1085 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "|||div#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1",
-      "property": "height",
-      "official": "0px",
-      "ours": "1072px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1",
-      "property": "color",
-      "official": "rgb(128, 0, 128)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1",
+      "key": "sidebar > account 1",
       "property": "font-size",
       "official": "14px",
       "ours": "16px",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
-      "key": "|||div#1",
+      "key": "sidebar > account 1",
       "property": "line-height",
       "official": "normal",
       "ours": "27.2px",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
-      "key": "|||div#1",
+      "key": "sidebar > account 1",
+      "property": "color",
+      "official": "rgb(97, 102, 107)",
+      "ours": "rgb(15, 17, 21)",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "6px",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "4px",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "6px",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > account 1",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "4px",
+      "status": "allowed",
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
+    },
+    {
+      "key": "sidebar > row 1",
       "property": "h",
-      "official": "0",
-      "ours": "1072",
+      "official": "40",
+      "ours": "50",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1",
-      "property": "position",
-      "official": "absolute",
-      "ours": "static",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1",
+      "key": "sidebar > row 1",
       "property": "background-color",
       "official": "rgba(0, 0, 0, 0)",
-      "ours": "rgb(255, 255, 255)",
+      "ours": "rgb(228, 237, 253)",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1",
-      "property": "color",
-      "official": "rgb(128, 0, 128)",
-      "ours": "rgb(15, 17, 21)",
+      "key": "sidebar > group 1",
+      "property": "x",
+      "official": "12",
+      "ours": "22",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "16px",
+      "key": "sidebar > group 1",
+      "property": "w",
+      "official": "236",
+      "ours": "24",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1",
-      "property": "line-height",
-      "official": "normal",
-      "ours": "27.2px",
+      "key": "sidebar > group 1",
+      "property": "h",
+      "official": "22",
+      "ours": "18",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "display",
-      "official": "block",
-      "ours": "flex",
+      "key": "sidebar > group 1",
+      "property": "background-color",
+      "official": "rgb(249, 250, 251)",
+      "ours": "rgba(0, 0, 0, 0)",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
+      "key": "sidebar > group 1",
+      "property": "box-shadow",
+      "official": "rgb(249, 250, 251) 4px 0px 0px 0px",
+      "ours": "none",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "width",
-      "official": "70px",
-      "ours": "94px",
+      "key": "sidebar > group 1",
+      "property": "padding-top",
+      "official": "2px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "height",
-      "official": "20px",
-      "ours": "23.7969px",
+      "key": "sidebar > group 1",
+      "property": "padding-right",
+      "official": "10px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "gap",
-      "official": "normal",
-      "ours": "8px",
+      "key": "sidebar > group 1",
+      "property": "padding-bottom",
+      "official": "2px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "row-gap",
-      "official": "normal",
-      "ours": "8px",
+      "key": "sidebar > group 1",
+      "property": "padding-left",
+      "official": "10px",
+      "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "column-gap",
-      "official": "normal",
-      "ours": "8px",
+      "key": "control ‘深度思考’",
+      "property": "x",
+      "official": "715.5",
+      "ours": "679.5",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "line-height",
-      "official": "normal",
-      "ours": "23.8px",
+      "key": "control ‘深度思考’",
+      "property": "y",
+      "official": "997",
+      "ours": "982.61",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "center",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
+      "key": "sidebar > span ‘开启新对话’",
       "property": "x",
       "official": "106",
       "ours": "83",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
-      "property": "y",
-      "official": "80",
-      "ours": "78.09",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
+      "key": "sidebar > span ‘开启新对话’",
       "property": "w",
       "official": "70",
       "ours": "94",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||开启新对话|span#1",
+      "key": "sidebar > span ‘开启新对话’",
       "property": "h",
       "official": "20",
-      "ours": "23.8",
+      "ours": "19",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "height",
-      "official": "24px",
-      "ours": "22.0938px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "line-height",
-      "official": "24px",
-      "ours": "22.1px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "center",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
+      "key": "main > span ‘深度思考’",
       "property": "x",
       "official": "744.5",
-      "ours": "722.5",
+      "ours": "708.5",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
+      "key": "main > span ‘深度思考’",
       "property": "y",
       "official": "1002",
-      "ours": "987.56",
+      "ours": "987.61",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > ||深度思考|span#1",
-      "property": "h",
-      "official": "24",
-      "ours": "22.09",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "height",
-      "official": "24px",
-      "ours": "22.0938px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "line-height",
-      "official": "24px",
-      "ours": "22.1px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "center",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
+      "key": "main > span ‘智能搜索’",
       "property": "x",
       "official": "846.52",
-      "ours": "832.5",
+      "ours": "808.5",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
+      "key": "main > span ‘智能搜索’",
       "property": "y",
       "official": "1002",
-      "ours": "987.56",
+      "ours": "987.61",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > ||智能搜索|span#1",
-      "property": "h",
-      "official": "24",
-      "ours": "22.09",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "font-size",
-      "official": "16px",
-      "ours": "14px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "line-height",
-      "official": "0px",
-      "ours": "23.8px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "center",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "stroke",
-      "official": "none",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "stroke-width",
-      "official": "1px",
-      "ours": "1.7px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "sidebar > icon 16×16 @84,82",
       "property": "x",
       "official": "84",
       "ours": "83",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "position",
-      "official": "absolute",
-      "ours": "static",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "width",
-      "official": "774px",
-      "ours": "810px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "height",
-      "official": "60px",
-      "ours": "58.375px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "min-width",
-      "official": "0px",
-      "ours": "auto",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "min-height",
-      "official": "60px",
-      "ours": "52px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "padding-right",
-      "official": "12px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "padding-bottom",
-      "official": "0px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "padding-left",
-      "official": "16px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "line-height",
-      "official": "24px",
-      "ours": "27.2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "z-index",
-      "official": "0",
-      "ours": "auto",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "x",
-      "official": "703.5",
-      "ours": "685.5",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "y",
-      "official": "925",
-      "ours": "914.23",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "w",
-      "official": "774",
-      "ours": "810",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > textbox|||textarea#1",
-      "property": "h",
-      "official": "60",
-      "ours": "58.38",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "width",
-      "official": "734px",
-      "ours": "840px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "margin-top",
-      "official": "0px",
-      "ours": "6.4px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "margin-bottom",
-      "official": "0px",
-      "ours": "6.4px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "left",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "x",
-      "official": "732.5",
-      "ours": "670.5",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "y",
-      "official": "222",
-      "ours": "226.89",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1",
-      "property": "w",
-      "official": "734",
-      "ours": "840",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "display",
-      "official": "block",
-      "ours": "flex",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "position",
-      "official": "sticky",
-      "ours": "static",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "width",
-      "official": "752px",
-      "ours": "840px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "height",
-      "official": "40px",
-      "ours": "28px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "margin-top",
-      "official": "0px",
-      "ours": "8px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "gap",
-      "official": "normal",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "row-gap",
-      "official": "normal",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "column-gap",
-      "official": "normal",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "background-color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgb(129, 133, 140)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "line-height",
-      "official": "28px",
-      "ours": "27.2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "left",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "z-index",
-      "official": "6",
-      "ours": "auto",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "x",
-      "official": "714.5",
-      "ours": "670.5",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "y",
-      "official": "266",
-      "ours": "262.89",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "w",
-      "official": "752",
-      "ours": "840",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "h",
-      "official": "40",
-      "ours": "28",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "box-sizing",
-      "official": "content-box",
-      "ours": "border-box",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "width",
-      "official": "16px",
-      "ours": "22px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "height",
-      "official": "16px",
-      "ours": "22px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgb(97, 102, 107)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "font-family",
-      "official": "quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Open Sans\", \"Helvetica Neue\", sans-serif",
-      "ours": "Inter, \"PingFang SC\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
-      "status": "known",
-      "reason": "known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state.",
-      "id": "font-family"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "line-height",
-      "official": "0px",
-      "ours": "27.2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "text-align",
-      "official": "start",
-      "ours": "center",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "white-space",
-      "official": "nowrap",
-      "ours": "normal",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "stroke",
-      "official": "none",
-      "ours": "rgb(97, 102, 107)",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "stroke-width",
-      "official": "1px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @1880,21",
       "property": "x",
       "official": "1880",
       "ours": "1878",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @1880,21",
       "property": "y",
       "official": "21",
       "ours": "15",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @1880,21",
       "property": "w",
       "official": "16",
       "ours": "22",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @1880,21",
       "property": "h",
       "official": "16",
       "ours": "22",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#1",
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "x",
+      "official": "702.5",
+      "ours": "670.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "w",
+      "official": "776",
+      "ours": "840",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "h",
+      "official": "28",
+      "ours": "20.39",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "background-color",
+      "official": "rgb(255, 255, 255)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "font-size",
+      "official": "11px",
+      "ours": "12px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "line-height",
+      "official": "16px",
+      "ours": "20.4px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "padding-top",
+      "official": "6px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
+      "property": "padding-bottom",
+      "official": "6px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @703,920 776×124",
+      "property": "x",
+      "official": "702.5",
+      "ours": "670.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @703,920 776×124",
+      "property": "y",
+      "official": "920",
+      "ours": "911.61",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @703,920 776×124",
+      "property": "w",
+      "official": "776",
+      "ours": "840",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @703,920 776×124",
+      "property": "box-shadow",
+      "official": "rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
+      "ours": "rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @198,25",
+      "property": "x",
+      "official": "198",
+      "ours": "188",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @198,25",
+      "property": "y",
+      "official": "24.5",
+      "ours": "22",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @12,134 236×22",
+      "property": "y",
+      "official": "134",
+      "ours": "122",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @12,134 236×22",
+      "property": "box-shadow",
+      "official": "rgb(249, 250, 251) 4px 0px 0px 0px",
+      "ours": "none",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @12,134 236×22",
+      "property": "padding-right",
+      "official": "8px",
+      "ours": "10px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @232,25",
+      "property": "x",
+      "official": "232",
+      "ours": "220",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @232,25",
+      "property": "y",
+      "official": "24.5",
+      "ours": "22",
+      "status": "fail"
+    },
+    {
+      "key": "main > textbox @704,925 774×60",
+      "property": "x",
+      "official": "703.5",
+      "ours": "671.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > textbox @704,925 774×60",
+      "property": "y",
+      "official": "925",
+      "ours": "912.61",
+      "status": "fail"
+    },
+    {
+      "key": "main > textbox @704,925 774×60",
+      "property": "w",
+      "official": "774",
+      "ours": "838",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @226,139",
+      "property": "x",
+      "official": "226",
+      "ours": "220",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @226,139",
+      "property": "y",
+      "official": "139",
+      "ours": "125",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @226,139",
+      "property": "w",
+      "official": "12",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @226,139",
+      "property": "h",
+      "official": "12",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "x",
+      "official": "226",
+      "ours": "214",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "y",
+      "official": "139",
+      "ours": "121",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "w",
+      "official": "12",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "h",
+      "official": "12",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "background-color",
+      "official": "rgb(249, 250, 251)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "12px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "font-weight",
+      "official": "400",
+      "ours": "500",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "18px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgb(97, 102, 107)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @226,139 12×12",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "x",
+      "official": "728.5",
+      "ours": "714.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "y",
+      "official": "280",
+      "ours": "266.89",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "w",
+      "official": "13.45",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "h",
+      "official": "13",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "font-size",
+      "official": "12px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "line-height",
+      "official": "18px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘js’",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(129, 133, 140)",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "x",
+      "official": "1431.5",
+      "ours": "1425.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "y",
+      "official": "997",
+      "ours": "982.61",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "background-color",
+      "official": "rgb(57, 100, 254)",
+      "ours": "rgba(0, 0, 0, 0)",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "border-top-left-radius",
+      "official": "50%",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "border-top-right-radius",
+      "official": "50%",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "border-bottom-right-radius",
+      "official": "50%",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "border-bottom-left-radius",
+      "official": "50%",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "font-weight",
+      "official": "500",
+      "ours": "400",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "23.8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1432,997 34×34",
+      "property": "color",
+      "official": "rgb(255, 255, 255)",
+      "ours": "rgb(97, 102, 107)",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 16×16 @1441,1006",
+      "property": "x",
+      "official": "1440.5",
+      "ours": "1434.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 16×16 @1441,1006",
+      "property": "y",
+      "official": "1006",
+      "ours": "991.61",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "x",
+      "official": "1424.48",
+      "ours": "1450.5",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "y",
+      "official": "72",
+      "ours": "68",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "w",
+      "official": "26.02",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "h",
+      "official": "16",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "font-weight",
+      "official": "500",
+      "ours": "400",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "line-height",
+      "official": "20px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘下载’",
+      "property": "color",
+      "official": "rgb(97, 102, 107)",
+      "ours": "rgb(129, 133, 140)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 261×1072",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "sidebar > icon 143×23 @16,21",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1 > |||div#1::after",
+      "key": "sidebar > div::after @250,137",
       "property": "unmatched",
       "official": "div::after",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1 > |||div#2",
+      "key": "sidebar > div @22,212 226×1",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1 > |||div#2 > |||div#1",
+      "key": "sidebar > div @261,12 1610×48",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > button|||div#2 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#1 > |||div#2 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > ||置顶|span#1",
-      "property": "unmatched",
-      "official": "置顶",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#1 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#4",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#5",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#6",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#7",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#8",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#9",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#10",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#11",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#12",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#13",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#14",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#2 > |||div#1 > |||div#15",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#4",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#4 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#4 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#4 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||定时器解释|div#1",
+      "key": "sidebar > div ‘定时器解释’",
       "property": "unmatched",
       "official": "定时器解释",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#1::after",
+      "key": "main > div::after @1909,257",
       "property": "unmatched",
       "official": "div::after",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2",
+      "key": "main > div @715,34 752×94",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1",
+      "key": "main > div @715,60 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2",
+      "key": "main > div @715,60 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1::before",
-      "property": "unmatched",
-      "official": "div::before",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||setTimeout(captureStyleA|span#1",
-      "property": "unmatched",
-      "official": "setTimeout(captureStyleA",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "main > icon 14×16 @1342,72",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > button|||div#2 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 14×16 @1407,72",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2::before",
-      "property": "unmatched",
-      "official": "div::before",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1::before",
-      "property": "unmatched",
-      "official": "div::before",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "main > icon 12×12 @715,116",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||已思考（用时 3 秒）|span#1",
-      "property": "unmatched",
-      "official": "已思考（用时 3 秒）",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 12×12 @1455,116",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
+      "key": "main > div @715,266 752×116",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
+      "key": "main > div @715,266 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#3",
+      "key": "main > div @715,266 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#1 > ||这行代码的作用是：|span#1",
-      "property": "unmatched",
-      "official": "这行代码的作用是：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||js|span#1",
-      "property": "unmatched",
-      "official": "js",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1342,278",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1 > ||复制|span#1",
-      "property": "unmatched",
-      "official": "复制",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1407,278",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1 > ||下载|span#1",
-      "property": "unmatched",
-      "official": "下载",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1",
-      "property": "unmatched",
-      "official": "pre",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1 > ||setTimeout|span#1",
-      "property": "unmatched",
-      "official": "setTimeout",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1 > ||(|span#1",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1 > ||,|span#1",
-      "property": "unmatched",
-      "official": ",",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1 > ||10000|span#1",
-      "property": "unmatched",
-      "official": "10000",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||pre#1 > ||captureStyleAudit|span#1 > ||)|span#1",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 12×12 @715,370",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||svg#2",
+      "key": "main > icon 12×12 @1455,370",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#2",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#2 > |||strong#1",
-      "property": "unmatched",
-      "official": "strong",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#2 > |||strong#1 > ||延迟 10 秒后执行|span#1",
-      "property": "unmatched",
-      "official": "延迟 10 秒后执行",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#2 > |||strong#1 > ||captureStyleAudit|code#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#2 > |||strong#1 > ||函数一次。|span#1",
-      "property": "unmatched",
-      "official": "函数一次。",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1",
-      "property": "unmatched",
-      "official": "ul",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#1",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#1 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#1 > |||p#1 > ||10000|code#1",
-      "property": "unmatched",
-      "official": "10000",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#1 > |||p#1 > ||单位是毫秒，即 10 秒。|span#1",
-      "property": "unmatched",
-      "official": "单位是毫秒，即 10 秒。",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ul#1 > listitem|||li#2 > |||p#1 > ||返回一个定时器 ID，可用于取消：|span#1",
-      "property": "unmatched",
-      "official": "返回一个定时器 ID，可用于取消：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2",
+      "key": "main > div @715,554 752×94",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1",
+      "key": "main > div @715,554 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
+      "key": "main > div @715,554 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||js|span#1",
-      "property": "unmatched",
-      "official": "js",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1342,566",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1 > ||复制|span#1",
-      "property": "unmatched",
-      "official": "复制",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1407,566",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1 > ||下载|span#1",
-      "property": "unmatched",
-      "official": "下载",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1",
-      "property": "unmatched",
-      "official": "pre",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1",
-      "property": "unmatched",
-      "official": "timerId captureStyleAudi",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||const|span#1",
-      "property": "unmatched",
-      "official": "const",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||=|span#1",
-      "property": "unmatched",
-      "official": "=",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||setTimeout|span#1",
-      "property": "unmatched",
-      "official": "setTimeout",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||(|span#1",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||,|span#1",
-      "property": "unmatched",
-      "official": ",",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||10000|span#1",
-      "property": "unmatched",
-      "official": "10000",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId captureStyleAudi|span#1 > ||)|span#1",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId|span#1",
-      "property": "unmatched",
-      "official": "timerId",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId|span#1 > ||clearTimeout|span#1",
-      "property": "unmatched",
-      "official": "clearTimeout",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId|span#1 > ||(|span#1",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||pre#1 > ||timerId|span#1 > ||)|span#1",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||svg#1",
+      "key": "main > icon 12×12 @715,636",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||svg#2",
+      "key": "main > icon 12×12 @1455,636",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#3",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#3 > ||注意：|span#1",
-      "property": "unmatched",
-      "official": "注意：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1",
-      "property": "unmatched",
-      "official": "ol",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1 > |||p#1 > ||captureStyleAudit|code#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1 > |||p#1 > ||必须已经定义，否则这行代码执行时会立即报|span#1",
-      "property": "unmatched",
-      "official": "必须已经定义，否则这行代码执行时会立即报",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1 > |||p#1 > ||ReferenceError|code#1",
-      "property": "unmatched",
-      "official": "ReferenceError",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#1 > |||p#1 > ||。|span#1",
-      "property": "unmatched",
-      "official": "。",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#2",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#2 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#2 > |||p#1 > ||10 秒后调用时默认不传参数。|span#1",
-      "property": "unmatched",
-      "official": "10 秒后调用时默认不传参数。",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#3",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#3 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#3 > |||p#1 > ||如果函数依赖|span#1",
-      "property": "unmatched",
-      "official": "如果函数依赖",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#3 > |||p#1 > ||this|code#1",
-      "property": "unmatched",
-      "official": "this",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#1 > listitem|||li#3 > |||p#1 > ||，直接传入可能会丢失上下文，建议写成：|span#1",
-      "property": "unmatched",
-      "official": "，直接传入可能会丢失上下文，建议写成：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3",
+      "key": "main > div @715,708 752×94",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1",
+      "key": "main > div @715,708 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1",
+      "key": "main > div @715,708 752×40",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||js|span#1",
-      "property": "unmatched",
-      "official": "js",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1342,720",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1 > ||复制|span#1",
-      "property": "unmatched",
-      "official": "复制",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 14×16 @1407,720",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1 > ||下载|span#1",
-      "property": "unmatched",
-      "official": "下载",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1",
-      "property": "unmatched",
-      "official": "pre",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||setTimeout|span#1",
-      "property": "unmatched",
-      "official": "setTimeout",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||(|span#1",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||(|span#2",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||)|span#1",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||=>|span#1",
-      "property": "unmatched",
-      "official": "=>",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||captureStyleAudit|span#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||(|span#3",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||)|span#2",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||,|span#1",
-      "property": "unmatched",
-      "official": ",",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||10000|span#1",
-      "property": "unmatched",
-      "official": "10000",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||pre#1 > |||span#1 > ||)|span#3",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||svg#1",
+      "key": "main > icon 12×12 @715,790",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#3 > |||svg#2",
+      "key": "main > icon 12×12 @1455,790",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#2",
-      "property": "unmatched",
-      "official": "ol",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#2 > listitem|||li#1",
-      "property": "unmatched",
-      "official": "li",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#2 > listitem|||li#1 > |||p#1",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > list|||ol#2 > listitem|||li#1 > |||p#1 > ||如果需要传参：|span#1",
-      "property": "unmatched",
-      "official": "如果需要传参：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > ||js|span#1",
-      "property": "unmatched",
-      "official": "js",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 16×16 @715,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||复制|div#1 > |||span#1 > ||复制|span#1",
-      "property": "unmatched",
-      "official": "复制",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||div#2 > |||svg#1",
+      "key": "main > icon 16×16 @753,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "span",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||div#1 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > button||下载|div#1 > |||span#1 > ||下载|span#1",
-      "property": "unmatched",
-      "official": "下载",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1",
-      "property": "unmatched",
-      "official": "pre",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1",
-      "property": "unmatched",
-      "official": "arg1 arg2",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||setTimeout|span#1",
-      "property": "unmatched",
-      "official": "setTimeout",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||(|span#1",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||(|span#2",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||)|span#1",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||=>|span#1",
-      "property": "unmatched",
-      "official": "=>",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||captureStyleAudit|span#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||(|span#3",
-      "property": "unmatched",
-      "official": "(",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||,|span#1",
-      "property": "unmatched",
-      "official": ",",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||)|span#2",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||,|span#2",
-      "property": "unmatched",
-      "official": ",",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||10000|span#1",
-      "property": "unmatched",
-      "official": "10000",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||pre#1 > ||arg1 arg2|span#1 > ||)|span#3",
-      "property": "unmatched",
-      "official": ")",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||svg#1",
+      "key": "main > icon 16×16 @791,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#4 > |||svg#2",
+      "key": "main > icon 16×16 @829,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4",
-      "property": "unmatched",
-      "official": "p",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4 > ||简单说：|span#1",
-      "property": "unmatched",
-      "official": "简单说：",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4 > |||strong#1",
-      "property": "unmatched",
-      "official": "strong",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4 > |||strong#1 > ||10 秒后执行一次|span#1",
-      "property": "unmatched",
-      "official": "10 秒后执行一次",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4 > |||strong#1 > ||captureStyleAudit()|code#1",
-      "property": "unmatched",
-      "official": "captureStyleAudit()",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||p#4 > |||strong#1 > ||。|span#1",
-      "property": "unmatched",
-      "official": "。",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2 > |||div#1 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#2 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#3 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#4 > |||div#2 > |||div#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1",
+      "key": "main > button ‘朗读’",
       "property": "unmatched",
       "official": "朗读",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|朗读||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @867,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#5 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @905,864",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > |||div#2 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#3",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "main > icon 14×14 @727,1007",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
+      "key": "main > div @818,997 92×34",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||div#1 > |||svg#1",
+      "key": "main > icon 14×14 @829,1007",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#1 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > button|||div#1 > |||div#2 > |||div#1 > |||svg#1",
+      "key": "main > icon 16×16 @1397,1006",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1",
+      "key": "main > button @1432,997 34×34",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#1::after",
-      "property": "unmatched",
-      "official": "div::after",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |||div#2 > |||div#1 > button|||div#1 > |||div#2 > |||svg#1",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > |||div#2 > |||div#3 > |||div#1 > |||div#2 > |||div#4 > ||内容由 AI 生成，请仔细甄别|div#1",
-      "property": "unmatched",
-      "official": "内容由 AI 生成，请仔细甄别",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#5",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#6",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#7",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#8",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "aside",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1",
+      "key": "sidebar > div @0,0 1920×1072",
       "property": "unmatched",
       "official": "",
       "ours": "div",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#1",
+      "key": "sidebar > complementary @0,0 261×1072",
       "property": "unmatched",
       "official": "",
-      "ours": "span",
+      "ours": "aside",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#1 > |||svg#1",
+      "key": "sidebar > icon 22×22 @16,19",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#1 > |||span#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#1 > |||span#1 > ||Harbor|span#1",
+      "key": "sidebar > span ‘Harbor’",
       "property": "unmatched",
       "official": "",
       "ours": "Harbor",
@@ -3829,7 +1135,7 @@
       "id": "brand-wordmark-unmatched"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#1 > |||span#1 > ||for DeepSeek|span#1",
+      "key": "sidebar > span ‘for DeepSeek’",
       "property": "unmatched",
       "official": "",
       "ours": "for DeepSeek",
@@ -3838,126 +1144,28 @@
       "id": "brand-wordmark-unmatched"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#2 > button|智能搜索||button#1",
+      "key": "sidebar > button ‘智能搜索’",
       "property": "unmatched",
       "official": "",
       "ours": "智能搜索",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#2 > button|智能搜索||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#2 > button|隐藏||button#1",
+      "key": "sidebar > button ‘隐藏’",
       "property": "unmatched",
       "official": "",
       "ours": "隐藏",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#1 > |||span#2 > button|隐藏||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > button||开启新对话⌘ J|button#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > button||开启新对话⌘ J|button#1 > ||⌘ J|kbd#1",
+      "key": "sidebar > kbd ‘⌘ J’",
       "property": "unmatched",
       "official": "",
       "ours": "⌘ J",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||p#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "p",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||p#1 > ||今天|span#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "今天",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||p#1 > button|多选||button#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "多选",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||p#1 > button|多选||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||div#1 > button||对照|button#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "对照",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||div#1 > button|菜单||button#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "菜单",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |||div#2 > |||div#1 > |||div#1 > button|菜单||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > |||span#1",
+      "key": "sidebar > span @16,1023 32×32",
       "property": "unmatched",
       "official": "",
       "ours": "span",
@@ -3966,7 +1174,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > |||span#1 > |||svg#1",
+      "key": "sidebar > icon 16×16 @24,1031",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -3975,16 +1183,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > |||span#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > |||span#2 > ||本地模式|span#1",
+      "key": "sidebar > span ‘本地模式’",
       "property": "unmatched",
       "official": "",
       "ours": "本地模式",
@@ -3993,7 +1192,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > |||span#2 > ||密钥与对话仅保存在本设备|small#1",
+      "key": "sidebar > small ‘密钥与对话仅保存在本设备’",
       "property": "unmatched",
       "official": "",
       "ours": "密钥与对话仅保存在本设备",
@@ -4002,7 +1201,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > button|菜单||button#1",
+      "key": "sidebar > button ‘菜单’",
       "property": "unmatched",
       "official": "",
       "ours": "菜单",
@@ -4011,7 +1210,7 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > complementary|||aside#1 > |密钥与对话仅保存在本设备||div#1 > button|菜单||button#1 > |||svg#1",
+      "key": "sidebar > icon 16×16 @220,1031",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -4020,419 +1219,181 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "section",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > banner|||header#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "header",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > banner|||header#1 > heading||对照|h2#1",
+      "key": "sidebar > heading ‘对照’",
       "property": "unmatched",
       "official": "",
       "ours": "对照",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > banner|||header#1 > |||span#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > banner|||header#1 > |||span#1 > button|share||button#1",
+      "key": "main > button ‘share’",
       "property": "unmatched",
       "official": "",
       "ours": "share",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "article",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > ||你好|div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "你好",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|复制||button#1",
+      "key": "main > button ‘复制’",
       "property": "unmatched",
       "official": "",
       "ours": "复制",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|复制||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|复制||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|编辑||button#1",
+      "key": "main > button ‘编辑’",
       "property": "unmatched",
       "official": "",
       "ours": "编辑",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|编辑||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#1 > |||div#1 > button|编辑||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @1489,68",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "article",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "section",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > button||已思考（用时 1 秒）|button#1",
+      "key": "main > button ‘已思考（用时 1 秒）’",
       "property": "unmatched",
       "official": "",
       "ours": "已思考（用时 1 秒）",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > button||已思考（用时 1 秒）|button#1 > |||svg#1",
+      "key": "main > icon 16×16 @671,138",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > button||已思考（用时 1 秒）|button#1 > |||span#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > button||已思考（用时 1 秒）|button#1 > |||span#1 > |||svg#1",
+      "key": "main > icon 16×16 @825,138",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > |||div#1",
+      "key": "main > div @678,166 833×51",
       "property": "unmatched",
       "official": "",
       "ours": "div",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > section|||section#1 > |||div#1 > |||div#1 > ||reasoning|p#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "reasoning",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|复制||button#1",
+      "key": "main > button ‘复制’",
       "property": "unmatched",
       "official": "",
       "ours": "复制",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|复制||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|复制||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @677,267",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|重新生成||button#1",
+      "key": "main > button ‘重新生成’",
       "property": "unmatched",
       "official": "",
       "ours": "重新生成",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|重新生成||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|重新生成||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|喜欢||button#1",
+      "key": "main > button ‘喜欢’",
       "property": "unmatched",
       "official": "",
       "ours": "喜欢",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|喜欢||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|喜欢||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @753,267",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|不喜欢||button#1",
+      "key": "main > button ‘不喜欢’",
       "property": "unmatched",
       "official": "",
       "ours": "不喜欢",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|不喜欢||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|不喜欢||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @791,267",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|朗读||button#1",
+      "key": "main > button ‘朗读’",
       "property": "unmatched",
       "official": "",
       "ours": "朗读",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|朗读||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|朗读||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @829,267",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|分享||button#1",
+      "key": "main > button ‘分享’",
       "property": "unmatched",
       "official": "",
       "ours": "分享",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|分享||button#1::after",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button::after",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||article#2 > |||div#2 > button|分享||button#1 > |||svg#1",
+      "key": "main > icon 20×20 @867,267",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#1 > |||div#1",
+      "key": "main > icon 14×14 @691,993",
       "property": "unmatched",
       "official": "",
-      "ours": "div",
+      "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||span#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||span#1 > button||深度思考|button#1",
+      "key": "main > button @780,983 92×34",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > |||span#1 > button||深度思考|button#1 > |||svg#1",
+      "key": "main > icon 14×14 @791,993",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > button||智能搜索|button#1",
+      "key": "main > button @1468,983 34×34",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#1 > button||智能搜索|button#1 > |||svg#1",
+      "key": "main > icon 16×16 @1477,992",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |添加文件||label#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "添加文件",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > |添加文件||label#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > button|||button#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > |||div#1 > |||div#1 > |||div#2 > button|||button#1 > |||svg#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "|||div#1 > |||div#1 > section|||section#1 > |||div#2 > ||内容由 AI 生成，请仔细甄别|p#1",
-      "property": "unmatched",
-      "official": "",
-      "ours": "内容由 AI 生成，请仔细甄别",
       "status": "fail"
     }
   ],
-  "unexplained": 572,
+  "unexplained": 173,
   "pass": false
 }

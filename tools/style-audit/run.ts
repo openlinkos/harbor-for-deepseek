@@ -332,7 +332,7 @@ const states: StateSpec[] = [
     },
   },
   {
-    id: 'thinking-collapsed', rows: [43], viewports: desktop, official: true,
+    id: 'thinking-collapsed', rows: [43], viewports: all, official: true,
     steps: ['Open an answer that has a thinking block. Click the thinking header so the body is collapsed.'],
     run: async (page) => {
       arm('ok')
@@ -395,7 +395,7 @@ const states: StateSpec[] = [
     },
   },
   {
-    id: 'scroll-up', rows: [25], viewports: desktop, official: true,
+    id: 'scroll-up', rows: [25], viewports: all, official: true,
     steps: ['Open a long answer, scroll up until 回到底部 is visible, and capture before clicking it.'],
     run: async (page) => {
       arm('long')
@@ -572,25 +572,37 @@ const stopServer = (child: ChildProcess | null) => {
 
 const clip = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 90)
 
+const SKIPPED = new Set([
+  'search-dialog 1920x1072',
+  'settings-general 1920x1072',
+  'settings-account 1920x1072',
+  'settings-data 1920x1072',
+  'settings-terms 1920x1072',
+  'user-menu 1920x1072',
+  'sidebar-item-menu 1920x1072',
+  'sidebar-date-groups 1920x1072',
+  'sidebar-collapsed 1920x1072',
+])
+
 const renderSummary = (reports: DiffReport[]) => {
   const lines = [
     '# Style audit',
     '',
-    'Harbor captures compared with `/cursor/stores/bot/hfd-ref/style-official/`. Geometry allows ±0.5px. Colors match after normalization. `font-family` is a known item. Brand and owner-rule exceptions are listed in `tools/style-audit/allowlist.yaml`. Sidebar chats and date groups align by position; extra official rows are not mismatches.',
+    'Visible painted elements only. Keys are the region plus the accessible name or text. Sidebar rows align by position, and extra official chats are not missing UI. Geometry allows ±0.5px. Text-bearing elements are compared on text color and font metrics. Container inheritance is not compared.',
     '',
-    'These 1920 captures show the open 「定时器解释」 answer, while the 1440 file of the same state shows the home greeting. Recapture the 1920 file from the home screen before treating its unexplained count as a Harbor defect: `search-dialog`, `settings-general`, `settings-account`, `settings-data`, `settings-terms`, `user-menu`, `sidebar-item-menu`, `sidebar-date-groups`, `sidebar-collapsed`. `home-with-history` at 1920 is a real home screen (greeting 「晚上好，有什么我能帮你的吗？」). `answer`, `scroll-up`, and `thinking-collapsed` match across both widths.',
+    'Nine 1920 captures still show the open 「定时器解释」 answer instead of the home screen. They are listed and skipped until they are recaptured: `search-dialog`, `settings-general`, `settings-account`, `settings-data`, `settings-terms`, `user-menu`, `sidebar-item-menu`, `sidebar-date-groups`, `sidebar-collapsed`.',
     '',
-    '| State | Viewport | Matched | Mismatched | Allowlisted | Unexplained | Result |',
-    '| --- | --- | ---: | ---: | ---: | ---: | --- |',
+    '| State | Viewport | Official visible | Matched equal | Matched with diff | Official only | Harbor only | Allowlisted | Unexplained | Result |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
   ]
   for (const report of reports) {
-    const mismatched = report.mismatches.filter((item) => item.status === 'fail' && item.property !== 'unmatched').length
-    const allowlisted = report.mismatches.filter((item) => item.status !== 'fail').length
-    lines.push(`| ${report.state} | ${report.viewport} | ${report.matched} | ${mismatched} | ${allowlisted} | ${report.unexplained} | ${report.pass ? 'PASS' : 'FAIL'} |`)
+    const skipped = SKIPPED.has(`${report.state} ${report.viewport}`)
+    lines.push(`| ${report.state} | ${report.viewport} | ${report.officialVisible} | ${report.matchedEqual} | ${report.matchedDiff} | ${report.officialOnly} | ${report.harborOnly} | ${report.allowlisted} | ${skipped ? '—' : report.unexplained} | ${skipped ? 'skip' : report.pass ? 'PASS' : 'FAIL'} |`)
   }
   lines.push('')
   for (const report of reports) {
-    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 15)
+    if (SKIPPED.has(`${report.state} ${report.viewport}`)) continue
+    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 20)
     lines.push(`## ${report.state} ${report.viewport}`)
     lines.push('')
     if (!top.length) {
@@ -598,9 +610,10 @@ const renderSummary = (reports: DiffReport[]) => {
       lines.push('')
       continue
     }
-    lines.push('| Property | Official | Ours | Key |')
-    lines.push('| --- | --- | --- | --- |')
-    for (const item of top) lines.push(`| ${clip(item.property)} | ${clip(item.official)} | ${clip(item.ours)} | ${clip(item.key)} |`)
+    for (const item of top) {
+      const name = item.property === 'unmatched' ? 'missing' : item.property
+      lines.push(`- ${clip(item.key)} › ${name} ${clip(item.official) || '—'} vs ${clip(item.ours) || '—'}`)
+    }
     lines.push('')
   }
   return `${lines.join('\n')}\n`
@@ -662,7 +675,7 @@ const main = async () => {
             reports.set(state.id, bucket)
             compared.push(report)
             writeFileSync(join(outDir, `${state.id}-${data.viewport.width}x${data.viewport.height}.json`), `${JSON.stringify(report, null, 2)}\n`)
-            if (!report.pass) failed += 1
+            if (!report.pass && !SKIPPED.has(`${state.id} ${data.viewport.width}x${data.viewport.height}`)) failed += 1
           }
           rows.push({ id: state.id, viewport: viewport.id, count: data.elements.length, pass })
           console.log(`${state.id} ${viewport.id} elements=${data.elements.length}${pass == null ? '' : pass ? ' PASS' : ' FAIL'}`)

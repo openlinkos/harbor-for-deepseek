@@ -1,1400 +1,597 @@
 # scroll-up 1440x900
 
-Result: FAIL (659 unexplained)
+Result: FAIL (184 unexplained)
 
-- Matched elements: 16
-- Unmatched official: 400
-- Unmatched ours: 110
+- Matched elements: 29
+- Unmatched official: 32
+- Unmatched ours: 27
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
-| allowed | brand:account-footer:0 | display | block | flex | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | position | static | relative | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | box-sizing | content-box | border-box | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | width | 129.125px | 236px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | height | 17px | 50.0938px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | min-width | 0px | auto | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | min-height | auto | 44px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | margin-left | 8px | 0px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-top | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-right | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-bottom | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-left | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | row-gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | column-gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
-| known | brand:account-footer:0 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| allowed | brand:account-footer:0 | font-size | 14px | 16px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | line-height | normal | 27.2px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | white-space | nowrap | normal | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow-x | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow-y | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | cursor | pointer | auto | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | x | 58 | 12 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | y | 859.5 | 841.91 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | w | 129.13 | 236 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | h | 17 | 50.09 | brand — the official account footer maps to the 本地模式 footer. |
-| fail | \|\|\|div#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 | height | 0px | 900px |  |
-| fail | \|\|\|div#1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) |  |
-| known | \|\|\|div#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 | font-size | 14px | 16px |  |
-| fail | \|\|\|div#1 | line-height | normal | 27.2px |  |
-| fail | \|\|\|div#1 | h | 0 | 900 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | position | absolute | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) |  |
-| known | \|\|\|div#1 > \|\|\|div#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 | font-size | 14px | 16px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | line-height | normal | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | display | block | flex |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | width | 70px | 94px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | height | 20px | 23.7969px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | gap | normal | 8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | row-gap | normal | 8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | column-gap | normal | 8px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | line-height | normal | 23.8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | x | 106 | 83 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | y | 80 | 78.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | w | 70 | 94 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | h | 20 | 23.8 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | height | 24px | 22.0938px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | line-height | 24px | 22.1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | x | 504.5 | 482.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | y | 830 | 815.56 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | h | 24 | 22.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | height | 24px | 22.0938px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | line-height | 24px | 22.1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | x | 606.52 | 592.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | y | 830 | 815.56 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | h | 24 | 22.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | box-sizing | content-box | border-box |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | font-size | 16px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | line-height | 0px | 23.8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke | none | rgb(15, 17, 21) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke-width | 1px | 1.7px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | x | 84 | 83 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | margin-bottom | 16px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | x | 474.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | y | 431 | 433.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | width | 734px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-bottom | 0px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | x | 492.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | y | 951 | 949.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | w | 734 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | width | 734px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-bottom | 0px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | x | 492.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | y | 917 | 914.7 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | w | 734 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | width | 734px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | margin-bottom | 0px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | x | 492.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | y | 883 | 880.31 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | w | 734 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | color | rgb(129, 133, 140) | rgb(97, 102, 107) |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | line-height | 0px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke | none | rgb(97, 102, 107) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke-width | 1px | 1.7px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | x | 222 | 220 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | y | 860 | 858.95 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | position | absolute | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | width | 774px | 810px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | height | 60px | 58.375px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | min-width | 0px | auto |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | min-height | 60px | 52px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-top | 12px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-right | 12px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-bottom | 0px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-left | 16px | 2px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | line-height | 24px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | z-index | 0 | auto |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | x | 463.5 | 445.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | y | 753 | 742.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | w | 774 | 810 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | h | 60 | 58.38 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | display | block | flex |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | position | relative | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | height | 116px | 136.375px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | min-height | 0px | 120px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | margin-top | 16px | 0px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | margin-bottom | 11px | 0px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | padding-top | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | padding-right | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | padding-bottom | 0px | 10px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | padding-left | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-top-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-right-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-bottom-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-left-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-top-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-right-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-bottom-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-left-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-top-left-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-top-right-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-bottom-right-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | border-bottom-left-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | background-color | rgb(249, 250, 251) | rgb(255, 255, 255) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | box-shadow | none | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | line-height | 28px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | x | 474.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | y | 707 | 727.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | h | 116 | 136.38 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | margin-top | 16px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | margin-bottom | 16px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | x | 474.5 | 430.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | y | 839 | 845.92 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | width | 16px | 22px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | height | 16px | 22px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | line-height | 0px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | white-space | nowrap | normal |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | stroke | none | rgb(97, 102, 107) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | stroke-width | 1px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | x | 1400 | 1398 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | y | 21 | 15 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | w | 16 | 22 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | h | 16 | 22 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|置顶\|span#1 | unmatched | 置顶 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#6 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#7 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#8 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#9 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#10 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#11 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#12 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#13 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#14 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#15 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|H\|div#1 | unmatched | H |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|定时器解释\|div#1 | unmatched | 定时器解释 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | setTimeout(captureStyleA |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 已思考（用时 3 秒） |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#3  | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#3  | unmatched | 我们需要回答用户。用户只写了 "setTimeo |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 > \|\|这行代码的作用是：\ | unmatched | 这行代码的作用是： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | strong |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | 延迟 10 秒后执行 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | 函数一次。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 | unmatched | ul |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 单位是毫秒，即 10 秒。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 返回一个定时器 ID，可用于取消： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | timerId captureStyleAudi |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | const |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | = |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | timerId |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | clearTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 > \|\|注意：\|span# | unmatched | 注意： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 | unmatched | ol |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 必须已经定义，否则这行代码执行时会立即报 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | ReferenceError |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 10 秒后调用时默认不传参数。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 如果函数依赖 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | this |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | ，直接传入可能会丢失上下文，建议写成： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | => |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 | unmatched | ol |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | 如果需要传参： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | arg1 arg2 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | => |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|简单说：\|span | unmatched | 简单说： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | strong |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | 10 秒后执行一次 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | captureStyleAudit() |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | 。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 | unmatched | 朗读 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#3 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|内容由 AI 生成，请仔细甄别\|div#1 | unmatched | 内容由 AI 生成，请仔细甄别 |  |  |
-| fail | \|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#6 | unmatched | div |  |  |
-| fail | \|\|\|div#7 | unmatched | div |  |  |
-| fail | \|\|\|div#8 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 | unmatched |  | aside |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|智能搜索\|\|button#1 | unmatched |  | 智能搜索 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|智能搜索\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|隐藏\|\|button#1 | unmatched |  | 隐藏 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|隐藏\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > button\|\|开启新对话⌘ J\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > button\|\|开启新对话⌘ J\|button#1 > \|\|⌘ J\|kbd#1 | unmatched |  | ⌘ J |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 | unmatched |  | p |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > \|\|今天\|span#1 | unmatched |  | 今天 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > button\|多选\|\|button#1 | unmatched |  | 多选 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > button\|多选\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|对照\|button#1 | unmatched |  | 对照 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|菜单\|\|button#1 | unmatched |  | 菜单 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|菜单\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 | unmatched |  | section |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 | unmatched |  | header |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > heading\|\|对照\|h2#1 | unmatched |  | 对照 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > \|\|\|span#1 > button\|share\|\|button#1 | unmatched |  | share |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 | unmatched |  | article |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|很长\|div#1 | unmatched |  | 很长 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1 | unmatched |  | 复制 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1 | unmatched |  | 编辑 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 | unmatched |  | article |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 | unmatched |  | section |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 | unmatched |  | 已思考（用时 1 秒） |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|span#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|reasoning\|p#1 | unmatched |  | reasoning |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 1 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 1 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 2 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 2 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 3 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 3 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 4 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 4 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 5 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 5 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 6 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 6 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 8 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 8 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 9 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 9 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 10 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 10 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 11 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 11 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 12 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 12 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 13 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 13 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 14 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 14 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 15 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 15 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 16 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 16 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 17 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 17 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 18 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 18 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 23 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 23 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 24 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 24 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1 | unmatched |  | 复制 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1 | unmatched |  | 重新生成 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1 | unmatched |  | 喜欢 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1 | unmatched |  | 不喜欢 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1 | unmatched |  | 朗读 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1 | unmatched |  | 分享 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > button\|回到底部\|\|button#1 | unmatched |  | 回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > button\|回到底部\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 > button\|\|深度思考\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 > button\|\|深度思考\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > button\|\|智能搜索\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > button\|\|智能搜索\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|添加文件\|\|label#1 | unmatched |  | 添加文件 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|添加文件\|\|label#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|内容由 AI 生成，请仔细甄别\|p#1 | unmatched |  | 内容由 AI 生成，请仔细甄别 |  |
+| allowed | sidebar > account 1 | x | 58 | 12 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | y | 859.5 | 841.91 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | w | 129.13 | 236 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | h | 17 | 50.09 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | font-size | 14px | 16px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | line-height | normal | 27.2px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-top | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-right | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-bottom | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-left | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
+| fail | sidebar > row 1 | h | 40 | 50 |  |
+| fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
+| fail | sidebar > group 1 | x | 12 | 22 |  |
+| fail | sidebar > group 1 | w | 236 | 24 |  |
+| fail | sidebar > group 1 | h | 22 | 18 |  |
+| fail | sidebar > group 1 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > group 1 | box-shadow | rgb(249, 250, 251) 4px 0px 0px 0px | none |  |
+| fail | sidebar > group 1 | padding-top | 2px | 0px |  |
+| fail | sidebar > group 1 | padding-right | 10px | 0px |  |
+| fail | sidebar > group 1 | padding-bottom | 2px | 0px |  |
+| fail | sidebar > group 1 | padding-left | 10px | 0px |  |
+| fail | control ‘深度思考’ | x | 475.5 | 439.5 |  |
+| fail | control ‘深度思考’ | y | 825 | 810.61 |  |
+| fail | sidebar > span ‘开启新对话’ | x | 106 | 83 |  |
+| fail | sidebar > span ‘开启新对话’ | w | 70 | 94 |  |
+| fail | sidebar > span ‘开启新对话’ | h | 20 | 19 |  |
+| fail | main > span ‘深度思考’ | x | 504.5 | 468.5 |  |
+| fail | main > span ‘深度思考’ | y | 830 | 815.61 |  |
+| fail | main > span ‘智能搜索’ | x | 606.52 | 568.5 |  |
+| fail | main > span ‘智能搜索’ | y | 830 | 815.61 |  |
+| fail | sidebar > icon 16×16 @84,82 | x | 84 | 83 |  |
+| fail | sidebar > div ‘H’ | x | 18 | 16 |  |
+| fail | sidebar > div ‘H’ | y | 852 | 850.95 |  |
+| fail | sidebar > icon 16×16 @222,860 | x | 222 | 220 |  |
+| fail | sidebar > icon 16×16 @222,860 | y | 860 | 858.95 |  |
+| fail | main > icon 16×16 @1400,21 | x | 1400 | 1398 |  |
+| fail | main > icon 16×16 @1400,21 | y | 21 | 15 |  |
+| fail | main > icon 16×16 @1400,21 | w | 16 | 22 |  |
+| fail | main > icon 16×16 @1400,21 | h | 16 | 22 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | x | 462.5 | 430.5 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
+| fail | main > div @475,707 752×40 | x | 474.5 | 430.5 |  |
+| fail | main > div @475,707 752×40 | y | 707 | 708.36 |  |
+| fail | main > div @475,707 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,707 752×40 | h | 40 | 28 |  |
+| fail | main > div @475,707 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @475,707 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @475,707 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @463,748 776×124 | x | 462.5 | 430.5 |  |
+| fail | main > div @463,748 776×124 | y | 748 | 739.61 |  |
+| fail | main > div @463,748 776×124 | w | 776 | 840 |  |
+| fail | main > div @463,748 776×124 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
+| fail | sidebar > icon 16×16 @198,25 | x | 198 | 188 |  |
+| fail | sidebar > icon 16×16 @198,25 | y | 24.5 | 22 |  |
+| fail | sidebar > div @12,134 236×22 | y | 134 | 122 |  |
+| fail | sidebar > div @12,134 236×22 | box-shadow | rgb(249, 250, 251) 4px 0px 0px 0px | none |  |
+| fail | sidebar > div @12,134 236×22 | padding-right | 8px | 10px |  |
+| fail | sidebar > icon 16×16 @232,25 | x | 232 | 220 |  |
+| fail | sidebar > icon 16×16 @232,25 | y | 24.5 | 22 |  |
+| fail | main > textbox @464,753 774×60 | x | 463.5 | 431.5 |  |
+| fail | main > textbox @464,753 774×60 | y | 753 | 740.61 |  |
+| fail | main > textbox @464,753 774×60 | w | 774 | 838 |  |
+| fail | sidebar > icon 12×12 @226,139 | x | 226 | 220 |  |
+| fail | sidebar > icon 12×12 @226,139 | y | 139 | 125 |  |
+| fail | sidebar > icon 12×12 @226,139 | w | 12 | 16 |  |
+| fail | sidebar > icon 12×12 @226,139 | h | 12 | 16 |  |
+| fail | main > div @475,475 752×40 | x | 474.5 | 430.5 |  |
+| fail | main > div @475,475 752×40 | y | 475 | 467.63 |  |
+| fail | main > div @475,475 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,475 752×40 | h | 40 | 28 |  |
+| fail | main > div @475,475 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @475,475 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @475,475 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | sidebar > button @226,139 12×12 | x | 226 | 214 |  |
+| fail | sidebar > button @226,139 12×12 | y | 139 | 121 |  |
+| fail | sidebar > button @226,139 12×12 | w | 12 | 24 |  |
+| fail | sidebar > button @226,139 12×12 | h | 12 | 24 |  |
+| fail | sidebar > button @226,139 12×12 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > button @226,139 12×12 | border-top-left-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-top-right-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-bottom-right-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-bottom-left-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | font-size | 14px | 12px |  |
+| fail | sidebar > button @226,139 12×12 | font-weight | 400 | 500 |  |
+| fail | sidebar > button @226,139 12×12 | line-height | 22px | 18px |  |
+| fail | sidebar > button @226,139 12×12 | color | rgb(129, 133, 140) | rgb(97, 102, 107) |  |
+| fail | sidebar > button @226,139 12×12 | padding-top | 0px | 1px |  |
+| fail | sidebar > button @226,139 12×12 | padding-right | 0px | 6px |  |
+| fail | sidebar > button @226,139 12×12 | padding-bottom | 0px | 1px |  |
+| fail | sidebar > button @226,139 12×12 | padding-left | 0px | 6px |  |
+| fail | main > div::after @475,188 | x | 474.5 | 451.5 |  |
+| fail | main > div::after @475,188 | y | 188 | 179.8 |  |
+| fail | main > div::after @475,188 | w | 762 | 819 |  |
+| fail | main > div::after @475,188 | h | 35 | 23.09 |  |
+| fail | main > div::after @475,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div::after @475,188 | line-height | normal | 23.1px |  |
+| fail | main > div::after @475,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
+| fail | main > div @1192,825 34×34 | x | 1191.5 | 1185.5 |  |
+| fail | main > div @1192,825 34×34 | y | 825 | 810.61 |  |
+| fail | main > div @1192,825 34×34 | background-color | rgb(57, 100, 254) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @1192,825 34×34 | border-top-left-radius | 50% | 8px |  |
+| fail | main > div @1192,825 34×34 | border-top-right-radius | 50% | 8px |  |
+| fail | main > div @1192,825 34×34 | border-bottom-right-radius | 50% | 8px |  |
+| fail | main > div @1192,825 34×34 | border-bottom-left-radius | 50% | 8px |  |
+| fail | main > div @1192,825 34×34 | font-weight | 500 | 400 |  |
+| fail | main > div @1192,825 34×34 | line-height | 22px | 23.8px |  |
+| fail | main > div @1192,825 34×34 | color | rgb(255, 255, 255) | rgb(97, 102, 107) |  |
+| fail | main > icon 16×16 @1201,834 | x | 1200.5 | 1194.5 |  |
+| fail | main > icon 16×16 @1201,834 | y | 834 | 819.61 |  |
+| fail | main > div @475,475 752×40 | x | 474.5 | 430.5 |  |
+| fail | main > div @475,475 752×40 | y | 475 | 502.02 |  |
+| fail | main > div @475,475 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,475 752×40 | h | 40 | 28 |  |
+| fail | main > div @475,475 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @475,475 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @475,475 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @475,475 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @475,475 752×40 | line-height | 20px | 28px |  |
+| fail | main > icon 12×12 @475,811 | x | 474.5 | 450.5 |  |
+| fail | main > icon 12×12 @475,811 | y | 811 | 820.61 |  |
+| fail | main > icon 12×12 @475,811 | w | 12 | 14 |  |
+| fail | main > icon 12×12 @475,811 | h | 12 | 14 |  |
+| fail | main > icon 12×12 @1215,811 | x | 1214.5 | 1236.5 |  |
+| fail | main > icon 12×12 @1215,811 | y | 811 | 819.61 |  |
+| fail | main > icon 12×12 @1215,811 | w | 12 | 16 |  |
+| fail | main > icon 12×12 @1215,811 | h | 12 | 16 |  |
+| fail | main > div @475,707 752×40 | x | 474.5 | 430.5 |  |
+| fail | main > div @475,707 752×40 | y | 707 | 742.75 |  |
+| fail | main > div @475,707 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,707 752×40 | h | 40 | 28 |  |
+| fail | main > div @475,707 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @475,707 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @475,707 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @475,707 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @475,707 752×40 | line-height | 20px | 28px |  |
+| fail | sidebar > div @0,0 261×900 | unmatched | div |  |  |
+| fail | sidebar > icon 143×23 @16,21 | unmatched | svg |  |  |
+| fail | sidebar > div::after @250,137 | unmatched | div::after |  |  |
+| fail | sidebar > div @22,212 226×1 | unmatched | div |  |  |
+| fail | sidebar > div @261,12 1130×48 | unmatched | div |  |  |
+| fail | sidebar > div ‘定时器解释’ | unmatched | 定时器解释 |  |  |
+| fail | main > div::after @1429,63 | unmatched | div::after |  |  |
+| fail | main > div @914,94 313×44 | unmatched | div |  |  |
+| fail | main > icon 16×16 @1167,150 | unmatched | svg |  |  |
+| fail | main > icon 16×16 @1205,150 | unmatched | svg |  |  |
+| fail | main > div::before @475,188 | unmatched | div::before |  |  |
+| fail | main > icon 16×16 @475,197 | unmatched | svg |  |  |
+| fail | main > icon 14×14 @649,198 | unmatched | svg |  |  |
+| fail | main > div @480,239 5×5 | unmatched | div |  |  |
+| fail | main > div @482,255 1×165 | unmatched | div |  |  |
+| fail | main > div @475,475 752×94 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1102,487 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1167,487 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @475,557 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @1215,557 | unmatched | svg |  |  |
+| fail | main > div @475,707 752×116 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1102,719 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1167,719 | unmatched | svg |  |  |
+| fail | main > button @1193,694 34×34 | unmatched | div |  |  |
+| fail | main > div @1193,694 34×34 | unmatched | div |  |  |
+| fail | main > div @1193,694 34×34 | unmatched | div |  |  |
+| fail | main > icon 14×14 @1203,704 | unmatched | svg |  |  |
+| fail | main > icon 14×14 @487,835 | unmatched | svg |  |  |
+| fail | main > div @578,825 92×34 | unmatched | div |  |  |
+| fail | main > icon 14×14 @589,835 | unmatched | svg |  |  |
+| fail | main > icon 16×16 @1157,834 | unmatched | svg |  |  |
+| fail | main > button @1192,825 34×34 | unmatched | div |  |  |
+| fail | sidebar > div @0,0 1440×900 | unmatched |  | div |  |
+| fail | sidebar > complementary @0,0 261×900 | unmatched |  | aside |  |
+| fail | sidebar > icon 22×22 @16,19 | unmatched |  | svg |  |
+| fail | sidebar > button ‘智能搜索’ | unmatched |  | 智能搜索 |  |
+| fail | sidebar > button ‘隐藏’ | unmatched |  | 隐藏 |  |
+| fail | sidebar > kbd ‘⌘ J’ | unmatched |  | ⌘ J |  |
+| fail | sidebar > heading ‘对照’ | unmatched |  | 对照 |  |
+| fail | main > button ‘share’ | unmatched |  | share |  |
+| fail | main > button ‘复制’ | unmatched |  | 复制 |  |
+| fail | main > icon 20×20 @1211,68 | unmatched |  | svg |  |
+| fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
+| fail | main > icon 20×20 @1249,68 | unmatched |  | svg |  |
+| fail | main > button ‘已思考（用时 1 秒）’ | unmatched |  | 已思考（用时 1 秒） |  |
+| fail | main > icon 16×16 @431,138 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @585,138 | unmatched |  | svg |  |
+| fail | main > div @438,166 833×51 | unmatched |  | div |  |
+| fail | main > button ‘回到底部’ | unmatched |  | 回到底部 |  |
+| fail | main > icon 16×16 @1396,742 | unmatched |  | svg |  |
+| fail | main > button @540,811 92×34 | unmatched |  | button |  |
+| fail | main > icon 14×14 @551,821 | unmatched |  | svg |  |
+| fail | main > button @1228,811 34×34 | unmatched |  | button |  |
 
 # scroll-up 1920x1072
 
-Result: FAIL (636 unexplained)
+Result: FAIL (233 unexplained)
 
-- Matched elements: 14
-- Unmatched official: 393
-- Unmatched ours: 112
+- Matched elements: 31
+- Unmatched official: 41
+- Unmatched ours: 41
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
-| allowed | brand:account-footer:0 | display | block | flex | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | position | static | relative | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | box-sizing | content-box | border-box | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | width | 129.125px | 236px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | height | 17px | 50.0938px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | min-width | 0px | auto | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | min-height | auto | 44px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | margin-left | 8px | 0px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-top | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-right | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-bottom | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | padding-left | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | row-gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | column-gap | normal | 8px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
-| known | brand:account-footer:0 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| allowed | brand:account-footer:0 | font-size | 14px | 16px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | line-height | normal | 27.2px | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | white-space | nowrap | normal | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow-x | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | overflow-y | hidden | visible | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | cursor | pointer | auto | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | x | 58 | 12 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | y | 1031.5 | 1013.91 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | w | 129.13 | 236 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | brand:account-footer:0 | h | 17 | 50.09 | brand — the official account footer maps to the 本地模式 footer. |
-| fail | \|\|\|div#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 | height | 0px | 1072px |  |
-| fail | \|\|\|div#1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) |  |
-| known | \|\|\|div#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 | font-size | 14px | 16px |  |
-| fail | \|\|\|div#1 | line-height | normal | 27.2px |  |
-| fail | \|\|\|div#1 | h | 0 | 1072 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | position | absolute | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) |  |
-| known | \|\|\|div#1 > \|\|\|div#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 | font-size | 14px | 16px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 | line-height | normal | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | display | block | flex |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | width | 70px | 94px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | height | 20px | 23.7969px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | gap | normal | 8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | row-gap | normal | 8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | column-gap | normal | 8px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | line-height | normal | 23.8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | x | 106 | 83 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | y | 80 | 78.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | w | 70 | 94 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|开启新对话\|span#1 | h | 20 | 23.8 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | height | 24px | 22.0938px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | line-height | 24px | 22.1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | x | 744.5 | 722.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | y | 1002 | 987.56 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | h | 24 | 22.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | height | 24px | 22.0938px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | line-height | 24px | 22.1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | x | 846.52 | 832.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | y | 1002 | 987.56 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | h | 24 | 22.09 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | box-sizing | content-box | border-box |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | font-size | 16px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | line-height | 0px | 23.8px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke | none | rgb(15, 17, 21) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | stroke-width | 1px | 1.7px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | x | 84 | 83 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | margin-top | 16px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | margin-bottom | 16px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | x | 714.5 | 670.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | width | 734px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | margin-bottom | 0px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | x | 732.5 | 670.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | y | 430 | 433.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | w | 734 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | width | 734px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | margin-bottom | 0px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | x | 732.5 | 670.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | y | 464 | 467.63 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | w | 734 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | position | absolute | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | width | 774px | 810px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | height | 60px | 58.375px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | min-width | 0px | auto |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | min-height | 60px | 52px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-top | 12px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-right | 12px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-bottom | 0px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | padding-left | 16px | 2px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | line-height | 24px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | z-index | 0 | auto |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | x | 703.5 | 685.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | y | 925 | 914.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | w | 774 | 810 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > textbox\|\|\|textarea#1 | h | 60 | 58.38 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | margin-top | 0px | 6.4px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | margin-bottom | 16px | 6.4px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | text-align | start | left |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | x | 714.5 | 670.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | y | 232 | 226.89 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | display | block | flex |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | position | relative | static |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | width | 752px | 840px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | height | 94px | 136.375px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | min-height | 0px | 120px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | margin-top | 16px | 0px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | margin-bottom | 11px | 0px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | padding-top | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | padding-right | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | padding-bottom | 0px | 10px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | padding-left | 0px | 14px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-top-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-right-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-bottom-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-left-width | 0px | 1px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-top-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-right-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-bottom-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-left-style | none | solid |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-top-left-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-top-right-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-bottom-right-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | border-bottom-left-radius | 12px | 24px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | background-color | rgb(249, 250, 251) | rgb(255, 255, 255) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | box-shadow | none | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | line-height | 28px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | x | 714.5 | 670.5 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | y | 950 | 899.23 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | w | 752 | 840 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | h | 94 | 136.38 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | box-sizing | content-box | border-box |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | width | 16px | 22px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | height | 16px | 22px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
-| known | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | font-family | quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif | Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif | known — Harbor uses Inter, not the official brand face. Font-family differences are reported and do not fail a state. |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | line-height | 0px | 27.2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | text-align | start | center |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | white-space | nowrap | normal |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | stroke | none | rgb(97, 102, 107) |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | stroke-width | 1px | 2px |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | x | 1880 | 1878 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | y | 21 | 15 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | w | 16 | 22 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | h | 16 | 22 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|置顶\|span#1 | unmatched | 置顶 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#6 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#7 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#8 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#9 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#10 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#11 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#12 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#13 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#14 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#15 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#4 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|定时器解释\|div#1 | unmatched | 定时器解释 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | setTimeout(captureStyleA |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1::before | unmatched | div::before |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 已思考（用时 3 秒） |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#1 > \|\|这行代码的作用是：\ | unmatched | 这行代码的作用是： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | strong |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | 延迟 10 秒后执行 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#2 > \|\|\|strong#1 | unmatched | 函数一次。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 | unmatched | ul |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 单位是毫秒，即 10 秒。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ul#1 > listitem\ | unmatched | 返回一个定时器 ID，可用于取消： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | timerId captureStyleAudi |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | const |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | = |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | timerId |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | clearTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#3 > \|\|注意：\|span# | unmatched | 注意： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 | unmatched | ol |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 必须已经定义，否则这行代码执行时会立即报 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | ReferenceError |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 10 秒后调用时默认不传参数。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | 如果函数依赖 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | this |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#1 > listitem\ | unmatched | ，直接传入可能会丢失上下文，建议写成： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | => |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 | unmatched | ol |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | li |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > list\|\|\|ol#2 > listitem\ | unmatched | 如果需要传参： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | js |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | 复制 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | span |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1  | unmatched | 下载 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1 | unmatched | pre |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | arg1 arg2 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | setTimeout |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | => |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | captureStyleAudit |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ( |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | , |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | 10000 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|pre#1  | unmatched | ) |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|svg#2 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 | unmatched | p |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|简单说：\|span | unmatched | 简单说： |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | strong |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | 10 秒后执行一次 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | captureStyleAudit() |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|p#4 > \|\|\|strong#1 | unmatched | 。 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#2 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#3 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#4 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 | unmatched | 朗读 |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|朗读\|\|div#1 > \|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#5 > \|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#1::after | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#3 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#1 > button\|\|\|div#1 > \|\|\|div#3 > \|\|\|svg#1 | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > button\|\|\| | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div::after |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#2 > \|\|\|div#1  | unmatched | svg |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#3 > \|\|\|div#1 > \|\|\|div#2 > \|\|\|div#4 > \|\|内容由 AI 生成，请仔细甄别\|div#1 | unmatched | 内容由 AI 生成，请仔细甄别 |  |  |
-| fail | \|\|\|div#5 | unmatched | div |  |  |
-| fail | \|\|\|div#6 | unmatched | div |  |  |
-| fail | \|\|\|div#7 | unmatched | div |  |  |
-| fail | \|\|\|div#8 | unmatched | div |  |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 | unmatched |  | aside |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|智能搜索\|\|button#1 | unmatched |  | 智能搜索 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|智能搜索\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|隐藏\|\|button#1 | unmatched |  | 隐藏 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#1 > \|\|\|span#2 > button\|隐藏\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > button\|\|开启新对话⌘ J\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > button\|\|开启新对话⌘ J\|button#1 > \|\|⌘ J\|kbd#1 | unmatched |  | ⌘ J |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 | unmatched |  | p |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > \|\|今天\|span#1 | unmatched |  | 今天 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > button\|多选\|\|button#1 | unmatched |  | 多选 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|p#1 > button\|多选\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|\|对照\|button#1 | unmatched |  | 对照 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|菜单\|\|button#1 | unmatched |  | 菜单 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > complementary\|\|\|aside#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > button\|菜单\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 | unmatched |  | section |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 | unmatched |  | header |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > heading\|\|对照\|h2#1 | unmatched |  | 对照 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > banner\|\|\|header#1 > \|\|\|span#1 > button\|share\|\|button#1 | unmatched |  | share |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 | unmatched |  | article |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|很长\|div#1 | unmatched |  | 很长 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1 | unmatched |  | 复制 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|复制\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1 | unmatched |  | 编辑 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#1 > \|\|\|div#1 > button\|编辑\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 | unmatched |  | article |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 | unmatched |  | section |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 | unmatched |  | 已思考（用时 1 秒） |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > button\|\|已思考（用时 1 秒）\|button#1 > \|\|\|span#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|reasoning\|p#1 | unmatched |  | reasoning |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 2 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 2 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 3 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 3 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 4 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 4 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 5 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 5 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 6 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 6 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 9 段。把这条回答撑到超过一屏，便于回到底部\|p#1 | unmatched |  | 第 9 段。把这条回答撑到超过一屏，便于回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 10 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 10 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 11 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 11 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 12 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 12 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 14 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 14 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 15 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 15 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 16 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 16 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 17 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 17 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 18 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 18 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 19 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 19 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 20 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 20 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 21 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 21 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 22 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 22 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 23 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 23 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#1 > \|\|第 24 段。把这条回答撑到超过一屏，便于回到底\|p#1 | unmatched |  | 第 24 段。把这条回答撑到超过一屏，便于回到底 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1 | unmatched |  | 复制 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|复制\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1 | unmatched |  | 重新生成 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|重新生成\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1 | unmatched |  | 喜欢 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|喜欢\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1 | unmatched |  | 不喜欢 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|不喜欢\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1 | unmatched |  | 朗读 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|朗读\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1 | unmatched |  | 分享 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1::after | unmatched |  | button::after |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|article#2 > \|\|\|div#2 > button\|分享\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > button\|回到底部\|\|button#1 | unmatched |  | 回到底部 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > button\|回到底部\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 | unmatched |  | span |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 > button\|\|深度思考\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|span#1 > button\|\|深度思考\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > button\|\|智能搜索\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#1 > button\|\|智能搜索\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 | unmatched |  | div |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|添加文件\|\|label#1 | unmatched |  | 添加文件 |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > \|添加文件\|\|label#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|button#1 | unmatched |  | button |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|\|div#1 > \|\|\|div#1 > \|\|\|div#2 > button\|\|\|button#1 > \|\|\|svg#1 | unmatched |  | svg |  |
-| fail | \|\|\|div#1 > \|\|\|div#1 > section\|\|\|section#1 > \|\|\|div#2 > \|\|内容由 AI 生成，请仔细甄别\|p#1 | unmatched |  | 内容由 AI 生成，请仔细甄别 |  |
+| allowed | sidebar > account 1 | x | 58 | 12 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | y | 1031.5 | 1013.91 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | w | 129.13 | 236 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | h | 17 | 50.09 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | font-size | 14px | 16px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | line-height | normal | 27.2px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-top | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-right | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-bottom | 0px | 6px | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | padding-left | 0px | 4px | brand — the official account footer maps to the 本地模式 footer. |
+| fail | sidebar > row 1 | h | 40 | 50 |  |
+| fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
+| fail | sidebar > group 1 | x | 12 | 22 |  |
+| fail | sidebar > group 1 | w | 236 | 24 |  |
+| fail | sidebar > group 1 | h | 22 | 18 |  |
+| fail | sidebar > group 1 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > group 1 | box-shadow | rgb(249, 250, 251) 4px 0px 0px 0px | none |  |
+| fail | sidebar > group 1 | padding-top | 2px | 0px |  |
+| fail | sidebar > group 1 | padding-right | 10px | 0px |  |
+| fail | sidebar > group 1 | padding-bottom | 2px | 0px |  |
+| fail | sidebar > group 1 | padding-left | 10px | 0px |  |
+| fail | control ‘深度思考’ | x | 715.5 | 679.5 |  |
+| fail | control ‘深度思考’ | y | 997 | 982.61 |  |
+| fail | sidebar > span ‘开启新对话’ | x | 106 | 83 |  |
+| fail | sidebar > span ‘开启新对话’ | w | 70 | 94 |  |
+| fail | sidebar > span ‘开启新对话’ | h | 20 | 19 |  |
+| fail | main > span ‘深度思考’ | x | 744.5 | 708.5 |  |
+| fail | main > span ‘深度思考’ | y | 1002 | 987.61 |  |
+| fail | main > span ‘智能搜索’ | x | 846.52 | 808.5 |  |
+| fail | main > span ‘智能搜索’ | y | 1002 | 987.61 |  |
+| fail | sidebar > icon 16×16 @84,82 | x | 84 | 83 |  |
+| fail | main > icon 16×16 @1880,21 | x | 1880 | 1878 |  |
+| fail | main > icon 16×16 @1880,21 | y | 21 | 15 |  |
+| fail | main > icon 16×16 @1880,21 | w | 16 | 22 |  |
+| fail | main > icon 16×16 @1880,21 | h | 16 | 22 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | x | 702.5 | 670.5 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
+| fail | main > div @715,950 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,950 752×40 | y | 950 | 949.09 |  |
+| fail | main > div @715,950 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,950 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,950 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,950 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,950 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @703,920 776×124 | x | 702.5 | 670.5 |  |
+| fail | main > div @703,920 776×124 | y | 920 | 911.61 |  |
+| fail | main > div @703,920 776×124 | w | 776 | 840 |  |
+| fail | main > div @703,920 776×124 | box-shadow | rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px | rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px |  |
+| fail | main > div @715,796 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,796 752×40 | y | 796 | 811.53 |  |
+| fail | main > div @715,796 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,796 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,796 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,796 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,796 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | sidebar > icon 16×16 @198,25 | x | 198 | 188 |  |
+| fail | sidebar > icon 16×16 @198,25 | y | 24.5 | 22 |  |
+| fail | main > div @715,508 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,508 752×40 | y | 508 | 502.02 |  |
+| fail | main > div @715,508 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,508 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,508 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,508 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,508 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | sidebar > div @12,134 236×22 | y | 134 | 122 |  |
+| fail | sidebar > div @12,134 236×22 | box-shadow | rgb(249, 250, 251) 4px 0px 0px 0px | none |  |
+| fail | sidebar > div @12,134 236×22 | padding-right | 8px | 10px |  |
+| fail | sidebar > icon 16×16 @232,25 | x | 232 | 220 |  |
+| fail | sidebar > icon 16×16 @232,25 | y | 24.5 | 22 |  |
+| fail | main > textbox @704,925 774×60 | x | 703.5 | 671.5 |  |
+| fail | main > textbox @704,925 774×60 | y | 925 | 912.61 |  |
+| fail | main > textbox @704,925 774×60 | w | 774 | 838 |  |
+| fail | sidebar > icon 12×12 @226,139 | x | 226 | 220 |  |
+| fail | sidebar > icon 12×12 @226,139 | y | 139 | 125 |  |
+| fail | sidebar > icon 12×12 @226,139 | w | 12 | 16 |  |
+| fail | sidebar > icon 12×12 @226,139 | h | 12 | 16 |  |
+| fail | sidebar > button @226,139 12×12 | x | 226 | 214 |  |
+| fail | sidebar > button @226,139 12×12 | y | 139 | 121 |  |
+| fail | sidebar > button @226,139 12×12 | w | 12 | 24 |  |
+| fail | sidebar > button @226,139 12×12 | h | 12 | 24 |  |
+| fail | sidebar > button @226,139 12×12 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > button @226,139 12×12 | border-top-left-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-top-right-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-bottom-right-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | border-bottom-left-radius | 4096px | 8px |  |
+| fail | sidebar > button @226,139 12×12 | font-size | 14px | 12px |  |
+| fail | sidebar > button @226,139 12×12 | font-weight | 400 | 500 |  |
+| fail | sidebar > button @226,139 12×12 | line-height | 22px | 18px |  |
+| fail | sidebar > button @226,139 12×12 | color | rgb(129, 133, 140) | rgb(97, 102, 107) |  |
+| fail | sidebar > button @226,139 12×12 | padding-top | 0px | 1px |  |
+| fail | sidebar > button @226,139 12×12 | padding-right | 0px | 6px |  |
+| fail | sidebar > button @226,139 12×12 | padding-bottom | 0px | 1px |  |
+| fail | sidebar > button @226,139 12×12 | padding-left | 0px | 6px |  |
+| fail | main > div @715,276 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,276 752×40 | y | 276 | 295.67 |  |
+| fail | main > div @715,276 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,276 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,276 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,276 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,276 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div::after @715,188 | x | 714.5 | 691.5 |  |
+| fail | main > div::after @715,188 | y | 188 | 179.8 |  |
+| fail | main > div::after @715,188 | w | 762 | 819 |  |
+| fail | main > div::after @715,188 | h | 35 | 23.09 |  |
+| fail | main > div::after @715,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | main > div::after @715,188 | line-height | normal | 23.1px |  |
+| fail | main > div::after @715,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
+| fail | main > div @1432,997 34×34 | x | 1431.5 | 1425.5 |  |
+| fail | main > div @1432,997 34×34 | y | 997 | 982.61 |  |
+| fail | main > div @1432,997 34×34 | background-color | rgb(57, 100, 254) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @1432,997 34×34 | border-top-left-radius | 50% | 8px |  |
+| fail | main > div @1432,997 34×34 | border-top-right-radius | 50% | 8px |  |
+| fail | main > div @1432,997 34×34 | border-bottom-right-radius | 50% | 8px |  |
+| fail | main > div @1432,997 34×34 | border-bottom-left-radius | 50% | 8px |  |
+| fail | main > div @1432,997 34×34 | font-weight | 500 | 400 |  |
+| fail | main > div @1432,997 34×34 | line-height | 22px | 23.8px |  |
+| fail | main > div @1432,997 34×34 | color | rgb(255, 255, 255) | rgb(97, 102, 107) |  |
+| fail | main > icon 16×16 @1441,1006 | x | 1440.5 | 1434.5 |  |
+| fail | main > icon 16×16 @1441,1006 | y | 1006 | 991.61 |  |
+| fail | main > span ‘(’ | x | 803.31 | 790.5 |  |
+| fail | main > span ‘(’ | y | 1010 | 992.61 |  |
+| fail | main > span ‘(’ | w | 7.28 | 14 |  |
+| fail | main > span ‘(’ | font-weight | 400 | 500 |  |
+| fail | main > span ‘(’ | line-height | 22px | 24px |  |
+| allowed | main > span ‘(’ | color | rgb(56, 58, 66) | rgb(57, 100, 254) | owner rule — both the thinking and search toggles default ON. |
+| fail | main > div @715,276 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,276 752×40 | y | 276 | 261.28 |  |
+| fail | main > div @715,276 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,276 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,276 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,276 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,276 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @715,276 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @715,276 752×40 | line-height | 20px | 28px |  |
+| fail | main > div @715,508 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,508 752×40 | y | 508 | 536.41 |  |
+| fail | main > div @715,508 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,508 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,508 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,508 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,508 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @715,508 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @715,508 752×40 | line-height | 20px | 28px |  |
+| fail | main > div @715,796 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,796 752×40 | y | 796 | 777.14 |  |
+| fail | main > div @715,796 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,796 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,796 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,796 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,796 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @715,796 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @715,796 752×40 | line-height | 20px | 28px |  |
+| fail | main > div @715,950 752×40 | x | 714.5 | 670.5 |  |
+| fail | main > div @715,950 752×40 | y | 950 | 983.48 |  |
+| fail | main > div @715,950 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,950 752×40 | h | 40 | 28 |  |
+| fail | main > div @715,950 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
+| fail | main > div @715,950 752×40 | border-top-left-radius | 12px | 0px |  |
+| fail | main > div @715,950 752×40 | border-top-right-radius | 12px | 0px |  |
+| fail | main > div @715,950 752×40 | font-size | 13px | 16px |  |
+| fail | main > div @715,950 752×40 | line-height | 20px | 28px |  |
+| fail | main > icon 12×12 @715,1032 | y | 1032 | 1057.88 |  |
+| fail | main > icon 12×12 @715,1032 | w | 12 | 20 |  |
+| fail | main > icon 12×12 @715,1032 | h | 12 | 20 |  |
+| fail | sidebar > div @0,0 261×1072 | unmatched | div |  |  |
+| fail | sidebar > icon 143×23 @16,21 | unmatched | svg |  |  |
+| fail | sidebar > div::after @250,137 | unmatched | div::after |  |  |
+| fail | sidebar > div @22,212 226×1 | unmatched | div |  |  |
+| fail | sidebar > div @261,12 1610×48 | unmatched | div |  |  |
+| fail | sidebar > div ‘定时器解释’ | unmatched | 定时器解释 |  |  |
+| fail | main > div::after @1909,63 | unmatched | div::after |  |  |
+| fail | main > div @1154,94 313×44 | unmatched | div |  |  |
+| fail | main > icon 16×16 @1407,150 | unmatched | svg |  |  |
+| fail | main > icon 16×16 @1445,150 | unmatched | svg |  |  |
+| fail | main > div::before @715,188 | unmatched | div::before |  |  |
+| fail | main > icon 16×16 @715,197 | unmatched | svg |  |  |
+| fail | main > icon 14×14 @889,198 | unmatched | svg |  |  |
+| fail | main > div @715,276 752×94 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1342,288 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1407,288 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @715,358 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @1455,358 | unmatched | svg |  |  |
+| fail | main > div @715,508 752×116 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1342,520 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1407,520 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @715,612 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @1455,612 | unmatched | svg |  |  |
+| fail | main > div @715,796 752×94 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1342,808 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1407,808 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @715,878 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @1455,878 | unmatched | svg |  |  |
+| fail | main > div @715,950 752×94 | unmatched | div |  |  |
+| fail | main > icon 14×16 @1342,962 | unmatched | svg |  |  |
+| fail | main > icon 14×16 @1407,962 | unmatched | svg |  |  |
+| fail | main > icon 12×12 @1455,1032 | unmatched | svg |  |  |
+| fail | main > button @1433,866 34×34 | unmatched | div |  |  |
+| fail | main > div @1433,866 34×34 | unmatched | div |  |  |
+| fail | main > div @1433,866 34×34 | unmatched | div |  |  |
+| fail | main > icon 14×14 @1443,876 | unmatched | svg |  |  |
+| fail | main > icon 14×14 @727,1007 | unmatched | svg |  |  |
+| fail | main > div @818,997 92×34 | unmatched | div |  |  |
+| fail | main > icon 14×14 @829,1007 | unmatched | svg |  |  |
+| fail | main > icon 16×16 @1397,1006 | unmatched | svg |  |  |
+| fail | main > button @1432,997 34×34 | unmatched | div |  |  |
+| fail | sidebar > div @0,0 1920×1072 | unmatched |  | div |  |
+| fail | sidebar > complementary @0,0 261×1072 | unmatched |  | aside |  |
+| fail | sidebar > icon 22×22 @16,19 | unmatched |  | svg |  |
+| fail | sidebar > button ‘智能搜索’ | unmatched |  | 智能搜索 |  |
+| fail | sidebar > button ‘隐藏’ | unmatched |  | 隐藏 |  |
+| fail | sidebar > kbd ‘⌘ J’ | unmatched |  | ⌘ J |  |
+| fail | sidebar > heading ‘对照’ | unmatched |  | 对照 |  |
+| fail | main > button ‘share’ | unmatched |  | share |  |
+| fail | main > button ‘复制’ | unmatched |  | 复制 |  |
+| fail | main > icon 20×20 @1451,68 | unmatched |  | svg |  |
+| fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
+| fail | main > icon 20×20 @1489,68 | unmatched |  | svg |  |
+| fail | main > button ‘已思考（用时 1 秒）’ | unmatched |  | 已思考（用时 1 秒） |  |
+| fail | main > icon 16×16 @671,138 | unmatched |  | svg |  |
+| fail | main > icon 16×16 @825,138 | unmatched |  | svg |  |
+| fail | main > div @678,166 833×51 | unmatched |  | div |  |
+| fail | main > button ‘复制’ | unmatched |  | 复制 |  |
+| fail | main > icon 20×20 @677,1058 | unmatched |  | svg |  |
+| fail | main > button ‘重新生成’ | unmatched |  | 重新生成 |  |
+| fail | main > button ‘喜欢’ | unmatched |  | 喜欢 |  |
+| fail | main > icon 20×20 @753,1058 | unmatched |  | svg |  |
+| fail | main > button ‘不喜欢’ | unmatched |  | 不喜欢 |  |
+| fail | main > icon 20×20 @791,1058 | unmatched |  | svg |  |
+| fail | main > button ‘朗读’ | unmatched |  | 朗读 |  |
+| fail | main > icon 20×20 @829,1058 | unmatched |  | svg |  |
+| fail | main > button ‘分享’ | unmatched |  | 分享 |  |
+| fail | main > icon 20×20 @867,1058 | unmatched |  | svg |  |
+| fail | main > button ‘回到底部’ | unmatched |  | 回到底部 |  |
+| fail | main > icon 16×16 @1876,914 | unmatched |  | svg |  |
+| fail | main > icon 14×14 @691,993 | unmatched |  | svg |  |
+| fail | main > button @780,983 92×34 | unmatched |  | button |  |
+| fail | main > button @1468,983 34×34 | unmatched |  | button |  |
+| fail | main > icon 16×16 @1477,992 | unmatched |  | svg |  |
+
+# scroll-up 390x844
+
+Result: FAIL (121 unexplained)
+
+- Matched elements: 11
+- Unmatched official: 16
+- Unmatched ours: 28
+
+| Status | Key | Property | Official | Ours | Reason |
+| --- | --- | --- | --- | --- | --- |
+| allowed | sidebar > mark 1 | x | 22 | 16 | brand — DeepSeek logo maps to the Harbor mark. |
+| allowed | sidebar > mark 1 | y | 24 | 16 | brand — DeepSeek logo maps to the Harbor mark. |
+| allowed | sidebar > mark 1 | w | 20 | 24 | brand — DeepSeek logo maps to the Harbor mark. |
+| allowed | sidebar > mark 1 | h | 20 | 24 | brand — DeepSeek logo maps to the Harbor mark. |
+| fail | control ‘深度思考’ | x | 29 | 37 |  |
+| fail | control ‘深度思考’ | y | 769 | 720.31 |  |
+| fail | control ‘智能搜索’ | x | 131.02 | 137 |  |
+| fail | control ‘智能搜索’ | y | 769 | 720.31 |  |
+| fail | sidebar > span ‘深度思考’ | x | 58 | 66 |  |
+| fail | sidebar > span ‘深度思考’ | y | 774 | 725.31 |  |
+| fail | sidebar > span ‘智能搜索’ | x | 160.02 | 166 |  |
+| fail | sidebar > span ‘智能搜索’ | y | 774 | 725.31 |  |
+| fail | main > icon 20×20 @343,24 | x | 343 | 350 |  |
+| fail | main > icon 20×20 @343,24 | y | 24 | 16 |  |
+| fail | main > icon 20×20 @343,24 | w | 20 | 24 |  |
+| fail | main > icon 20×20 @343,24 | h | 20 | 24 |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | y | 816 | 809.31 |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 18.69 |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 18.7px |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
+| fail | main > icon 20×20 @289,24 | x | 289 | 302 |  |
+| fail | main > icon 20×20 @289,24 | y | 24 | 16 |  |
+| fail | main > icon 20×20 @289,24 | w | 20 | 24 |  |
+| fail | main > icon 20×20 @289,24 | h | 20 | 24 |  |
+| fail | main > button @328,656 34×34 | x | 328 | 336 |  |
+| fail | main > button @328,656 34×34 | y | 656 | 676 |  |
+| fail | main > button @328,656 34×34 | w | 34 | 36 |  |
+| fail | main > button @328,656 34×34 | h | 34 | 36 |  |
+| fail | main > button @328,656 34×34 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
+| fail | main > button @328,656 34×34 | font-size | 14px | 16px |  |
+| fail | main > button @328,656 34×34 | line-height | 22px | 27.2px |  |
+| fail | main > button @328,656 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
+| fail | main > button @328,656 34×34 | border-top-width | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | main > button @328,656 34×34 | border-top-style | none | solid |  |
+| fail | main > button @328,656 34×34 | padding-top | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-right-width | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | main > button @328,656 34×34 | border-right-style | none | solid |  |
+| fail | main > button @328,656 34×34 | padding-right | 0px | 6px |  |
+| fail | main > button @328,656 34×34 | border-bottom-width | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | main > button @328,656 34×34 | border-bottom-style | none | solid |  |
+| fail | main > button @328,656 34×34 | padding-bottom | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-left-width | 0px | 1px |  |
+| fail | main > button @328,656 34×34 | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | main > button @328,656 34×34 | border-left-style | none | solid |  |
+| fail | main > button @328,656 34×34 | padding-left | 0px | 6px |  |
+| fail | main > icon 14×14 @338,666 | x | 338 | 346 |  |
+| fail | main > icon 14×14 @338,666 | y | 666 | 686 |  |
+| fail | main > icon 14×14 @338,666 | w | 14 | 16 |  |
+| fail | main > icon 14×14 @338,666 | h | 14 | 16 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | x | 38 | 16 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | y | 664 | 637.31 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | w | 322.41 | 358 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | h | 216 | 144 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | box-shadow | none | rgba(15, 17, 21, 0.06) 0px 8px 24px 0px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-left-radius | 0px | 24px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-right-radius | 0px | 24px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-right-radius | 0px | 24px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-left-radius | 0px | 24px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | line-height | 28px | 27.2px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-width | 0px | 1px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-style | none | solid |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | padding-top | 0px | 12px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-right-width | 0px | 1px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-right-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-right-style | none | solid |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | padding-right | 0px | 12px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-width | 0px | 1px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-style | none | solid |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | padding-bottom | 0px | 8px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-left-width | 0px | 1px |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-left-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-left-style | none | solid |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | padding-left | 0px | 12px |  |
+| fail | sidebar > div @0,0 331×60 | unmatched | div |  |  |
+| fail | sidebar > div ‘快速排序详解’ | unmatched | 快速排序详解 |  |  |
+| fail | sidebar > span ‘基准值 pivot 的选择会直接影响分区是否平衡’ | unmatched | 基准值 pivot 的选择会直接影响分区是否平衡 |  |  |
+| fail | sidebar > span ‘分区过程完成元素归位’ | unmatched | 分区过程完成元素归位 |  |  |
+| fail | sidebar > span ‘分区是快速排序的关键步骤。本代码采用 Lomut’ | unmatched | 分区是快速排序的关键步骤。本代码采用 Lomut |  |  |
+| fail | sidebar > span ‘分区返回基准下标 pivot_index 后，基’ | unmatched | 分区返回基准下标 pivot_index 后，基 |  |  |
+| fail | main > div @328,656 34×34 | unmatched | div |  |  |
+| fail | main > div @328,656 34×34 | unmatched | div |  |  |
+| fail | sidebar > div @16,710 358×106 | unmatched | div |  |  |
+| fail | sidebar > textbox @17,715 356×42 | unmatched | textarea |  |  |
+| fail | sidebar > icon 14×14 @40,779 | unmatched | svg |  |  |
+| fail | sidebar > icon 14×14 @142,779 | unmatched | svg |  |  |
+| fail | main > icon 16×16 @292,778 | unmatched | svg |  |  |
+| fail | main > button @327,769 34×34 | unmatched | div |  |  |
+| fail | main > div @327,769 34×34 | unmatched | div |  |  |
+| fail | main > icon 16×16 @336,778 | unmatched | svg |  |  |
+| fail | sidebar > div @0,0 390×844 | unmatched |  | div |  |
+| fail | sidebar > button @6,6 44×44 | unmatched |  | button |  |
+| fail | sidebar > heading ‘对照’ | unmatched |  | 对照 |  |
+| fail | main > button ‘开启新对话’ | unmatched |  | 开启新对话 |  |
+| fail | main > button ‘share’ | unmatched |  | share |  |
+| fail | main > button ‘复制’ | unmatched |  | 复制 |  |
+| fail | main > icon 20×20 @294,116 | unmatched |  | svg |  |
+| fail | main > button ‘编辑’ | unmatched |  | 编辑 |  |
+| fail | main > icon 20×20 @332,116 | unmatched |  | svg |  |
+| fail | sidebar > div @43,214 311×51 | unmatched |  | div |  |
+| fail | sidebar > p ‘reasoning’ | unmatched |  | reasoning |  |
+| fail | sidebar > p ‘第 1 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 1 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 2 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 2 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 3 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 3 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 4 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 4 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 5 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 5 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 6 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 6 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 7 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 7 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 8 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 8 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 9 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 9 段。把这条回答撑到超过一屏，便于回到底部 |  |
+| fail | sidebar > p ‘第 10 段。把这条回答撑到超过一屏，便于回到底’ | unmatched |  | 第 10 段。把这条回答撑到超过一屏，便于回到底 |  |
+| fail | sidebar > textbox @29,650 332×60 | unmatched |  | textarea |  |
+| fail | sidebar > icon 14×14 @48,730 | unmatched |  | svg |  |
+| fail | sidebar > icon 14×14 @148,730 | unmatched |  | svg |  |
+| fail | sidebar > label ‘添加文件’ | unmatched |  | 添加文件 |  |
+| fail | main > icon 16×16 @286,729 | unmatched |  | svg |  |
+| fail | main > button @319,720 34×34 | unmatched |  | button |  |
+| fail | main > icon 16×16 @328,729 | unmatched |  | svg |  |

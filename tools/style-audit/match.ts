@@ -28,34 +28,108 @@ export type Pair = {
   official: StyleNode
   ours: StyleNode
   brand?: 'wordmark' | 'logo' | 'account-footer' | 'chat-list'
-  how: 'brand' | 'key' | 'role-text' | 'iou'
+  how: 'brand' | 'semantic' | 'position'
 }
 
 export type MatchResult = {
   pairs: Pair[]
   unmatchedOfficial: StyleNode[]
   unmatchedOurs: StyleNode[]
+  officialVisible: number
 }
 
 const byPos = (a: StyleNode, b: StyleNode) => a.rect.y - b.rect.y || a.rect.x - b.rect.x
 
-const area = (rect: Rect) => Math.max(0, rect.w) * Math.max(0, rect.h)
+const clean = (value: string) => value.replace(/\s+/g, ' ').trim()
 
-export const iou = (a: Rect, b: Rect) => {
-  const x1 = Math.max(a.x, b.x)
-  const y1 = Math.max(a.y, b.y)
-  const x2 = Math.min(a.x + a.w, b.x + b.w)
-  const y2 = Math.min(a.y + a.h, b.y + b.h)
-  const inter = Math.max(0, x2 - x1) * Math.max(0, y2 - y1)
-  const union = area(a) + area(b) - inter
-  return union <= 0 ? 0 : inter / union
+export const visibleText = (node: StyleNode) => clean(node.text || '').slice(0, 24)
+
+export const accessibleName = (node: StyleNode) => clean(node.name || '') || visibleText(node)
+
+const alphaOf = (color: string) => {
+  const match = color.trim().toLowerCase().match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\s*\)/)
+  if (match?.[1]) return Number(match[1])
+  if (color === 'transparent') return 0
+  if (/^rgb\(/.test(color) || /^#[0-9a-f]{3,8}$/i.test(color)) return 1
+  return 1
 }
 
-const textOf = (node: StyleNode) => `${node.name} ${node.text}`.replace(/\s+/g, ' ').trim()
+const paints = (node: StyleNode) => {
+  if (accessibleName(node)) return true
+  if (node.tag === 'svg' || node.tag === 'img' || node.tag === 'input' || node.tag === 'textarea' || node.tag === 'button' || node.tag === 'a' || node.tag === 'select') return true
+  const background = node.style['background-color'] || ''
+  if (background && background !== 'transparent' && alphaOf(background) > 0.01) return true
+  const shadow = node.style['box-shadow'] || 'none'
+  if (shadow && shadow !== 'none') return true
+  for (const side of ['top', 'right', 'bottom', 'left']) {
+    const width = parseFloat(node.style[`border-${side}-width`] || '0')
+    const style = node.style[`border-${side}-style`] || 'none'
+    const color = node.style[`border-${side}-color`] || ''
+    if (width > 0 && style !== 'none' && alphaOf(color) > 0.01) return true
+  }
+  const content = node.style.content || ''
+  if (node.pseudo && content && content !== 'none' && content !== 'normal' && content !== '""') return true
+  return false
+}
+
+export const isVisiblePainted = (node: StyleNode, viewport: { width: number; height: number }) => {
+  const { x, y, w, h } = node.rect
+  if (w < 0.5 || h < 0.5) return false
+  if (x + w <= 0 || y + h <= 0 || x >= viewport.width || y >= viewport.height) return false
+  if (node.style.visibility === 'hidden' || node.style.display === 'none') return false
+  if (Number.parseFloat(node.style.opacity || '1') === 0) return false
+  return paints(node)
+}
+
+const regionOf = (node: StyleNode) => (node.rect.x < 280 ? 'sidebar' : 'main')
+
+export const humanLabel = (node: StyleNode) => {
+  const region = regionOf(node)
+  const name = accessibleName(node)
+  const role = node.role || node.tag
+  if (name) return `${region} > ${role} ‘${name}’`
+  if (node.tag === 'svg' || node.tag === 'img') return `${region} > icon ${Math.round(node.rect.w)}×${Math.round(node.rect.h)} @${Math.round(node.rect.x)},${Math.round(node.rect.y)}`
+  if (node.pseudo) return `${region} > ${node.tag} @${Math.round(node.rect.x)},${Math.round(node.rect.y)}`
+  return `${region} > ${role} @${Math.round(node.rect.x)},${Math.round(node.rect.y)} ${Math.round(node.rect.w)}×${Math.round(node.rect.h)}`
+}
+
+const semanticKey = (node: StyleNode) => {
+  const role = node.role || node.tag
+  const name = accessibleName(node)
+  if (name) return `${regionOf(node)}|${role}|${name}|${node.tag}`
+  if (node.testId) return `${regionOf(node)}|${role}|#${node.testId}|${node.tag}`
+  if (node.tag === 'svg' || node.tag === 'img') return ''
+  return ''
+}
+
+const inSidebar = (node: StyleNode) => node.rect.x < 40 && node.rect.x + node.rect.w < 320
+
+const isSidebarRow = (node: StyleNode) => {
+  if (node.pseudo || node.rect.y < 110) return false
+  if (!inSidebar(node)) return false
+  if (node.rect.w < 160 || node.rect.h < 28 || node.rect.h > 52) return false
+  if (!/^(a|div|button)$/.test(node.tag)) return false
+  const text = accessibleName(node)
+  if (/开启新对话|深度思考|智能搜索|new chat/i.test(text)) return false
+  return true
+}
+
+const isLooseTitle = (node: StyleNode) => {
+  if (node.rect.x > 48 || node.rect.y < 140 || node.rect.h > 24 || node.rect.w > 220) return false
+  const text = visibleText(node)
+  if (!text || isGroupLabel(node)) return false
+  return !/开启新对话|本地模式|密钥|置顶|今天|昨天|天内/.test(text)
+}
+
+const isGroupLabel = (node: StyleNode) => {
+  if (!inSidebar(node)) return false
+  const text = visibleText(node)
+  return text.length > 0 && text.length <= 16 && /置顶|今天|昨天|天内|^\d{4}-\d{2}$/.test(text)
+}
 
 const isWordmark = (node: StyleNode, side: 'official' | 'ours') => {
   if (node.rect.y > 140 || node.rect.x > 280) return false
-  const text = textOf(node)
+  const text = accessibleName(node)
   if (side === 'official') return /deepseek/i.test(text)
   return /harbor/i.test(text) || /for deepseek/i.test(text)
 }
@@ -65,50 +139,9 @@ const isLogo = (node: StyleNode) =>
 
 const isFooter = (node: StyleNode, side: 'official' | 'ours', height: number) => {
   if (node.rect.x > 320) return false
-  const text = textOf(node)
+  const text = accessibleName(node)
   if (side === 'ours') return /本地模式|密钥与对话/.test(text)
-  return node.rect.y > height - 180 && /@/.test(text)
-}
-
-const inSidebar = (node: StyleNode) => node.rect.x < 48 && node.rect.x + node.rect.w < 340
-
-const isChatRow = (node: StyleNode) => {
-  if (node.pseudo || node.rect.y < 120) return false
-  if (!inSidebar(node)) return false
-  if (node.rect.w < 180 || node.rect.h < 36 || node.rect.h > 48) return false
-  if (node.tag !== 'a' && node.tag !== 'div' && node.tag !== 'button') return false
-  if (node.style.display === 'grid' || node.style.color === 'rgb(128, 0, 128)') return false
-  const text = textOf(node)
-  if (/开启新对话|new chat|深度思考|智能搜索/i.test(text)) return false
-  return true
-}
-
-const isGroupLabel = (node: StyleNode) => {
-  if (node.pseudo || !inSidebar(node)) return false
-  if (node.rect.h < 14 || node.rect.h > 28 || node.rect.w < 160) return false
-  const text = node.text.trim()
-  return text.length > 0 && text.length <= 16 && /置顶|今天|昨天|天内|^\d{4}-\d{2}$/.test(text)
-}
-
-const contained = (parent: StyleNode, node: StyleNode) => {
-  const outer = parent.rect
-  const inner = node.rect
-  return inner.x >= outer.x - 1 && inner.y >= outer.y - 1 && inner.x + inner.w <= outer.x + outer.w + 2 && inner.y + inner.h <= outer.y + outer.h + 2
-}
-
-const distinctRows = (nodes: StyleNode[]) => {
-  const sorted = [...nodes].sort(byPos)
-  const kept: StyleNode[] = []
-  for (const node of sorted) {
-    if (kept.some((row) => contained(row, node))) continue
-    kept.push(node)
-  }
-  return kept
-}
-
-const withoutRows = (pool: StyleNode[], rows: StyleNode[]) => {
-  if (!rows.length) return pool
-  return pool.filter((node) => !rows.some((row) => node === row || contained(row, node) || node.key.startsWith(`${row.key} > `) || node.key.startsWith(`${row.key}::`)))
+  return node.rect.y > height - 220 && /@/.test(text)
 }
 
 const take = (pool: StyleNode[], chosen: StyleNode[]) => {
@@ -116,114 +149,164 @@ const take = (pool: StyleNode[], chosen: StyleNode[]) => {
   return pool.filter((node) => !drop.has(node))
 }
 
-const zipBrand = (
-  official: StyleNode[],
-  ours: StyleNode[],
-  brand: Pair['brand'],
-): { pairs: Pair[]; official: StyleNode[]; ours: StyleNode[] } => {
-  const left = [...official].sort(byPos)
-  const right = [...ours].sort(byPos)
-  const count = Math.min(left.length, right.length)
+const zip = (official: StyleNode[], ours: StyleNode[], brand: Pair['brand'], label: string): Pair[] => {
+  const count = Math.min(official.length, ours.length)
   const pairs: Pair[] = []
   for (let index = 0; index < count; index += 1) {
-    const a = left[index]
-    const b = right[index]
-    if (!a || !b) continue
-    pairs.push({ key: `brand:${brand}:${index}`, official: a, ours: b, brand, how: 'brand' })
+    const left = official[index]
+    const right = ours[index]
+    if (!left || !right) continue
+    pairs.push({ key: `${label} ${index + 1}`, official: left, ours: right, brand, how: 'brand' })
   }
-  return {
-    pairs,
-    official: take(official, left.slice(0, count)),
-    ours: take(ours, right.slice(0, count)),
-  }
+  return pairs
 }
 
-const looseKey = (node: StyleNode) => {
-  const text = (node.name || node.text || '').replace(/\s+/g, ' ').trim().slice(0, 24)
-  if (!text) return ''
-  return `${node.role}|${text}|${node.tag}`
+const inside = (outer: StyleNode, inner: StyleNode) => {
+  if (outer === inner) return true
+  const box = outer.rect
+  const item = inner.rect
+  return item.x >= box.x - 1 && item.y >= box.y - 1 && item.x + item.w <= box.x + box.w + 2 && item.y + item.h <= box.y + box.h + 2
+}
+
+const dropInside = (pool: StyleNode[], rows: StyleNode[]) =>
+  pool.filter((node) => !rows.some((row) => inside(row, node)))
+
+const sameControl = (left: StyleNode, right: StyleNode) => {
+  const tags = new Set([left.tag, right.tag])
+  return tags.size === 2 && [...tags].every((tag) => tag === 'button' || tag === 'a' || tag === 'div')
+}
+
+const shellOf = (node: StyleNode, pool: StyleNode[]) => {
+  let key = node.key
+  let shell = node
+  while (key.includes(' > ')) {
+    key = key.slice(0, key.lastIndexOf(' > '))
+    const ancestor = pool.find((item) => item.key === key)
+    if (!ancestor) break
+    if (ancestor.rect.w > 480 || ancestor.rect.h > 80) break
+    const background = ancestor.style['background-color'] || ''
+    const bordered = ['top', 'right', 'bottom', 'left'].some((side) => Number.parseFloat(ancestor.style[`border-${side}-width`] || '0') > 0)
+    const filled = background && background !== 'transparent' && alphaOf(background) > 0.01
+    if (ancestor.tag === 'button' || ancestor.tag === 'a' || filled || bordered) shell = ancestor
+  }
+  return shell
+}
+
+const pairShells = (official: StyleNode[], ours: StyleNode[]) => {
+  const labels = ['开启新对话', '深度思考', '智能搜索', '新对话']
+  const pairs: Pair[] = []
+  const usedOfficial = new Set<StyleNode>()
+  const usedOurs = new Set<StyleNode>()
+  for (const label of labels) {
+    const leftText = official.find((node) => accessibleName(node) === label)
+    const rightText = ours.find((node) => accessibleName(node) === label || accessibleName(node).includes(label))
+    if (!leftText || !rightText) continue
+    const left = shellOf(leftText, official)
+    const right = shellOf(rightText, ours)
+    if (usedOfficial.has(left) || usedOurs.has(right) || left === leftText || right === rightText) continue
+    usedOfficial.add(left)
+    usedOurs.add(right)
+    pairs.push({ key: `control ‘${label}’`, official: left, ours: right, how: 'semantic' })
+  }
+  return pairs
+}
+
+const pairGreetings = (official: StyleNode[], ours: StyleNode[]) => {
+  const big = (node: StyleNode) => regionOf(node) === 'main' && Number.parseFloat(node.style['font-size'] || '0') >= 20 && visibleText(node).length > 4
+  const left = official.filter(big).sort(byPos)
+  const right = ours.filter(big).sort(byPos)
+  return zip(left, right, undefined, 'main > greeting').map((pair) => ({ ...pair, how: 'position' as const }))
+}
+
+const center = (node: StyleNode) => ({ x: node.rect.x + node.rect.w / 2, y: node.rect.y + node.rect.h / 2 })
+
+const distance = (left: StyleNode, right: StyleNode) => {
+  const a = center(left)
+  const b = center(right)
+  return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
 export const matchCaptures = (official: Capture, ours: Capture): MatchResult => {
-  const height = official.viewport?.height || 900
-  let officialPool = official.elements.slice()
-  let oursPool = ours.elements.slice()
+  const viewport = official.viewport || { width: 1440, height: 900 }
+  let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport))
+  let oursPool = ours.elements.filter((node) => isVisiblePainted(node, ours.viewport || viewport))
+  const officialVisible = officialPool.length
   const pairs: Pair[] = []
 
-  const word = zipBrand(
-    officialPool.filter((node) => isWordmark(node, 'official')),
-    oursPool.filter((node) => isWordmark(node, 'ours')),
+  const word = zip(
+    officialPool.filter((node) => isWordmark(node, 'official')).sort(byPos),
+    oursPool.filter((node) => isWordmark(node, 'ours')).sort(byPos),
     'wordmark',
+    'sidebar > wordmark',
   )
-  pairs.push(...word.pairs)
-  officialPool = take(officialPool, word.pairs.map((pair) => pair.official))
-  oursPool = take(oursPool, word.pairs.map((pair) => pair.ours))
+  pairs.push(...word)
+  officialPool = take(officialPool, word.map((pair) => pair.official))
+  oursPool = take(oursPool, word.map((pair) => pair.ours))
 
-  const logo = zipBrand(officialPool.filter(isLogo), oursPool.filter(isLogo), 'logo')
-  pairs.push(...logo.pairs)
-  officialPool = take(officialPool, logo.pairs.map((pair) => pair.official))
-  oursPool = take(oursPool, logo.pairs.map((pair) => pair.ours))
+  const logos = zip(
+    officialPool.filter(isLogo).sort(byPos),
+    oursPool.filter(isLogo).sort(byPos),
+    'logo',
+    'sidebar > mark',
+  )
+  pairs.push(...logos)
+  officialPool = take(officialPool, logos.map((pair) => pair.official))
+  oursPool = take(oursPool, logos.map((pair) => pair.ours))
 
-  const footer = zipBrand(
-    officialPool.filter((node) => isFooter(node, 'official', height)),
-    oursPool.filter((node) => isFooter(node, 'ours', height)),
+  const footers = zip(
+    officialPool.filter((node) => isFooter(node, 'official', viewport.height)).sort(byPos),
+    oursPool.filter((node) => isFooter(node, 'ours', viewport.height)).sort(byPos),
     'account-footer',
+    'sidebar > account',
   )
-  pairs.push(...footer.pairs)
-  officialPool = take(officialPool, footer.pairs.map((pair) => pair.official))
-  oursPool = take(oursPool, footer.pairs.map((pair) => pair.ours))
+  pairs.push(...footers)
+  officialPool = take(officialPool, footers.map((pair) => pair.official))
+  oursPool = take(oursPool, footers.map((pair) => pair.ours))
 
-  const officialRows = distinctRows(officialPool.filter(isChatRow))
-  const oursRows = distinctRows(oursPool.filter(isChatRow))
-  const chat = zipBrand(officialRows, oursRows, 'chat-list')
-  pairs.push(...chat.pairs)
-  officialPool = withoutRows(officialPool, officialRows)
-  oursPool = withoutRows(oursPool, oursRows)
+  const officialRows = officialPool.filter(isSidebarRow).sort(byPos)
+  const oursRows = oursPool.filter(isSidebarRow).sort(byPos)
+  const rows = zip(officialRows, oursRows, 'chat-list', 'sidebar > row')
+  pairs.push(...rows)
+  officialPool = dropInside(officialPool, officialRows).filter((node) => !isLooseTitle(node))
+  oursPool = dropInside(oursPool, oursRows).filter((node) => !isLooseTitle(node))
 
-  const officialGroups = distinctRows(officialPool.filter(isGroupLabel))
-  const oursGroups = distinctRows(oursPool.filter(isGroupLabel))
-  const groups = zipBrand(officialGroups, oursGroups, 'chat-list')
-  pairs.push(...groups.pairs)
+  const officialGroups = officialPool.filter(isGroupLabel).sort(byPos)
+  const oursGroups = oursPool.filter(isGroupLabel).sort(byPos)
+  const sharedGroups = officialGroups.filter((node) => oursGroups.some((item) => visibleText(item) === visibleText(node)))
+  const sharedOursGroups = oursGroups.filter((node) => officialGroups.some((item) => visibleText(item) === visibleText(node)))
+  const groups = zip(sharedGroups, sharedOursGroups.sort(byPos), 'chat-list', 'sidebar > group')
+  pairs.push(...groups)
   officialPool = take(officialPool, officialGroups)
   oursPool = take(oursPool, oursGroups)
 
+  const shells = pairShells(officialPool, oursPool)
+  pairs.push(...shells)
+  officialPool = take(officialPool, shells.map((pair) => pair.official))
+  oursPool = take(oursPool, shells.map((pair) => pair.ours))
+
+  const greetings = pairGreetings(officialPool, oursPool)
+  pairs.push(...greetings)
+  officialPool = take(officialPool, greetings.map((pair) => pair.official))
+  oursPool = take(oursPool, greetings.map((pair) => pair.ours))
+
   const oursByKey = new Map<string, StyleNode[]>()
   for (const node of oursPool) {
-    const list = oursByKey.get(node.key) || []
+    const key = semanticKey(node)
+    if (!key) continue
+    const list = oursByKey.get(key) || []
     list.push(node)
-    oursByKey.set(node.key, list)
+    oursByKey.set(key, list)
   }
   const usedOurs = new Set<StyleNode>()
   const usedOfficial = new Set<StyleNode>()
   for (const node of officialPool) {
-    const list = oursByKey.get(node.key)
-    const found = list?.find((item) => !usedOurs.has(item))
+    const key = semanticKey(node)
+    if (!key) continue
+    const found = oursByKey.get(key)?.find((item) => !usedOurs.has(item))
     if (!found) continue
     usedOurs.add(found)
     usedOfficial.add(node)
-    pairs.push({ key: node.key, official: node, ours: found, how: 'key' })
-  }
-  officialPool = officialPool.filter((node) => !usedOfficial.has(node))
-  oursPool = oursPool.filter((node) => !usedOurs.has(node))
-
-  const oursByLoose = new Map<string, StyleNode[]>()
-  for (const node of oursPool) {
-    const key = looseKey(node)
-    if (!key) continue
-    const list = oursByLoose.get(key) || []
-    list.push(node)
-    oursByLoose.set(key, list)
-  }
-  usedOurs.clear()
-  usedOfficial.clear()
-  for (const node of officialPool) {
-    const key = looseKey(node)
-    if (!key) continue
-    const found = oursByLoose.get(key)?.find((item) => !usedOurs.has(item))
-    if (!found) continue
-    usedOurs.add(found)
-    usedOfficial.add(node)
-    pairs.push({ key: node.key, official: node, ours: found, how: 'role-text' })
+    pairs.push({ key: humanLabel(node), official: node, ours: found, how: 'semantic' })
   }
   officialPool = officialPool.filter((node) => !usedOfficial.has(node))
   oursPool = oursPool.filter((node) => !usedOurs.has(node))
@@ -231,26 +314,38 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   const candidates: Array<{ score: number; official: StyleNode; ours: StyleNode }> = []
   for (const left of officialPool) {
     for (const right of oursPool) {
-      if (left.tag !== right.tag) continue
-      if (left.rect.w > 500 && left.rect.h > 400) continue
-      if (left.style.color === 'rgb(128, 0, 128)' && right.style.color !== left.style.color) continue
-      const score = iou(left.rect, right.rect)
-      if (score >= 0.5) candidates.push({ score, official: left, ours: right })
+      if (regionOf(left) !== regionOf(right)) continue
+      if (left.tag !== right.tag && left.role !== right.role && !sameControl(left, right)) continue
+      const widthGap = Math.abs(left.rect.w - right.rect.w)
+      const heightGap = Math.abs(left.rect.h - right.rect.h)
+      if (widthGap > Math.max(16, left.rect.w * 0.25) || heightGap > Math.max(12, left.rect.h * 0.35)) continue
+      const gap = distance(left, right)
+      const limit = Math.max(36, Math.min(left.rect.w, left.rect.h))
+      if (gap > limit) continue
+      candidates.push({ score: gap, official: left, ours: right })
     }
   }
-  candidates.sort((a, b) => b.score - a.score)
+  candidates.sort((a, b) => a.score - b.score)
   usedOurs.clear()
   usedOfficial.clear()
   for (const candidate of candidates) {
     if (usedOfficial.has(candidate.official) || usedOurs.has(candidate.ours)) continue
     usedOfficial.add(candidate.official)
     usedOurs.add(candidate.ours)
-    pairs.push({ key: candidate.official.key, official: candidate.official, ours: candidate.ours, how: 'iou' })
+    pairs.push({ key: humanLabel(candidate.official), official: candidate.official, ours: candidate.ours, how: 'position' })
   }
 
+  const contentLeaf = (node: StyleNode) => {
+    if (regionOf(node) !== 'main') return false
+    if (/^(button|textarea|input|svg|img|a)$/.test(node.tag)) return false
+    if (!visibleText(node)) return false
+    if (Number.parseFloat(node.style['font-size'] || '0') >= 20) return false
+    return true
+  }
   return {
     pairs,
-    unmatchedOfficial: officialPool.filter((node) => !usedOfficial.has(node)),
-    unmatchedOurs: oursPool.filter((node) => !usedOurs.has(node)),
+    unmatchedOfficial: officialPool.filter((node) => !usedOfficial.has(node) && !contentLeaf(node)),
+    unmatchedOurs: oursPool.filter((node) => !usedOurs.has(node) && !contentLeaf(node)),
+    officialVisible,
   }
 }

@@ -51,7 +51,7 @@ export const selfCheck = () => {
     capture([node({ key: 'a', style: { color: 'rgb(0, 0, 0)', 'font-family': 'DeepSeek Sans', 'font-size': '14px' } })]),
     capture([node({ key: 'a', style: { color: '#000', 'font-family': 'Inter', 'font-size': '14px' } })]),
   ), allow)
-  assert(font.pass && font.mismatches.some((item) => item.property === 'font-family' && item.status === 'known'), 'font-family is a known item')
+  assert(font.pass && !font.mismatches.some((item) => item.property === 'font-family'), 'font-family is not a visual property')
 
   const brand = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'logo', text: 'DeepSeek', tag: 'span', role: '', rect: { x: 40, y: 20, w: 80, h: 18 }, style: { color: 'black', 'font-size': '16px' } })]),

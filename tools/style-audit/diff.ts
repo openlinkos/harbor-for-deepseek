@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import type { MatchResult, Pair, StyleNode } from './match.ts'
+import { humanLabel, type MatchResult, type Pair, type StyleNode } from './match.ts'
 
 export type Exception = {
   id: string
@@ -25,12 +25,19 @@ export type Mismatch = {
 export type DiffReport = {
   state: string
   viewport: string
+  officialVisible: number
   matched: number
+  matchedEqual: number
+  matchedDiff: number
+  officialOnly: number
+  harborOnly: number
+  allowlisted: number
   unmatchedOfficial: number
   unmatchedOurs: number
   mismatches: Mismatch[]
   unexplained: number
   pass: boolean
+  skipped?: boolean
 }
 
 const COLOR_PROPS = new Set([
@@ -186,25 +193,46 @@ const explain = (exceptions: Exception[], pair: Pair | null, property: string, o
   return undefined
 }
 
+const RADIUS = ['border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius', 'border-bottom-left-radius']
+const BORDER_SIDES = ['top', 'right', 'bottom', 'left']
+
+const visualProperties = (pair: Pair) => {
+  const text = Boolean(accessibleText(pair.official) || accessibleText(pair.ours))
+  const props = ['x', 'y', 'w', 'h', 'background-color', 'box-shadow', 'opacity', ...RADIUS]
+  if (text) props.push('font-size', 'font-weight', 'line-height', 'letter-spacing', 'color')
+  for (const side of BORDER_SIDES) {
+    const officialWidth = parseFloat(pair.official.style[`border-${side}-width`] || '0')
+    const oursWidth = parseFloat(pair.ours.style[`border-${side}-width`] || '0')
+    if (officialWidth > 0 || oursWidth > 0) {
+      props.push(`border-${side}-width`, `border-${side}-color`, `border-${side}-style`)
+    }
+    const officialPad = parseFloat(pair.official.style[`padding-${side}`] || '0')
+    const oursPad = parseFloat(pair.ours.style[`padding-${side}`] || '0')
+    if (officialPad > 0 || oursPad > 0) props.push(`padding-${side}`)
+  }
+  return props
+}
+
+const accessibleText = (node: StyleNode) => `${node.name} ${node.text}`.replace(/\s+/g, ' ').trim()
+
+const valueOf = (node: StyleNode, property: string) => {
+  if (property === 'x') return String(node.rect.x)
+  if (property === 'y') return String(node.rect.y)
+  if (property === 'w') return String(node.rect.w)
+  if (property === 'h') return String(node.rect.h)
+  return node.style[property] ?? ''
+}
+
 export const diffMatch = (state: string, viewport: string, result: MatchResult, exceptions: Exception[]): DiffReport => {
   const mismatches: Mismatch[] = []
   for (const pair of result.pairs) {
-    const officialStyle = { ...pair.official.style, x: String(pair.official.rect.x), y: String(pair.official.rect.y), w: String(pair.official.rect.w), h: String(pair.official.rect.h) }
-    const oursStyle = { ...pair.ours.style, x: String(pair.ours.rect.x), y: String(pair.ours.rect.y), w: String(pair.ours.rect.w), h: String(pair.ours.rect.h) }
-    const props = new Set([...Object.keys(officialStyle), ...Object.keys(oursStyle)])
-    for (const property of props) {
-      const official = officialStyle[property] ?? ''
-      const ours = oursStyle[property] ?? ''
+    for (const property of visualProperties(pair)) {
+      const official = valueOf(pair.official, property)
+      const ours = valueOf(pair.ours, property)
       if (same(property, official, ours)) continue
-      if (property === 'outline' && official.includes(' none') && ours.includes(' none')) continue
-      if (property.startsWith('border-') && property.endsWith('-color')) {
-        const side = property.slice('border-'.length, -'-color'.length)
-        const officialWidth = pair.official.style[`border-${side}-width`] || '0px'
-        const oursWidth = pair.ours.style[`border-${side}-width`] || '0px'
-        if (officialWidth === '0px' && oursWidth === '0px') continue
-      }
+      if (property === 'y' && pair.brand === 'chat-list') continue
       const exception = explain(exceptions, pair, property, pair.official, pair.ours)
-      const known = exception?.id === 'font-family' || property === 'font-family' && exception
+      const known = exception?.id === 'font-family'
       mismatches.push({
         key: pair.key,
         property,
@@ -219,7 +247,7 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
   for (const node of result.unmatchedOfficial) {
     const exception = explain(exceptions, null, 'unmatched', node, null, 'official')
     mismatches.push({
-      key: node.key,
+      key: humanLabel(node),
       property: 'unmatched',
       official: node.text || node.name || node.tag,
       ours: '',
@@ -231,7 +259,7 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
   for (const node of result.unmatchedOurs) {
     const exception = explain(exceptions, null, 'unmatched', null, node, 'ours')
     mismatches.push({
-      key: node.key,
+      key: humanLabel(node),
       property: 'unmatched',
       official: '',
       ours: node.text || node.name || node.tag,
@@ -241,10 +269,19 @@ export const diffMatch = (state: string, viewport: string, result: MatchResult, 
     })
   }
   const unexplained = mismatches.filter((item) => item.status === 'fail').length
+  const allowlisted = mismatches.filter((item) => item.status !== 'fail').length
+  const matchedDiff = new Set(mismatches.filter((item) => item.status === 'fail' && item.property !== 'unmatched').map((item) => item.key)).size
+  const matched = result.pairs.length
   return {
     state,
     viewport,
-    matched: result.pairs.length,
+    officialVisible: result.officialVisible,
+    matched,
+    matchedEqual: matched - matchedDiff,
+    matchedDiff,
+    officialOnly: result.unmatchedOfficial.length,
+    harborOnly: result.unmatchedOurs.length,
+    allowlisted,
     unmatchedOfficial: result.unmatchedOfficial.length,
     unmatchedOurs: result.unmatchedOurs.length,
     mismatches,
