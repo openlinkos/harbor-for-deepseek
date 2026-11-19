@@ -16,7 +16,9 @@ spec:
                 name: harbor-web
                 port:
                   name: http
-  # TLS is optional. Cloudflare terminates HTTPS in front of this ingress.
+  # Public TLS terminates at GoEdge, which manages the certificate.
+  # Cloudflare DNS for this host is a DNS-only CNAME to 70c9d096.quic.ing.
+  # This Ingress is the origin and does not hold the public certificate.
   # tls:
   #   - hosts: [hfd.linkos.org]
   #     secretName: harbor-web-tls
