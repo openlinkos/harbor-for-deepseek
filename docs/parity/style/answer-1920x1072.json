@@ -2,14 +2,14 @@
   "state": "answer",
   "viewport": "1920x1072",
   "officialVisible": 202,
-  "matched": 30,
-  "matchedEqual": 13,
+  "matched": 31,
+  "matchedEqual": 14,
   "matchedDiff": 17,
-  "officialOnly": 51,
-  "harborOnly": 28,
-  "allowlisted": 36,
-  "unmatchedOfficial": 51,
-  "unmatchedOurs": 28,
+  "officialOnly": 53,
+  "harborOnly": 26,
+  "allowlisted": 20,
+  "unmatchedOfficial": 53,
+  "unmatchedOurs": 26,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -35,8 +35,8 @@
       "official": "143",
       "ours": "48.2",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -44,8 +44,8 @@
       "official": "23",
       "ours": "15",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -71,8 +71,8 @@
       "official": "normal",
       "ours": "15px",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -107,8 +107,8 @@
       "official": "129.13",
       "ours": "148",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -116,8 +116,8 @@
       "official": "17",
       "ours": "23.8",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -125,8 +125,8 @@
       "official": "normal",
       "ours": "23.8px",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -171,15 +171,6 @@
       "official": "997",
       "ours": "988.61",
       "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘开启新对话’",
-      "property": "h",
-      "official": "20",
-      "ours": "19",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
     },
     {
       "key": "main > span ‘深度思考’",
@@ -228,18 +219,14 @@
       "property": "w",
       "official": "34",
       "ours": "32",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > button @1871,12 34×34",
       "property": "h",
       "official": "34",
       "ours": "32",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > button @1871,12 34×34",
@@ -275,15 +262,6 @@
       "official": "14px",
       "ours": "16px",
       "status": "fail"
-    },
-    {
-      "key": "main > button @1871,12 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "27.2px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
     },
     {
       "key": "main > button @1871,12 34×34",
@@ -360,18 +338,14 @@
       "property": "w",
       "official": "776",
       "ours": "840",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
       "property": "h",
       "official": "28",
       "ours": "20.39",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
@@ -392,9 +366,7 @@
       "property": "line-height",
       "official": "16px",
       "ours": "20.4px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > div ‘内容由 AI 生成，请仔细甄别’",
@@ -478,18 +450,14 @@
       "property": "w",
       "official": "13.45",
       "ours": "20",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘js’",
       "property": "h",
       "official": "13",
       "ours": "20",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘js’",
@@ -503,9 +471,7 @@
       "property": "line-height",
       "official": "18px",
       "ours": "27.2px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘js’",
@@ -579,15 +545,6 @@
     },
     {
       "key": "main > button @1432,997 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1432,997 34×34",
       "property": "color",
       "official": "rgb(255, 255, 255)",
       "ours": "rgb(15, 17, 21)",
@@ -626,18 +583,14 @@
       "property": "w",
       "official": "26.02",
       "ours": "20",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘下载’",
       "property": "h",
       "official": "16",
       "ours": "20",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘下载’",
@@ -658,9 +611,7 @@
       "property": "line-height",
       "official": "20px",
       "ours": "27.2px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > span ‘下载’",
@@ -716,6 +667,20 @@
       "property": "y",
       "official": "1007",
       "ours": "998.61",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @216,261 28×28",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @222,267",
+      "property": "unmatched",
+      "official": "svg",
+      "ours": "",
       "status": "fail"
     },
     {
@@ -1094,15 +1059,6 @@
       "id": "brand-wordmark-unmatched"
     },
     {
-      "key": "sidebar > kbd ‘⌘ J’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "⌘ J",
-      "status": "allowed",
-      "reason": "owner rule — Harbor shows the new-chat shortcut. The official control keeps that glyph at opacity 0 until hover.",
-      "id": "shortcut-resting"
-    },
-    {
       "key": "sidebar > span @18,1024 32×32",
       "property": "unmatched",
       "official": "",
@@ -1134,15 +1090,6 @@
       "property": "unmatched",
       "official": "",
       "ours": "菜单",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > icon 16×16 @222,1032",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
       "status": "allowed",
       "reason": "brand — the 本地模式 footer is the Harbor account footer.",
       "id": "brand-footer-unmatched-ours"
@@ -1288,6 +1235,6 @@
       "status": "fail"
     }
   ],
-  "unexplained": 136,
+  "unexplained": 149,
   "pass": false
 }

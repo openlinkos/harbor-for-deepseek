@@ -7,47 +7,10 @@
   "matchedDiff": 0,
   "officialOnly": 0,
   "harborOnly": 0,
-  "allowlisted": 4,
+  "allowlisted": 0,
   "unmatchedOfficial": 0,
   "unmatchedOurs": 0,
-  "mismatches": [
-    {
-      "key": "sidebar > button @63,15 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "sidebar > button @99,15 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "sidebar > button @135,15 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1257,549 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    }
-  ],
+  "mismatches": [],
   "unexplained": 0,
   "pass": true
 }

@@ -1,47 +1,45 @@
 # scroll-up 1440x900
 
-Result: FAIL (129 unexplained)
+Result: FAIL (149 unexplained)
 
-- Matched elements: 36
-- Unmatched official: 30
+- Matched elements: 35
+- Unmatched official: 32
 - Unmatched ours: 17
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
 | allowed | sidebar > wordmark 1 | x | 16 | 40 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | y | 21 | 25 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
-| allowed | sidebar > wordmark 1 | w | 143 | 48.2 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > wordmark 1 | h | 23 | 15 | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > wordmark 1 | w | 143 | 48.2 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
+| allowed | sidebar > wordmark 1 | h | 23 | 15 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | font-size | 14px | 15px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | font-weight | 400 | 650 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
-| allowed | sidebar > wordmark 1 | line-height | normal | 15px | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > wordmark 1 | line-height | normal | 15px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | letter-spacing | normal | -0.3px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > account 1 | y | 859.5 | 848.91 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | sidebar > account 1 | w | 129.13 | 148 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > account 1 | h | 17 | 23.8 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > account 1 | line-height | normal | 23.8px | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > account 1 | w | 129.13 | 148 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
 | fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
 | fail | control ‘深度思考’ | x | 475.5 | 443.5 |  |
 | fail | control ‘深度思考’ | y | 825 | 816.61 |  |
 | fail | control ‘智能搜索’ | x | 577.52 | 545.5 |  |
 | fail | control ‘智能搜索’ | y | 825 | 816.61 |  |
-| allowed | sidebar > span ‘开启新对话’ | h | 20 | 19 | known — text box size follows Inter, not the official face. |
 | fail | main > span ‘深度思考’ | x | 504.5 | 472.5 |  |
 | fail | main > span ‘深度思考’ | y | 830 | 821.61 |  |
 | fail | main > span ‘智能搜索’ | x | 606.52 | 574.5 |  |
 | fail | main > span ‘智能搜索’ | y | 830 | 821.61 |  |
 | fail | main > button @1391,12 34×34 | x | 1391 | 1392 |  |
 | fail | main > button @1391,12 34×34 | y | 12 | 10 |  |
-| allowed | main > button @1391,12 34×34 | w | 34 | 32 | known — text box size follows Inter, not the official face. |
-| allowed | main > button @1391,12 34×34 | h | 34 | 32 | known — text box size follows Inter, not the official face. |
+| fail | main > button @1391,12 34×34 | w | 34 | 32 |  |
+| fail | main > button @1391,12 34×34 | h | 34 | 32 |  |
 | fail | main > button @1391,12 34×34 | border-top-left-radius | 4096px | 8px |  |
 | fail | main > button @1391,12 34×34 | border-top-right-radius | 4096px | 8px |  |
 | fail | main > button @1391,12 34×34 | border-bottom-right-radius | 4096px | 8px |  |
 | fail | main > button @1391,12 34×34 | border-bottom-left-radius | 4096px | 8px |  |
 | fail | main > button @1391,12 34×34 | font-size | 14px | 16px |  |
-| allowed | main > button @1391,12 34×34 | line-height | 22px | 27.2px | known — text box size follows Inter, not the official face. |
 | fail | main > button @1391,12 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
 | fail | main > button @1391,12 34×34 | padding-top | 0px | 1px |  |
 | fail | main > button @1391,12 34×34 | padding-right | 0px | 6px |  |
@@ -52,17 +50,17 @@ Result: FAIL (129 unexplained)
 | fail | main > icon 16×16 @1400,21 | w | 16 | 22 |  |
 | fail | main > icon 16×16 @1400,21 | h | 16 | 22 |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | x | 462.5 | 430.5 |  |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 | known — text box size follows Inter, not the official face. |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px | known — text box size follows Inter, not the official face. |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
 | fail | main > div @475,707 752×40 | x | 474.5 | 430.5 |  |
 | fail | main > div @475,707 752×40 | y | 707 | 708.36 |  |
-| allowed | main > div @475,707 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @475,707 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,707 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,707 752×40 | h | 40 | 28 |  |
 | fail | main > div @475,707 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @475,707 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @475,707 752×40 | border-top-right-radius | 12px | 0px |  |
@@ -75,8 +73,8 @@ Result: FAIL (129 unexplained)
 | fail | main > textbox @464,753 774×60 | w | 774 | 838 |  |
 | fail | main > div @475,475 752×40 | x | 474.5 | 430.5 |  |
 | fail | main > div @475,475 752×40 | y | 475 | 467.63 |  |
-| allowed | main > div @475,475 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @475,475 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,475 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,475 752×40 | h | 40 | 28 |  |
 | fail | main > div @475,475 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @475,475 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @475,475 752×40 | border-top-right-radius | 12px | 0px |  |
@@ -89,26 +87,25 @@ Result: FAIL (129 unexplained)
 | fail | main > button @1192,825 34×34 | border-bottom-right-radius | 50% | 4096px |  |
 | fail | main > button @1192,825 34×34 | border-bottom-left-radius | 50% | 4096px |  |
 | fail | main > button @1192,825 34×34 | font-weight | 500 | 400 |  |
-| allowed | main > button @1192,825 34×34 | line-height | 22px | 23.8px | known — text box size follows Inter, not the official face. |
 | fail | main > button @1192,825 34×34 | color | rgb(255, 255, 255) | rgb(15, 17, 21) |  |
 | fail | main > icon 16×16 @1201,834 | x | 1200.5 | 1188.5 |  |
 | fail | main > icon 16×16 @1201,834 | y | 834 | 825.61 |  |
 | fail | main > div::after @475,188 | x | 474.5 | 451.5 |  |
 | fail | main > div::after @475,188 | y | 188 | 179.8 |  |
-| allowed | main > div::after @475,188 | w | 762 | 819 | known — text box size follows Inter, not the official face. |
-| allowed | main > div::after @475,188 | h | 35 | 23.09 | known — text box size follows Inter, not the official face. |
+| fail | main > div::after @475,188 | w | 762 | 819 |  |
+| fail | main > div::after @475,188 | h | 35 | 23.09 |  |
 | fail | main > div::after @475,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| allowed | main > div::after @475,188 | line-height | normal | 23.1px | known — text box size follows Inter, not the official face. |
+| fail | main > div::after @475,188 | line-height | normal | 23.1px |  |
 | fail | main > div::after @475,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
 | fail | main > div @475,475 752×40 | x | 474.5 | 430.5 |  |
 | fail | main > div @475,475 752×40 | y | 475 | 502.02 |  |
-| allowed | main > div @475,475 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @475,475 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,475 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,475 752×40 | h | 40 | 28 |  |
 | fail | main > div @475,475 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @475,475 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @475,475 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @475,475 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @475,475 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,475 752×40 | line-height | 20px | 28px |  |
 | fail | main > icon 12×12 @475,811 | x | 474.5 | 454.5 |  |
 | fail | main > icon 12×12 @475,811 | y | 811 | 826.61 |  |
 | fail | main > icon 12×12 @475,811 | w | 12 | 14 |  |
@@ -119,18 +116,20 @@ Result: FAIL (129 unexplained)
 | fail | main > icon 12×12 @1215,811 | h | 12 | 16 |  |
 | fail | main > div @475,707 752×40 | x | 474.5 | 430.5 |  |
 | fail | main > div @475,707 752×40 | y | 707 | 742.75 |  |
-| allowed | main > div @475,707 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @475,707 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,707 752×40 | w | 752 | 840 |  |
+| fail | main > div @475,707 752×40 | h | 40 | 28 |  |
 | fail | main > div @475,707 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @475,707 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @475,707 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @475,707 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @475,707 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @475,707 752×40 | line-height | 20px | 28px |  |
 | fail | main > div @1192,825 34×34 | x | 1191.5 | 1223.5 |  |
 | fail | main > div @1192,825 34×34 | y | 825 | 816.61 |  |
 | fail | main > div @1192,825 34×34 | opacity | 1 | 0.4 |  |
 | fail | main > icon 14×14 @589,835 | x | 588.52 | 556.5 |  |
 | fail | main > icon 14×14 @589,835 | y | 835 | 826.61 |  |
+| fail | sidebar > button @216,261 28×28 | unmatched | div |  |  |
+| fail | sidebar > icon 16×16 @222,267 | unmatched | svg |  |  |
 | fail | sidebar > div @261,12 1130×48 | unmatched | div |  |  |
 | fail | sidebar > div ‘定时器解释’ | unmatched | 定时器解释 |  |  |
 | fail | main > div @914,94 313×44 | unmatched | div |  |  |
@@ -175,48 +174,46 @@ Result: FAIL (129 unexplained)
 
 # scroll-up 1920x1072
 
-Result: FAIL (175 unexplained)
+Result: FAIL (207 unexplained)
 
-- Matched elements: 38
-- Unmatched official: 44
-- Unmatched ours: 31
+- Matched elements: 39
+- Unmatched official: 46
+- Unmatched ours: 29
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
 | allowed | sidebar > wordmark 1 | x | 16 | 40 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | y | 21 | 25 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
-| allowed | sidebar > wordmark 1 | w | 143 | 48.2 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > wordmark 1 | h | 23 | 15 | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > wordmark 1 | w | 143 | 48.2 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
+| allowed | sidebar > wordmark 1 | h | 23 | 15 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | font-size | 14px | 15px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | font-weight | 400 | 650 | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
-| allowed | sidebar > wordmark 1 | line-height | normal | 15px | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > wordmark 1 | line-height | normal | 15px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | letter-spacing | normal | -0.3px | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > wordmark 1 | color | rgb(128, 0, 128) | rgb(15, 17, 21) | brand — DeepSeek logo/wordmark maps to the Harbor wordmark. |
 | allowed | sidebar > account 1 | y | 1031.5 | 1020.91 | brand — the official account footer maps to the 本地模式 footer. |
-| allowed | sidebar > account 1 | w | 129.13 | 148 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > account 1 | h | 17 | 23.8 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > account 1 | line-height | normal | 23.8px | known — text box size follows Inter, not the official face. |
+| allowed | sidebar > account 1 | w | 129.13 | 148 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
+| allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
 | fail | sidebar > row 1 | background-color | rgba(0, 0, 0, 0) | rgb(228, 237, 253) |  |
 | fail | control ‘深度思考’ | x | 715.5 | 683.5 |  |
 | fail | control ‘深度思考’ | y | 997 | 988.61 |  |
 | fail | control ‘智能搜索’ | x | 817.52 | 785.5 |  |
 | fail | control ‘智能搜索’ | y | 997 | 988.61 |  |
-| allowed | sidebar > span ‘开启新对话’ | h | 20 | 19 | known — text box size follows Inter, not the official face. |
 | fail | main > span ‘深度思考’ | x | 744.5 | 712.5 |  |
 | fail | main > span ‘深度思考’ | y | 1002 | 993.61 |  |
 | fail | main > span ‘智能搜索’ | x | 846.52 | 814.5 |  |
 | fail | main > span ‘智能搜索’ | y | 1002 | 993.61 |  |
 | fail | main > button @1871,12 34×34 | x | 1871 | 1872 |  |
 | fail | main > button @1871,12 34×34 | y | 12 | 10 |  |
-| allowed | main > button @1871,12 34×34 | w | 34 | 32 | known — text box size follows Inter, not the official face. |
-| allowed | main > button @1871,12 34×34 | h | 34 | 32 | known — text box size follows Inter, not the official face. |
+| fail | main > button @1871,12 34×34 | w | 34 | 32 |  |
+| fail | main > button @1871,12 34×34 | h | 34 | 32 |  |
 | fail | main > button @1871,12 34×34 | border-top-left-radius | 4096px | 8px |  |
 | fail | main > button @1871,12 34×34 | border-top-right-radius | 4096px | 8px |  |
 | fail | main > button @1871,12 34×34 | border-bottom-right-radius | 4096px | 8px |  |
 | fail | main > button @1871,12 34×34 | border-bottom-left-radius | 4096px | 8px |  |
 | fail | main > button @1871,12 34×34 | font-size | 14px | 16px |  |
-| allowed | main > button @1871,12 34×34 | line-height | 22px | 27.2px | known — text box size follows Inter, not the official face. |
 | fail | main > button @1871,12 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
 | fail | main > button @1871,12 34×34 | padding-top | 0px | 1px |  |
 | fail | main > button @1871,12 34×34 | padding-right | 0px | 6px |  |
@@ -227,17 +224,17 @@ Result: FAIL (175 unexplained)
 | fail | main > icon 16×16 @1880,21 | w | 16 | 22 |  |
 | fail | main > icon 16×16 @1880,21 | h | 16 | 22 |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | x | 702.5 | 670.5 |  |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 | known — text box size follows Inter, not the official face. |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | w | 776 | 840 |  |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 20.39 |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | font-size | 11px | 12px |  |
-| allowed | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px | known — text box size follows Inter, not the official face. |
+| fail | main > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 20.4px |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
 | fail | main > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
 | fail | main > div @715,950 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,950 752×40 | y | 950 | 949.09 |  |
-| allowed | main > div @715,950 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,950 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,950 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,950 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,950 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,950 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,950 752×40 | border-top-right-radius | 12px | 0px |  |
@@ -250,28 +247,28 @@ Result: FAIL (175 unexplained)
 | fail | main > textbox @704,925 774×60 | w | 774 | 838 |  |
 | fail | main > div @715,796 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,796 752×40 | y | 796 | 811.53 |  |
-| allowed | main > div @715,796 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,796 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,796 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,796 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,796 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,796 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,796 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > span ‘(’ | x | 803.31 | 796.5 |  |
 | fail | main > span ‘(’ | y | 1010 | 998.61 |  |
-| allowed | main > span ‘(’ | w | 7.28 | 14 | known — text box size follows Inter, not the official face. |
+| fail | main > span ‘(’ | w | 7.28 | 14 |  |
 | fail | main > span ‘(’ | font-weight | 400 | 500 |  |
-| allowed | main > span ‘(’ | line-height | 22px | 24px | known — text box size follows Inter, not the official face. |
+| fail | main > span ‘(’ | line-height | 22px | 24px |  |
 | allowed | main > span ‘(’ | color | rgb(56, 58, 66) | rgb(57, 100, 254) | owner rule — both the thinking and search toggles default ON. |
 | fail | main > div @715,508 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,508 752×40 | y | 508 | 502.02 |  |
-| allowed | main > div @715,508 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,508 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,508 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,508 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,508 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,508 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,508 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,276 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,276 752×40 | y | 276 | 295.67 |  |
-| allowed | main > div @715,276 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,276 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,276 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,276 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,276 752×40 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,276 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,276 752×40 | border-top-right-radius | 12px | 0px |  |
@@ -284,53 +281,52 @@ Result: FAIL (175 unexplained)
 | fail | main > button @1432,997 34×34 | border-bottom-right-radius | 50% | 4096px |  |
 | fail | main > button @1432,997 34×34 | border-bottom-left-radius | 50% | 4096px |  |
 | fail | main > button @1432,997 34×34 | font-weight | 500 | 400 |  |
-| allowed | main > button @1432,997 34×34 | line-height | 22px | 23.8px | known — text box size follows Inter, not the official face. |
 | fail | main > button @1432,997 34×34 | color | rgb(255, 255, 255) | rgb(15, 17, 21) |  |
 | fail | main > icon 16×16 @1441,1006 | x | 1440.5 | 1428.5 |  |
 | fail | main > icon 16×16 @1441,1006 | y | 1006 | 997.61 |  |
 | fail | main > div::after @715,188 | x | 714.5 | 691.5 |  |
 | fail | main > div::after @715,188 | y | 188 | 179.8 |  |
-| allowed | main > div::after @715,188 | w | 762 | 819 | known — text box size follows Inter, not the official face. |
-| allowed | main > div::after @715,188 | h | 35 | 23.09 | known — text box size follows Inter, not the official face. |
+| fail | main > div::after @715,188 | w | 762 | 819 |  |
+| fail | main > div::after @715,188 | h | 35 | 23.09 |  |
 | fail | main > div::after @715,188 | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| allowed | main > div::after @715,188 | line-height | normal | 23.1px | known — text box size follows Inter, not the official face. |
+| fail | main > div::after @715,188 | line-height | normal | 23.1px |  |
 | fail | main > div::after @715,188 | color | rgb(128, 0, 128) | rgb(154, 160, 166) |  |
 | fail | main > div @715,276 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,276 752×40 | y | 276 | 261.28 |  |
-| allowed | main > div @715,276 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,276 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,276 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,276 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,276 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,276 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,276 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,276 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @715,276 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,276 752×40 | line-height | 20px | 28px |  |
 | fail | main > div @715,508 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,508 752×40 | y | 508 | 536.41 |  |
-| allowed | main > div @715,508 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,508 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,508 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,508 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,508 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,508 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,508 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,508 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @715,508 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,508 752×40 | line-height | 20px | 28px |  |
 | fail | main > div @715,796 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,796 752×40 | y | 796 | 777.14 |  |
-| allowed | main > div @715,796 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,796 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,796 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,796 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,796 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,796 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,796 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,796 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @715,796 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,796 752×40 | line-height | 20px | 28px |  |
 | fail | main > div @715,950 752×40 | x | 714.5 | 670.5 |  |
 | fail | main > div @715,950 752×40 | y | 950 | 983.48 |  |
-| allowed | main > div @715,950 752×40 | w | 752 | 840 | known — text box size follows Inter, not the official face. |
-| allowed | main > div @715,950 752×40 | h | 40 | 28 | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,950 752×40 | w | 752 | 840 |  |
+| fail | main > div @715,950 752×40 | h | 40 | 28 |  |
 | fail | main > div @715,950 752×40 | background-color | rgb(249, 250, 251) | rgba(0, 0, 0, 0) |  |
 | fail | main > div @715,950 752×40 | border-top-left-radius | 12px | 0px |  |
 | fail | main > div @715,950 752×40 | border-top-right-radius | 12px | 0px |  |
 | fail | main > div @715,950 752×40 | font-size | 13px | 16px |  |
-| allowed | main > div @715,950 752×40 | line-height | 20px | 28px | known — text box size follows Inter, not the official face. |
+| fail | main > div @715,950 752×40 | line-height | 20px | 28px |  |
 | fail | main > icon 12×12 @715,1032 | y | 1032 | 1057.88 |  |
 | fail | main > icon 12×12 @715,1032 | w | 12 | 20 |  |
 | fail | main > icon 12×12 @715,1032 | h | 12 | 20 |  |
@@ -339,6 +335,8 @@ Result: FAIL (175 unexplained)
 | fail | main > div @1432,997 34×34 | x | 1431.5 | 1463.5 |  |
 | fail | main > div @1432,997 34×34 | y | 997 | 988.61 |  |
 | fail | main > div @1432,997 34×34 | opacity | 1 | 0.4 |  |
+| fail | sidebar > button @216,261 28×28 | unmatched | div |  |  |
+| fail | sidebar > icon 16×16 @222,267 | unmatched | svg |  |  |
 | fail | sidebar > div @261,12 1610×48 | unmatched | div |  |  |
 | fail | sidebar > div ‘定时器解释’ | unmatched | 定时器解释 |  |  |
 | fail | main > div @1154,94 313×44 | unmatched | div |  |  |
@@ -409,11 +407,11 @@ Result: FAIL (175 unexplained)
 
 # scroll-up 390x844
 
-Result: FAIL (124 unexplained)
+Result: FAIL (128 unexplained)
 
-- Matched elements: 13
+- Matched elements: 12
 - Unmatched official: 16
-- Unmatched ours: 25
+- Unmatched ours: 26
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -421,12 +419,8 @@ Result: FAIL (124 unexplained)
 | allowed | sidebar > mark 1 | y | 24 | 16 | brand — DeepSeek logo maps to the Harbor mark. |
 | allowed | sidebar > mark 1 | w | 20 | 24 | brand — DeepSeek logo maps to the Harbor mark. |
 | allowed | sidebar > mark 1 | h | 20 | 24 | brand — DeepSeek logo maps to the Harbor mark. |
-| fail | control ‘深度思考’ | x | 29 | 41 |  |
-| fail | control ‘深度思考’ | y | 769 | 726.31 |  |
 | fail | control ‘智能搜索’ | x | 131.02 | 143 |  |
 | fail | control ‘智能搜索’ | y | 769 | 726.31 |  |
-| fail | sidebar > span ‘深度思考’ | x | 58 | 70 |  |
-| fail | sidebar > span ‘深度思考’ | y | 774 | 731.31 |  |
 | fail | sidebar > span ‘智能搜索’ | x | 160.02 | 172 |  |
 | fail | sidebar > span ‘智能搜索’ | y | 774 | 731.31 |  |
 | fail | sidebar > button @10,12 44×44 | x | 10 | 6 |  |
@@ -447,7 +441,6 @@ Result: FAIL (124 unexplained)
 | fail | main > button @331,12 44×44 | border-bottom-left-radius | 4096px | 8px |  |
 | fail | main > button @331,12 44×44 | font-size | 14px | 16px |  |
 | fail | main > button @331,12 44×44 | font-weight | 500 | 400 |  |
-| allowed | main > button @331,12 44×44 | line-height | 22px | 27.2px | known — text box size follows Inter, not the official face. |
 | fail | main > button @331,12 44×44 | color | rgb(15, 17, 21) | rgb(26, 26, 26) |  |
 | fail | main > button @331,12 44×44 | padding-top | 0px | 1px |  |
 | fail | main > button @331,12 44×44 | padding-right | 0px | 6px |  |
@@ -458,9 +451,9 @@ Result: FAIL (124 unexplained)
 | fail | main > icon 20×20 @343,24 | w | 20 | 24 |  |
 | fail | main > icon 20×20 @343,24 | h | 20 | 24 |  |
 | fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | y | 816 | 809.31 |  |
-| allowed | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 18.69 | known — text box size follows Inter, not the official face. |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | h | 28 | 18.69 |  |
 | fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | background-color | rgb(255, 255, 255) | rgba(0, 0, 0, 0) |  |
-| allowed | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 18.7px | known — text box size follows Inter, not the official face. |
+| fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | line-height | 16px | 18.7px |  |
 | fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-top | 6px | 0px |  |
 | fail | sidebar > div ‘内容由 AI 生成，请仔细甄别’ | padding-bottom | 6px | 0px |  |
 | fail | main > icon 20×20 @289,24 | x | 289 | 302 |  |
@@ -469,11 +462,11 @@ Result: FAIL (124 unexplained)
 | fail | main > icon 20×20 @289,24 | h | 20 | 24 |  |
 | fail | main > button @328,656 34×34 | x | 328 | 336 |  |
 | fail | main > button @328,656 34×34 | y | 656 | 676 |  |
-| allowed | main > button @328,656 34×34 | w | 34 | 36 | known — text box size follows Inter, not the official face. |
-| allowed | main > button @328,656 34×34 | h | 34 | 36 | known — text box size follows Inter, not the official face. |
+| fail | main > button @328,656 34×34 | w | 34 | 36 |  |
+| fail | main > button @328,656 34×34 | h | 34 | 36 |  |
 | fail | main > button @328,656 34×34 | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
 | fail | main > button @328,656 34×34 | font-size | 14px | 16px |  |
-| allowed | main > button @328,656 34×34 | line-height | 22px | 27.2px | known — text box size follows Inter, not the official face. |
+| fail | main > button @328,656 34×34 | line-height | 22px | 27.2px |  |
 | fail | main > button @328,656 34×34 | color | rgb(15, 17, 21) | rgb(97, 102, 107) |  |
 | fail | main > button @328,656 34×34 | border-top-width | 0px | 1px |  |
 | fail | main > button @328,656 34×34 | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
@@ -497,15 +490,14 @@ Result: FAIL (124 unexplained)
 | fail | main > icon 14×14 @338,666 | h | 14 | 16 |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | x | 38 | 16 |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | y | 664 | 637.31 |  |
-| allowed | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | w | 322.41 | 358 | known — text box size follows Inter, not the official face. |
-| allowed | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | h | 216 | 144 | known — text box size follows Inter, not the official face. |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | w | 322.41 | 358 |  |
+| fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | h | 216 | 144 |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | background-color | rgba(0, 0, 0, 0) | rgb(255, 255, 255) |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | box-shadow | none | rgba(15, 17, 21, 0.06) 0px 8px 24px 0px |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-left-radius | 0px | 24px |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-right-radius | 0px | 24px |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-right-radius | 0px | 24px |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-bottom-left-radius | 0px | 24px |  |
-| allowed | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | line-height | 28px | 27.2px | known — text box size follows Inter, not the official face. |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-width | 0px | 1px |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-color | rgb(15, 17, 21) | rgba(0, 0, 0, 0.1) |  |
 | fail | sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’ | border-top-style | none | solid |  |
@@ -548,6 +540,7 @@ Result: FAIL (124 unexplained)
 | fail | sidebar > p ‘第 9 段。把这条回答撑到超过一屏，便于回到底部’ | unmatched |  | 第 9 段。把这条回答撑到超过一屏，便于回到底部 |  |
 | fail | sidebar > p ‘第 10 段。把这条回答撑到超过一屏，便于回到底’ | unmatched |  | 第 10 段。把这条回答撑到超过一屏，便于回到底 |  |
 | fail | sidebar > textbox @29,654 332×60 | unmatched |  | textarea |  |
+| fail | sidebar > button @41,726 92×34 | unmatched |  | button |  |
 | fail | sidebar > icon 14×14 @52,736 | unmatched |  | svg |  |
 | fail | sidebar > icon 14×14 @154,736 | unmatched |  | svg |  |
 | fail | sidebar > label ‘添加文件’ | unmatched |  | 添加文件 |  |

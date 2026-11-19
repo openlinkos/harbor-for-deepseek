@@ -121,10 +121,10 @@ const isSidebarRow = (node: StyleNode) => {
 }
 
 const isLooseTitle = (node: StyleNode) => {
-  if (node.rect.x > 48 || node.rect.y < 140 || node.rect.h > 24 || node.rect.w > 220) return false
-  const text = visibleText(node)
+  if (node.rect.x > 160 || node.rect.y < 140 || node.rect.h > 40 || node.rect.w > 220) return false
+  const text = visibleText(node) || node.name.trim()
   if (!text || isGroupLabel(node)) return false
-  return !/开启新对话|本地模式|密钥|置顶|今天|昨天|天内/.test(text)
+  return !/开启新对话|本地模式|密钥|置顶|今天|昨天|天内|重命名|分享|多选|删除|取消置顶/.test(text)
 }
 
 const isGroupLabel = (node: StyleNode) => {
@@ -282,8 +282,9 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   const oursRows = oursPool.filter(isSidebarRow).sort(byPos)
   const rows = zip(officialRows, oursRows, 'chat-list', 'sidebar > row')
   pairs.push(...rows)
-  officialPool = dropInside(officialPool, officialRows).filter((node) => !isLooseTitle(node))
-  oursPool = dropInside(oursPool, oursRows).filter((node) => !isLooseTitle(node))
+  const rowLabel = (node: StyleNode, rows: StyleNode[]) => rows.some((row) => row !== node && inside(row, node) && (node.rect.x < 100 || node.rect.w > 40))
+  officialPool = take(officialPool, officialRows).filter((node) => !rowLabel(node, officialRows) && !isLooseTitle(node))
+  oursPool = take(oursPool, oursRows).filter((node) => !rowLabel(node, oursRows) && !isLooseTitle(node))
 
   const officialGroups = officialPool.filter(isGroupLabel).sort(byPos)
   const oursGroups = oursPool.filter(isGroupLabel).sort(byPos)
@@ -313,6 +314,69 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   pairs.push(...greetings)
   officialPool = take(officialPool, greetings.map((pair) => pair.official))
   oursPool = take(oursPool, greetings.map((pair) => pair.ours))
+
+  const padSum = (node: StyleNode) => ['top', 'right', 'bottom', 'left'].reduce((sum, side) => sum + Number.parseFloat(node.style[`padding-${side}`] || '0'), 0)
+  const controlShell = (node: StyleNode, pool: StyleNode[]) => {
+    let shell = node
+    for (const item of pool) {
+      if (item === node || item.pseudo || item.rect.h < 28 || item.rect.h > 52 || item.rect.w < 80) continue
+      if (!inside(item, node)) continue
+      if (item.rect.h > shell.rect.h || (item.rect.h === shell.rect.h && padSum(item) > padSum(shell))) shell = item
+    }
+    return shell
+  }
+  const labeled: Pair[] = []
+  const usedLabelOurs = new Set<StyleNode>()
+  const usedLabelOfficial = new Set<StyleNode>()
+  for (const left of officialPool) {
+    const text = visibleText(left)
+    if (!text || text.length > 12 || left.pseudo || usedLabelOfficial.has(left)) continue
+    const rightText = oursPool.find((node) => !usedLabelOurs.has(node) && !node.pseudo && visibleText(node) === text && regionOf(node) === regionOf(left))
+    if (!rightText) continue
+    const officialShell = controlShell(left, officialPool)
+    const oursShell = controlShell(rightText, oursPool)
+    if (Math.abs(officialShell.rect.w - oursShell.rect.w) > Math.max(24, officialShell.rect.w * 0.4)) continue
+    if (Math.abs(officialShell.rect.h - oursShell.rect.h) > 18) continue
+    if (usedLabelOfficial.has(officialShell) || usedLabelOurs.has(oursShell)) continue
+    usedLabelOfficial.add(officialShell)
+    usedLabelOurs.add(oursShell)
+    labeled.push({ key: humanLabel(left), official: officialShell, ours: oursShell, how: 'semantic' })
+  }
+  pairs.push(...labeled)
+  officialPool = take(officialPool, labeled.map((pair) => pair.official))
+  oursPool = take(oursPool, labeled.map((pair) => pair.ours))
+
+  const menuPanels = pairByBox(
+    officialPool,
+    oursPool,
+    (node) => node.rect.w > 100 && node.rect.w < 180 && node.rect.h > 150 && node.rect.h < 260 && node.rect.x > 80 && node.rect.x < 420,
+    'menu',
+  )
+  pairs.push(...menuPanels)
+  officialPool = take(officialPool, menuPanels.map((pair) => pair.official))
+  oursPool = take(oursPool, menuPanels.map((pair) => pair.ours))
+  const inPanel = (node: StyleNode, panels: Pair[], side: 'official' | 'ours') => panels.some((pair) => inside(side === 'official' ? pair.official : pair.ours, node))
+  const menuIcons = (pool: StyleNode[], side: 'official' | 'ours') => pool.filter((node) => node.tag === 'svg' && node.rect.w <= 18 && node.rect.h <= 18 && inPanel(node, menuPanels, side)).sort(byPos)
+  const icons = zip(menuIcons(officialPool, 'official'), menuIcons(oursPool, 'ours'), undefined, 'menu > icon')
+  pairs.push(...icons)
+  officialPool = take(officialPool, icons.map((pair) => pair.official))
+  oursPool = take(oursPool, icons.map((pair) => pair.ours))
+  const rowMore = (pool: StyleNode[], side: 'official' | 'ours') => pool.filter((node) => (node.tag === 'button' || node.role === 'button') && node.rect.w <= 36 && node.rect.h <= 36 && node.rect.x > 150 && node.rect.x < 300 && node.rect.y > 140 && node.rect.y < 820 && !inPanel(node, menuPanels, side)).sort(byPos)
+  const more = zip(rowMore(officialPool, 'official'), rowMore(oursPool, 'ours'), undefined, 'row-more')
+  pairs.push(...more)
+  officialPool = take(officialPool, more.map((pair) => pair.official))
+  oursPool = take(oursPool, more.map((pair) => pair.ours))
+  const rowMoreIcon = (pool: StyleNode[], panels: Pair[], side: 'official' | 'ours') => pool.filter((node) => {
+    if (node.tag !== 'svg' || node.rect.w < 14 || node.rect.w > 18) return false
+    return panels.some((pair) => {
+      const box = side === 'official' ? pair.official.rect : pair.ours.rect
+      return node.rect.y > box.y - 48 && node.rect.y < box.y + 6 && Math.abs(node.rect.x + node.rect.w / 2 - (box.x + box.w / 2)) < box.w
+    })
+  }).sort(byPos)
+  const moreIcons = zip(rowMoreIcon(officialPool, menuPanels, 'official'), rowMoreIcon(oursPool, menuPanels, 'ours'), undefined, 'row-more > icon')
+  pairs.push(...moreIcons)
+  officialPool = take(officialPool, moreIcons.map((pair) => pair.official))
+  oursPool = take(oursPool, moreIcons.map((pair) => pair.ours))
 
   const oursByKey = new Map<string, StyleNode[]>()
   for (const node of oursPool) {

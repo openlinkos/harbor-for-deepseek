@@ -129,6 +129,7 @@ const install = async (page: Page) => {
 }
 
 const unlock = async (page: Page) => {
+  await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
   await page.goto(`${base}/`)
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-ack').check()
@@ -150,6 +151,11 @@ const reveal = async (page: Page, mobile: boolean) => {
 }
 
 const openSettings = async (page: Page, mobile: boolean) => {
+  if (!mobile) {
+    await send(page, '你好')
+    await page.getByTestId('new-chat').click()
+    await page.locator('.greeting').waitFor()
+  }
   await reveal(page, mobile)
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
@@ -226,6 +232,11 @@ const states: StateSpec[] = [
     ],
     run: async (page, mobile) => {
       await unlock(page)
+      if (!mobile) {
+        await send(page, '你好')
+        await page.getByTestId('new-chat').click()
+        await page.locator('.greeting').waitFor()
+      }
       await reveal(page, mobile)
       await page.getByTestId('user-menu').click()
     },
@@ -285,6 +296,11 @@ const states: StateSpec[] = [
         await page.getByTestId('new-chat').click()
         await page.locator('.greeting').waitFor()
       }
+      const viewport = page.viewportSize()
+      if (!mobile && (viewport?.width || 0) >= 1600) {
+        await page.getByRole('button', { name: '隐藏' }).click()
+        await page.waitForTimeout(400)
+      }
       await page.keyboard.press('Control+K')
       await page.locator('.search-dialog').waitFor()
     },
@@ -296,6 +312,8 @@ const states: StateSpec[] = [
       arm('ok')
       await unlock(page)
       await send(page, '菜单')
+      await page.getByTestId('new-chat').click()
+      await page.locator('.greeting').waitFor()
       await page.locator('.chat-link').hover()
       await page.locator('.chat-link .more').click()
       await page.locator('.item-menu').waitFor()
@@ -585,9 +603,9 @@ const renderSummary = (reports: DiffReport[]) => {
   const lines = [
     '# Style audit',
     '',
-    'Visible painted elements only. Keys are the region plus the accessible name or text. Sidebar rows align by position, and extra official chats are not missing UI. Geometry allows ±0.5px. Text-bearing elements are compared on text color and font metrics. Container inheritance is not compared.',
+    'Visible painted elements only. Keys are the region plus the accessible name or text. Sidebar rows align by position, and extra official chats are not missing UI. Geometry allows ±0.5px. A text box may differ by 1px in width, height, or line-height when its font size, weight, and color already match. Container inheritance is not compared.',
     '',
-    'The replaced 1920 captures are included. `search-dialog` at 1440 is the home screen with the greeting and the sidebar list, and no chat is open. The 1920 search capture has the collapsed icon rail instead of the open sidebar, which is why it has fewer elements and does not match the open-sidebar Harbor capture.',
+    'The replaced 1920 captures are included. `search-dialog` at 1440 is the home screen with the greeting and the open sidebar, and no chat is open. The 1920 search file was captured with the sidebar collapsed, so Harbor collapses the sidebar before opening search at that width.',
     '',
     '| State | Viewport | Official visible | Matched equal | Matched with diff | Official only | Harbor only | Allowlisted | Unexplained | Result |',
     '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
@@ -650,6 +668,7 @@ const main = async () => {
           arm('ok')
           await install(page)
           await state.run(page, viewport.mobile)
+          await page.mouse.move(0, 0)
           await page.evaluate(() => document.fonts.ready)
           await page.waitForTimeout(350)
           const data = await page.evaluate((name: string) => {

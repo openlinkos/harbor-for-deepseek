@@ -2,10 +2,6 @@
 # is listed here. Brand pairs are aligned in match.ts; these entries are the
 # explicit reason, not a pixel mask.
 exceptions:
-  - id: font-metrics
-    property: "w|h|line-height"
-    text: "‘"
-    reason: known — text box size follows Inter, not the official face.
   - id: brand-header-mark
     unmatched: ours
     text: "icon 22×22"
@@ -43,10 +39,6 @@ exceptions:
     property: "color|background-color|border-top-color|border-right-color|border-bottom-color|border-left-color|fill|stroke"
     ours: "#3964fe"
     reason: owner rule — Harbor keeps #3964fe where the official UI uses its blue.
-  - id: shortcut-resting
-    unmatched: ours
-    text: "⌘ J|Ctrl J"
-    reason: owner rule — Harbor shows the new-chat shortcut. The official control keeps that glyph at opacity 0 until hover.
   - id: toggles-default-on
     text: "深度思考|智能搜索|思考|搜索|Thinking|Search|toggle-thinking|toggle-search"
     property: "background-color|color|border-top-color|border-right-color|border-bottom-color|border-left-color|border-top-width|border-right-width|border-bottom-width|border-left-width|box-shadow"

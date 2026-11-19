@@ -53,6 +53,18 @@ export const selfCheck = () => {
   ), allow)
   assert(font.pass && !font.mismatches.some((item) => item.property === 'font-family'), 'font-family is not a visual property')
 
+  const textStyle = { color: 'rgb(15, 17, 21)', 'font-size': '14px', 'font-weight': '500', 'line-height': '22px' }
+  const metric = diffMatch('s', '1440x900', matchCaptures(
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 70, h: 20 }, style: textStyle })]),
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 71, h: 19 }, style: textStyle })]),
+  ), allow)
+  assert(metric.pass, '1px text-box width and height pass when the font matches')
+  const metricFar = diffMatch('s', '1440x900', matchCaptures(
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 70, h: 20 }, style: textStyle })]),
+    capture([node({ key: 't', text: '开启新对话', tag: 'span', role: '', rect: { x: 106, y: 80, w: 72, h: 20 }, style: { ...textStyle, 'font-size': '15px' } })]),
+  ), allow)
+  assert(metricFar.mismatches.some((item) => item.property === 'w' && item.status === 'fail'), 'text-box width still fails when the font size differs')
+
   const brand = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'logo', text: 'DeepSeek', tag: 'span', role: '', rect: { x: 40, y: 20, w: 80, h: 18 }, style: { color: 'black', 'font-size': '16px' } })]),
     capture([node({ key: 'mark', text: 'Harbor', tag: 'span', role: '', rect: { x: 40, y: 20, w: 70, h: 18 }, style: { color: 'red', 'font-size': '15px' } })]),

@@ -55,7 +55,7 @@ const shortcutHint = () => {
   if (typeof navigator === 'undefined') return 'Ctrl J'
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
   const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
-  return /mac|iphone|ipad|ipod|linux|x11/i.test(platform) ? '⌘ J' : 'Ctrl J'
+  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
 }
 
 const Wordmark = () => (
@@ -302,6 +302,7 @@ const ThemeSwitch = () => {
             setTheme(choice)
           }}
         >
+          <span className="theme-face" />
           <Icon
             d={
               choice === 'light'
@@ -332,7 +333,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
   }
   return (
     <div className="pill-menu">
-      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}</button>
+      <button type="button" ref={trigger} data-testid={testId} aria-expanded={open} onClick={show}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></button>
       {open ? createPortal(
         <div className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, minHeight: menuClass === 'lang-menu' ? Math.max(240, window.innerHeight - box.top - 8) : undefined }}>
           {options.map((option, index) => (
@@ -1148,27 +1149,27 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       ) : (
         <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id) }}>{conversation.title || t('newChat')}</button>
       )}
-      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={() => {
-        const rect = row.current?.getBoundingClientRect()
-        if (rect) setMenuBox({ top: rect.top, left: rect.right - 28 })
+      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect()
+        setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
-        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
-          <button type="button" onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" />{t('rename')}</button>
-          <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />{conversation.pinned ? t('unpin') : t('pin')}</button>
-          <button type="button" onClick={() => {
+        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
+          <div role="menuitem" tabIndex={0} onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => {
             setOpen(false)
             const body = messages.map((message) => {
               const text = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
               return `**${message.role}**\n\n${text}`
             }).join('\n\n')
             downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
-          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
-          <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
-          <button className="danger" type="button" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
+          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
+          <div role="menuitem" tabIndex={0} className="danger" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" /><span>{t('delete')}</span></div>
         </div>
         </>,
         document.body,

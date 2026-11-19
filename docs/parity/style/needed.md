@@ -70,8 +70,8 @@ Matrix rows: 40
 
 Files:
 
-- `style-official-user-menu-1440x900.json` (ours: 61 elements, FAIL)
-- `style-official-user-menu-1920x1072.json` (ours: 61 elements, FAIL)
+- `style-official-user-menu-1440x900.json` (ours: 66 elements, PASS)
+- `style-official-user-menu-1920x1072.json` (ours: 66 elements, PASS)
 - `style-official-user-menu-390x844.json` (ours: 66 elements, FAIL)
 
 ## settings-general
@@ -82,9 +82,9 @@ Matrix rows: 36, 37, 44
 
 Files:
 
-- `style-official-settings-general-1440x900.json` (ours: 105 elements, FAIL)
-- `style-official-settings-general-1920x1072.json` (ours: 105 elements, FAIL)
-- `style-official-settings-general-390x844.json` (ours: 110 elements, FAIL)
+- `style-official-settings-general-1440x900.json` (ours: 102 elements, PASS)
+- `style-official-settings-general-1920x1072.json` (ours: 102 elements, PASS)
+- `style-official-settings-general-390x844.json` (ours: 102 elements, FAIL)
 
 ## settings-account
 
@@ -94,8 +94,8 @@ Matrix rows: 36
 
 Files:
 
-- `style-official-settings-account-1440x900.json` (ours: 77 elements, FAIL)
-- `style-official-settings-account-1920x1072.json` (ours: 77 elements, FAIL)
+- `style-official-settings-account-1440x900.json` (ours: 82 elements, FAIL)
+- `style-official-settings-account-1920x1072.json` (ours: 82 elements, FAIL)
 - `style-official-settings-account-390x844.json` (ours: 82 elements, FAIL)
 
 ## settings-data
@@ -106,8 +106,8 @@ Matrix rows: 36, 59
 
 Files:
 
-- `style-official-settings-data-1440x900.json` (ours: 130 elements, FAIL)
-- `style-official-settings-data-1920x1072.json` (ours: 130 elements, FAIL)
+- `style-official-settings-data-1440x900.json` (ours: 135 elements, FAIL)
+- `style-official-settings-data-1920x1072.json` (ours: 135 elements, FAIL)
 - `style-official-settings-data-390x844.json` (ours: 135 elements, FAIL)
 
 ## settings-terms
@@ -118,8 +118,8 @@ Matrix rows: 36
 
 Files:
 
-- `style-official-settings-terms-1440x900.json` (ours: 88 elements, FAIL)
-- `style-official-settings-terms-1920x1072.json` (ours: 88 elements, FAIL)
+- `style-official-settings-terms-1440x900.json` (ours: 93 elements, FAIL)
+- `style-official-settings-terms-1920x1072.json` (ours: 93 elements, FAIL)
 - `style-official-settings-terms-390x844.json` (ours: 93 elements, FAIL)
 
 ## settings-english
@@ -130,8 +130,8 @@ Matrix rows: 38
 
 Files:
 
-- `style-official-settings-english-1440x900.json` (ours: 105 elements)
-- `style-official-settings-english-1920x1072.json` (ours: 105 elements)
+- `style-official-settings-english-1440x900.json` (ours: 102 elements)
+- `style-official-settings-english-1920x1072.json` (ours: 102 elements)
 
 ## search-dialog
 
@@ -142,25 +142,8 @@ Matrix rows: 34, 60
 Files:
 
 - `style-official-search-dialog-1440x900.json` (ours: 66 elements, PASS)
-- `style-official-search-dialog-1920x1072.json` (ours: 66 elements, FAIL)
-- `style-official-search-dialog-390x844.json` (ours capture failed: locator.click: Timeout 20000ms exceeded.
-Call log:
-  - waiting for getByTestId('new-chat')
-    - locator resolved to <button type="button" class="new-chat" data-testid="new-chat">…</button>
-  - attempting click action
-    2 × waiting for element to be visible, enabled and stable
-      - element is not visible
-    - retrying click action
-    - waiting 20ms
-    2 × waiting for element to be visible, enabled and stable
-      - element is not visible
-    - retrying click action
-      - waiting 100ms
-    39 × waiting for element to be visible, enabled and stable
-       - element is not visible
-     - retrying click action
-       - waiting 500ms
-)
+- `style-official-search-dialog-1920x1072.json` (ours: 43 elements, PASS)
+- `style-official-search-dialog-390x844.json` (ours: 39 elements)
 
 ## sidebar-item-menu
 
@@ -170,8 +153,8 @@ Matrix rows: 30, 31, 32, 66
 
 Files:
 
-- `style-official-sidebar-item-menu-1440x900.json` (ours: 112 elements, FAIL)
-- `style-official-sidebar-item-menu-1920x1072.json` (ours: 112 elements, FAIL)
+- `style-official-sidebar-item-menu-1440x900.json` (ours: 76 elements, PASS)
+- `style-official-sidebar-item-menu-1920x1072.json` (ours: 76 elements, FAIL)
 
 ## sidebar-collapsed
 
@@ -285,8 +268,8 @@ Matrix rows: 37
 
 Files:
 
-- `style-official-theme-dark-1440x900.json` (ours: 53 elements)
-- `style-official-theme-dark-1920x1072.json` (ours: 53 elements)
+- `style-official-theme-dark-1440x900.json` (ours: 58 elements)
+- `style-official-theme-dark-1920x1072.json` (ours: 58 elements)
 
 ## scroll-up
 
@@ -384,7 +367,7 @@ Matrix rows: 63, 66
 
 Files:
 
-- `style-official-mobile-item-sheet-390x844.json` (ours: 118 elements, FAIL)
+- `style-official-mobile-item-sheet-390x844.json` (ours: 123 elements, FAIL)
 
 ## sidebar-date-groups
 

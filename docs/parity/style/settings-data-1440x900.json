@@ -2,24 +2,15 @@
   "state": "settings-data",
   "viewport": "1440x900",
   "officialVisible": 100,
-  "matched": 44,
-  "matchedEqual": 28,
-  "matchedDiff": 16,
-  "officialOnly": 5,
-  "harborOnly": 10,
-  "allowlisted": 50,
-  "unmatchedOfficial": 5,
-  "unmatchedOurs": 10,
+  "matched": 47,
+  "matchedEqual": 38,
+  "matchedDiff": 9,
+  "officialOnly": 6,
+  "harborOnly": 7,
+  "allowlisted": 19,
+  "unmatchedOfficial": 6,
+  "unmatchedOurs": 7,
   "mismatches": [
-    {
-      "key": "sidebar > wordmark 1",
-      "property": "x",
-      "official": "16",
-      "ours": "40",
-      "status": "allowed",
-      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
-      "id": "brand-wordmark"
-    },
     {
       "key": "sidebar > wordmark 1",
       "property": "y",
@@ -35,8 +26,8 @@
       "official": "143",
       "ours": "48.2",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -44,8 +35,8 @@
       "official": "23",
       "ours": "15",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -71,8 +62,8 @@
       "official": "normal",
       "ours": "15px",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — DeepSeek logo/wordmark maps to the Harbor wordmark.",
+      "id": "brand-wordmark"
     },
     {
       "key": "sidebar > wordmark 1",
@@ -107,8 +98,8 @@
       "official": "129.13",
       "ours": "148",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -116,8 +107,8 @@
       "official": "17",
       "ours": "23.8",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -125,8 +116,8 @@
       "official": "normal",
       "ours": "23.8px",
       "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "reason": "brand — the official account footer maps to the 本地模式 footer.",
+      "id": "brand-account-footer"
     },
     {
       "key": "sidebar > account 1",
@@ -138,42 +129,52 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "sidebar > span ‘开启新对话’",
-      "property": "h",
-      "official": "20",
-      "ours": "19",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1148,463 34×34",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > icon 16×16 @364,320",
-      "property": "y",
-      "official": "320",
-      "ours": "316",
+      "key": "main > span ‘管理’",
+      "property": "x",
+      "official": "1026",
+      "ours": "1048",
       "status": "fail"
     },
     {
-      "key": "main > switch @1036,285 40×24",
+      "key": "main > span ‘管理’",
+      "property": "y",
+      "official": "359",
+      "ours": "343",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘导出’",
       "property": "x",
-      "official": "1036",
-      "ours": "1038",
+      "official": "1026",
+      "ours": "1048",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘导出’",
+      "property": "y",
+      "official": "432",
+      "ours": "403",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘删除’",
+      "property": "box-shadow",
+      "official": "none",
+      "ours": "rgb(242, 90, 90) 0px 0px 0px 1px inset",
+      "status": "fail"
+    },
+    {
+      "key": "main > span ‘删除’",
+      "property": "color",
+      "official": "rgb(236, 19, 19)",
+      "ours": "rgb(242, 90, 90)",
       "status": "fail"
     },
     {
       "key": "main > switch @1036,285 40×24",
       "property": "y",
       "official": "285",
-      "ours": "290.98",
+      "ours": "283",
       "status": "fail"
     },
     {
@@ -181,9 +182,7 @@
       "property": "h",
       "official": "24",
       "ours": "22",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "status": "fail"
     },
     {
       "key": "main > switch @1036,285 40×24",
@@ -215,12 +214,17 @@
     },
     {
       "key": "main > switch @1036,285 40×24",
+      "property": "font-size",
+      "official": "13.3333px",
+      "ours": "14px",
+      "status": "fail"
+    },
+    {
+      "key": "main > switch @1036,285 40×24",
       "property": "line-height",
       "official": "normal",
-      "ours": "22.1px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
+      "ours": "22px",
+      "status": "fail"
     },
     {
       "key": "main > switch @1036,285 40×24",
@@ -258,560 +262,52 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 14×14 @1065,226",
+      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
+      "property": "y",
+      "official": "292",
+      "ours": "284",
+      "status": "fail"
+    },
+    {
+      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
       "property": "w",
-      "official": "14",
-      "ours": "16",
+      "official": "376",
+      "ours": "360",
       "status": "fail"
     },
     {
-      "key": "main > icon 14×14 @1065,226",
-      "property": "h",
-      "official": "14",
-      "ours": "16",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @364,364",
-      "property": "y",
-      "official": "364",
-      "ours": "356",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "y",
-      "official": "134",
-      "ours": "146",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "h",
-      "official": "22",
-      "ours": "20.39",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "background-color",
-      "official": "rgb(249, 250, 251)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "box-shadow",
-      "official": "rgb(249, 250, 251) 4px 0px 0px 0px",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "font-weight",
-      "official": "500",
-      "ours": "400",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "line-height",
-      "official": "18px",
-      "ours": "20.4px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "padding-top",
-      "official": "2px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "padding-right",
-      "official": "8px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "padding-bottom",
-      "official": "2px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @12,134 236×22",
-      "property": "padding-left",
-      "official": "10px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @364,408",
-      "property": "y",
-      "official": "408",
-      "ours": "396",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "x",
-      "official": "1004",
-      "ours": "1024",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "y",
-      "official": "352",
-      "ours": "347.47",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "w",
-      "official": "72",
-      "ours": "54",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
+      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
       "property": "h",
       "official": "36",
-      "ours": "32",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "background-color",
-      "official": "rgba(0, 0, 0, 0)",
-      "ours": "rgb(241, 243, 245)",
+      "ours": "44",
       "status": "fail"
     },
     {
-      "key": "main > button @1004,352 72×36",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,352 72×36",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "13px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "x",
-      "official": "356",
-      "ours": "352",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "y",
-      "official": "264",
-      "ours": "266",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "w",
-      "official": "164",
-      "ours": "144",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "h",
-      "official": "40",
-      "ours": "36",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "border-bottom-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "border-bottom-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
+      "key": "main > div ‘允许我们将你的对话内容用于优化 DeepSeek’",
       "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "padding-top",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "padding-bottom",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,264 164×40",
-      "property": "padding-left",
-      "official": "8px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "x",
-      "official": "356",
-      "ours": "352",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "y",
-      "official": "308",
-      "ours": "306",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "w",
-      "official": "164",
-      "ours": "144",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "h",
-      "official": "40",
-      "ours": "36",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "border-bottom-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "border-bottom-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "padding-top",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "padding-bottom",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,308 164×40",
-      "property": "padding-left",
-      "official": "8px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "x",
-      "official": "560",
-      "ours": "530",
+      "official": "18px",
+      "ours": "22px",
       "status": "fail"
     },
     {
       "key": "main > div ‘我共享的链接’",
       "property": "y",
       "official": "340",
-      "ours": "336.97",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "w",
-      "official": "516",
-      "ours": "548",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "h",
-      "official": "60",
-      "ours": "52",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "box-shadow",
-      "official": "rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "16px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "27.2px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "border-top-width",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "border-top-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "border-top-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘我共享的链接’",
-      "property": "padding-bottom",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "x",
-      "official": "356",
-      "ours": "352",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "y",
-      "official": "352",
-      "ours": "346",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "w",
-      "official": "164",
-      "ours": "144",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "h",
-      "official": "40",
-      "ours": "36",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "background-color",
-      "official": "rgba(38, 49, 72, 0.06)",
-      "ours": "rgb(241, 243, 245)",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "border-bottom-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "border-bottom-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "padding-top",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "padding-bottom",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,352 164×40",
-      "property": "padding-left",
-      "official": "8px",
-      "ours": "10px",
+      "ours": "324",
       "status": "fail"
     },
     {
       "key": "main > div @1055,288 18×18",
       "property": "x",
       "official": "1055",
-      "ours": "1038",
+      "ours": "1036",
       "status": "fail"
     },
     {
       "key": "main > div @1055,288 18×18",
       "property": "y",
       "official": "288",
-      "ours": "290.98",
+      "ours": "283",
       "status": "fail"
     },
     {
@@ -843,454 +339,49 @@
       "status": "fail"
     },
     {
-      "key": "main > button @356,396 164×40",
-      "property": "x",
-      "official": "356",
-      "ours": "352",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
+      "key": "main > div @560,400 516×86",
       "property": "y",
-      "official": "396",
-      "ours": "386",
+      "official": "400",
+      "ours": "384",
       "status": "fail"
     },
     {
-      "key": "main > button @356,396 164×40",
-      "property": "w",
-      "official": "164",
-      "ours": "144",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,396 164×40",
+      "key": "main > div @560,400 516×86",
       "property": "h",
-      "official": "40",
-      "ours": "36",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "border-top-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "border-bottom-right-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "border-bottom-left-radius",
-      "official": "12px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "23.8px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "padding-top",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "padding-bottom",
-      "official": "9px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @356,396 164×40",
-      "property": "padding-left",
-      "official": "8px",
-      "ours": "10px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "x",
-      "official": "1004",
-      "ours": "1024",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "y",
-      "official": "425",
-      "ours": "451.47",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "w",
-      "official": "72",
-      "ours": "54",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "h",
-      "official": "36",
-      "ours": "32",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "box-shadow",
-      "official": "none",
-      "ours": "rgb(242, 90, 90) 0px 0px 0px 1px inset",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "13px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1004,425 72×36",
-      "property": "color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgb(242, 90, 90)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "x",
-      "official": "1004",
-      "ours": "1024",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "y",
-      "official": "425",
-      "ours": "399.47",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "w",
-      "official": "72",
-      "ours": "54",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "h",
-      "official": "36",
-      "ours": "32",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "background-color",
-      "official": "rgba(0, 0, 0, 0)",
-      "ours": "rgb(241, 243, 245)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-top-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-top-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-bottom-right-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-bottom-left-radius",
-      "official": "4096px",
-      "ours": "999px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "13px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-top-width",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-top-color",
-      "official": "rgba(0, 0, 0, 0.1)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-top-style",
-      "official": "solid",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-right-width",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-right-color",
-      "official": "rgba(0, 0, 0, 0.1)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-right-style",
-      "official": "solid",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "padding-right",
-      "official": "0px",
-      "ours": "14px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-bottom-width",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-bottom-color",
-      "official": "rgba(0, 0, 0, 0.1)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-bottom-style",
-      "official": "solid",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-left-width",
-      "official": "1px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-left-color",
-      "official": "rgba(0, 0, 0, 0.1)",
-      "ours": "rgb(15, 17, 21)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "border-left-style",
-      "official": "solid",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1004,425 72×36",
-      "property": "padding-left",
-      "official": "0px",
-      "ours": "14px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "x",
-      "official": "560",
-      "ours": "530",
+      "official": "86",
+      "ours": "60",
       "status": "fail"
     },
     {
       "key": "main > div ‘删除所有对话’",
       "property": "y",
       "official": "486",
-      "ours": "440.97",
+      "ours": "444",
       "status": "fail"
     },
     {
-      "key": "main > div ‘删除所有对话’",
-      "property": "w",
-      "official": "516",
-      "ours": "548",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "h",
-      "official": "60",
-      "ours": "52",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "box-shadow",
-      "official": "rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset",
-      "ours": "none",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "font-size",
-      "official": "14px",
-      "ours": "16px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "line-height",
-      "official": "22px",
-      "ours": "27.2px",
-      "status": "allowed",
-      "reason": "known — text box size follows Inter, not the official face.",
-      "id": "font-metrics"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "border-top-width",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "border-top-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgba(0, 0, 0, 0.1)",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "border-top-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "main > div ‘删除所有对话’",
-      "property": "padding-bottom",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @226,139 12×12",
+      "key": "main > button @1004,352 72×36",
       "property": "unmatched",
       "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 12×12 @226,139",
+      "key": "main > div @1004,352 72×36",
       "property": "unmatched",
-      "official": "svg",
+      "official": "div",
       "ours": "",
       "status": "fail"
     },
     {
-      "key": "main > div @560,400 516×86",
+      "key": "main > button @1004,425 72×36",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
+      "key": "main > div @1004,425 72×36",
       "property": "unmatched",
       "official": "div",
       "ours": "",
@@ -1329,13 +420,13 @@
       "id": "brand-wordmark-unmatched"
     },
     {
-      "key": "sidebar > kbd ‘⌘ J’",
+      "key": "sidebar > span @18,852 32×32",
       "property": "unmatched",
       "official": "",
-      "ours": "⌘ J",
+      "ours": "span",
       "status": "allowed",
-      "reason": "owner rule — Harbor shows the new-chat shortcut. The official control keeps that glyph at opacity 0 until hover.",
-      "id": "shortcut-resting"
+      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
+      "id": "brand-footer-unmatched-ours"
     },
     {
       "key": "sidebar > icon 16×16 @26,860",
@@ -1365,27 +456,6 @@
       "id": "brand-footer-unmatched-ours"
     },
     {
-      "key": "main > button ‘关闭’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "关闭",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @530,266 548×71",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @530,389 548×52",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
       "key": "main > button ‘刷新’",
       "property": "unmatched",
       "official": "",
@@ -1393,6 +463,6 @@
       "status": "fail"
     }
   ],
-  "unexplained": 133,
+  "unexplained": 40,
   "pass": false
 }
