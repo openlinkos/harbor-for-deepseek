@@ -12,7 +12,7 @@ describe('parseSkin', () => {
       layout: { sidebar: { widthPx: 240 } },
     }))
     expect(pack.layout?.sidebar?.widthPx).toBe(240)
-    expect(() => parseSkin(JSON.stringify({ format: 'harbor-ui', schema: 1, name: 'x', scripts: 'forbidden', tokens: { light: { '--dsw-alias-brand-primary': 'sk-abcdefghijklmnopqrstuvwxyz' } } }))).toThrow()
+    expect(() => parseSkin(JSON.stringify({ format: 'harbor-ui', schema: 1, name: 'x', scripts: 'forbidden', tokens: { light: { '--dsw-alias-brand-primary': 'sk-shortkey' } } }))).toThrow()
     expect(() => parseSkin('{"format":"harbor-ui","schema":1,"name":"x","scripts":"ok"}')).toThrow()
   })
 })

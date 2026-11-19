@@ -56,7 +56,7 @@ const focusComposer = () => {
   window.requestAnimationFrame(() => {
     const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
     if (!box) return
-    box.focus()
+    box.focus({ preventScroll: true })
     const end = box.value.length
     box.setSelectionRange(end, end)
   })
@@ -625,7 +625,6 @@ const AssistantTurn = ({ message }: { message: Message }) => {
           <Markdown text={block.text} citations={block.citations} />
         </div>
       ))}
-      {texts.length ? <p className="answer-note">{t('answerNote')}</p> : null}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
           <span className="favicons">{sources.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
@@ -967,7 +966,7 @@ export const Shell = () => {
             <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
               <p className="group-label">
                 {label}
-                {label === t('groupToday') ? (
+                {label === (groups.some(([name]) => name === t('groupPinned')) ? t('groupPinned') : t('groupToday')) ? (
                   <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
                     <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
                   </button>
@@ -1050,10 +1049,11 @@ export const Shell = () => {
       ) : null}
       <section className="stage">
         <header className="topbar">
+          {conversation ? <div className="title-bar" aria-hidden="true" /> : null}
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
-          <h2>{conversation?.title || ''}</h2>
+          {conversation?.title ? <div className="chat-title">{conversation.title}</div> : null}
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
@@ -1167,9 +1167,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [title, setTitle] = useState(conversation.title)
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
   const [confirming, setConfirming] = useState(false)
-  const row = useRef<HTMLDivElement>(null)
+  const RowTag = conversation.pinned ? 'a' : 'div'
   return (
-    <div className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`} ref={row}>
+    <RowTag className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`}>
       {picking ? <input type="checkbox" aria-label={conversation.title || t('newChat')} checked={picked} onChange={() => onPick?.()} /> : null}
       {editing ? (
         <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
@@ -1180,7 +1180,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       )}
       <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
-        setMenuBox({ top: rect.top, left: rect.left - 10 })
+        setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
@@ -1210,7 +1210,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           onConfirm={() => { setConfirming(false); void removeChat(conversation.id) }}
         />
       ) : null}
-    </div>
+    </RowTag>
   )
 }
 

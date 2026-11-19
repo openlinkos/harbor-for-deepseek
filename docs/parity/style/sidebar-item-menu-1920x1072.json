@@ -2,14 +2,14 @@
   "state": "sidebar-item-menu",
   "viewport": "1920x1072",
   "officialVisible": 86,
-  "matched": 39,
-  "matchedEqual": 39,
+  "matched": 41,
+  "matchedEqual": 41,
   "matchedDiff": 0,
-  "officialOnly": 3,
-  "harborOnly": 6,
+  "officialOnly": 0,
+  "harborOnly": 5,
   "allowlisted": 18,
-  "unmatchedOfficial": 3,
-  "unmatchedOurs": 6,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 5,
   "mismatches": [
     {
       "key": "sidebar > wordmark 1",
@@ -129,27 +129,6 @@
       "id": "brand-account-footer"
     },
     {
-      "key": "sidebar > button @216,261 28×28",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @216,261 28×28",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @222,267",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > icon 22×22 @12,22",
       "property": "unmatched",
       "official": "",
@@ -193,15 +172,8 @@
       "status": "allowed",
       "reason": "brand — the 本地模式 footer is the Harbor account footer.",
       "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > icon 16×16 @136,341",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
     }
   ],
-  "unexplained": 4,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

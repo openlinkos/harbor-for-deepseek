@@ -13,9 +13,9 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | settings-data | 1440x900 | 99 | 50 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-terms | 1440x900 | 89 | 43 | 0 | 0 | 11 | 24 | 0 | PASS |
 | search-dialog | 1440x900 | 70 | 34 | 0 | 0 | 5 | 18 | 0 | PASS |
-| sidebar-item-menu | 1440x900 | 78 | 39 | 0 | 3 | 6 | 18 | 4 | FAIL |
+| sidebar-item-menu | 1440x900 | 78 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1440x900 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
-| answer | 1440x900 | 121 | 27 | 19 | 26 | 24 | 19 | 74 | FAIL |
+| answer | 1440x900 | 121 | 74 | 1 | 0 | 5 | 19 | 3 | FAIL |
 | thinking-collapsed | 1440x900 | 123 | 27 | 12 | 34 | 40 | 19 | 106 | FAIL |
 | scroll-up | 1440x900 | 114 | 28 | 6 | 31 | 15 | 19 | 70 | FAIL |
 | sidebar-date-groups | 1440x900 | 64 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
@@ -26,9 +26,9 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | settings-data | 1920x1072 | 107 | 50 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-terms | 1920x1072 | 97 | 43 | 0 | 0 | 11 | 24 | 0 | PASS |
 | search-dialog | 1920x1072 | 29 | 28 | 0 | 0 | 0 | 0 | 0 | PASS |
-| sidebar-item-menu | 1920x1072 | 86 | 39 | 0 | 3 | 6 | 18 | 4 | FAIL |
+| sidebar-item-menu | 1920x1072 | 86 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1920x1072 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
-| answer | 1920x1072 | 141 | 27 | 20 | 34 | 30 | 19 | 91 | FAIL |
+| answer | 1920x1072 | 141 | 38 | 39 | 6 | 8 | 19 | 58 | FAIL |
 | thinking-collapsed | 1920x1072 | 144 | 27 | 11 | 44 | 40 | 19 | 112 | FAIL |
 | scroll-up | 1920x1072 | 144 | 31 | 8 | 44 | 15 | 19 | 114 | FAIL |
 | sidebar-date-groups | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
@@ -74,10 +74,7 @@ No unexplained diffs.
 
 ## sidebar-item-menu 1440x900
 
-- sidebar > button @216,501 28×28 › missing div vs —
-- sidebar > div @216,501 28×28 › missing div vs —
-- sidebar > icon 16×16 @222,507 › missing svg vs —
-- sidebar > icon 16×16 @136,341 › missing — vs svg
+No unexplained diffs.
 
 ## sidebar-collapsed 1440x900
 
@@ -85,18 +82,9 @@ No unexplained diffs.
 
 ## answer 1440x900
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- main > button @1391,12 34×34 › x 1391 vs 1390
-- main > button @1391,12 34×34 › y 12 vs 10
-- main > icon 16×16 @1400,21 › x 1400 vs 1399
-- main > icon 16×16 @1400,21 › y 21 vs 19
-- main > button @469,686 28×28 › y 686 vs 673.8
-- main > icon 16×16 @475,692 › y 692 vs 679.8
-- main > button @507,686 28×28 › y 686 vs 673.8
-- main > icon 16×16 @513,692 › y 692 vs 679.8
-- main > button @545,686 28×28 › y 686 vs 673.8
-- main > icon 16×16 @551,692 › y 692 vs 679.8
-- main > button @583,686 28×28 › y 686 vs 673.8
+- main > span ‘10 秒后执行一次’ › y 650 vs 648.8
+- main > span ‘10 秒后执行一次’ › w 121.39 vs 118.47
+- main > span ‘10 秒后执行一次’ › h 20 vs 22
 
 ## thinking-collapsed 1440x900
 
@@ -162,10 +150,7 @@ No unexplained diffs.
 
 ## sidebar-item-menu 1920x1072
 
-- sidebar > button @216,261 28×28 › missing div vs —
-- sidebar > div @216,261 28×28 › missing div vs —
-- sidebar > icon 16×16 @222,267 › missing svg vs —
-- sidebar > icon 16×16 @136,341 › missing — vs svg
+No unexplained diffs.
 
 ## sidebar-collapsed 1920x1072
 
@@ -173,18 +158,18 @@ No unexplained diffs.
 
 ## answer 1920x1072
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- main > button @1871,12 34×34 › x 1871 vs 1870
-- main > button @1871,12 34×34 › y 12 vs 10
-- main > icon 16×16 @1880,21 › x 1880 vs 1879
-- main > icon 16×16 @1880,21 › y 21 vs 19
-- main > button @709,858 28×28 › y 858 vs 845.8
-- main > icon 16×16 @715,864 › y 864 vs 851.8
-- main > button @747,858 28×28 › y 858 vs 845.8
-- main > icon 16×16 @753,864 › y 864 vs 851.8
-- main > button @785,858 28×28 › y 858 vs 845.8
-- main > icon 16×16 @791,864 › y 864 vs 851.8
-- main > button @823,858 28×28 › y 858 vs 845.8
+- main > icon 12×12 @715,116 › y 116 vs 112.89
+- main > icon 12×12 @715,116 › w 12 vs 16
+- main > icon 12×12 @715,116 › h 12 vs 16
+- main > icon 14×16 @1407,72 › x 1407.48 vs 1406.5
+- main > icon 14×16 @1407,72 › y 72 vs 65
+- main > icon 14×16 @1407,72 › w 14 vs 20
+- main > icon 14×16 @1407,72 › h 16 vs 20
+- main > div @715,266 752×116 › y 266 vs 256.8
+- main > div @715,266 752×40 › y 266 vs 256.8
+- main > div @715,266 752×40 › y 266 vs 256.8
+- main > icon 12×12 @715,370 › y 370 vs 360.8
+- main > icon 12×12 @1455,370 › y 370 vs 360.8
 
 ## thinking-collapsed 1920x1072
 

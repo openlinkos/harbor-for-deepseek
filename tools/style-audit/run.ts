@@ -102,7 +102,8 @@ let calls = 0
 let hold: Promise<void> = Promise.resolve()
 let releaseHold = () => {}
 
-const sse = (text: string, title = '对照') => {
+let answerTitle = '对照'
+const sse = (text: string, title = answerTitle) => {
   const events = [
     { type: 'message_start', message: { id: 'req', model: 'deepseek-flash' } },
     { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
@@ -120,6 +121,7 @@ const sse = (text: string, title = '对照') => {
 const arm = (next: Mode) => {
   mode = next
   calls = 0
+  answerTitle = '对照'
   if (next === 'hold') hold = new Promise((resolve) => { releaseHold = resolve })
   else releaseHold = () => {}
 }
@@ -150,7 +152,7 @@ const install = async (page: Page) => {
     }
     calls += 1
     const text = mode === 'rich' ? rich : mode === 'long' ? longAnswer : mode === 'code' ? longCode : mode === 'versions' && calls > 1 ? '第二版' : answerEssay
-    await route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(text, mode === 'versions' ? '版本' : '对照') })
+    await route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(text, mode === 'versions' ? '版本' : answerTitle) })
   })
 }
 
@@ -163,6 +165,18 @@ const unlock = async (page: Page) => {
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await page.getByTestId('composer').waitFor()
+}
+
+const seedPinned = async (page: Page) => {
+  if ((page.viewportSize()?.width || 0) < 768) return
+  answerTitle = '测试会话A'
+  await send(page, '占位')
+  await page.locator('.chat-link').hover()
+  await page.locator('.chat-link .more').click()
+  await page.getByRole('menuitem', { name: '置顶' }).click()
+  await page.getByTestId('new-chat').click()
+  await page.locator('.greeting').waitFor()
+  answerTitle = '定时器解释'
 }
 
 const send = async (page: Page, text: string) => {
@@ -357,7 +371,7 @@ const states: StateSpec[] = [
   {
     id: 'answer', rows: [5, 7, 8, 10, 13, 46, 47], viewports: all, official: true,
     steps: ['Send any short message and wait until the answer, the action row, and the AI disclaimer are visible. Do not scroll.'],
-    run: async (page) => { arm('ok'); await unlock(page); await send(page, '你好') },
+    run: async (page) => { arm('ok'); await unlock(page); await seedPinned(page); await send(page, '你好') },
   },
   {
     id: 'answer-markdown', rows: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 56, 57], viewports: all, official: true,
@@ -390,6 +404,7 @@ const states: StateSpec[] = [
     run: async (page) => {
       arm('ok')
       await unlock(page)
+      await seedPinned(page)
       await send(page, '思考')
       await page.getByTestId('thinking').getByRole('button').click()
     },
@@ -453,6 +468,7 @@ const states: StateSpec[] = [
     run: async (page) => {
       arm('long')
       await unlock(page)
+      await seedPinned(page)
       await send(page, '很长')
       await page.getByTestId('message-list').evaluate((node) => { node.scrollTop = 0 })
       await page.getByRole('button', { name: '回到底部' }).waitFor()
