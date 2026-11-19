@@ -9,7 +9,7 @@
     'border-top-style,border-right-style,border-bottom-style,border-left-style,' +
     'border-top-color,border-right-color,border-bottom-color,border-left-color,' +
     'border-top-left-radius,border-top-right-radius,border-bottom-right-radius,border-bottom-left-radius,' +
-    'background-color,background-image,box-shadow,color,opacity,' +
+    'background-color,background-image,box-shadow,backdrop-filter,color,opacity,' +
     'font-family,font-size,font-weight,line-height,letter-spacing,text-align,white-space,' +
     'overflow,overflow-x,overflow-y,z-index,transform,' +
     'transition-property,transition-duration,transition-timing-function,transition-delay,' +
@@ -234,6 +234,17 @@
         style: style,
       })
     }
+    var scroller = document.querySelector('.chat-scroll, .transcript')
+    var scroll = null
+    if (scroller) {
+      var scs = getComputedStyle(scroller)
+      scroll = {
+        overflowY: scs.overflowY,
+        scrollHeight: scroller.scrollHeight,
+        clientHeight: scroller.clientHeight,
+        scrollbar: scs.scrollbarWidth,
+      }
+    }
     var payload = {
       label: job.label,
       state: job.state,
@@ -246,6 +257,7 @@
         body: document.body ? customProps(document.body) : {},
       },
       truncated: elements.length >= 8000,
+      scroll: scroll,
       elements: elements,
     }
     if (job.download) {

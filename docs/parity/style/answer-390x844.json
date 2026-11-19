@@ -2,20 +2,20 @@
   "state": "answer",
   "viewport": "390x844",
   "officialVisible": 54,
-  "matched": 16,
-  "matchedEqual": 2,
-  "matchedDiff": 14,
-  "officialOnly": 31,
-  "harborOnly": 46,
-  "allowlisted": 21,
-  "unmatchedOfficial": 31,
-  "unmatchedOurs": 46,
+  "matched": 26,
+  "matchedEqual": 4,
+  "matchedDiff": 22,
+  "officialOnly": 20,
+  "harborOnly": 49,
+  "allowlisted": 17,
+  "unmatchedOfficial": 20,
+  "unmatchedOurs": 49,
   "mismatches": [
     {
       "key": "sidebar > mark 1",
       "property": "x",
       "official": "22",
-      "ours": "36",
+      "ours": "44",
       "status": "allowed",
       "reason": "brand — DeepSeek logo maps to the Harbor mark.",
       "id": "brand-logo"
@@ -24,7 +24,7 @@
       "key": "sidebar > mark 1",
       "property": "y",
       "official": "24",
-      "ours": "22.98",
+      "ours": "11.89",
       "status": "allowed",
       "reason": "brand — DeepSeek logo maps to the Harbor mark.",
       "id": "brand-logo"
@@ -51,217 +51,364 @@
       "key": "control ‘智能搜索’",
       "property": "x",
       "official": "131.02",
-      "ours": "151",
+      "ours": "139",
       "status": "fail"
     },
     {
       "key": "control ‘智能搜索’",
       "property": "y",
       "official": "769",
-      "ours": "734.31",
+      "ours": "733",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘智能搜索’",
       "property": "x",
       "official": "160.02",
-      "ours": "180",
+      "ours": "168",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘智能搜索’",
       "property": "y",
       "official": "774",
-      "ours": "739.31",
+      "ours": "738",
       "status": "fail"
     },
     {
       "key": "row-more 1",
-      "property": "padding-top",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "padding-right",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "padding-bottom",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 1",
-      "property": "padding-left",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 2",
-      "property": "padding-top",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 2",
-      "property": "padding-right",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 2",
-      "property": "padding-bottom",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "row-more 2",
-      "property": "padding-left",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "x",
-      "official": "20",
+      "property": "w",
+      "official": "28",
       "ours": "36",
       "status": "fail"
     },
     {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "y",
-      "official": "60",
-      "ours": "60.89",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "w",
-      "official": "350",
-      "ours": "318",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @20,60 350×40",
+      "key": "row-more 1",
       "property": "h",
-      "official": "40",
+      "official": "28",
+      "ours": "36",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "background-color",
+      "official": "rgba(0, 0, 0, 0)",
+      "ours": "rgb(255, 255, 255)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "box-shadow",
+      "official": "none",
+      "ours": "rgba(0, 0, 0, 0.2) 0px 0px 1px 0px, rgba(0, 0, 0, 0.02) 0px 0px 4px 0px, rgba(0, 0, 0, 0.08) 0px 12px 32px 0px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "50%",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "line-height",
+      "official": "20px",
+      "ours": "27.2px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgb(97, 102, 107)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-width",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgba(0, 0, 0, 0.1)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-top-style",
+      "official": "none",
+      "ours": "solid",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-right-width",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-right-color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgba(0, 0, 0, 0.1)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-right-style",
+      "official": "none",
+      "ours": "solid",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-width",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgba(0, 0, 0, 0.1)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-bottom-style",
+      "official": "none",
+      "ours": "solid",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-left-width",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-left-color",
+      "official": "rgb(129, 133, 140)",
+      "ours": "rgba(0, 0, 0, 0.1)",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "border-left-style",
+      "official": "none",
+      "ours": "solid",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 1",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 3",
+      "property": "w",
+      "official": "34",
       "ours": "28",
       "status": "fail"
     },
     {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "background-color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgba(0, 0, 0, 0)",
+      "key": "row-more 3",
+      "property": "h",
+      "official": "34",
+      "ours": "28",
       "status": "fail"
     },
     {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "border-top-left-radius",
+      "key": "row-more 3",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "13px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 3",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "20px",
+      "status": "fail"
+    },
+    {
+      "key": "row-more 3",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(129, 133, 140)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "x",
+      "official": "36",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "y",
+      "official": "52.22",
+      "ours": "49.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "w",
+      "official": "313.09",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "h",
+      "official": "36",
+      "ours": "28",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "font-size",
+      "official": "13px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘quick_sortleft mid quick’",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "28px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "y",
+      "official": "0",
+      "ours": "12",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "w",
+      "official": "331",
+      "ours": "341",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "h",
+      "official": "60",
+      "ours": "48",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "padding-top",
       "official": "12px",
       "ours": "0px",
       "status": "fail"
     },
     {
-      "key": "sidebar > div @20,60 350×40",
-      "property": "border-top-right-radius",
-      "official": "12px",
+      "key": "sidebar > div @0,0 331×60",
+      "property": "padding-right",
+      "official": "10px",
       "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "padding-bottom",
+      "official": "4px",
+      "ours": "0px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @0,0 331×60",
+      "property": "padding-left",
+      "official": "10px",
+      "ours": "18px",
       "status": "fail"
     },
     {
       "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
       "property": "x",
       "official": "16",
-      "ours": "36",
+      "ours": "24",
       "status": "fail"
     },
     {
       "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
       "property": "y",
       "official": "816",
-      "ours": "809.31",
+      "ours": "808",
       "status": "fail"
     },
     {
       "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
       "property": "w",
       "official": "358",
-      "ours": "318",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "h",
-      "official": "28",
-      "ours": "18.69",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "background-color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "line-height",
-      "official": "16px",
-      "ours": "18.7px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "padding-top",
-      "official": "6px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
-      "property": "padding-bottom",
-      "official": "6px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
-      "property": "x",
-      "official": "56",
-      "ours": "36",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
-      "property": "y",
-      "official": "252.22",
-      "ours": "236.89",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
-      "property": "w",
-      "official": "281.69",
-      "ours": "318",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
-      "property": "h",
-      "official": "20",
-      "ours": "28",
+      "ours": "342",
       "status": "fail"
     },
     {
@@ -366,28 +513,70 @@
       "key": "main > icon 20×20 @343,24",
       "property": "x",
       "official": "343",
-      "ours": "354",
+      "ours": "356",
       "status": "fail"
     },
     {
       "key": "main > icon 20×20 @343,24",
       "property": "y",
       "official": "24",
-      "ours": "17",
+      "ours": "20",
       "status": "fail"
     },
     {
       "key": "main > icon 20×20 @343,24",
       "property": "w",
       "official": "20",
-      "ours": "22",
+      "ours": "16",
       "status": "fail"
     },
     {
       "key": "main > icon 20×20 @343,24",
       "property": "h",
       "official": "20",
-      "ours": "22",
+      "ours": "16",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @172,654",
+      "property": "x",
+      "official": "172",
+      "ours": "187",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @172,654",
+      "property": "y",
+      "official": "654.22",
+      "ours": "650",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "x",
+      "official": "56",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "y",
+      "official": "252.22",
+      "ours": "225.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "w",
+      "official": "281.69",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第二级：从数组中选一个元素作为 pivot’",
+      "property": "h",
+      "official": "20",
+      "ours": "28",
       "status": "fail"
     },
     {
@@ -398,129 +587,24 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > div @0,0 331×60",
+      "key": "sidebar > icon 16×16 @210,654",
       "property": "x",
-      "official": "0",
-      "ours": "43",
+      "official": "210",
+      "ours": "220",
       "status": "fail"
     },
     {
-      "key": "sidebar > div @0,0 331×60",
+      "key": "sidebar > icon 16×16 @210,654",
+      "property": "y",
+      "official": "654.22",
+      "ours": "631.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 16×16 @210,654",
       "property": "w",
-      "official": "331",
-      "ours": "311",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "h",
-      "official": "60",
-      "ours": "51.09",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "background-color",
-      "official": "rgb(255, 255, 255)",
-      "ours": "rgba(0, 0, 0, 0)",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "padding-top",
-      "official": "12px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "padding-right",
-      "official": "10px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "padding-bottom",
-      "official": "4px",
-      "ours": "0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "border-left-width",
-      "official": "0px",
-      "ours": "2px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "border-left-color",
-      "official": "rgb(15, 17, 21)",
-      "ours": "rgb(230, 231, 233)",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "border-left-style",
-      "official": "none",
-      "ours": "solid",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 331×60",
-      "property": "padding-left",
-      "official": "10px",
-      "ours": "12px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @16,710 358×106",
-      "property": "x",
       "official": "16",
-      "ours": "36",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @16,710 358×106",
-      "property": "y",
-      "official": "710",
-      "ours": "675.31",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @16,710 358×106",
-      "property": "w",
-      "official": "358",
-      "ours": "326",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @16,710 358×106",
-      "property": "box-shadow",
-      "official": "rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
-      "ours": "rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > textbox @17,715 356×42",
-      "property": "x",
-      "official": "17",
-      "ours": "37",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > textbox @17,715 356×42",
-      "property": "y",
-      "official": "715",
-      "ours": "680.31",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > textbox @17,715 356×42",
-      "property": "w",
-      "official": "356",
-      "ours": "324",
+      "ours": "14",
       "status": "fail"
     },
     {
@@ -534,7 +618,7 @@
       "key": "sidebar > icon 14×14 @40,779",
       "property": "y",
       "official": "779",
-      "ours": "740.89",
+      "ours": "801.8",
       "status": "fail"
     },
     {
@@ -549,6 +633,293 @@
       "property": "h",
       "official": "14",
       "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @142,779",
+      "property": "x",
+      "official": "142.02",
+      "ours": "156",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @142,779",
+      "property": "y",
+      "official": "779",
+      "ours": "801.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @142,779",
+      "property": "w",
+      "official": "14",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×14 @142,779",
+      "property": "h",
+      "official": "14",
+      "ours": "20",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "x",
+      "official": "20",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "y",
+      "official": "60",
+      "ours": "93.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "w",
+      "official": "350",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "x",
+      "official": "20",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "y",
+      "official": "60",
+      "ours": "93.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @20,60 350×40",
+      "property": "w",
+      "official": "350",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "x",
+      "official": "245.97",
+      "ours": "237",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "y",
+      "official": "72",
+      "ours": "105.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "w",
+      "official": "14",
+      "ours": "30",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "15px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 14×16 @246,72",
+      "property": "line-height",
+      "official": "0px",
+      "ours": "20px",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "x",
+      "official": "310.98",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "y",
+      "official": "72",
+      "ours": "105.8",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "w",
+      "official": "14",
+      "ours": "30",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "15px",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 14×16 @311,72",
+      "property": "line-height",
+      "official": "0px",
+      "ours": "20px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,710 358×106",
+      "property": "x",
+      "official": "16",
+      "ours": "24",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,710 358×106",
+      "property": "y",
+      "official": "710",
+      "ours": "674",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,710 358×106",
+      "property": "w",
+      "official": "358",
+      "ours": "342",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > div @16,710 358×106",
+      "property": "box-shadow",
+      "official": "rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px",
+      "ours": "rgba(0, 0, 0, 0.02) 0px 4px 12px 0px, rgba(72, 104, 178, 0.01) 0px 2px 2px 0px, rgba(72, 104, 178, 0.03) 0px 30px 60px 0px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @17,715 356×42",
+      "property": "x",
+      "official": "17",
+      "ours": "25",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @17,715 356×42",
+      "property": "y",
+      "official": "715",
+      "ours": "679",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > textbox @17,715 356×42",
+      "property": "w",
+      "official": "356",
+      "ours": "340",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "x",
+      "official": "74",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "y",
+      "official": "584.22",
+      "ours": "619.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "w",
+      "official": "290.61",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "h",
+      "official": "48",
+      "ours": "40",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "background-color",
+      "official": "rgba(0, 0, 0, 0)",
+      "ours": "rgb(255, 255, 255)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "border-top-left-radius",
+      "official": "0px",
+      "ours": "12px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
+      "property": "border-top-right-radius",
+      "official": "0px",
+      "ours": "12px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "x",
+      "official": "74",
+      "ours": "44",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "y",
+      "official": "422.22",
+      "ours": "465.8",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "w",
+      "official": "279.88",
+      "ours": "302",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "h",
+      "official": "48",
+      "ours": "40",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "background-color",
+      "official": "rgba(0, 0, 0, 0)",
+      "ours": "rgb(255, 255, 255)",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "border-top-left-radius",
+      "official": "0px",
+      "ours": "12px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
+      "property": "border-top-right-radius",
+      "official": "0px",
+      "ours": "12px",
       "status": "fail"
     },
     {
@@ -569,41 +940,6 @@
       "key": "sidebar > div @20,-162 350×314",
       "property": "unmatched",
       "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @236,66 63×28",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 14×16 @246,72",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @301,66 63×28",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×16 @311,72",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘quick_sortleft mid quick’",
-      "property": "unmatched",
-      "official": "quick_sortleft mid quick",
       "ours": "",
       "status": "fail"
     },
@@ -629,23 +965,9 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > span ‘第三级：小于 pivot 放左边，大于 pivo’",
-      "property": "unmatched",
-      "official": "第三级：小于 pivot 放左边，大于 pivo",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > span ‘第二级：对左右子数组分别递归调用快速排序’",
       "property": "unmatched",
       "official": "第二级：对左右子数组分别递归调用快速排序",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘第三级：当子数组长度为 0 或 1 时停止递归，’",
-      "property": "unmatched",
-      "official": "第三级：当子数组长度为 0 或 1 时停止递归，",
       "ours": "",
       "status": "fail"
     },
@@ -722,43 +1044,7 @@
       "id": "brand-footer-unmatched-official"
     },
     {
-      "key": "sidebar > icon 16×16 @172,654",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "allowed",
-      "reason": "brand — official account email or name in the sidebar footer.",
-      "id": "brand-footer-unmatched-official"
-    },
-    {
-      "key": "sidebar > icon 16×16 @210,654",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "allowed",
-      "reason": "brand — official account email or name in the sidebar footer.",
-      "id": "brand-footer-unmatched-official"
-    },
-    {
       "key": "sidebar > div @29,769 92×34",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "allowed",
-      "reason": "brand — official account email or name in the sidebar footer.",
-      "id": "brand-footer-unmatched-official"
-    },
-    {
-      "key": "sidebar > icon 14×14 @142,779",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "allowed",
-      "reason": "brand — official account email or name in the sidebar footer.",
-      "id": "brand-footer-unmatched-official"
-    },
-    {
-      "key": "main > button @283,769 34×34",
       "property": "unmatched",
       "official": "div",
       "ours": "",
@@ -803,7 +1089,7 @@
       "id": "brand-footer-unmatched-official"
     },
     {
-      "key": "sidebar > heading ‘对照’",
+      "key": "sidebar > div ‘对照’",
       "property": "unmatched",
       "official": "",
       "ours": "对照",
@@ -845,7 +1131,7 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 16×16 @190,23",
+      "key": "sidebar > icon 16×16 @198,12",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -859,42 +1145,35 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > div @36,105 318×116",
+      "key": "sidebar > div @44,94 302×116",
       "property": "unmatched",
       "official": "",
       "ours": "div",
       "status": "fail"
     },
     {
-      "key": "sidebar > button @219,111 63×28",
+      "key": "sidebar > button @212,100 63×28",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×16 @227,117",
+      "key": "sidebar > icon 14×16 @220,106",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > span ‘复制’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "复制",
-      "status": "fail"
-    },
-    {
-      "key": "main > button ‘下载’",
+      "key": "sidebar > button ‘下载’",
       "property": "unmatched",
       "official": "",
       "ours": "下载",
       "status": "fail"
     },
     {
-      "key": "main > icon 14×16 @292,117",
+      "key": "main > icon 14×16 @285,106",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -905,6 +1184,20 @@
       "property": "unmatched",
       "official": "",
       "ours": "timerId = (captureStyleA",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @44,198",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @334,198",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
       "status": "fail"
     },
     {
@@ -929,21 +1222,28 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > div @36,393 318×94",
+      "key": "sidebar > div @44,466 302×94",
       "property": "unmatched",
       "official": "",
       "ours": "div",
       "status": "fail"
     },
     {
-      "key": "sidebar > button @219,399 63×28",
+      "key": "sidebar > div @44,466 302×40",
+      "property": "unmatched",
+      "official": "",
+      "ours": "div",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @212,472 63×28",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×16 @227,405",
+      "key": "sidebar > icon 14×16 @220,478",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -957,14 +1257,28 @@
       "status": "fail"
     },
     {
-      "key": "main > button ‘下载’",
+      "key": "sidebar > button ‘下载’",
       "property": "unmatched",
       "official": "",
       "ours": "下载",
       "status": "fail"
     },
     {
-      "key": "main > icon 14×16 @292,405",
+      "key": "main > icon 14×16 @285,478",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @44,548",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @334,548",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -978,24 +1292,24 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > div @36,547 318×94",
+      "key": "sidebar > div @44,620 302×94",
       "property": "unmatched",
       "official": "",
       "ours": "div",
       "status": "fail"
     },
     {
-      "key": "sidebar > button @219,553 63×28",
+      "key": "sidebar > div @44,620 302×40",
       "property": "unmatched",
       "official": "",
-      "ours": "button",
+      "ours": "div",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×16 @227,559",
+      "key": "sidebar > button @212,626 63×28",
       "property": "unmatched",
       "official": "",
-      "ours": "svg",
+      "ours": "button",
       "status": "fail"
     },
     {
@@ -1006,14 +1320,28 @@
       "status": "fail"
     },
     {
-      "key": "main > button ‘下载’",
+      "key": "sidebar > button ‘下载’",
       "property": "unmatched",
       "official": "",
       "ours": "下载",
       "status": "fail"
     },
     {
-      "key": "main > icon 14×16 @292,559",
+      "key": "main > icon 14×16 @285,632",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > icon 12×12 @44,702",
+      "property": "unmatched",
+      "official": "",
+      "ours": "svg",
+      "status": "fail"
+    },
+    {
+      "key": "main > icon 12×12 @334,702",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -1027,70 +1355,49 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 20×20 @80,741",
+      "key": "sidebar > icon 20×20 @80,802",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 20×20 @118,741",
+      "key": "sidebar > icon 20×20 @118,802",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 20×20 @156,741",
+      "key": "sidebar > icon 20×20 @194,802",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 20×20 @194,741",
+      "key": "sidebar > icon 20×20 @232,802",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 20×20 @232,741",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "main > button ‘回到底部’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "回到底部",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @346,686",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @49,734 92×34",
+      "key": "sidebar > button @37,733 92×34",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×14 @60,744",
+      "key": "sidebar > icon 14×14 @48,743",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×14 @162,744",
+      "key": "sidebar > icon 14×14 @150,743",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -1104,27 +1411,27 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @280,743",
+      "key": "main > icon 16×16 @284,742",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "main > button @315,734 34×34",
+      "key": "main > button @319,733 34×34",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @324,743",
+      "key": "main > icon 16×16 @328,742",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     }
   ],
-  "unexplained": 132,
+  "unexplained": 181,
   "pass": false
 }

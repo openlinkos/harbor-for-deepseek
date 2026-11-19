@@ -144,7 +144,9 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
   }
   return (
     <div className="code-card">
+      <div className="code-sticky">
       <div className="code-head">
+        <div className="code-bar">
         <span>{(language || 'text').toLowerCase()}</span>
         <span className="code-tools">
           <button
@@ -164,6 +166,8 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
             <span>{label('下载', 'Download')}</span>
           </button>
         </span>
+        </div>
+      </div>
       </div>
       <pre className={long && !expanded ? 'collapsed' : ''}>
         <code dangerouslySetInnerHTML={{ __html: html }} />

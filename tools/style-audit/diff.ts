@@ -199,6 +199,7 @@ const BORDER_SIDES = ['top', 'right', 'bottom', 'left']
 const visualProperties = (pair: Pair) => {
   const text = Boolean(accessibleText(pair.official) || accessibleText(pair.ours))
   const props = ['x', 'y', 'w', 'h', 'background-color', 'box-shadow', 'opacity', ...RADIUS]
+  if (pair.official.style['backdrop-filter'] != null && pair.ours.style['backdrop-filter'] != null) props.push('backdrop-filter')
   if (text) props.push('font-size', 'font-weight', 'line-height', 'letter-spacing', 'color')
   for (const side of BORDER_SIDES) {
     const officialWidth = parseFloat(pair.official.style[`border-${side}-width`] || '0')

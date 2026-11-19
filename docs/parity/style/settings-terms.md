@@ -1,6 +1,6 @@
 # settings-terms 1440x900
 
-Result: FAIL (6 unexplained)
+Result: PASS (0 unexplained)
 
 - Matched elements: 43
 - Unmatched official: 0
@@ -21,16 +21,10 @@ Result: FAIL (6 unexplained)
 | allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
-| fail | main > contentinfo @560,378 516×64 | unmatched |  | footer |  |
-| fail | main > link ‘GitHub’ | unmatched |  | GitHub |  |
-| fail | main > link ‘许可证’ | unmatched |  | 许可证 |  |
-| fail | main > link ‘OpenLinkOS’ | unmatched |  | OpenLinkOS |  |
-| fail | main > link ‘openlinkos/harbor-for-de’ | unmatched |  | openlinkos/harbor-for-de |  |
-| fail | main > link ‘platform.deepseek.com’ | unmatched |  | platform.deepseek.com |  |
 
 # settings-terms 1920x1072
 
-Result: FAIL (6 unexplained)
+Result: PASS (0 unexplained)
 
 - Matched elements: 43
 - Unmatched official: 0
@@ -51,16 +45,10 @@ Result: FAIL (6 unexplained)
 | allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
-| fail | main > contentinfo @800,464 516×64 | unmatched |  | footer |  |
-| fail | main > link ‘GitHub’ | unmatched |  | GitHub |  |
-| fail | main > link ‘许可证’ | unmatched |  | 许可证 |  |
-| fail | main > link ‘OpenLinkOS’ | unmatched |  | OpenLinkOS |  |
-| fail | main > link ‘openlinkos/harbor-for-de’ | unmatched |  | openlinkos/harbor-for-de |  |
-| fail | main > link ‘platform.deepseek.com’ | unmatched |  | platform.deepseek.com |  |
 
 # settings-terms 390x844
 
-Result: FAIL (111 unexplained)
+Result: FAIL (107 unexplained)
 
 - Matched elements: 30
 - Unmatched official: 37
@@ -188,8 +176,4 @@ Result: FAIL (111 unexplained)
 | fail | sidebar > icon 16×16 @88,125 | unmatched |  | svg |  |
 | fail | main > icon 16×16 @292,125 | unmatched |  | svg |  |
 | fail | main > link @294,165 72×36 | unmatched |  | a |  |
-| fail | sidebar > contentinfo @24,277 342×64 | unmatched |  | footer |  |
-| fail | sidebar > p ‘OpenLinkOS 发起的开源项目’ | unmatched |  | OpenLinkOS 发起的开源项目 |  |
-| fail | sidebar > p ‘DeepSeek 是其所有者的商标。本项目与深度’ | unmatched |  | DeepSeek 是其所有者的商标。本项目与深度 |  |
 | fail | sidebar > p ‘·’ | unmatched |  | · |  |
-| fail | sidebar > link ‘platform.deepseek.com’ | unmatched |  | platform.deepseek.com |  |

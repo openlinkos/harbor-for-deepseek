@@ -1,10 +1,10 @@
 # sidebar-item-menu 1440x900
 
-Result: PASS (0 unexplained)
+Result: FAIL (4 unexplained)
 
-- Matched elements: 40
-- Unmatched official: 0
-- Unmatched ours: 5
+- Matched elements: 39
+- Unmatched official: 3
+- Unmatched ours: 6
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -21,14 +21,18 @@ Result: PASS (0 unexplained)
 | allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
+| fail | sidebar > button @216,501 28×28 | unmatched | div |  |  |
+| fail | sidebar > div @216,501 28×28 | unmatched | div |  |  |
+| fail | sidebar > icon 16×16 @222,507 | unmatched | svg |  |  |
+| fail | sidebar > icon 16×16 @136,341 | unmatched |  | svg |  |
 
 # sidebar-item-menu 1920x1072
 
-Result: PASS (0 unexplained)
+Result: FAIL (4 unexplained)
 
-- Matched elements: 40
-- Unmatched official: 0
-- Unmatched ours: 5
+- Matched elements: 39
+- Unmatched official: 3
+- Unmatched ours: 6
 
 | Status | Key | Property | Official | Ours | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -45,3 +49,7 @@ Result: PASS (0 unexplained)
 | allowed | sidebar > account 1 | h | 17 | 23.8 | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | line-height | normal | 23.8px | brand — the official account footer maps to the 本地模式 footer. |
 | allowed | sidebar > account 1 | color | rgb(97, 102, 107) | rgb(15, 17, 21) | brand — the official account footer maps to the 本地模式 footer. |
+| fail | sidebar > button @216,261 28×28 | unmatched | div |  |  |
+| fail | sidebar > div @216,261 28×28 | unmatched | div |  |  |
+| fail | sidebar > icon 16×16 @222,267 | unmatched | svg |  |  |
+| fail | sidebar > icon 16×16 @136,341 | unmatched |  | svg |  |

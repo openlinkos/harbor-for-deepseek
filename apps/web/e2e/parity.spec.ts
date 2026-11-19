@@ -147,7 +147,8 @@ test('send', async ({ page }) => {
   await page.getByTestId('composer').fill('你好')
   await page.getByTestId('composer').press('Enter')
   await expect(page.getByTestId('message-user')).toContainText('你好')
-  await expect(page.locator('.turn.user')).toHaveCSS('justify-content', 'flex-end')
+  await expect(page.locator('.turn.user')).toHaveCSS('flex-direction', 'column')
+  await expect(page.locator('.turn.user')).toHaveCSS('align-items', 'flex-end')
 })
 
 test('stream and stop', async ({ page }) => {

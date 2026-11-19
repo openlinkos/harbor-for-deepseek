@@ -11,38 +11,38 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | settings-general | 1440x900 | 103 | 52 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-account | 1440x900 | 111 | 60 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-data | 1440x900 | 99 | 50 | 0 | 0 | 5 | 18 | 0 | PASS |
-| settings-terms | 1440x900 | 89 | 43 | 0 | 0 | 11 | 18 | 6 | FAIL |
+| settings-terms | 1440x900 | 89 | 43 | 0 | 0 | 11 | 24 | 0 | PASS |
 | search-dialog | 1440x900 | 70 | 34 | 0 | 0 | 5 | 18 | 0 | PASS |
-| sidebar-item-menu | 1440x900 | 78 | 40 | 0 | 0 | 5 | 18 | 0 | PASS |
+| sidebar-item-menu | 1440x900 | 78 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1440x900 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
-| answer | 1440x900 | 126 | 14 | 48 | 16 | 7 | 19 | 158 | FAIL |
-| thinking-collapsed | 1440x900 | 128 | 14 | 29 | 33 | 35 | 19 | 159 | FAIL |
-| scroll-up | 1440x900 | 118 | 16 | 19 | 31 | 16 | 19 | 110 | FAIL |
+| answer | 1440x900 | 121 | 74 | 1 | 0 | 5 | 19 | 3 | FAIL |
+| thinking-collapsed | 1440x900 | 123 | 38 | 20 | 17 | 31 | 19 | 94 | FAIL |
+| scroll-up | 1440x900 | 114 | 39 | 6 | 22 | 7 | 19 | 61 | FAIL |
 | sidebar-date-groups | 1440x900 | 64 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | home-with-history | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | user-menu | 1920x1072 | 82 | 28 | 0 | 3 | 8 | 26 | 0 | PASS |
 | settings-general | 1920x1072 | 111 | 52 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-account | 1920x1072 | 119 | 60 | 0 | 0 | 5 | 18 | 0 | PASS |
 | settings-data | 1920x1072 | 107 | 50 | 0 | 0 | 5 | 18 | 0 | PASS |
-| settings-terms | 1920x1072 | 97 | 43 | 0 | 0 | 11 | 18 | 6 | FAIL |
+| settings-terms | 1920x1072 | 97 | 43 | 0 | 0 | 11 | 24 | 0 | PASS |
 | search-dialog | 1920x1072 | 29 | 28 | 0 | 0 | 0 | 0 | 0 | PASS |
-| sidebar-item-menu | 1920x1072 | 86 | 40 | 0 | 0 | 5 | 18 | 0 | PASS |
+| sidebar-item-menu | 1920x1072 | 86 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1920x1072 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
-| answer | 1920x1072 | 147 | 14 | 51 | 20 | 11 | 19 | 182 | FAIL |
-| thinking-collapsed | 1920x1072 | 150 | 14 | 30 | 42 | 33 | 19 | 172 | FAIL |
-| scroll-up | 1920x1072 | 150 | 18 | 21 | 44 | 16 | 19 | 148 | FAIL |
+| answer | 1920x1072 | 141 | 74 | 4 | 5 | 9 | 19 | 23 | FAIL |
+| thinking-collapsed | 1920x1072 | 144 | 38 | 20 | 26 | 29 | 19 | 101 | FAIL |
+| scroll-up | 1920x1072 | 144 | 39 | 8 | 35 | 7 | 19 | 84 | FAIL |
 | sidebar-date-groups | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | home-with-history | 390x844 | 23 | 19 | 0 | 0 | 0 | 0 | 0 | PASS |
 | user-menu | 390x844 | 93 | 6 | 13 | 28 | 20 | 38 | 66 | FAIL |
 | settings-general | 390x844 | 122 | 7 | 25 | 45 | 30 | 31 | 134 | FAIL |
 | settings-account | 390x844 | 130 | 8 | 35 | 35 | 22 | 31 | 143 | FAIL |
 | settings-data | 390x844 | 118 | 6 | 23 | 44 | 29 | 31 | 146 | FAIL |
-| settings-terms | 390x844 | 108 | 7 | 23 | 37 | 28 | 31 | 111 | FAIL |
-| answer | 390x844 | 54 | 2 | 14 | 31 | 46 | 21 | 132 | FAIL |
-| thinking-collapsed | 390x844 | 62 | 2 | 13 | 27 | 41 | 8 | 160 | FAIL |
-| scroll-up | 390x844 | 33 | 2 | 10 | 16 | 27 | 8 | 101 | FAIL |
+| settings-terms | 390x844 | 108 | 7 | 23 | 37 | 28 | 35 | 107 | FAIL |
+| answer | 390x844 | 54 | 4 | 22 | 20 | 49 | 17 | 181 | FAIL |
+| thinking-collapsed | 390x844 | 62 | 2 | 15 | 26 | 50 | 10 | 155 | FAIL |
+| scroll-up | 390x844 | 33 | 2 | 10 | 18 | 28 | 11 | 80 | FAIL |
 | mobile-drawer | 390x844 | 71 | 18 | 10 | 2 | 7 | 18 | 38 | FAIL |
-| mobile-item-sheet | 390x844 | 94 | 11 | 25 | 19 | 58 | 29 | 194 | FAIL |
+| mobile-item-sheet | 390x844 | 94 | 12 | 23 | 21 | 72 | 32 | 160 | FAIL |
 
 ## home-with-history 1440x900
 
@@ -66,12 +66,7 @@ No unexplained diffs.
 
 ## settings-terms 1440x900
 
-- main > contentinfo @560,378 516×64 › missing — vs footer
-- main > link ‘GitHub’ › missing — vs GitHub
-- main > link ‘许可证’ › missing — vs 许可证
-- main > link ‘OpenLinkOS’ › missing — vs OpenLinkOS
-- main > link ‘openlinkos/harbor-for-de’ › missing — vs openlinkos/harbor-for-de
-- main > link ‘platform.deepseek.com’ › missing — vs platform.deepseek.com
+No unexplained diffs.
 
 ## search-dialog 1440x900
 
@@ -87,48 +82,28 @@ No unexplained diffs.
 
 ## answer 1440x900
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 825 vs 816.61
-- control ‘智能搜索’ › y 825 vs 816.61
-- main > span ‘深度思考’ › y 830 vs 821.61
-- main > span ‘智能搜索’ › y 830 vs 821.61
-- main > code ‘captureStyleAudit’ › x 492.5 vs 496.5
-- main > code ‘captureStyleAudit’ › y 274 vs 278.98
-- main > code ‘captureStyleAudit’ › w 143.28 vs 150.81
-- main > code ‘captureStyleAudit’ › h 22 vs 18
-- main > code ‘captureStyleAudit’ › padding-right 5px vs 4px
-- main > code ‘captureStyleAudit’ › padding-left 5px vs 4px
-- main > code ‘ReferenceError’ › x 964.8 vs 975.64
+- main > span ‘10 秒后执行一次’ › y 650 vs 648.8
+- main > span ‘10 秒后执行一次’ › w 121.39 vs 118.47
+- main > span ‘10 秒后执行一次’ › h 20 vs 22
 
 ## thinking-collapsed 1440x900
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 825 vs 816.61
-- control ‘智能搜索’ › y 825 vs 816.61
-- main > span ‘深度思考’ › y 830 vs 821.61
-- main > span ‘智能搜索’ › y 830 vs 821.61
-- main > code ‘captureStyleAudit’ › x 599.92 vs 496.5
-- main > code ‘captureStyleAudit’ › y 390 vs 397.89
-- main > code ‘captureStyleAudit’ › w 143.28 vs 150.81
-- main > code ‘captureStyleAudit’ › h 22 vs 18
-- main > code ‘captureStyleAudit’ › padding-right 5px vs 4px
-- main > code ‘captureStyleAudit’ › padding-left 5px vs 4px
-- main > code ‘ReferenceError’ › x 964.8 vs 975.64
+The thinking body is collapsed. 94 unexplained remain, mostly unmatched code-card icons and a non-uniform vertical offset through the essay.
 
 ## scroll-up 1440x900
 
 - sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 825 vs 816.61
-- control ‘智能搜索’ › y 825 vs 816.61
-- main > span ‘深度思考’ › y 830 vs 821.61
-- main > span ‘智能搜索’ › y 830 vs 821.61
-- main > button @1391,12 34×34 › x 1391 vs 1392
+- main > div @475,475 752×40 › y 475 vs 479.8
+- main > div @475,475 752×40 › h 40 vs 28
+- main > div @475,475 752×40 › background-color rgb(255, 255, 255) vs rgba(0, 0, 0, 0)
+- main > div @475,475 752×40 › border-top-left-radius 12px vs 0px
+- main > div @475,475 752×40 › border-top-right-radius 12px vs 0px
+- main > button @1391,12 34×34 › x 1391 vs 1390
 - main > button @1391,12 34×34 › y 12 vs 10
-- main > button @1391,12 34×34 › w 34 vs 32
-- main > button @1391,12 34×34 › h 34 vs 32
-- main > button @1391,12 34×34 › border-top-left-radius 4096px vs 8px
-- main > button @1391,12 34×34 › border-top-right-radius 4096px vs 8px
-- main > button @1391,12 34×34 › border-bottom-right-radius 4096px vs 8px
+- main > icon 16×16 @1400,21 › x 1400 vs 1399
+- main > icon 16×16 @1400,21 › y 21 vs 19
+- main > div @475,707 752×40 › y 707 vs 699.8
+- main > div @475,707 752×40 › h 40 vs 28
 
 ## sidebar-date-groups 1440x900
 
@@ -156,12 +131,7 @@ No unexplained diffs.
 
 ## settings-terms 1920x1072
 
-- main > contentinfo @800,464 516×64 › missing — vs footer
-- main > link ‘GitHub’ › missing — vs GitHub
-- main > link ‘许可证’ › missing — vs 许可证
-- main > link ‘OpenLinkOS’ › missing — vs OpenLinkOS
-- main > link ‘openlinkos/harbor-for-de’ › missing — vs openlinkos/harbor-for-de
-- main > link ‘platform.deepseek.com’ › missing — vs platform.deepseek.com
+No unexplained diffs.
 
 ## search-dialog 1920x1072
 
@@ -177,48 +147,48 @@ No unexplained diffs.
 
 ## answer 1920x1072
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 997 vs 988.61
-- control ‘智能搜索’ › y 997 vs 988.61
-- main > span ‘深度思考’ › y 1002 vs 993.61
-- main > span ‘智能搜索’ › y 1002 vs 993.61
-- main > code ‘captureStyleAudit’ › x 839.92 vs 736.5
-- main > code ‘captureStyleAudit’ › y 148 vs 423.98
-- main > code ‘captureStyleAudit’ › w 143.28 vs 150.81
-- main > code ‘captureStyleAudit’ › h 22 vs 18
-- main > code ‘captureStyleAudit’ › padding-right 5px vs 4px
-- main > code ‘captureStyleAudit’ › padding-left 5px vs 4px
-- main > code ‘ReferenceError’ › x 1204.8 vs 1215.64
+- main > icon 12×12 @715,116 › y 116 vs 112.89
+- main > icon 12×12 @715,116 › w 12 vs 16
+- main > icon 12×12 @715,116 › h 12 vs 16
+- main > icon 14×16 @1407,72 › x 1407.48 vs 1406.5
+- main > icon 14×16 @1407,72 › y 72 vs 65
+- main > icon 14×16 @1407,72 › w 14 vs 20
+- main > icon 14×16 @1407,72 › h 16 vs 20
+- main > div @715,266 752×116 › y 266 vs 256.8
+- main > div @715,266 752×40 › y 266 vs 256.8
+- main > div @715,266 752×40 › y 266 vs 256.8
+- main > icon 12×12 @715,370 › y 370 vs 360.8
+- main > icon 12×12 @1455,370 › y 370 vs 360.8
 
 ## thinking-collapsed 1920x1072
 
 - sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 997 vs 988.61
-- control ‘智能搜索’ › y 997 vs 988.61
-- main > span ‘深度思考’ › y 1002 vs 993.61
-- main > span ‘智能搜索’ › y 1002 vs 993.61
-- main > code ‘captureStyleAudit’ › x 839.92 vs 736.5
-- main > code ‘captureStyleAudit’ › y 390 vs 397.89
-- main > code ‘captureStyleAudit’ › w 143.28 vs 150.81
-- main > code ‘captureStyleAudit’ › h 22 vs 18
-- main > code ‘captureStyleAudit’ › padding-right 5px vs 4px
-- main > code ‘captureStyleAudit’ › padding-left 5px vs 4px
-- main > code ‘ReferenceError’ › x 1204.8 vs 1215.64
+- main > button @1871,12 34×34 › x 1871 vs 1870
+- main > button @1871,12 34×34 › y 12 vs 10
+- main > icon 16×16 @1880,21 › x 1880 vs 1879
+- main > icon 16×16 @1880,21 › y 21 vs 19
+- main > div @715,276 752×40 › x 714.5 vs 728.5
+- main > div @715,276 752×40 › y 276 vs 253.8
+- main > div @715,276 752×40 › w 752 vs 724
+- main > div @715,276 752×40 › h 40 vs 44
+- main > div @715,276 752×40 › background-color rgb(255, 255, 255) vs rgba(0, 0, 0, 0)
+- main > div @715,276 752×40 › border-top-left-radius 12px vs 0px
+- main > div @715,276 752×40 › border-top-right-radius 12px vs 0px
 
 ## scroll-up 1920x1072
 
 - sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- control ‘深度思考’ › y 997 vs 988.61
-- control ‘智能搜索’ › y 997 vs 988.61
-- main > span ‘深度思考’ › y 1002 vs 993.61
-- main > span ‘智能搜索’ › y 1002 vs 993.61
-- main > button @1871,12 34×34 › x 1871 vs 1872
+- main > button @1871,12 34×34 › x 1871 vs 1870
 - main > button @1871,12 34×34 › y 12 vs 10
-- main > button @1871,12 34×34 › w 34 vs 32
-- main > button @1871,12 34×34 › h 34 vs 32
-- main > button @1871,12 34×34 › border-top-left-radius 4096px vs 8px
-- main > button @1871,12 34×34 › border-top-right-radius 4096px vs 8px
-- main > button @1871,12 34×34 › border-bottom-right-radius 4096px vs 8px
+- main > icon 16×16 @1880,21 › x 1880 vs 1879
+- main > icon 16×16 @1880,21 › y 21 vs 19
+- main > div @715,950 752×40 › y 950 vs 963.8
+- main > div @715,950 752×40 › h 40 vs 28
+- main > div @715,950 752×40 › background-color rgb(255, 255, 255) vs rgba(0, 0, 0, 0)
+- main > div @715,950 752×40 › border-top-left-radius 12px vs 0px
+- main > div @715,950 752×40 › border-top-right-radius 12px vs 0px
+- main > div @715,508 752×40 › y 508 vs 523.8
+- main > div @715,508 752×40 › h 40 vs 28
 
 ## sidebar-date-groups 1920x1072
 
@@ -305,48 +275,48 @@ No unexplained diffs.
 
 ## answer 390x844
 
-- control ‘智能搜索’ › x 131.02 vs 151
-- control ‘智能搜索’ › y 769 vs 734.31
-- sidebar > span ‘智能搜索’ › x 160.02 vs 180
-- sidebar > span ‘智能搜索’ › y 774 vs 739.31
-- row-more 1 › padding-top 0px vs 1px
-- row-more 1 › padding-right 0px vs 6px
-- row-more 1 › padding-bottom 0px vs 1px
-- row-more 1 › padding-left 0px vs 6px
-- row-more 2 › padding-top 0px vs 1px
-- row-more 2 › padding-right 0px vs 6px
-- row-more 2 › padding-bottom 0px vs 1px
-- row-more 2 › padding-left 0px vs 6px
+- control ‘智能搜索’ › x 131.02 vs 139
+- control ‘智能搜索’ › y 769 vs 732.8
+- sidebar > span ‘智能搜索’ › x 160.02 vs 168
+- sidebar > span ‘智能搜索’ › y 774 vs 737.8
+- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › x 16 vs 24
+- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › y 816 vs 807.8
+- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › w 358 vs 342
+- main > button @331,12 44×44 › x 331 vs 348
+- main > button @331,12 44×44 › w 44 vs 32
+- main > button @331,12 44×44 › h 44 vs 32
+- main > button @331,12 44×44 › border-top-left-radius 4096px vs 8px
+- main > button @331,12 44×44 › border-top-right-radius 4096px vs 8px
 
 ## thinking-collapsed 390x844
 
-- control ‘智能搜索’ › x 131.02 vs 151
-- control ‘智能搜索’ › y 769 vs 734.31
-- sidebar > span ‘智能搜索’ › x 160.02 vs 180
-- sidebar > span ‘智能搜索’ › y 774 vs 739.31
-- sidebar > div @16,710 358×106 › x 16 vs 36
-- sidebar > div @16,710 358×106 › y 710 vs 713.8
-- sidebar > div @16,710 358×106 › w 358 vs 318
-- sidebar > div @16,710 358×106 › h 106 vs 94
-- sidebar > div @16,710 358×106 › background-color rgb(255, 255, 255) vs rgb(249, 250, 251)
-- sidebar > div @16,710 358×106 › box-shadow rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px vs none
-- sidebar > div @16,710 358×106 › border-top-left-radius 24px vs 12px
-- sidebar > div @16,710 358×106 › border-top-right-radius 24px vs 12px
+- control ‘智能搜索’ › x 131.02 vs 139
+- control ‘智能搜索’ › y 769 vs 733
+- sidebar > span ‘智能搜索’ › x 160.02 vs 168
+- sidebar > span ‘智能搜索’ › y 774 vs 738
+- row-more 1 › w 34 vs 36
+- row-more 1 › h 34 vs 36
+- row-more 1 › background-color rgba(0, 0, 0, 0) vs rgb(255, 255, 255)
+- row-more 1 › box-shadow none vs rgba(0, 0, 0, 0.2) 0px 0px 1px 0px, rgba(0, 0, 0, 0.02) 0px 0px 4px 0px, rgba(0, 0, 0, 0.0
+- row-more 1 › border-top-left-radius 4096px vs 50%
+- row-more 1 › border-top-right-radius 4096px vs 50%
+- row-more 1 › border-bottom-right-radius 4096px vs 50%
+- row-more 1 › border-bottom-left-radius 4096px vs 50%
 
 ## scroll-up 390x844
 
-- control ‘智能搜索’ › x 131.02 vs 151
-- control ‘智能搜索’ › y 769 vs 734.31
-- sidebar > span ‘智能搜索’ › x 160.02 vs 180
-- sidebar > span ‘智能搜索’ › y 774 vs 739.31
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › x 16 vs 36
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › y 816 vs 809.31
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › w 358 vs 318
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › h 28 vs 18.69
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › background-color rgb(255, 255, 255) vs rgba(0, 0, 0, 0)
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › line-height 16px vs 18.7px
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › padding-top 6px vs 0px
-- sidebar > div ‘内容由 AI 生成，请仔细甄别’ › padding-bottom 6px vs 0px
+- control ‘智能搜索’ › x 131.02 vs 139
+- control ‘智能搜索’ › y 769 vs 733
+- sidebar > span ‘智能搜索’ › x 160.02 vs 168
+- sidebar > span ‘智能搜索’ › y 774 vs 738
+- row-more 1 › w 34 vs 36
+- row-more 1 › h 34 vs 36
+- row-more 1 › background-color rgba(0, 0, 0, 0) vs rgb(255, 255, 255)
+- row-more 1 › box-shadow none vs rgba(0, 0, 0, 0.2) 0px 0px 1px 0px, rgba(0, 0, 0, 0.02) 0px 0px 4px 0px, rgba(0, 0, 0, 0.0
+- row-more 1 › border-top-left-radius 4096px vs 50%
+- row-more 1 › border-top-right-radius 4096px vs 50%
+- row-more 1 › border-bottom-right-radius 4096px vs 50%
+- row-more 1 › border-bottom-left-radius 4096px vs 50%
 
 ## mobile-drawer 390x844
 
@@ -365,14 +335,14 @@ No unexplained diffs.
 
 ## mobile-item-sheet 390x844
 
-- sidebar > row 1 › h 40 vs 50
+- sidebar > row 1 › h 40 vs 46
 - sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
 - sidebar 1 › padding-top 6px vs 12px
 - sidebar 1 › padding-bottom 0px vs 12px
 - sidebar > span ‘开启新对话’ › y 70 vs 76
 - sidebar > span ‘开启新对话’ › box-shadow rgba(72, 104, 178, 0.04) 0px -2px 2px 0px, rgba(106, 111, 117, 0.09) 0px 2px 2px 0px, rgba vs rgba(0, 0, 0, 0.06) 0px 1px 2px 0px, rgba(15, 17, 21, 0.04) 0px 4px 12px 0px
-- sidebar > span ‘智能搜索’ › x 131.02 vs 151
-- sidebar > span ‘智能搜索’ › y 769 vs 734.31
+- sidebar > span ‘智能搜索’ › x 131.02 vs 139
+- sidebar > span ‘智能搜索’ › y 769 vs 732.8
 - row-more 1 › w 28 vs 12
 - row-more 1 › h 28 vs 12
 - row-more 1 › background-color rgba(0, 0, 0, 0) vs rgb(249, 250, 251)
