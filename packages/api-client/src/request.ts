@@ -24,44 +24,11 @@ export const clampExpireSeconds = (days: number): number => {
   return Math.min(FILE_EXPIRE_MAX_SECONDS, Math.max(FILE_EXPIRE_MIN_SECONDS, seconds))
 }
 
-export const HARBOR_SYSTEM_PROMPT =
-  'You are a helpful assistant inside DeepAPI. ' +
-  'Reply in the language the user writes in, and reason in that same language. ' +
-  'Do not claim to be an official product, a partner, or a support agent.'
+/** Official web chat does not send a client persona or a clock. */
+export const HARBOR_SYSTEM_PROMPT = ''
 
-const ZH_SYSTEM_PROMPT =
-  '你是 DeepAPI 里的助手。' +
-  '请使用用户书写的语言回答，思考过程也使用同一种语言。' +
-  '不要声称自己是官方产品、合作伙伴或客服。'
-
-const timeZoneOrDefault = (timeZone: string | undefined): string => {
-  if (!timeZone) {
-    return 'Asia/Shanghai'
-  }
-  try {
-    new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date())
-    return timeZone
-  } catch {
-    return 'Asia/Shanghai'
-  }
-}
-
-/** Date and time go in the system prompt so “today” is not a guess. Chinese UI gets a Chinese prompt. */
-export const harborSystemPrompt = (input: { locale?: string; timeZone?: string; now?: Date } = {}): string => {
-  const timeZone = timeZoneOrDefault(input.timeZone)
-  const now = input.now ?? new Date()
-  const stamp = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(now)
-  const base = input.locale === 'zh' ? ZH_SYSTEM_PROMPT : HARBOR_SYSTEM_PROMPT
-  return `${base} Current date and time: ${stamp} (${timeZone}). Use this when the user says today or now.`
-}
+/** Official web chat does not inject a client clock or persona. */
+export const harborSystemPrompt = (_input: { locale?: string; timeZone?: string; now?: Date } = {}): string => ''
 
 export type TurnOptions = {
   model: ChatModel
@@ -158,10 +125,11 @@ export const buildRequest = (options: TurnOptions): CreateMessageBody => {
       tools.push({ type: 'deepseek_read_url', name: 'deepseek_read_url' })
     }
   }
+  const system = harborSystemPrompt({ locale: options.locale, timeZone: options.timeZone, now: options.now })
   return {
     model: options.model,
     stream: true,
-    system: harborSystemPrompt({ locale: options.locale, timeZone: options.timeZone, now: options.now }),
+    ...(system ? { system } : {}),
     messages: toApiMessages(options.messages),
     thinking: { type: options.thinking ? 'enabled' : 'disabled' },
     ...(tools.length ? { tools } : {}),

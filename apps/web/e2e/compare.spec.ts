@@ -137,7 +137,7 @@ const shot = async (page: Page, name: string) => {
 const pinGreeting = async (page: Page) => {
   for (let attempt = 0; attempt < 24; attempt += 1) {
     const text = await page.locator('.greeting').innerText()
-    if (text.includes('欢迎回来，随时开始吧')) {
+    if (text.includes('你好，我能帮什么忙吗？')) {
       return
     }
     await page.getByRole('button', { name: '快排介绍' }).click()
@@ -145,7 +145,7 @@ const pinGreeting = async (page: Page) => {
     await page.getByTestId('new-chat').click()
     await expect(page.locator('.greeting')).toBeVisible()
   }
-  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+  await expect(page.locator('.greeting')).toContainText('你好，我能帮什么忙吗？')
 }
 
 test('capture official states at 1920x1072', async ({ page }) => {
@@ -153,7 +153,6 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await page.route('https://api.deepseek.com/**', fulfill)
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
@@ -191,16 +190,17 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '系统设置' })).toBeVisible()
   await expect(page.getByRole('button', { name: '深色' })).toHaveClass(/on/)
   await shot(page, 'settings-general.png')
-  await page.locator('.pill-menu').first().getByRole('button').click()
+  await page.getByTestId('language-trigger').click()
   await expect(page.getByRole('option', { name: 'English' })).toBeVisible()
   await shot(page, 'settings-general-language-dropdown.png')
-  await page.locator('.pill-menu').first().getByRole('button').first().click()
+  await page.getByTestId('language-trigger').click()
   await page.getByTestId('voice-select').click()
   await expect(page.getByRole('option', { name: '贝壳' })).toBeVisible()
   await shot(page, 'settings-general-voice-dropdown.png')
   await page.getByTestId('voice-select').click()
   await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('nickname')).toBeVisible()
+  await expect(page.getByText('微信')).toHaveCount(0)
   await shot(page, 'settings-account.png')
   await page.getByRole('button', { name: '数据管理' }).click()
   await expect(page.getByText('导出所有历史对话')).toBeVisible()

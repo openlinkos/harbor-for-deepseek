@@ -90,7 +90,6 @@ test('mobile states at 390x844', async ({ page }) => {
   await page.route('https://api.deepseek.com/**', fulfill)
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
@@ -141,7 +140,7 @@ test('mobile states at 390x844', async ({ page }) => {
   await shot(page, 'answer-code.png')
 
   await page.getByTestId('top-new').click()
-  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，有什么我能帮你的吗？/)
+  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
   await shot(page, 'home-with-history.png')
   await page.getByTestId('menu').click()
   await expect(page.locator('.sidebar')).toBeVisible()

@@ -59,7 +59,6 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
   }
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
@@ -183,7 +182,7 @@ for (const point of points) {
         await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
         await expect(page.locator('.sidebar')).toHaveCSS('width', '0px')
       }
-      await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，有什么我能帮你的吗？/)
+      await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
     } finally {
       await page.context().close().catch(() => undefined)
     }

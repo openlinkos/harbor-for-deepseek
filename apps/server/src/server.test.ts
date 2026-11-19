@@ -272,7 +272,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     const bad = await harbor.sql<{ status: string }[]>`select status from api_keys where label = 'bad'`
     expect(bad[0]?.status).toBe('error')
     expect(seen.some((line) => line.includes('/messages') && line.includes('good-pool-key'))).toBe(true)
-    expect(seen.some((line) => line.startsWith('system:') && line.includes('Asia/Shanghai') && line.includes('Current date and time'))).toBe(true)
+    expect(seen.some((line) => line.startsWith('system:') && line.slice('system:'.length).trim() !== '')).toBe(false)
     const ledger = await harbor.app.request('/api/admin/usage', { headers: authed(session, created.csrf) })
     const ledgerBody = (await ledger.json()) as { daily: Array<{ day: string; username: string; keyLabel: string }> }
     expect(ledgerBody.daily[0]?.day).toMatch(/^\d{4}-\d{2}-\d{2}$/)
