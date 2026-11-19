@@ -127,6 +127,8 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('balance-side')).toContainText('317.22')
+  await page.getByTestId('refresh-balance').click()
+  await expect(page.getByTestId('balance-side')).toContainText('317.22')
   await page.getByRole('button', { name: '数据管理' }).click()
   await expect(page.locator('.usage-grid')).toContainText('41')
   await expect(page.getByTestId('safety-select')).toHaveValue('high')
@@ -157,8 +159,13 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '通用设置' }).click()
-  await page.getByTestId('settings-more-general').evaluate((el: HTMLDetailsElement) => { el.open = true })
+  await expect(page.getByTestId('model-select')).toBeVisible()
   await page.getByTestId('model-select').selectOption('deepseek-v4-pro')
+  await page.getByTestId('effort-select').selectOption('low')
+  await expect(page.getByTestId('effort-select')).toHaveValue('low')
+  await page.getByTestId('safety-select').selectOption('low')
+  await expect(page.getByTestId('safety-select')).toHaveValue('low')
+  await page.getByTestId('skin-reset').click()
   await expect(page.getByTestId('toggle-search')).toHaveAttribute('aria-disabled', 'true')
   const searchClass = await page.getByTestId('toggle-search').getAttribute('class')
   await page.getByTestId('toggle-search').click({ force: true })
@@ -170,7 +177,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '数据管理' }).click()
-  await page.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
+  await expect(page.getByTestId('export-json')).toBeVisible()
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByTestId('export-json').click(),
@@ -185,7 +192,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
 
   await page.getByTestId('import-json').setInputFiles(exported)
   await expect(page.getByTestId('import-toast')).toContainText('跳过')
-  await page.getByTestId('import-as-copy').check()
+  await page.getByTestId('import-as-copy').click()
   await page.getByTestId('import-json').setInputFiles(exported)
   await expect(page.getByTestId('import-toast')).toContainText('已导入')
   await page.screenshot({ path: join(shots, '06-imported.png') })

@@ -1391,7 +1391,6 @@ const Settings = () => {
   const prefs = useHarbor((state) => state.prefs)
   const setPrefs = useHarbor((state) => state.setPrefs)
   const balance = useHarbor((state) => state.balance)
-  const balanceError = useHarbor((state) => state.balanceError)
   const patchSettings = useHarbor((state) => state.patchSettings)
   const setLocale = useHarbor((state) => state.setLocale)
   const refreshBalance = useHarbor((state) => state.refreshBalance)
@@ -1434,7 +1433,6 @@ const Settings = () => {
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
   const saveKey = useHarbor((state) => state.saveKey)
-  const info = balance?.balance_infos[0]
   const cost = estimateCost(totals, new Date())
   return (
     <div className="modal settings-modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
@@ -1480,12 +1478,9 @@ const Settings = () => {
             <span>{t('voice')}</span>
             <VoiceSelect />
           </div>
-        </section>
-        <details className="settings-more settings-general" data-testid="settings-more-general">
-          <summary>{t('more')}</summary>
-          <section className="settings-general">
-            <div className="settings-line">
-              <span>{t('skin')}</span>
+          <div className="settings-line">
+            <span>{t('skin')}</span>
+            <span className="account-side">
               <label className="file-button">
                 {t('skinImport')}
                 <input
@@ -1500,76 +1495,103 @@ const Settings = () => {
                   }}
                 />
               </label>
-              <button type="button" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</button>
-            </div>
-            <h3>{t('model')}</h3>
-            <label>
-              {t('model')}
-              <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
-                <option value="deepseek-flash">DeepSeek {t('flash')}</option>
-                <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
-              </select>
-            </label>
-            <label>
-              {t('effort')}
-              <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
-                <option value="low">low</option>
-                <option value="high">high</option>
-                <option value="max">max</option>
-              </select>
-            </label>
-            <button type="button" data-testid="toggle-read" className={prefs.readLink ? 'chip on' : 'chip'} disabled={prefs.model !== 'deepseek-flash'} onClick={() => void setPrefs({ readLink: !prefs.readLink })}>
-              {t('readLink')}
+              <button type="button" className="account-quiet" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</button>
+            </span>
+          </div>
+          <div className="settings-line">
+            <span>{t('model')}</span>
+            <select data-testid="model-select" value={prefs.model} onChange={(event) => void setPrefs({ model: event.target.value as HarborState['prefs']['model'] })}>
+              <option value="deepseek-flash">DeepSeek {t('flash')}</option>
+              <option value="deepseek-v4-pro">DeepSeek {t('pro')}</option>
+            </select>
+          </div>
+          <div className="settings-line">
+            <span>{t('effort')}</span>
+            <select data-testid="effort-select" value={prefs.effort} onChange={(event) => void setPrefs({ effort: event.target.value as HarborState['prefs']['effort'] })}>
+              <option value="low">low</option>
+              <option value="high">high</option>
+              <option value="max">max</option>
+            </select>
+          </div>
+          <div className="settings-line">
+            <span>{t('safety')}</span>
+            <select
+              data-testid="safety-select"
+              value={settings.safetyLevel}
+              onChange={(event) => void patchSettings({ safetyLevel: event.target.value === 'low' ? 'low' : 'high' })}
+            >
+              <option value="high">{t('safetyHigh')}</option>
+              <option value="low">{t('safetyLow')}</option>
+            </select>
+          </div>
+          <div className="settings-line">
+            <span>{t('readLink')}</span>
+            <button
+              type="button"
+              data-testid="toggle-read"
+              className={prefs.readLink ? 'switch on' : 'switch'}
+              aria-pressed={prefs.readLink}
+              disabled={prefs.model !== 'deepseek-flash'}
+              onClick={() => void setPrefs({ readLink: !prefs.readLink })}
+            >
+              <span className="knob" />
             </button>
-            {prefs.model !== 'deepseek-flash' ? <p className="hint">{t('toolsFlashOnly')}</p> : null}
-          </section>
-          <section className="settings-general">
-            <h3>{t('safety')}</h3>
-            <label>
-              <select
-                data-testid="safety-select"
-                value={settings.safetyLevel}
-                onChange={(event) => void patchSettings({ safetyLevel: event.target.value === 'low' ? 'low' : 'high' })}
-              >
-                <option value="high">{t('safetyHigh')}</option>
-                <option value="low">{t('safetyLow')}</option>
-              </select>
-            </label>
-            <p className="hint">{t('safetyWarn')}</p>
-            <label>
-              {t('fileExpiry')}
-              <input
-                type="number"
-                min={1}
-                max={30}
-                value={settings.fileExpireDays}
-                onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
-              />
-            </label>
-            <label>
-              {t('filePurpose')}
-              <select
-                value={settings.documentPurpose}
-                onChange={(event) =>
-                  void patchSettings({
-                    documentPurpose: event.target.value === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition',
-                  })
-                }
-              >
-                <option value="rich_layout_recognition">{t('richLayout')}</option>
-                <option value="text_recognition">{t('textRecognition')}</option>
-              </select>
-            </label>
-          </section>
-        </details>
+          </div>
+          <div className="settings-line">
+            <span>{t('fileExpiry')}</span>
+            <input
+              type="number"
+              min={1}
+              max={30}
+              value={settings.fileExpireDays}
+              onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
+            />
+          </div>
+          <div className="settings-line">
+            <span>{t('filePurpose')}</span>
+            <select
+              value={settings.documentPurpose}
+              onChange={(event) =>
+                void patchSettings({
+                  documentPurpose: event.target.value === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition',
+                })
+              }
+            >
+              <option value="rich_layout_recognition">{t('richLayout')}</option>
+              <option value="text_recognition">{t('textRecognition')}</option>
+            </select>
+          </div>
+        </section>
         <section className="settings-account">
           <div className="settings-line">
             <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
           <div className="settings-line">
             <span>{t('balance')}</span>
-            <span data-testid="balance-side">{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
+            <span className="account-side">
+              <span data-testid="balance-side">{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
+              {serverMode ? null : (
+                <button type="button" className="account-quiet" data-testid="refresh-balance" onClick={() => void refreshBalance()}>{t('refresh')}</button>
+              )}
+            </span>
           </div>
+          {serverMode ? (
+            <div className="settings-line">
+              <span>{t('quotaHeading')}</span>
+              <span data-testid="quota">
+                {quota
+                  ? t('quotaLine', {
+                      tokenUsed: quota.tokenUsed,
+                      tokenQuota: quota.tokenQuota,
+                      searchUsed: quota.searchUsed,
+                      searchQuota: quota.searchQuota,
+                      pageUsed: quota.pageUsed,
+                      pageQuota: quota.pageQuota,
+                    })
+                  : t('balanceFailed')}
+              </span>
+            </div>
+          ) : null}
           <div className="settings-line">
             <span>{t('nickname')}</span>
             <span className="account-chip wide">
@@ -1608,42 +1630,6 @@ const Settings = () => {
             ) : null}
           </div>
         </section>
-        <details className="settings-more settings-data" data-testid="settings-more-data">
-          <summary>{t('more')}</summary>
-        <section className="settings-data">
-          <h3>{serverMode ? t('quotaHeading') : t('balance')}</h3>
-          {serverMode ? (
-            <p data-testid="quota">
-              {quota
-                ? t('quotaLine', {
-                    tokenUsed: quota.tokenUsed,
-                    tokenQuota: quota.tokenQuota,
-                    searchUsed: quota.searchUsed,
-                    searchQuota: quota.searchQuota,
-                    pageUsed: quota.pageUsed,
-                    pageQuota: quota.pageQuota,
-                  })
-                : t('balanceFailed')}
-            </p>
-          ) : (
-            <p data-testid="balance">
-              {info ? (
-                <>
-                  {info.total_balance} {info.currency} · {balance?.is_available ? t('available') : t('unavailable')} · {t('granted')}{' '}
-                  {info.granted_balance} · {t('toppedUp')} {info.topped_up_balance}
-                </>
-              ) : (
-                t('balanceFailed')
-              )}
-            </p>
-          )}
-          {balanceError && !serverMode ? <p className="form-error">{t('balanceFailed')}</p> : null}
-          {serverMode ? null : (
-            <button type="button" data-testid="refresh-balance" onClick={() => void refreshBalance()}>
-              {t('refresh')}
-            </button>
-          )}
-        </section>
         <section className="settings-data">
           <h3>{t('usageTitle')}</h3>
           <p className="hint">{serverMode ? t('serverUsageNote') : t('noUsageApi')}</p>
@@ -1665,19 +1651,22 @@ const Settings = () => {
           <h3>{serverMode ? t('serverPrivacyTitle') : t('privacyTitle')}</h3>
           <p className="hint">{serverMode ? t('serverPrivacyBody') : t('currentKey')}</p>
           <p className="hint">{serverMode ? t('serverImportNote') : t('importMergeNote')}</p>
-          <div className="button-row">
-            <button type="button" data-testid="export-json" onClick={() => void exportJson()}>
-              {t('exportJson')}
-            </button>
-            <button type="button" data-testid="export-zip" onClick={() => void exportZip()}>
-              {t('exportZip')}
+          <div className="settings-line">
+            <span>{t('exportJson')}</span>
+            <button type="button" className="account-quiet" data-testid="export-json" onClick={() => void exportJson()}>{t('export')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('exportZip')}</span>
+            <button type="button" className="account-quiet" data-testid="export-zip" onClick={() => void exportZip()}>{t('export')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('importAsCopy')}</span>
+            <button type="button" data-testid="import-as-copy" className={asCopy ? 'switch on' : 'switch'} aria-pressed={asCopy} onClick={() => setAsCopy((value) => !value)}>
+              <span className="knob" />
             </button>
           </div>
-          <label className="check">
-            <input data-testid="import-as-copy" type="checkbox" checked={asCopy} onChange={(event) => setAsCopy(event.target.checked)} />
-            <span>{t('importAsCopy')}</span>
-          </label>
-          <div className="button-row">
+          <div className="settings-line">
+            <span>{t('importJson')}</span>
             <label className="file-button">
               {t('importJson')}
               <input
@@ -1687,12 +1676,13 @@ const Settings = () => {
                 onChange={(event) => {
                   const file = event.target.files?.[0]
                   event.target.value = ''
-                  if (file) {
-                    void importJson(file, asCopy)
-                  }
+                  if (file) void importJson(file, asCopy)
                 }}
               />
             </label>
+          </div>
+          <div className="settings-line">
+            <span>{t('importZip')}</span>
             <label className="file-button">
               {t('importZip')}
               <input
@@ -1702,9 +1692,7 @@ const Settings = () => {
                 onChange={(event) => {
                   const file = event.target.files?.[0]
                   event.target.value = ''
-                  if (file) {
-                    void importZip(file, asCopy)
-                  }
+                  if (file) void importZip(file, asCopy)
                 }}
               />
             </label>
@@ -1808,7 +1796,6 @@ const Settings = () => {
             </button>
           ) : null}
         </section>
-        </details>
         <section className="settings-legal">
           <article className="legal-copy">
             <h3>{t('terms')}</h3>
