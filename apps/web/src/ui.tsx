@@ -51,6 +51,13 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
   </svg>
 )
 
+const shortcutHint = () => {
+  if (typeof navigator === 'undefined') return 'Ctrl J'
+  const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
+  const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
+  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
+}
+
 const Wordmark = () => (
   <span className="wordmark">
     <span className="wordmark-name">Harbor</span>
@@ -921,7 +928,7 @@ export const Shell = () => {
         </div>
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
           <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}</span>
-          <kbd className="kbd">Ctrl J</kbd>
+          <kbd className="kbd">{shortcutHint()}</kbd>
         </button>
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
@@ -1164,7 +1171,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   )
 }
 
-const RETURNING_GREETINGS = ['welcomeBack', 'welcomeAlt'] as const
+const RETURNING_GREETINGS = ['welcomeBack', 'welcomeAlt', 'welcomeHello'] as const
 
 const Empty = () => {
   const t = useT()

@@ -110,9 +110,13 @@ Selection in the home component:
 - Otherwise pick `messages[Math.floor(random * length)].text`. `Math.random()` is memoized once per mount.
 - If a file is attached, the model is not the default, or the random line is missing, the UI shows `welcomeMessageChat250808` (or the single-model `welcomeMsg` when only one switchable model exists).
 
-`欢迎回来，随时开始吧` and `欢迎回来，想从哪里开始？` are not in `main.js` or the CSS. They were seen on logged-in screenshots (desktop and phone), so they belong to the remote `welcome_msg` payload. This client does not call that API.
+`欢迎回来，随时开始吧`, `欢迎回来，想从哪里开始？`, and `你好，有什么我能帮你的吗？` are not in `main.js` or the CSS. They were seen on logged-in screenshots (desktop and phone), so they belong to the remote `welcome_msg` payload. This client does not call that API.
 
-Harbor substitutes the observed lines locally. With no conversations, the headline is the static fallback `今天有什么可以帮到你？` (English: `How can I help you?`). Once any conversation exists, each home mount picks one of the two returning lines at random: `欢迎回来，随时开始吧` or `欢迎回来，想从哪里开始？`. The English pair is `Welcome back. Where should we start?` and `Welcome back. What should we pick up?`. The pick is memoized for that mount.
+Harbor substitutes the observed lines locally. With no conversations, the headline is the static fallback `今天有什么可以帮到你？` (English: `How can I help you?`). Once any conversation exists, each home mount picks one of the three returning lines at random: `欢迎回来，随时开始吧`, `欢迎回来，想从哪里开始？`, or `你好，有什么我能帮你的吗？`. The English set is `Welcome back. Where should we start?`, `Welcome back. What should we pick up?`, and `Hello. How can I help?`. The pick is memoized for that mount.
+
+The selected toggle uses `--dsl-toggle-button-color-selected` (`--dsw-alias-button-ghost-active-fill`, light `#edf3fe`), `--dsl-toggle-button-text-color-selected` (`--dsw-alias-brand-text`, `#3964fe`), and `--dsl-toggle-button-border-color-selected` (`--dsw-alias-button-ghost-active-border`, light `#b7c8fe`). The unselected control is a 1px `--dsw-alias-border-l2` border, white fill on the composer, and primary label color. Both toggles stay on by default in this client.
+
+The new-chat control centers its icon and label. The shortcut is `⌘ J` when the platform string matches Mac, iPhone, or iPad, and `Ctrl J` otherwise.
 
 ## Motion tokens used while matching
 

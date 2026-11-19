@@ -6,7 +6,7 @@ Side-by-side frames for the logged-in stills are in `docs/parity/compare/`. Ours
 
 | State | Official | Harbor |
 | --- | --- | --- |
-| Home, dark, both tools on | Centered mark and greeting, grey composer, outlined chips, round send | Same layout. Empty history says 「今天有什么可以帮到你？」. A new chat with history picks 「欢迎回来，随时开始吧」 or 「欢迎回来，想从哪里开始？」 |
+| Home, dark, both tools on | Centered mark and greeting, grey composer, outlined chips, round send | Same layout. Empty history says 「今天有什么可以帮到你？」. A new chat with history picks 「欢迎回来，随时开始吧」, 「欢迎回来，想从哪里开始？」, or 「你好，有什么我能帮你的吗？」 |
 | Home, light | White page, pale composer, blue selected chips | Same tokens: bubble `#edf3fe`, page white, sidebar `#f9fafb` |
 | Composer focus | No inner blue rectangle | Textarea outline removed |
 | Settings general | Centered ~860px, radius 24px, left nav, three theme tiles, language and voice pills | Same shell. Language is 简体中文 / English. Voice is 默认 plus the Web Speech voices |

@@ -110,7 +110,8 @@ a { color: var(--dsw-alias-brand-text); }
 .new-chat {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
   padding: 0 14px;
   gap: 8px;
   width: 100%;
@@ -130,7 +131,17 @@ body[data-ds-dark-theme] .new-chat {
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 .new-chat-label { display: inline-flex; align-items: center; gap: 8px; }
-.kbd { border: 0; background: transparent; color: var(--dsw-alias-label-tertiary); font: inherit; font-size: 12px; }
+.kbd {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  font: inherit;
+  font-size: 12px;
+}
 .select-bar { display: flex; align-items: center; gap: 8px; margin: 8px; font-size: 13px; }
 .select-bar .danger { color: var(--dsw-alias-state-error-primary); background: transparent; border: 0; }
 .edit-card { width: min(100%, 640px); margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 16px; padding: 10px 12px; background: var(--dsw-specific-bubble); }
@@ -629,30 +640,30 @@ body[data-ds-dark-theme] .composer {
 .chip:hover:not(:disabled):not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
 .composer .chip:not(.on) {
   background: #fff;
-  border-color: #e5e7eb;
-  color: #8b9096;
+  border: 1px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-primary);
 }
 body[data-ds-dark-theme] .composer .chip:not(.on) {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.16);
-  color: #9aa0a6;
+  border: 1px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-primary);
 }
 .composer .chip.on,
 .chip.on {
-  background: #d4e4ff;
-  color: #3964fe;
-  border: 1.5px solid #3964fe;
+  background: var(--dsw-alias-button-ghost-active-fill);
+  color: var(--dsw-alias-brand-text);
+  border: 1px solid var(--dsw-alias-button-ghost-active-border);
   box-shadow: none;
 }
 body[data-ds-dark-theme] .composer .chip.on,
 body[data-ds-dark-theme] .chip.on {
-  background: rgb(40, 49, 66);
-  color: #8eb7fe;
-  border: 1px solid #5c8af5;
+  background: var(--dsw-alias-button-ghost-active-fill);
+  color: var(--dsw-alias-brand-text);
+  border: 1px solid var(--dsw-alias-button-ghost-active-border);
   box-shadow: none;
 }
-.chip.on:hover:not(:disabled) { background: #d3e2ff; }
-body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: #34415b; }
+.chip.on:hover:not(:disabled) { background: var(--dsw-alias-button-ghost-active-hover); }
+body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-alias-button-ghost-active-hover); }
 .chip-icon { display: block; flex: none; }
 .composer.icon-only .chip {
   width: 34px;
@@ -1399,8 +1410,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
   .bubble { max-width: calc(100% - 68px); }
   body:not([data-ds-dark-theme]) .composer .chip:not(.on) {
     background: #fff;
-    border-color: #e5e7eb;
-    color: #8b9096;
+    border: 1px solid var(--dsw-alias-border-l2);
+    color: var(--dsw-alias-label-primary);
   }
 }
 @media (hover: none) {

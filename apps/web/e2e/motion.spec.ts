@@ -182,7 +182,7 @@ for (const point of points) {
         await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
         await expect(page.locator('.sidebar')).toHaveCSS('width', '0px')
       }
-      await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)/)
+      await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，有什么我能帮你的吗？/)
     } finally {
       await page.context().close().catch(() => undefined)
     }
