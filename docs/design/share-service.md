@@ -1,102 +1,92 @@
 # 分享服务（hfd.linkos.io）
 
-本文只定设计。服务还不存在，本仓库的页面和 `apps/server` 都不改。
+本文只定设计。服务还不存在，本仓库的页面和 `apps/server` 都不改。部署清单将来放在 `best/flux-k8s`，不放进 `deploy/web/k8s` 的静态站。
 
-Harbor 的公开站 [hfd.linkos.org](https://hfd.linkos.org) 只发静态文件。Key 和对话留在浏览器里，浏览器直接请求 `https://api.deepseek.com`（见 [README.zh-CN.md](../../README.zh-CN.md)、[docs/decisions.md](../decisions.md)、[SECURITY.md](../../SECURITY.md)）。分享服务用另一个域名，避免这个静态站开始接收对话正文。
+Harbor 的公开站 [hfd.linkos.org](https://hfd.linkos.org) 只发静态文件。Key 和对话留在浏览器里，浏览器直接请求 `https://api.deepseek.com`（见 [README.zh-CN.md](../../README.zh-CN.md)、[docs/decisions.md](../decisions.md)、[SECURITY.md](../../SECURITY.md)）。分享用另一个域名，避免这个静态站开始接收对话正文。
 
 相关文档：[可替换的界面](ui-customization.md)、[里程碑](roadmap.md)。
 
+## 已决定
+
+1. 私密分享没有账号。创建时发一次性删除令牌。
+2. 第一期只有私密链接。公开列表以后再做。
+3. 对话和界面包默认不加密。隐私靠猜不到的链接：128 位随机 id、页面 `noindex`、可选过期、可选口令。取舍见下一节。
+4. 服务跑在现有的 prod-us 集群上，由 Flux（`best/flux-k8s`）发布，入口是 GoEdge，域名 `hfd.linkos.io`。Cloudflare 上的记录与 `hfd.linkos.org` 相同：开启代理，HTTPS 在 Cloudflare 终结。不用 Workers、R2、D1、KV。
+5. 聊天页只有在用户确认分享之后才连接 `hfd.linkos.io`。
+
 ## 这是哪一类问题
 
-本地优先的应用要多一个「我明确点了才上传」的发布动作。上传之后有两种用法，解法不一样：
+本地优先的应用要多一个「我明确点了才上传」的发布动作。第一期只做私密链接：id 是 128 位随机数，没有链接就找不到这份内容。链接会过期（若用户设了过期），也可以再加一道口令。
 
-1. **私密链接。** 知道链接的人才能打开。链接里带一段服务器读不到的密钥，正文在服务器上是密文。这和「文件加密后把密钥放在网址片段里」是同一类做法：片段（`#` 后面）不会发给服务器。
-2. **公开陈列。** 谁都能在一个列表里看到。服务器必须能读内容，否则无法下架。公开和加密不能同时成立。
+公开列表是以后的事。到那时内容要能被审核，那一批会单独做，不进第一期的接口。
 
-Harbor 加上的约束是：不上传是默认；上传的那一次不带 Key；静态站的对话请求仍然不经过这个服务。
+Harbor 的约束不变：不上传是默认；上传的那一次不带 Key；静态站的对话请求仍然不经过这个服务。
 
 自托管服务器（`apps/server`）用 Postgres、邀请码和管理员放入的 Key 池，给一小群人同步自己的对话。分享服务面向任意访客的上传，使用单独的库和单独的进程。
 
+## 取舍
+
+默认分享的正文以明文存在 prod-us 的磁盘上。
+
+- 拿到 `https://hfd.linkos.io/s/<id>` 的人可以阅读全文，也可以再复制走。
+- 能登录这台机器、能读这份备份的人，也可以阅读全文。运营者看得到用户主动分享出去的内容。
+- id 有 128 位，不递增，不使用短地址。猜中一条现有链接在计算上不成立。页面和接口都带 `X-Robots-Tag: noindex, nofollow`，`robots.txt` 禁止抓取，没有站点地图。这挡的是搜索引擎，不是拿到链接的人。
+- 可选过期：到期后接口返回 404，定时清理会删掉正文。用户可以不设过期，链接就一直留到被删除。默认给 30 天，避免一份分享在无人过问时永远留在磁盘上。
+- 可选口令：接收方除了链接还要再输入口令，服务器用慢哈希核对。没有口令的人即使有链接也拿不到正文。口令本身不入库，入库的是哈希。正文仍然是明文，所以口令挡不住持有磁盘的人。
+- 端到端加密能让磁盘上只剩密文。这一期不这么做。上面几条就是这一期的隐私边界。
+
+客户端仍拒绝把 Key 形状的字符串传上去。对话正文是单条对话的可见分支：角色、正文、用户勾选时的思考过程、搜索来源的标题和链接。不含文件字节（与 v3 归档不重新上传图片字节一致）、不含计费明细、不含 `deviceId`。思考过程默认不包含，由勾选打开。
+
+界面包的正文是校验后的 `harbor-ui.json`（或 zip）。接收方下载后仍走本地校验，先预览再应用。
+
 ## 本地优先怎么保住
 
-默认网络行为和今天一样：页面只连接自身和 `https://api.deepseek.com`。
+已决定：聊天页的内容安全策略写上 `connect-src` 中的 `https://hfd.linkos.io`，但程序只有在用户确认分享之后才向该域名发请求。未确认时，网络记录里不出现这个域名。
 
-分享是一次单独的确认：
+步骤：
 
 1. 用户在某一条对话或某一份界面包上点分享。
-2. 页面说明将要上传什么、对方能看到什么、链接是否加密。
+2. 页面说明将要上传的范围、链接到期时间、是否设置口令，并写明：正文会明文存在分享服务上，拿到链接的人可以阅读。
 3. 用户确认后，浏览器才向 `https://hfd.linkos.io` 发送这一份正文。
-4. 取消、过期、删除都不再继续上传。没有后台同步。
+4. 取消之后不再上传。没有后台同步。
 
 请求从内存里的那一条对话或那一份界面包组出来。不读 `harbor-secrets`。导出现有 JSON 归档时已经会去掉 Key（`SECURITY.md`）；分享走同一条过滤。
 
-服务端模式不会把对话自动镜像到这个服务。Android / iOS 同样要用户点一次。
+服务端模式不会把对话自动镜像到这个服务。第一期只做网页，不为 Android / iOS 壳加分享入口。
 
 `apps/web/public/sw.js` 对其它来源的请求直接放过，所以它不会缓存分享服务上的正文。
 
-内容安全策略要不要放行这个域名，是要先定的事，见文末。推荐的做法是：公开站的 `connect-src` 加上 `https://hfd.linkos.io`，并且只有用户确认分享之后才发出请求。安装包里的副本已经允许任意 `https:`，只要分享服务的 CORS 允许它的来源即可。
-
-## 可见性
-
-| | 私密 | 公开 |
-| --- | --- | --- |
-| 谁打得开 | 持有链接的人 | 列表里的所有人，以及持有链接的人 |
-| 服务器能否阅读 | 加密时不能 | 能。否则不能审核 |
-| 是否出现在列表 | 否 | 审核通过之后才出现 |
-| 适合放什么 | 对话、界面包 | 第一期建议先只放界面包。对话公开的风险更高 |
-| 默认 | 是，这是分享按钮的默认 | 另一次确认，并写成「任何人都能看见」 |
-
-私密对话默认加密。私密界面包默认也加密。公开条目必须是明文。
-
 ## 账号
 
-所有者还没定要不要账号。三档由弱到强：
-
-| 档 | 做法 | 适合 |
-| --- | --- | --- |
-| 无账号 | 创建时返回一次性删除令牌。页面把令牌放进 `harbor` 库。谁有令牌谁能删。换浏览器又没导出令牌，就只能等过期，或写信请所有者下架 | 和今天「公开站没有账号」一致。私密链接够用 |
-| 可选账号 | 私密链接仍不需要账号。账号只用来列出「我发出的」并在换设备后删除。登录用访问密钥或一次性邮件链接，不放密码库 | 公开陈列需要一个能联系上的作者时 |
-| 必须账号 | 每次上传都要登录 | 和本地优先、无账号的公开站相反。不建议 |
-
-建议：私密链接用无账号。公开陈列若要做，再用可选账号，或第一期干脆不做公开。审核不依赖访客账号：所有者用 Worker 密钥调用管理接口。
-
-删除令牌是 128 位随机数。库里只存它的 SHA-256。创建响应里出现一次。页面写进 `harbor` 的 `shares` 记录（库版本再往上升一档），不写进 `harbor-secrets`。
-
-## 加密
-
-算法用浏览器自带的 AES-256-GCM，和本机 Key 封装同一套 Web Crypto。不自造算法。
-
-- 密钥 32 字节，放在网址片段：`https://hfd.linkos.io/s/<id>#k=<base64url>`。
-- 初始向量 12 字节，跟密文一起存，它不是秘密。
-- 附加认证数据带上分享 id，避免把一份密文换到另一个 id 上仍能解开。
-- 页面在发起请求前丢掉片段。服务端代码不读 `Referer`。响应带 `Referrer-Policy: no-referrer`。密钥不进查询字符串，因为查询字符串会进日志。
-- 口令是可选项，叠在加密上面。口令用现有的 PBKDF2-SHA-256（60 万次，`packages/storage/src/secret.ts` 的 `PBKDF2_ITERATIONS`）派生密钥。盐和迭代次数跟密文一起存。服务器不存口令，也不存能离线试口令的校验值。口令错了，GCM 会失败，页面说「打不开」。带口令的链接里不再放 `#k=`。
-
-服务器保存的是密文、长度、类型、创建时间、过期时间、是否带口令。日志不记正文、片段、删除令牌和 `Authorization` 头。
-
-客户端在加密前再扫一遍明文：拒绝把 Key 形状的字符串传上去。对话分享的明文是单条对话的可见分支：角色、正文、用户勾选时的思考过程、搜索来源的标题和链接。不含文件字节（与 v3 归档「不重新上传图片字节」一致）、不含 `usage` 里的计费明细、不含 `deviceId`。思考过程默认不包含，由勾选打开。
-
-界面包的明文就是校验后的 `harbor-ui.json`（或 zip）。接收方下载后仍走本地校验，先预览再应用。
+已决定：第一期没有账号。创建响应里给一次删除令牌。令牌是 128 位随机数，库里只存它的 SHA-256（与 `apps/server` 保存会话令牌的方式相同）。页面把令牌写进 `harbor` 库的 `shares` 记录，不写进 `harbor-secrets`。换掉浏览器又没留下令牌时，只能等过期，或由所有者用管理密钥删除。
 
 ## 接口
 
-基址 `https://hfd.linkos.io`。没有 Cookie。CORS 允许的来源只有：
+基址 `https://hfd.linkos.io`。没有 Cookie。第一期 CORS 只允许：
 
 - `https://hfd.linkos.org`
-- `capacitor://localhost`
-- `https://localhost`
-- `http://localhost`（仅开发）
+- `http://localhost` 与 `https://localhost`（开发）
 
-不反射任意 `Origin`。自托管的 Harbor 若域名不在这张表里，用户导出文件后，打开分享网站自己上传。不为每个自托管域名改公开站。
+不反射任意 `Origin`。自托管的 Harbor 若域名不在这张表里，用户导出文件后，在分享网站自己上传。那个页面和接口同源，不需要把每个自托管域名写进 CORS。
+
+每个响应都带：
+
+- `X-Robots-Tag: noindex, nofollow`
+- `Referrer-Policy: no-referrer`
+- `X-Content-Type-Options: nosniff`
+- `Cache-Control: no-store`
+
+`GET /robots.txt` 的正文是 `Disallow: /`。给人打开的页面 `/s/<id>` 另有 `<meta name="robots" content="noindex, nofollow">`。
 
 | 方法 | 路径 | 作用 |
 | --- | --- | --- |
-| `POST` | `/v1/shares` | 创建。正文见下。返回 `id`、`deleteToken`、拼好的路径（不含片段；片段由页面自己接上） |
-| `GET` | `/v1/shares/:id` | 取元数据和密文或明文。过期、删除、未通过审核的公开项都是 404 |
-| `DELETE` | `/v1/shares/:id` | 头 `Authorization: Bearer <删除令牌>`。令牌不对是 404，避免用状态码探测 |
-| `POST` | `/v1/shares/:id/report` | 举报。正文是 `{ "reason": "..." }`，理由限长 |
-| `GET` | `/v1/gallery` | 只列已通过审核的公开项。查询参数 `cursor` |
-| `POST` | `/v1/admin/shares/:id` | 所有者下架或通过。头是部署时配置的管理密钥 |
+| `POST` | `/v1/shares` | 创建。返回 `id`、`deleteToken`、路径 `/s/<id>` |
+| `GET` | `/v1/shares/:id` | 元数据。没有口令时连正文一起返回。过期和已删除都是 404 |
+| `POST` | `/v1/shares/:id/open` | 正文是 `{ "password": "..." }`。口令对才返回正文。口令不进查询字符串 |
+| `DELETE` | `/v1/shares/:id` | 头 `Authorization: Bearer <删除令牌>`。令牌不对是 404 |
+| `POST` | `/v1/admin/shares/:id/delete` | 所有者下架。头是部署时配置的管理密钥 |
+
+第一期没有列表接口。`visibility` 不是 `unlisted` 时返回 400。
 
 创建正文：
 
@@ -104,143 +94,153 @@ Harbor 加上的约束是：不上传是默认；上传的那一次不带 Key；
 {
   "kind": "conversation",
   "visibility": "unlisted",
-  "encryption": "aes-256-gcm",
-  "password": false,
   "expiresAt": "2026-12-19T00:00:00.000Z",
-  "title": "可选，公开时必填",
-  "sha256": "密文或明文的哈希",
+  "password": "",
+  "title": "",
+  "sha256": "正文的哈希",
   "bytes": 12034,
   "payload": "base64"
 }
 ```
 
-`kind` 是 `conversation` 或 `ui`。`visibility` 是 `unlisted` 或 `public`。`encryption` 是 `aes-256-gcm` 或 `none`。`public` 配 `aes-256-gcm` 直接 400。
+`kind` 是 `conversation` 或 `ui`。`expiresAt` 可以省略，省略表示不过期。`password` 为空表示不设口令。口令只在这一次请求里出现，服务端算出 scrypt 哈希后丢掉原文。哈希算法与 `apps/server/src/crypto.ts` 的 `hashPassword` 相同，比较用 `timingSafeEqual`。
 
-上限：对话 1 MB，界面包 256 KB（与界面包文档一致）。超过就 413。
+上限：对话 1 MB，界面包 256 KB（与界面包文档一致）。超过就 413。同一 id 口令错误累计 5 次后，这一小时内不再接受该 id 的口令尝试。
 
-页面打开私密链接时只从片段取密钥，向 `GET /v1/shares/:id` 要密文，在本地解密。解密失败不把密文写进对话库。
+给人看的页面只向接口要数据，不把正文写进对方的对话库。对方若要留下，另选导入。
 
-公开的界面包用 `https://hfd.linkos.io/u/<id>`，没有密钥片段。
-
-管理接口不放在公开站，也不进 `apps/server` 的管理员页面。
+管理接口不放在 `hfd.linkos.org`，也不进 `apps/server` 的管理员页面。
 
 ## 存储
 
-在推荐的 Cloudflare 方案里：
+已决定放在集群里，不用 Cloudflare 的对象存储。
+
+元数据和正文分开：
 
 | 数据 | 放在 | 原因 |
 | --- | --- | --- |
-| 元数据：id、kind、visibility、审核状态、过期时间、口令盐、删除令牌哈希、sha256、字节数、R2 键 | D1 一张 `shares` 表 | 要查询和过期 |
-| 举报 | D1 一张 `reports` 表 | 量小 |
-| 正文 | R2 一个桶，对象键是 id | 二进制，按对象删 |
-| 限流计数、刚删除的 id | KV | 热键，避免每次读取都扫 D1 |
+| id、kind、过期时间、删除令牌哈希、口令哈希、sha256、字节数、对象路径 | Postgres 数据库 `harbor_share`，表 `shares` | 要按过期时间删除，也要记限流计数。与 Harbor 自托管服务器一样只用 Postgres，不引入 SQLite |
+| 正文 | 数据盘上的一个文件，路径按 id | 二进制，按文件删。不把最大 1 MB 的正文放进数据库行 |
+| 限流计数、口令失败次数 | 同一 Postgres 里的小表 | 第一期只有一个副本，不必再加 Redis |
+
+不使用 `apps/server` 的库，也不使用它的 `users` / `api_keys` 表。
+
+Postgres 由这份服务自己带一个单副本。数据目录在 worker-us 的数据盘：`/data/storage/harbor-share/pg`。正文目录是 `/data/storage/harbor-share/objects`。这和「服务数据放数据盘、不放系统盘上的 compose 目录」一致。磁盘是 `hostPath`，所以 Pod 固定在持有这块盘的节点上，应用只有一个副本。卷是 ReadWriteOnce，清理过期记录的循环写在应用进程里，不另起一个要挂同一块卷的 CronJob。
 
 id 用 128 位随机数的 base64url。不用自增数字。
 
-每小时一次定时任务：删掉 `expiresAt` 已过的 D1 行和 R2 对象。用户删除和管理员下架走同一条删除。
-
-若改放 prod-us：元数据用该集群上单独的 Postgres 库，正文用磁盘目录，见下文部署。表结构与上面相同。不写入 Harbor 自托管那套 `users` / `api_keys` 表。
-
 ## 滥用和限额
 
-公开的上传地址会被扫。限额写在边缘和程序里各一层。
+上传地址在公网上，会被扫。限额做两层，数字可以在上线时改，两层都要有。
 
-建议的起点（上线时可以改数字，规则保留）：
+GoEdge（这台主机的站点配置，和 Ingress 同一次变更）：
 
-- 同一 IP 每小时最多创建 10 次，每天最多 30 次。
-- 同一 IP 每分钟最多读取 60 次。
-- 同一个 id 每分钟最多读取 30 次，避免被当成图床或分发站。
-- 举报：同一 IP 对同一 id 每天 1 次，正文最多 500 字。
-- 创建体只接受 JSON 和约定的 base64。不接受任意 `Content-Type` 的反代。
-- 公开项先进入 `pending`，列表不展示。所有者通过后才是 `public`。
-- 一条公开项收到 3 次举报就自动回到 `pending`，链接暂时 404，等所有者看。
+- 单个来源地址每分钟最多 30 次请求。来源地址取 `CF-Connecting-IP`，与 `hfd.linkos.org` 一样走 Cloudflare 代理。
+- 请求体最大 2 MB。这比应用里的 1 MB 宽一点，给 JSON 和 base64 留余量。应用仍按上一节的字节数拒绝。
 
-免费档在请求量异常时会当天拒绝新请求，这本身是刹车。付费档要设消费上限，避免被人刷到账单。
+应用：
 
-日志保留期用平台默认值，并且本来就不含正文。不把 IP 写进 R2 对象。IP 只进入限流计数，计数几小时过期。
+- 同一来源地址每小时最多创建 10 次，每天最多 30 次。
+- 同一来源地址每分钟最多读取 60 次。
+- 同一个 id 每分钟最多读取 30 次。
+- 创建体只接受 JSON。应用信任 `CF-Connecting-IP` 的前提是连接来自集群入口；其它来源忽略这个头，改用套接字上的地址。
 
-## 删除和下架
+日志记方法、状态码、id 的前 4 个字符、字节数。不记正文、口令、删除令牌和 `Authorization` 头。来源地址只进入限流表，计数几小时后删掉。
+
+## 删除
 
 能删掉一份分享的途径：
 
 1. 持有删除令牌的人调用 `DELETE`。
-2. 到达 `expiresAt`。默认 30 天，用户可改成 1 天、7 天、30 天，或最长 90 天。不允许永久。
-3. 所有者用管理密钥下架。公开和私密都可以下架。私密内容是密文，所有者看不到正文，仍可以根据举报或法律要求删除对象。
-4. 公开项因举报退回待审，效果与暂时下架相同。
+2. 到达 `expiresAt`。应用每小时扫一次到期行，删掉数据库行和对象文件。
+3. 所有者用管理密钥删除。正文是明文，所有者可以在收到投诉或法律要求时直接删文件。
 
-删除是去掉 D1 行和 R2 对象。第一期不另做备份。若以后打开桶的版本或平台备份，备份保留不超过 7 天，并写进隐私说明。
+删除是去掉数据库行和对象文件。备份保留 7 天，见部署一节。备份里仍是明文。
 
-设置的数据页已经有一行「我共享的链接」（`ui.tsx` 里 `t('sharedLinks')`）。现在点「管理」只会显示「没有共享链接」。实现时让这一行列出本机 `harbor` 库里还存着删除令牌的分享。换设备后的找回放到「可选账号」那一档，不放进第一期。
+设置的数据页已经有一行「我共享的链接」（`ui.tsx` 里 `t('sharedLinks')`）。现在点「管理」只会显示「没有共享链接」。实现时让这一行列出本机还存着删除令牌的分享。
 
 ## 隐私说明里要写清的点
 
-上线前用一页普通中文写给访客，至少包括：
+上线前用一页普通中文放在 `hfd.linkos.io` 上，至少包括：
 
-- 分享发生在 `hfd.linkos.io`。聊天页只有在你点了分享并确认之后才上传。
-- 我们不接收、也不想接收 DeepSeek 的 API Key。客户端会拒绝明显像 Key 的内容。
-- 私密且加密的分享：我们存的是密文。我们能看到的是大小、时间、类型、是否设置了口令、过期时间，以及用于限流的 IP（短时间，不和正文放在一起）。我们读不了片段里的密钥。
-- 带口令的分享：口令不到服务器。忘掉口令就打不开，我们也无法找回。
-- 公开的分享：内容、标题对所有人可见，我们也看得到。可以举报。
-- 过期和删除会从线上存储去掉。备份若存在，不超过 7 天。
-- 不出售这些数据，不用它做广告画像。没有第三方统计脚本。
-- 对话内容一旦分享，接收方可以复制。加密只保护「链接和口令以外的人」，不保护你把链接发给的那个人。
-- 联系方式和管辖：写所有者的邮箱，以及这份服务跑在 Cloudflare 上（若采用推荐部署）。
+- 分享发生在 `hfd.linkos.io`。聊天页只有在你确认之后才上传。
+- 我们不接收 DeepSeek 的 API Key。客户端会拒绝明显像 Key 的内容。
+- 你分享的正文以明文存在我们的服务器和最多 7 天的备份里。拿到链接的人可以阅读。我们也能阅读。
+- 口令是可选项。它挡住没有口令的访问者。它不会把正文变成我们读不到的密文。
+- 过期和删除会从线上磁盘去掉。备份不超过 7 天。
+- 不出售这些数据，不用它做广告。没有第三方统计脚本。
+- 联系方式和管辖：所有者的邮箱，以及机器在 prod-us。
 
-Harbor 仓库的 [SECURITY.md](../../SECURITY.md) 在实现时加一小节，指向这页，并重复「Key 不会发到 hfd.linkos.io」。
+Harbor 仓库的 [SECURITY.md](../../SECURITY.md) 在实现时加一小节，指向这页，并写明 Key 不会发到 `hfd.linkos.io`。
 
 ## 部署
 
-比较的是两处都能跑起来的做法。域名 `hfd.linkos.io` 在所有者的 Cloudflare 账号上，和 `linkos.org` 同一账号。
+已决定：prod-us，Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 账号与 `linkos.org` 相同，记录的做法与 `hfd.linkos.org` 相同。按 [docs/deploy-web.md](../deploy-web.md)，那台主机开启代理（橙色云），HTTPS 在 Cloudflare 终结，集群 Ingress 不写公网证书。`hfd.linkos.io` 照这套做。Cloudflare 不运行这份服务，也不存放正文。
 
-### 现状里和选择有关的事实
+本仓库 `deploy/web/k8s` 里的 Ingress 类名是 `nginx`，那是静态站自己的对象。分享服务不改那个类名，也不和 `harbor-web` 挤在同一个 Deployment 里。GoEdge 的 Ingress 类名从 `best/flux-k8s` 里已有的 GoEdge Ingress 抄过来。
 
-- 公开站的 Kubernetes 清单在 `deploy/web/k8s`：命名空间 `harbor`，Deployment `harbor-web` 两个副本，镜像 `ghcr.io/openlinkos/harbor-web`，听 8080，资源请求 25m CPU / 32Mi 内存，上限 200m / 128Mi。根文件系统只读，以 uid 101 运行，用 nginx 提供静态文件。
-- 镜像标签里有 `<时间>-<7位 sha>`，给 prod-us 上的 Flux ImagePolicy 排序（`docs/deploy-web.md`）。
-- 清单里的 Ingress 类名写的是 `nginx`，TLS 在注释里关掉，因为 Cloudflare 在前面终结 HTTPS。所有者描述的 prod-us 入口是 GoEdge。本仓库没有 `best/flux-k8s`。设计把 GoEdge 当作生产入口的事实，把仓库里的 Ingress 当作这个静态站自己的对象。新服务若进集群，在 Flux 仓库里单独建一份 Deployment，与 `harbor-web` 并列。
-- `docs/deploy.md` 还写了 Cloudflare Pages。无论流量最后从 Pages 还是从这只 nginx 出去，公开站都没有业务接口，也不要加 Pages Function 去代理 DeepSeek。
-- 自托管数据若落在自家机器上，按所有者既有习惯放在数据盘（`worker-us` 的 `/data/storage`），不放在系统盘的 compose 目录里。
+镜像沿用静态站的标签习惯：`ghcr.io/openlinkos/harbor-share`，主分支推送时打 `<YYYYMMDDHHmmss>-<sha7>`，供 Flux ImagePolicy 排序（见 `docs/deploy-web.md`）。实现时再加工具流；本文不添加工作流。
 
-### 方案 1：Cloudflare Workers，加上 R2、D1、KV
+现金成本是这块数据盘上的空间。进程加在已经在跑的集群上。一个安静的分享服务，数据库和正文加起来远小于 1 GB。
 
-一个 Worker 绑定一个 D1、一个 R2 桶、一个 KV 命名空间，再加每小时的定时清理。DNS 在同一账号。不经过 prod-us。
+### 对象
 
-费用按 Cloudflare 公布的价格估算（Workers、R2、D1、KV 的定价页，2026 年仍是这套结构）：
+命名空间 `harbor-share`。
 
-| 用量 | 大约费用 |
+| 对象 | 作用 |
 | --- | --- |
-| 很安静：每天远少于 10 万次请求，存储不到 1 GB | 0。这在 Workers 免费档（每天 10 万次请求）和 R2 免费档之内（每月 10 GB、100 万次写入类操作、1000 万次读取类操作）。前提是这个账号上别的 Worker 没有先把免费档用完 |
-| 账号已经开了 Workers 付费 | 月费最低 5 美元，包含每月 1000 万次请求、D1 的 5 GB 和大量行读写、KV 的 1000 万次读。分享服务在吃满这些额度之前不再加一笔 |
-| 较忙：大约 10 GB 正文、每月一两百万次读取 | 存储刚过 R2 免费的 10 GB 时，超出部分约 0.015 美元 / GB·月。读取类操作在 1000 万次以内不加价 |
-| 被人当接口扫 | 免费档当天超额后请求失败，等于自动停。付费档必须设消费上限。Workers 付费的超额大约是每百万次请求 0.30 美元，外加 CPU |
+| Deployment `harbor-share` | 一个副本。听 8080。`/healthz` 只表示进程在。`/readyz` 同时检查 Postgres |
+| Service `harbor-share` | 把 8080 交给 Ingress |
+| Ingress `harbor-share` | 主机名 `hfd.linkos.io`，类名用 GoEdge 的。不写 `tls`，与静态站的 Ingress 一样 |
+| PersistentVolume + PVC `harbor-share-objects` | `hostPath`：`/data/storage/harbor-share/objects`。应用挂到 `/var/lib/harbor-share/objects` |
+| StatefulSet `harbor-share-postgres` | 一个副本。数据在 `/data/storage/harbor-share/pg` |
+| Secret | 数据库口令、管理密钥。不进 Git |
+| 应用内的每日备份 | 写到 `/data/storage/harbor-share/backups`，保留 7 天 |
 
-D1 的行读写在这个规模里可以忽略。KV 只放计数器，不到 1 GB。
+应用的资源请求大约 100m CPU、256Mi 内存，上限 500m、512Mi。静态站那档 32Mi 装不下 Postgres 客户端和正文缓冲。Postgres 大约 100m CPU、256Mi 内存。根文件系统对应用容器保持只读，可写的只有对象目录和 `/tmp`。镜像不以 root 运行。
 
-### 方案 2：prod-us 上的服务，经 Flux 和 GoEdge
+Pod 用节点亲和性固定到持有 `/data/storage` 的那台 worker。
 
-在 `best/flux-k8s` 里新增一个应用：单独的 Deployment、Service、Ingress，主机名 `hfd.linkos.io`，入口走 GoEdge。进程可以是本仓库一个新的小服务，镜像沿用现有的「时间戳加短 sha」标签，让 Flux ImagePolicy 更新。正文目录挂到 `worker-us` 的 `/data/storage`。数据库用集群里单独的 Postgres 库，不用 `apps/server` 那一个。
+### Ingress 示意
 
-现金增量接近 0，因为机器已经在跑。进程本身大约 100m CPU、256Mi 内存就够，静态站那档 32Mi 太小。真正的成本是：
+类名在落地时换成 Flux 仓库里 GoEdge 正在用的值。
 
-- 公网写入打在 prod-us 的入口和出口上。GoEdge 能限流，但没有 R2 那种按对象删除、无出口流量费的存储。
-- 备份、磁盘满、证书和 Flux 变更都要所有者看。
-- 滥用流量和 Harbor 静态站、其它生产服务走同一集群入口。隔离比「另一个 Cloudflare 主机名」差。
-- 仓库里的 Ingress 类名还是 `nginx`。新服务要在 Flux 里按 GoEdge 的实际写法配，不能假设把 `deploy/web/k8s` 改个 host 就能用。
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: harbor-share
+  namespace: harbor-share
+spec:
+  ingressClassName: goedge # 换成 best/flux-k8s 里已有的类名
+  rules:
+    - host: hfd.linkos.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: harbor-share
+                port:
+                  name: http
+```
 
-### 建议
+请求体大小和每分钟次数写在这台主机的 GoEdge 站点配置里，和这份 Ingress 一起提交。数值见「滥用和限额」。
 
-用方案 1。
+### 备份
 
-理由：
+应用每天做两件事，写到数据盘的 `backups/YYYYMMDD/`：
 
-1. 这个服务的形状是「小块元数据加一个对象」，读多写少，会过期删除。Workers、D1、R2 与这个形状匹配。静态站的 nginx 继续只发文件，自托管的 Key 池继续只服务受邀请的那一组人。
-2. `linkos.io` 已经在这只 Cloudflare 账号上。DNS、HTTPS 和边缘限流不用再在 GoEdge 上开一条公网写入。
-3. 安静到中等的用量是 0 到 5 美元一个月。集群方案的现金也接近 0。把「任何人都能 POST」放进 prod-us 时，影响面会落到整台入口。
-4. 加密正文即使放在 Cloudflare，服务器也读不到密钥。想把密文留在自己磁盘上时，再改方案 2，接口不用变。
+1. `pg_dump` 数据库 `harbor_share`。
+2. 把对象目录打成一个归档。
 
-不建议的第三种：Cloudflare 只做代理、源站仍在 prod-us。那样两套都要维护，限流规则会拆成两半。要选就选上面两个里的一个。
+超过 7 天的目录删掉。恢复时先恢复数据库，再把对象归档解回 `/data/storage/harbor-share/objects`，然后核对每一行的 `object_path` 是否还有文件。备份含明文，目录权限与对象目录相同，不对集群里的其它命名空间开放。
 
 ## 和界面包的衔接
 
-界面包的分享在包能在本地导入导出之后再做。接收方打开链接、解密、用同一套校验器检查、预览、再应用。校验失败的包不进入 `ui_packages`。
+界面包能在本地导入导出之后，才从设置里生成私密链接。接收方打开链接，取到明文，用同一套校验器检查，预览，再应用。校验失败的包不进入 `ui_packages`。
 
-公开列表第一期可以空着。私密链接不依赖列表。
+## 以后
+
+公开列表、举报后的公开展示、以及「谁都能翻到的画廊」不在第一期。第一期的下架只走删除令牌和管理密钥。那一批要做时再加表和接口，不改私密链接的 id 和删除方式。
