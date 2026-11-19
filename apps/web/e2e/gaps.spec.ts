@@ -60,7 +60,22 @@ test('mobile drawer', async ({ page }) => {
   await page.getByTestId('menu').click()
   await expect(page.locator('.sidebar')).toBeVisible()
   const box = await page.locator('.sidebar').boundingBox()
-  expect(box?.width ?? 0).toBeLessThanOrEqual(261)
+  expect(Math.round(box?.width ?? 0)).toBe(261)
+  const footer = await page.locator('.user-bar').boundingBox()
+  expect((footer?.y ?? 0) + (footer?.height ?? 0)).toBeLessThanOrEqual(844)
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
+  expect(overflow).toBe(false)
+  const bar = await page.evaluate(() => getComputedStyle(document.querySelector('.transcript')!).scrollbarWidth)
+  expect(bar).toBe('none')
+  await page.locator('.chips').evaluate((node) => { node.style.flex = '0 0 80px' })
+  await expect(page.getByTestId('toggle-thinking')).toHaveCSS('width', '40px')
+  await expect(page.getByTestId('toggle-thinking')).toHaveCSS('height', '40px')
+  await expect(page.getByTestId('top-new')).toHaveCSS('border-top-width', '0px')
+  const composer = await page.locator('.composer').boundingBox()
+  expect(Math.round(composer?.x ?? 0)).toBeGreaterThanOrEqual(15)
+  expect(Math.round(composer?.x ?? 0)).toBeLessThanOrEqual(17)
+  expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeGreaterThanOrEqual(373)
+  expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeLessThanOrEqual(375)
   await page.locator('.scrim').click({ position: { x: 340, y: 200 } })
   await expect(page.locator('.sidebar')).toBeHidden()
   await page.getByTestId('menu').click()
@@ -91,6 +106,41 @@ test('long code', async ({ page }) => {
   await expect(card.locator('pre')).not.toHaveClass(/collapsed/)
   await card.getByRole('button', { name: '收起' }).click()
   await expect(card.locator('pre')).toHaveClass(/collapsed/)
+})
+
+test('scroll follow', async ({ page }) => {
+  await unlock(page)
+  hold = true
+  await page.getByTestId('composer').fill('滚一下')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('stop')).toBeVisible()
+  await page.getByTestId('message-list').evaluate((node) => {
+    const pad = document.createElement('div')
+    pad.style.flex = '0 0 2000px'
+    pad.style.height = '2000px'
+    node.prepend(pad)
+    node.scrollTop = 0
+    node.dispatchEvent(new Event('scroll'))
+  })
+  await expect(page.getByRole('button', { name: '回到底部' })).toBeVisible()
+  await page.getByRole('button', { name: '回到底部' }).click()
+  await expect(page.getByRole('button', { name: '回到底部' })).toBeHidden()
+  hold = false
+})
+
+test('narrow layout 360', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 })
+  await unlock(page)
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
+  expect(overflow).toBe(false)
+  await expect(page.locator('.kbd')).toBeHidden()
+  await page.locator('.chips').evaluate((node) => { node.style.flex = '0 0 80px' })
+  await expect(page.getByTestId('toggle-search')).toHaveCSS('width', '40px')
+  const composer = await page.locator('.composer').boundingBox()
+  expect(Math.round(composer?.x ?? 0)).toBeGreaterThanOrEqual(15)
+  expect(Math.round(composer?.x ?? 0)).toBeLessThanOrEqual(17)
+  expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeGreaterThanOrEqual(343)
+  expect(Math.round((composer?.x ?? 0) + (composer?.width ?? 0))).toBeLessThanOrEqual(345)
 })
 
 test('delete confirm', async ({ page }) => {

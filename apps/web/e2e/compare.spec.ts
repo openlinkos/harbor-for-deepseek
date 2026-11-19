@@ -134,6 +134,20 @@ const shot = async (page: Page, name: string) => {
   await page.screenshot({ path: join(dir, name), animations: 'disabled' })
 }
 
+const pinGreeting = async (page: Page) => {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const text = await page.locator('.greeting').innerText()
+    if (text.includes('欢迎回来，随时开始吧')) {
+      return
+    }
+    await page.getByRole('button', { name: '快排介绍' }).click()
+    await expect(page.locator('.greeting')).toHaveCount(0)
+    await page.getByTestId('new-chat').click()
+    await expect(page.locator('.greeting')).toBeVisible()
+  }
+  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+}
+
 test('capture official states at 1920x1072', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1072 })
   await page.route('https://api.deepseek.com/**', fulfill)
@@ -157,7 +171,7 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(page.getByTestId('assistant-text')).toContainText('核心思想')
   await expect(page.getByTestId('sidebar')).toContainText('快排介绍')
   await page.getByTestId('new-chat').click()
-  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+  await pinGreeting(page)
   await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
   await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
   await shot(page, 'home.png')
@@ -256,7 +270,7 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await page.getByTestId('search-panel').getByRole('button', { name: '关闭' }).click()
 
   await page.getByTestId('new-chat').click()
-  await expect(page.locator('.greeting')).toContainText('欢迎回来，随时开始吧')
+  await pinGreeting(page)
   await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
   await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
   const idle = page.locator('.chat-link').filter({ hasText: '快排介绍' })

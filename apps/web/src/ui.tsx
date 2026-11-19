@@ -3,7 +3,7 @@ import { presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@harbor/pricing'
 import { activePath, siblingIds } from '@harbor/types'
 import type { ContentBlock, Conversation, Message } from '@harbor/types'
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
@@ -45,10 +45,18 @@ export const SiteFooter = () => {
   )
 }
 
-const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={size >= 24 ? 2 : 1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke ?? (size >= 20 ? 2 : 1.7)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={d} />
   </svg>
+)
+
+const Wordmark = () => (
+  <span className="wordmark">
+    <span className="wordmark-name">Harbor</span>
+    {' '}
+    <span className="wordmark-sub">for DeepSeek</span>
+  </span>
 )
 
 const Favicon = ({ label }: { label: string }) => (
@@ -141,7 +149,7 @@ export const KeyGate = () => {
       <header className="landing-bar">
         <span className="brand-name">
           <Mark />
-          <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
+          <Wordmark />
         </span>
         <LanguageSwitch locale={locale} onChange={setLocale} />
       </header>
@@ -641,7 +649,7 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
     if (next && versionCurrent) void selectSibling(versionCurrent, next)
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''}`} data-testid={`message-${message.role}`} aria-busy={message.status === 'streaming'}>
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -656,10 +664,10 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
           <div className="bubble">{textOf}</div>
           <div className="user-actions">
             <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
-              <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+              <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
             </button>
             <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
-              <Icon d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+              <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
             </button>
           </div>
         </>
@@ -685,14 +693,14 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <Icon d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+              <Icon size={20} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={20} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={20} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
             if (!textOf || !('speechSynthesis' in window)) return
             const utterance = new SpeechSynthesisUtterance(textOf)
@@ -705,8 +713,8 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             window.speechSynthesis.cancel()
             setSpeaking(true)
             window.speechSynthesis.speak(utterance)
-          }}>{speaking ? <Icon d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          }}>{speaking ? <Icon size={20} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={20} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={20} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -741,6 +749,9 @@ export const Shell = () => {
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
+  const consumed = useRef<string | null>(null)
+  const seenChat = useRef<string | null | undefined>(undefined)
+  const seenAssistant = useRef<string | null>(null)
   const [away, setAway] = useState(false)
   const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && !navigator.onLine)
   useEffect(() => {
@@ -753,12 +764,58 @@ export const Shell = () => {
       window.removeEventListener('online', up)
     }
   }, [])
-  useEffect(() => {
-    if (!stick.current) {
+  useLayoutEffect(() => {
+    const list = listRef.current
+    const latest = [...path].reverse().find((message) => message.role === 'assistant')
+    const chatId = conversation?.id ?? null
+    const switching = seenChat.current !== undefined && seenChat.current !== chatId && !state.streaming
+    seenChat.current = chatId
+    if (!list) {
       return
     }
-    endRef.current?.scrollIntoView({ block: 'end' })
-  }, [path.length, state.streaming, state.messages])
+    if (switching) {
+      seenAssistant.current = latest?.id ?? null
+      consumed.current = latest?.id ?? null
+      stick.current = true
+      list.scrollTo({ left: 0, top: list.scrollHeight, behavior: 'instant' })
+      return
+    }
+    const appeared = Boolean(latest && latest.id !== seenAssistant.current)
+    if (appeared && state.streaming) {
+      stick.current = true
+    }
+    if (!stick.current) {
+      seenAssistant.current = latest?.id ?? null
+      return
+    }
+    const bottom = list.scrollHeight - list.clientHeight
+    const nodes = list.querySelectorAll<HTMLElement>('.turn.assistant .prose')
+    const assistant = nodes[nodes.length - 1]
+    let target = bottom
+    let stop = false
+    const followId = latest?.id ?? null
+    if (assistant && appeared && followId && followId !== consumed.current) {
+      const bodyTop = assistant.getBoundingClientRect().top - list.getBoundingClientRect().top
+      const absolute = list.scrollTop + bodyTop
+      if (Number.isFinite(absolute) && absolute < bottom - 1) {
+        target = Math.max(0, absolute)
+        stop = true
+      }
+    }
+    if (!stop && appeared && state.streaming) {
+      return
+    }
+    list.scrollTo({ left: 0, top: target, behavior: 'instant' })
+    if (stop && followId) {
+      consumed.current = followId
+      seenAssistant.current = followId
+      stick.current = false
+      const distance = list.scrollHeight - list.scrollTop - list.clientHeight
+      setAway(distance > 52)
+    } else if (!appeared || !state.streaming) {
+      seenAssistant.current = latest?.id ?? null
+    }
+  }, [path, state.streaming, state.messages, conversation?.id])
   useEffect(() => {
     const viewport = window.visualViewport
     if (!viewport) {
@@ -851,7 +908,7 @@ export const Shell = () => {
         <div className="sider-top">
           <span className="brand-name">
             <Mark />
-            <span className="wordmark">Harbor for <span className="wordmark-ds">DeepSeek</span></span>
+            <Wordmark />
           </span>
           <span className="sider-icons">
             <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
@@ -876,7 +933,7 @@ export const Shell = () => {
             </div>
           ) : null}
           {groups.map(([label, items]) => (
-            <div key={label}>
+            <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
               <p className="group-label">
                 <span>{label}</span>
                 {label === t('groupToday') ? (
@@ -950,7 +1007,7 @@ export const Shell = () => {
       <section className="stage">
         <header className="topbar">
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
-            <Icon size={24} d="M3 8h18M3 16h11" />
+            <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
           <h2>{conversation?.title || ''}</h2>
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
@@ -958,12 +1015,12 @@ export const Shell = () => {
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
           <span className="top-actions">
-            <button className="icon-btn top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
-              <Icon d="M12 5v14M5 12h14" />
+            <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+              <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
             {path.length > 0 ? (
               <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor for DeepSeek', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
-                <Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
+                <Icon size={22} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />
               </button>
             ) : null}
           </span>
@@ -981,16 +1038,15 @@ export const Shell = () => {
                 if (!list) {
                   return
                 }
-                const distance = list.scrollHeight - list.scrollTop - list.clientHeight
-                stick.current = distance < 96
-                setAway(distance > 96)
+                stick.current = list.scrollTop + list.offsetHeight >= list.scrollHeight - 1
+                setAway(!(list.scrollTop + list.offsetHeight > list.scrollHeight - 52))
               }}
             >
               {path.map((message) => conversation ? <MessageRow key={message.id} message={message} conversation={conversation} /> : null)}
               <div ref={endRef} />
             </div>
             {away ? (
-              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }}>
+              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); listRef.current?.scrollTo({ left: 0, top: listRef.current.scrollHeight, behavior: 'instant' }) }}>
                 <Icon d="M6 9l6 6 6-6" />
               </button>
             ) : null}
@@ -1078,7 +1134,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         setOpen((value) => !value)
       }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
       {open ? createPortal(
-        <div className="menu item-menu" style={{ top: menuBox.top, left: menuBox.left }}>
+        <>
+        {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
+        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
           <button type="button" onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" />{t('rename')}</button>
           <button type="button" onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />{conversation.pinned ? t('unpin') : t('pin')}</button>
           <button type="button" onClick={() => {
@@ -1091,7 +1149,8 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" />{t('share')}</button>
           <button type="button" onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" />{t('multiSelect')}</button>
           <button className="danger" type="button" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />{t('delete')}</button>
-        </div>,
+        </div>
+        </>,
         document.body,
       ) : null}
       {confirming ? (
@@ -1105,12 +1164,22 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   )
 }
 
+const RETURNING_GREETINGS = ['welcomeBack', 'welcomeAlt'] as const
+
 const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
+  const returning = useMemo(() => {
+    if (!hasHistory) {
+      return 'welcomeMessage' as const
+    }
+    const index = Math.floor(Math.random() * RETURNING_GREETINGS.length)
+    return RETURNING_GREETINGS[index] ?? 'welcomeBack'
+  }, [hasHistory])
+  const line = t(returning)
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /> {hasHistory ? t('welcomeBack') : t('emptyTitle')}</h2>
+      <h2 className="greeting"><Mark /> {line}</h2>
       <Composer />
     </div>
   )
@@ -1127,7 +1196,54 @@ const Composer = () => {
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
   const [text, setText] = useState('')
+  const [iconOnly, setIconOnly] = useState(false)
+  const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    const row = chips.current
+    if (!row) {
+      return
+    }
+    let collapsedAt = 0
+    const phoneCollapsed = () => {
+      // The public bundle only hides labels on overflow. Logged-in Android
+      // Chrome at ~393px still shows icon-only buttons, so a coarse/mobile
+      // viewport below 768px follows that observed layout.
+      if (!window.matchMedia('(max-width: 767px)').matches) {
+        return false
+      }
+      const coarse = window.matchMedia('(pointer: coarse)').matches
+      const touch = navigator.maxTouchPoints > 0
+      const mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+      return coarse || touch || mobileUa
+    }
+    const measure = () => {
+      const labels = [...row.querySelectorAll<HTMLElement>('.chip-label')]
+      if (phoneCollapsed()) {
+        labels.forEach((label) => { label.hidden = true })
+        setIconOnly(true)
+        collapsedAt = row.clientWidth
+        return
+      }
+      if (collapsedAt && row.clientWidth <= collapsedAt + 24) {
+        return
+      }
+      labels.forEach((label) => { label.hidden = false })
+      const wrapped = labels.some((label) => {
+        const line = Number.parseFloat(getComputedStyle(label).lineHeight)
+        return Number.isFinite(line) && line > 0 && label.getBoundingClientRect().height > 1.5 * line
+      })
+      const content = [...row.querySelectorAll<HTMLElement>('.chip')].reduce((sum, chip) => sum + chip.getBoundingClientRect().width, 0)
+      const overflow = content > row.clientWidth + 1 || row.scrollWidth > row.clientWidth + 1 || wrapped
+      labels.forEach((label) => { label.hidden = overflow })
+      setIconOnly(overflow)
+      collapsedAt = overflow ? row.clientWidth : 0
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(row)
+    return () => observer.disconnect()
+  }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
       setText((event as CustomEvent<string>).detail)
@@ -1143,7 +1259,7 @@ const Composer = () => {
     void send(value)
   }
   return (
-    <div className="composer">
+    <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
       {drafts.length ? (
         <ul className="drafts">
           {drafts.map((file) => (
@@ -1172,26 +1288,27 @@ const Composer = () => {
         }}
       />
       <div className="composer-tools">
-        <div className="chips">
+        <div className="chips" ref={chips}>
           <span className="chip-wrap">
             <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-              <svg className="chip-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2 13.7 8 19.5 9.7 13.7 11.4 12 17.2 10.3 11.4 4.5 9.7 10.3 8 12 2.2Zm6.1 10.3.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2ZM6.3 14.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6.6-1.5Z" /></svg>
-              {t('thinking')}
+              <svg className="chip-icon" width="20" height="20" viewBox="2 1 20 20" aria-hidden="true"><path fill="currentColor" d="M12 2.2 13.7 8 19.5 9.7 13.7 11.4 12 17.2 10.3 11.4 4.5 9.7 10.3 8 12 2.2Zm6.1 10.3.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2ZM6.3 14.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6.6-1.5Z" /></svg>
+              <span className="chip-label">{t('thinking')}</span>
             </button>
           </span>
           <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} disabled={!flash} onClick={() => void setPrefs({ search: !prefs.search })}>
-            <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
+            <Icon size={20} stroke={2.2} d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+            <span className="chip-label">{t('search')}</span>
           </button>
         </div>
         <div className="tool-right">
           <label className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')}>
-            <Icon d="M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8" />
+            <Icon size={20} stroke={2} d="M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8" />
             <input data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           </label>
           {streaming ? (
-            <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon d="M8 8h8v8H8z" /></button>
+            <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
-            <button className={`send ${text.trim() ? 'ready' : ''}`} data-testid="send" type="button" onClick={submit}><Icon d="M12 19V5M6 11l6-6 6 6" /></button>
+            <button className={`send ${text.trim() ? 'ready' : ''}`} data-testid="send" type="button" onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
           )}
         </div>
       </div>
