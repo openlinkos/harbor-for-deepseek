@@ -275,6 +275,7 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
   const idle = page.locator('.chat-link').filter({ hasText: '快排介绍' })
   await expect(idle).not.toHaveClass(/active/)
+  await idle.hover()
   await idle.locator('.more').click()
   await expect(page.getByRole('button', { name: '重命名' })).toBeVisible()
   await shot(page, 'sidebar-item-menu.png')

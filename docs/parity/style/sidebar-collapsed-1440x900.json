@@ -1,473 +1,53 @@
 {
   "state": "sidebar-collapsed",
   "viewport": "1440x900",
-  "officialVisible": 19,
-  "matched": 15,
-  "matchedEqual": 2,
-  "matchedDiff": 13,
-  "officialOnly": 4,
-  "harborOnly": 21,
-  "allowlisted": 11,
-  "unmatchedOfficial": 4,
-  "unmatchedOurs": 21,
+  "officialVisible": 23,
+  "matched": 22,
+  "matchedEqual": 22,
+  "matchedDiff": 0,
+  "officialOnly": 0,
+  "harborOnly": 0,
+  "allowlisted": 4,
+  "unmatchedOfficial": 0,
+  "unmatchedOurs": 0,
   "mismatches": [
     {
-      "key": "sidebar > mark 1",
-      "property": "x",
-      "official": "16",
-      "ours": "4",
+      "key": "sidebar > button @63,15 34×34",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "23.8px",
       "status": "allowed",
-      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
-      "id": "brand-logo"
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
-      "key": "sidebar > mark 1",
-      "property": "y",
-      "official": "20",
-      "ours": "19",
+      "key": "sidebar > button @99,15 34×34",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "23.8px",
       "status": "allowed",
-      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
-      "id": "brand-logo"
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
-      "key": "sidebar > mark 1",
-      "property": "w",
-      "official": "27",
-      "ours": "22",
+      "key": "sidebar > button @135,15 34×34",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "23.8px",
       "status": "allowed",
-      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
-      "id": "brand-logo"
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
-      "key": "sidebar > mark 1",
-      "property": "h",
-      "official": "24",
-      "ours": "22",
+      "key": "main > button @1017,463 34×34",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "23.8px",
       "status": "allowed",
-      "reason": "brand — DeepSeek logo maps to the Harbor mark.",
-      "id": "brand-logo"
-    },
-    {
-      "key": "control ‘深度思考’",
-      "property": "x",
-      "official": "345",
-      "ours": "341",
-      "status": "fail"
-    },
-    {
-      "key": "control ‘深度思考’",
-      "property": "y",
-      "official": "462.5",
-      "ours": "460",
-      "status": "fail"
-    },
-    {
-      "key": "main > greeting 1",
-      "property": "x",
-      "official": "622",
-      "ours": "607",
-      "status": "fail"
-    },
-    {
-      "key": "main > greeting 1",
-      "property": "y",
-      "official": "326.5",
-      "ours": "337",
-      "status": "fail"
-    },
-    {
-      "key": "main > greeting 1",
-      "property": "w",
-      "official": "240",
-      "ours": "264",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘深度思考’",
-      "property": "x",
-      "official": "374",
-      "ours": "370",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘深度思考’",
-      "property": "y",
-      "official": "467.5",
-      "ours": "465",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘智能搜索’",
-      "property": "x",
-      "official": "476.02",
-      "ours": "470",
-      "status": "fail"
-    },
-    {
-      "key": "main > span ‘智能搜索’",
-      "property": "y",
-      "official": "467.5",
-      "ours": "465",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @332,386 776×124",
-      "property": "y",
-      "official": "385.5",
-      "ours": "389",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @356,473",
-      "property": "x",
-      "official": "356",
-      "ours": "352",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @356,473",
-      "property": "y",
-      "official": "472.5",
-      "ours": "470",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "x",
-      "official": "1061",
-      "ours": "1065",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "y",
-      "official": "462.5",
-      "ours": "460",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "opacity",
-      "official": "0.4",
-      "ours": "0.45",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "padding-top",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "padding-right",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "padding-bottom",
-      "official": "0px",
-      "ours": "1px",
-      "status": "fail"
-    },
-    {
-      "key": "main > button @1061,463 34×34",
-      "property": "padding-left",
-      "official": "0px",
-      "ours": "6px",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1070,472",
-      "property": "x",
-      "official": "1070",
-      "ours": "1074",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1070,472",
-      "property": "y",
-      "official": "471.5",
-      "ours": "469",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1026,472",
-      "property": "x",
-      "official": "1026",
-      "ours": "1032",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 16×16 @1026,472",
-      "property": "y",
-      "official": "471.5",
-      "ours": "469",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @458,473",
-      "property": "x",
-      "official": "458.02",
-      "ours": "452",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 14×14 @458,473",
-      "property": "y",
-      "official": "472.5",
-      "ours": "470",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @447,463 92×34",
-      "property": "x",
-      "official": "447.02",
-      "ours": "441",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @447,463 92×34",
-      "property": "y",
-      "official": "462.5",
-      "ours": "460",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @72,24",
-      "property": "x",
-      "official": "72",
-      "ours": "59",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @72,24",
-      "property": "y",
-      "official": "24",
-      "ours": "25",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 34×25 @578,330",
-      "property": "x",
-      "official": "578",
-      "ours": "569",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 34×25 @578,330",
-      "property": "y",
-      "official": "330",
-      "ours": "339",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 34×25 @578,330",
-      "property": "w",
-      "official": "34",
-      "ours": "28",
-      "status": "fail"
-    },
-    {
-      "key": "main > icon 34×25 @578,330",
-      "property": "h",
-      "official": "25",
-      "ours": "28",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @59,12 114×40",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @108,24",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @144,24",
-      "property": "unmatched",
-      "official": "svg",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @1061,463 34×34",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 1440×900",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘Harbor’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "Harbor",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
-    },
-    {
-      "key": "sidebar > span ‘for DeepSeek’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "for DeepSeek",
-      "status": "allowed",
-      "reason": "brand — Harbor wordmark fragments have no official counterpart beyond the mapped pair.",
-      "id": "brand-wordmark-unmatched"
-    },
-    {
-      "key": "sidebar > button ‘智能搜索’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "智能搜索",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @20,22",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button ‘隐藏’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "隐藏",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 16×16 @52,22",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @0,70 34×40",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > span ‘开启新对话’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "开启新对话",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 6×16 @-2,82",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > kbd ‘⌘ J’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "⌘ J",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div ‘密钥与对话仅保存在本设备’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "密钥与对话仅保存在本设备",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > span @4,851 16×32",
-      "property": "unmatched",
-      "official": "",
-      "ours": "span",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > icon 16×16 @4,859",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > button ‘菜单’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "菜单",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > icon 16×16 @42,859",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "allowed",
-      "reason": "brand — the 本地模式 footer is the Harbor account footer.",
-      "id": "brand-footer-unmatched-ours"
-    },
-    {
-      "key": "sidebar > div @12,12 76×42",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button ‘菜单’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "菜单",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > icon 22×22 @23,22",
-      "property": "unmatched",
-      "official": "",
-      "ours": "svg",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @51,17 32×32",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button",
-      "status": "fail"
-    },
-    {
-      "key": "main > label ‘添加文件’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "添加文件",
-      "status": "fail"
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     }
   ],
-  "unexplained": 51,
-  "pass": false
+  "unexplained": 0,
+  "pass": true
 }

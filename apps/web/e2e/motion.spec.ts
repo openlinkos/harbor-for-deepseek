@@ -172,6 +172,7 @@ for (const point of points) {
         await page.locator('.item-menu-scrim').click({ position: { x: 200, y: 120 } })
         await page.getByTestId('new-chat').click()
       } else {
+        await page.locator('.chat-link').first().hover()
         await page.locator('.chat-link .more').first().click()
         await expect(page.locator('.item-menu')).toBeVisible()
         await expect(page.locator('.item-menu.sheet')).toHaveCount(0)

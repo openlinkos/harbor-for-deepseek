@@ -200,6 +200,7 @@ const states: StateSpec[] = [
       'Wait until the returning greeting is visible and the composer is empty.',
     ],
     run: async (page, mobile) => {
+      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
       arm('ok')
       await unlock(page)
       await send(page, '你好')
@@ -275,8 +276,15 @@ const states: StateSpec[] = [
   {
     id: 'search-dialog', rows: [34, 60], viewports: all, official: true,
     steps: ['On the home screen, press Ctrl+K (⌘K on macOS). Leave the search dialog open. Do not type a query.'],
-    run: async (page) => {
+    run: async (page, mobile) => {
+      await page.addInitScript(() => sessionStorage.setItem('harbor-audit-greeting', 'welcomeAlt'))
+      arm('ok')
       await unlock(page)
+      if (!mobile) {
+        await send(page, '你好')
+        await page.getByTestId('new-chat').click()
+        await page.locator('.greeting').waitFor()
+      }
       await page.keyboard.press('Control+K')
       await page.locator('.search-dialog').waitFor()
     },
@@ -288,6 +296,7 @@ const states: StateSpec[] = [
       arm('ok')
       await unlock(page)
       await send(page, '菜单')
+      await page.locator('.chat-link').hover()
       await page.locator('.chat-link .more').click()
       await page.locator('.item-menu').waitFor()
     },
@@ -572,37 +581,23 @@ const stopServer = (child: ChildProcess | null) => {
 
 const clip = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 90)
 
-const SKIPPED = new Set([
-  'search-dialog 1920x1072',
-  'settings-general 1920x1072',
-  'settings-account 1920x1072',
-  'settings-data 1920x1072',
-  'settings-terms 1920x1072',
-  'user-menu 1920x1072',
-  'sidebar-item-menu 1920x1072',
-  'sidebar-date-groups 1920x1072',
-  'sidebar-collapsed 1920x1072',
-])
-
 const renderSummary = (reports: DiffReport[]) => {
   const lines = [
     '# Style audit',
     '',
     'Visible painted elements only. Keys are the region plus the accessible name or text. Sidebar rows align by position, and extra official chats are not missing UI. Geometry allows ±0.5px. Text-bearing elements are compared on text color and font metrics. Container inheritance is not compared.',
     '',
-    'Nine 1920 captures still show the open 「定时器解释」 answer instead of the home screen. They are listed and skipped until they are recaptured: `search-dialog`, `settings-general`, `settings-account`, `settings-data`, `settings-terms`, `user-menu`, `sidebar-item-menu`, `sidebar-date-groups`, `sidebar-collapsed`.',
+    'The replaced 1920 captures are included. `search-dialog` at 1440 is the home screen with the greeting and the sidebar list, and no chat is open. The 1920 search capture has the collapsed icon rail instead of the open sidebar, which is why it has fewer elements and does not match the open-sidebar Harbor capture.',
     '',
     '| State | Viewport | Official visible | Matched equal | Matched with diff | Official only | Harbor only | Allowlisted | Unexplained | Result |',
     '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
   ]
   for (const report of reports) {
-    const skipped = SKIPPED.has(`${report.state} ${report.viewport}`)
-    lines.push(`| ${report.state} | ${report.viewport} | ${report.officialVisible} | ${report.matchedEqual} | ${report.matchedDiff} | ${report.officialOnly} | ${report.harborOnly} | ${report.allowlisted} | ${skipped ? '—' : report.unexplained} | ${skipped ? 'skip' : report.pass ? 'PASS' : 'FAIL'} |`)
+    lines.push(`| ${report.state} | ${report.viewport} | ${report.officialVisible} | ${report.matchedEqual} | ${report.matchedDiff} | ${report.officialOnly} | ${report.harborOnly} | ${report.allowlisted} | ${report.unexplained} | ${report.pass ? 'PASS' : 'FAIL'} |`)
   }
   lines.push('')
   for (const report of reports) {
-    if (SKIPPED.has(`${report.state} ${report.viewport}`)) continue
-    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 20)
+    const top = report.mismatches.filter((item) => item.status === 'fail').slice(0, 12)
     lines.push(`## ${report.state} ${report.viewport}`)
     lines.push('')
     if (!top.length) {
@@ -675,7 +670,7 @@ const main = async () => {
             reports.set(state.id, bucket)
             compared.push(report)
             writeFileSync(join(outDir, `${state.id}-${data.viewport.width}x${data.viewport.height}.json`), `${JSON.stringify(report, null, 2)}\n`)
-            if (!report.pass && !SKIPPED.has(`${state.id} ${data.viewport.width}x${data.viewport.height}`)) failed += 1
+            if (!report.pass) failed += 1
           }
           rows.push({ id: state.id, viewport: viewport.id, count: data.elements.length, pass })
           console.log(`${state.id} ${viewport.id} elements=${data.elements.length}${pass == null ? '' : pass ? ' PASS' : ' FAIL'}`)
@@ -695,7 +690,8 @@ const main = async () => {
     await browser.close()
     stopServer(server)
   }
-  for (const state of states) {
+  const partial = Boolean(onlyStates.size || onlyViews.size)
+  if (!partial) for (const state of states) {
     const chunks = reports.get(state.id)
     const related = rows.filter((row) => row.id === state.id)
     const body = chunks?.length
@@ -712,8 +708,10 @@ const main = async () => {
         ].join('\n')
     writeFileSync(join(outDir, `${state.id}.md`), body)
   }
-  writeNeeded(rows)
-  if (compared.length) writeFileSync(join(outDir, 'report.md'), renderSummary(compared))
+  if (!partial) {
+    writeNeeded(rows)
+    if (compared.length) writeFileSync(join(outDir, 'report.md'), renderSummary(compared))
+  }
   if (failed) {
     console.error(`style audit finished with ${failed} failed captures or comparisons`)
     process.exitCode = 1

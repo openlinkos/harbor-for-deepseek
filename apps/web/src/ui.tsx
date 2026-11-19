@@ -927,7 +927,7 @@ export const Shell = () => {
           </span>
         </div>
         <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat() }}>
-          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /> {t('newChat')}</span>
+          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
           <kbd className="kbd">{shortcutHint()}</kbd>
         </button>
         <div className="side-scroll">
@@ -942,7 +942,7 @@ export const Shell = () => {
           {groups.map(([label, items]) => (
             <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
               <p className="group-label">
-                <span>{label}</span>
+                {label}
                 {label === t('groupToday') ? (
                   <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
                     <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
@@ -998,17 +998,30 @@ export const Shell = () => {
         </div>
       </aside>
       {collapsed ? (
-        <div className="float-pill">
-          <button className="icon-btn" type="button" aria-label={t('menu')} onClick={() => setCollapsed(false)}><Mark /></button>
-          <button className="icon-btn" type="button" onClick={() => void state.newChat()}><Icon d="M12 5v14M5 12h14" /></button>
-        </div>
+        <>
+          <span className="collapsed-mark"><Mark /></span>
+          <div className="float-pill">
+            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(false)}>
+              <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
+            </button>
+            <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => void state.newChat()}>
+              <Icon d="M12 5v14M5 12h14" />
+            </button>
+            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering(true)}>
+              <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+            </button>
+          </div>
+        </>
       ) : null}
       {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }} /> : null}
       {filtering ? (
         <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
-          <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+          <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
+          <span className="search-rule" />
           <input className="side-filter" autoFocus placeholder={t('searchChats')} value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
-          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>×</button>
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter('') }}>
+            <Icon d="M6 6l12 12M18 6 6 18" />
+          </button>
         </form>
       ) : null}
       <section className="stage">
@@ -1177,6 +1190,10 @@ const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const returning = useMemo(() => {
+    const pinned = sessionStorage.getItem('harbor-audit-greeting')
+    if (pinned === 'welcomeMessage' || (RETURNING_GREETINGS as readonly string[]).includes(pinned || '')) {
+      return pinned as typeof RETURNING_GREETINGS[number] | 'welcomeMessage'
+    }
     if (!hasHistory) {
       return 'welcomeMessage' as const
     }

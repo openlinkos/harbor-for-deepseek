@@ -1,15 +1,15 @@
 {
   "state": "scroll-up",
   "viewport": "390x844",
-  "officialVisible": 29,
-  "matched": 11,
+  "officialVisible": 33,
+  "matched": 13,
   "matchedEqual": 1,
-  "matchedDiff": 10,
+  "matchedDiff": 12,
   "officialOnly": 16,
-  "harborOnly": 28,
-  "allowlisted": 4,
+  "harborOnly": 25,
+  "allowlisted": 22,
   "unmatchedOfficial": 16,
-  "unmatchedOurs": 28,
+  "unmatchedOurs": 25,
   "mismatches": [
     {
       "key": "sidebar > mark 1",
@@ -51,56 +51,226 @@
       "key": "control ‘深度思考’",
       "property": "x",
       "official": "29",
-      "ours": "37",
+      "ours": "41",
       "status": "fail"
     },
     {
       "key": "control ‘深度思考’",
       "property": "y",
       "official": "769",
-      "ours": "720.31",
+      "ours": "726.31",
       "status": "fail"
     },
     {
       "key": "control ‘智能搜索’",
       "property": "x",
       "official": "131.02",
-      "ours": "137",
+      "ours": "143",
       "status": "fail"
     },
     {
       "key": "control ‘智能搜索’",
       "property": "y",
       "official": "769",
-      "ours": "720.31",
+      "ours": "726.31",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘深度思考’",
       "property": "x",
       "official": "58",
-      "ours": "66",
+      "ours": "70",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘深度思考’",
       "property": "y",
       "official": "774",
-      "ours": "725.31",
+      "ours": "731.31",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘智能搜索’",
       "property": "x",
       "official": "160.02",
-      "ours": "166",
+      "ours": "172",
       "status": "fail"
     },
     {
       "key": "sidebar > span ‘智能搜索’",
       "property": "y",
       "official": "774",
-      "ours": "725.31",
+      "ours": "731.31",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "x",
+      "official": "10",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "sidebar > button @10,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "x",
+      "official": "331",
+      "ours": "340",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "y",
+      "official": "12",
+      "ours": "6",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-top-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-top-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-bottom-right-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "border-bottom-left-radius",
+      "official": "4096px",
+      "ours": "8px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "font-size",
+      "official": "14px",
+      "ours": "16px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "font-weight",
+      "official": "500",
+      "ours": "400",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "line-height",
+      "official": "22px",
+      "ours": "27.2px",
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "color",
+      "official": "rgb(15, 17, 21)",
+      "ours": "rgb(26, 26, 26)",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-top",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-right",
+      "official": "0px",
+      "ours": "6px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-bottom",
+      "official": "0px",
+      "ours": "1px",
+      "status": "fail"
+    },
+    {
+      "key": "main > button @331,12 44×44",
+      "property": "padding-left",
+      "official": "0px",
+      "ours": "6px",
       "status": "fail"
     },
     {
@@ -143,7 +313,9 @@
       "property": "h",
       "official": "28",
       "ours": "18.69",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
@@ -157,7 +329,9 @@
       "property": "line-height",
       "official": "16px",
       "ours": "18.7px",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "sidebar > div ‘内容由 AI 生成，请仔细甄别’",
@@ -220,14 +394,18 @@
       "property": "w",
       "official": "34",
       "ours": "36",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "main > button @328,656 34×34",
       "property": "h",
       "official": "34",
       "ours": "36",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "main > button @328,656 34×34",
@@ -248,7 +426,9 @@
       "property": "line-height",
       "official": "22px",
       "ours": "27.2px",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "main > button @328,656 34×34",
@@ -416,14 +596,18 @@
       "property": "w",
       "official": "322.41",
       "ours": "358",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’",
       "property": "h",
       "official": "216",
       "ours": "144",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’",
@@ -472,7 +656,9 @@
       "property": "line-height",
       "official": "28px",
       "ours": "27.2px",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "known — text box size follows Inter, not the official face.",
+      "id": "font-metrics"
     },
     {
       "key": "sidebar > span ‘快速排序的递归终止条件是当前区间为空或只有一个元’",
@@ -601,6 +787,13 @@
       "status": "fail"
     },
     {
+      "key": "sidebar > button @277,12 44×44",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "fail"
+    },
+    {
       "key": "sidebar > span ‘基准值 pivot 的选择会直接影响分区是否平衡’",
       "property": "unmatched",
       "official": "基准值 pivot 的选择会直接影响分区是否平衡",
@@ -629,88 +822,85 @@
       "status": "fail"
     },
     {
-      "key": "main > div @328,656 34×34",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "main > div @328,656 34×34",
-      "property": "unmatched",
-      "official": "div",
-      "ours": "",
-      "status": "fail"
-    },
-    {
       "key": "sidebar > div @16,710 358×106",
       "property": "unmatched",
       "official": "div",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "sidebar > textbox @17,715 356×42",
       "property": "unmatched",
       "official": "textarea",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "sidebar > icon 14×14 @40,779",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "sidebar > icon 14×14 @142,779",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
+    },
+    {
+      "key": "main > button @283,769 34×34",
+      "property": "unmatched",
+      "official": "div",
+      "ours": "",
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "main > icon 16×16 @292,778",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "main > button @327,769 34×34",
       "property": "unmatched",
       "official": "div",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "main > div @327,769 34×34",
       "property": "unmatched",
       "official": "div",
       "ours": "",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "main > icon 16×16 @336,778",
       "property": "unmatched",
       "official": "svg",
       "ours": "",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > div @0,0 390×844",
-      "property": "unmatched",
-      "official": "",
-      "ours": "div",
-      "status": "fail"
-    },
-    {
-      "key": "sidebar > button @6,6 44×44",
-      "property": "unmatched",
-      "official": "",
-      "ours": "button",
-      "status": "fail"
+      "status": "allowed",
+      "reason": "brand — official account email or name in the sidebar footer.",
+      "id": "brand-footer-unmatched-official"
     },
     {
       "key": "sidebar > heading ‘对照’",
@@ -724,13 +914,6 @@
       "property": "unmatched",
       "official": "",
       "ours": "开启新对话",
-      "status": "fail"
-    },
-    {
-      "key": "main > button ‘share’",
-      "property": "unmatched",
-      "official": "",
-      "ours": "share",
       "status": "fail"
     },
     {
@@ -846,21 +1029,21 @@
       "status": "fail"
     },
     {
-      "key": "sidebar > textbox @29,650 332×60",
+      "key": "sidebar > textbox @29,654 332×60",
       "property": "unmatched",
       "official": "",
       "ours": "textarea",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×14 @48,730",
+      "key": "sidebar > icon 14×14 @52,736",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "sidebar > icon 14×14 @148,730",
+      "key": "sidebar > icon 14×14 @154,736",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
@@ -874,27 +1057,27 @@
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @286,729",
+      "key": "main > icon 16×16 @280,735",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     },
     {
-      "key": "main > button @319,720 34×34",
+      "key": "main > button @315,726 34×34",
       "property": "unmatched",
       "official": "",
       "ours": "button",
       "status": "fail"
     },
     {
-      "key": "main > icon 16×16 @328,729",
+      "key": "main > icon 16×16 @324,735",
       "property": "unmatched",
       "official": "",
       "ours": "svg",
       "status": "fail"
     }
   ],
-  "unexplained": 121,
+  "unexplained": 124,
   "pass": false
 }

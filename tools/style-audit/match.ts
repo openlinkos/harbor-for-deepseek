@@ -54,19 +54,25 @@ const alphaOf = (color: string) => {
   return 1
 }
 
-const paints = (node: StyleNode) => {
-  if (accessibleName(node)) return true
-  if (node.tag === 'svg' || node.tag === 'img' || node.tag === 'input' || node.tag === 'textarea' || node.tag === 'button' || node.tag === 'a' || node.tag === 'select') return true
+const filled = (node: StyleNode) => {
   const background = node.style['background-color'] || ''
-  if (background && background !== 'transparent' && alphaOf(background) > 0.01) return true
+  return Boolean(background && background !== 'transparent' && alphaOf(background) > 0.01)
+}
+
+const bordered = (node: StyleNode) => ['top', 'right', 'bottom', 'left'].some((side) => {
+  const width = Number.parseFloat(node.style[`border-${side}-width`] || '0')
+  const style = node.style[`border-${side}-style`] || 'none'
+  const color = node.style[`border-${side}-color`] || ''
+  return width > 0 && style !== 'none' && alphaOf(color) > 0.01
+})
+
+const paints = (node: StyleNode) => {
+  if (visibleText(node)) return true
+  if (node.tag === 'svg' || node.tag === 'img' || node.tag === 'input' || node.tag === 'textarea' || node.tag === 'button' || node.tag === 'a' || node.tag === 'select' || node.tag === 'label') return true
+  if (node.role === 'button') return true
+  if (filled(node) || bordered(node)) return true
   const shadow = node.style['box-shadow'] || 'none'
   if (shadow && shadow !== 'none') return true
-  for (const side of ['top', 'right', 'bottom', 'left']) {
-    const width = parseFloat(node.style[`border-${side}-width`] || '0')
-    const style = node.style[`border-${side}-style`] || 'none'
-    const color = node.style[`border-${side}-color`] || ''
-    if (width > 0 && style !== 'none' && alphaOf(color) > 0.01) return true
-  }
   const content = node.style.content || ''
   if (node.pseudo && content && content !== 'none' && content !== 'normal' && content !== '""') return true
   return false
@@ -130,7 +136,7 @@ const isGroupLabel = (node: StyleNode) => {
 const isWordmark = (node: StyleNode, side: 'official' | 'ours') => {
   if (node.rect.y > 140 || node.rect.x > 280) return false
   const text = accessibleName(node)
-  if (side === 'official') return /deepseek/i.test(text)
+  if (side === 'official') return /deepseek/i.test(text) || (node.tag === 'svg' && node.rect.w > 80 && node.rect.y < 50)
   return /harbor/i.test(text) || /for deepseek/i.test(text)
 }
 
@@ -173,7 +179,7 @@ const dropInside = (pool: StyleNode[], rows: StyleNode[]) =>
 
 const sameControl = (left: StyleNode, right: StyleNode) => {
   const tags = new Set([left.tag, right.tag])
-  return tags.size === 2 && [...tags].every((tag) => tag === 'button' || tag === 'a' || tag === 'div')
+  return tags.size === 2 && [...tags].every((tag) => tag === 'button' || tag === 'a' || tag === 'div' || tag === 'label' || tag === 'form')
 }
 
 const shellOf = (node: StyleNode, pool: StyleNode[]) => {
@@ -199,7 +205,7 @@ const pairShells = (official: StyleNode[], ours: StyleNode[]) => {
   const usedOurs = new Set<StyleNode>()
   for (const label of labels) {
     const leftText = official.find((node) => accessibleName(node) === label)
-    const rightText = ours.find((node) => accessibleName(node) === label || accessibleName(node).includes(label))
+    const rightText = ours.find((node) => leftText && regionOf(node) === regionOf(leftText) && (accessibleName(node) === label || accessibleName(node).includes(label)))
     if (!leftText || !rightText) continue
     const left = shellOf(leftText, official)
     const right = shellOf(rightText, ours)
@@ -209,6 +215,14 @@ const pairShells = (official: StyleNode[], ours: StyleNode[]) => {
     pairs.push({ key: `control ‘${label}’`, official: left, ours: right, how: 'semantic' })
   }
   return pairs
+}
+
+const pairByBox = (official: StyleNode[], ours: StyleNode[], pred: (node: StyleNode) => boolean, label: string) =>
+  zip(official.filter(pred).sort(byPos), ours.filter(pred).sort(byPos), undefined, label)
+
+const pairShortcuts = (official: StyleNode[], ours: StyleNode[]) => {
+  const hit = (node: StyleNode) => /⌘|Ctrl/.test(`${accessibleName(node)} ${node.style.content || ''}`)
+  return zip(official.filter(hit).sort(byPos), ours.filter(hit).sort(byPos), undefined, 'sidebar > shortcut')
 }
 
 const pairGreetings = (official: StyleNode[], ours: StyleNode[]) => {
@@ -228,8 +242,9 @@ const distance = (left: StyleNode, right: StyleNode) => {
 
 export const matchCaptures = (official: Capture, ours: Capture): MatchResult => {
   const viewport = official.viewport || { width: 1440, height: 900 }
-  let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport))
-  let oursPool = ours.elements.filter((node) => isVisiblePainted(node, ours.viewport || viewport))
+  const isPageCanvas = (node: StyleNode) => !visibleText(node) && node.tag !== 'svg' && node.rect.w >= viewport.width - 2 && node.rect.h >= viewport.height - 2
+  let officialPool = official.elements.filter((node) => isVisiblePainted(node, viewport) && !isPageCanvas(node))
+  let oursPool = ours.elements.filter((node) => isVisiblePainted(node, ours.viewport || viewport) && !isPageCanvas(node))
   const officialVisible = officialPool.length
   const pairs: Pair[] = []
 
@@ -283,6 +298,16 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
   pairs.push(...shells)
   officialPool = take(officialPool, shells.map((pair) => pair.official))
   oursPool = take(oursPool, shells.map((pair) => pair.ours))
+
+  const sidebars = pairByBox(officialPool, oursPool, (node) => node.rect.x <= 1 && node.rect.w > 240 && node.rect.w < 280 && node.rect.h > 700, 'sidebar')
+  pairs.push(...sidebars)
+  officialPool = take(officialPool, sidebars.map((pair) => pair.official))
+  oursPool = take(oursPool, sidebars.map((pair) => pair.ours))
+
+  const shortcuts = pairShortcuts(officialPool, oursPool)
+  pairs.push(...shortcuts)
+  officialPool = take(officialPool, shortcuts.map((pair) => pair.official))
+  oursPool = take(oursPool, shortcuts.map((pair) => pair.ours))
 
   const greetings = pairGreetings(officialPool, oursPool)
   pairs.push(...greetings)
@@ -342,10 +367,19 @@ export const matchCaptures = (official: Capture, ours: Capture): MatchResult => 
     if (Number.parseFloat(node.style['font-size'] || '0') >= 20) return false
     return true
   }
+  const isScrollbar = (node: StyleNode) => node.rect.w <= 10 && node.rect.h >= 80
+  const isHairline = (node: StyleNode) => regionOf(node) === 'sidebar' && node.rect.h <= 2 && node.rect.w >= 80
+  const sameBox = (left: StyleNode, right: StyleNode) =>
+    Math.abs(left.rect.x - right.rect.x) <= 1 && Math.abs(left.rect.y - right.rect.y) <= 1
+    && Math.abs(left.rect.w - right.rect.w) <= 1 && Math.abs(left.rect.h - right.rect.h) <= 1
+  const paired = pairs.map((pair) => pair.official)
+  const duplicate = (node: StyleNode) => paired.some((other) => other !== node && sameBox(other, node))
+  const wrapsPaired = (node: StyleNode) => node.rect.h <= 28 && paired.some((other) => other !== node && inside(node, other) && other.rect.h <= 24)
+  const keep = (node: StyleNode) => !contentLeaf(node) && !isScrollbar(node) && !isHairline(node) && !duplicate(node) && !wrapsPaired(node)
   return {
     pairs,
-    unmatchedOfficial: officialPool.filter((node) => !usedOfficial.has(node) && !contentLeaf(node)),
-    unmatchedOurs: oursPool.filter((node) => !usedOurs.has(node) && !contentLeaf(node)),
+    unmatchedOfficial: officialPool.filter((node) => !usedOfficial.has(node) && keep(node)),
+    unmatchedOurs: oursPool.filter((node) => !usedOurs.has(node) && keep(node)),
     officialVisible,
   }
 }
