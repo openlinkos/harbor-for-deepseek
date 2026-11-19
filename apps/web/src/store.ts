@@ -108,6 +108,7 @@ export type HarborState = {
   openChat: (id: string) => Promise<void>
   rename: (id: string, title: string) => Promise<void>
   pin: (id: string) => Promise<void>
+  pinMany: (ids: string[]) => Promise<void>
   removeChat: (id: string) => Promise<void>
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
@@ -432,6 +433,18 @@ export const useHarbor = create<HarborState>((set, get) => ({
       await store.saveConversation(next)
     }
     set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
+  },
+
+  async pinMany(ids) {
+    const wanted = new Set(ids)
+    const next = get().conversations.map((item) => (wanted.has(item.id) && !item.pinned ? stamp({ ...item, pinned: true }) : item))
+    if (!get().serverMode) {
+      const store = await repository()
+      for (const item of next) {
+        if (wanted.has(item.id)) await store.saveConversation(item)
+      }
+    }
+    set({ conversations: next })
   },
 
   async removeChat(id) {

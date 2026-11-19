@@ -10,6 +10,7 @@ import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor, type HarborState } from './store.js'
+import { ACTION_ICONS } from './official-icons.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -46,6 +47,16 @@ export const SiteFooter = () => {
   )
 }
 
+const FillIcon = ({ paths, size = 16 }: { paths: string[]; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    {paths.map((d) => <path key={d.slice(0, 24)} d={d} fill="currentColor" />)}
+  </svg>
+)
+const MORE_DOTS = [
+  'M4.55146 8.00001C4.55146 8.63513 4.03659 9.15001 3.40146 9.15001C2.76634 9.15001 2.25146 8.63513 2.25146 8.00001C2.25146 7.36488 2.76634 6.85001 3.40146 6.85001C4.03659 6.85001 4.55146 7.36488 4.55146 8.00001Z',
+  'M9.1476 8.00001C9.1476 8.63513 8.63273 9.15001 7.9976 9.15001C7.36248 9.15001 6.8476 8.63513 6.8476 8.00001C6.8476 7.36488 7.36248 6.85001 7.9976 6.85001C8.63273 6.85001 9.1476 7.36488 9.1476 8.00001Z',
+  'M13.7486 8.00001C13.7486 8.63513 13.2338 9.15001 12.5986 9.15001C11.9635 9.15001 11.4486 8.63513 11.4486 8.00001C11.4486 7.36488 11.9635 6.85001 12.5986 6.85001C13.2338 6.85001 13.7486 7.36488 13.7486 8.00001Z',
+]
 const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke ?? (size >= 20 ? 2 : 1.7)} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={d} />
@@ -241,20 +252,27 @@ export const KeyGate = () => {
       </div>
       <footer className="landing-foot">
         <div>
-          <strong>{t('product')}</strong>
-          <div>DeepAPI</div>
+          <strong>产品</strong>
+          <a href="https://deepapi.linkos.org">DeepAPI 网页版</a>
           <a href={PLATFORM}>{t('apiPlatform')}</a>
+          <a href="https://deepapi.linkos.io">分享</a>
+          <a href={REPO}>GitHub</a>
         </div>
         <div>
-          <strong>{t('navLegal')}</strong>
+          <strong>文档</strong>
+          <a href="https://api-docs.deepseek.com">API 文档</a>
+          <a href="https://platform.deepseek.com">API 价格</a>
+        </div>
+        <div>
+          <strong>法务 & 安全</strong>
           <div>{t('terms')}</div>
           <div>{t('privacyPolicy')}</div>
         </div>
         <div>
-          <strong>GitHub</strong>
+          <strong>加入我们</strong>
           <a href={REPO}>openlinkos/deepapi</a>
-          <a href="https://github.com/openlinkos/deepapi/releases">{t('downloadApp')}</a>
         </div>
+        <p className="landing-copy">© 2026 OpenLinkOS</p>
       </footer>
       <SiteFooter />
       {keyOpen && !locked ? (
@@ -706,15 +724,16 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <Icon size={16} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />}</button>
+          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           {conversation.activeLeafId === message.id ? (
             <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-              <Icon size={16} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
+              <FillIcon paths={[...ACTION_ICONS.regen]} />
             </button>
           ) : null}
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={16} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={16} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
+          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /></button>
+          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
+          <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { const utter = new SpeechSynthesisUtterance(textOf); utter.lang = 'zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(utter) }}><FillIcon paths={[...ACTION_ICONS.speak]} /></button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -926,25 +945,27 @@ export const Shell = () => {
             </button>
           </span>
         </div>
-        <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }}>
-          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
-          <kbd className="kbd">{shortcutHint()}</kbd>
-        </button>
+        {selecting ? (
+          <div className="select-head">
+            <span>{picked.length ? t('selectedCount', { count: picked.length }) : t('selectChats')}</span>
+            <button className="select-close" type="button" aria-label={t('close')} title={t('exitMulti')} onClick={() => { setSelecting(false); setPicked([]) }}>
+              <Icon size={12} d="M6 6l12 12M18 6 6 18" />
+            </button>
+          </div>
+        ) : (
+          <button className="new-chat" data-testid="new-chat" type="button" onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }}>
+            <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
+            <kbd className="kbd">{shortcutHint()}</kbd>
+          </button>
+        )}
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
-          {selecting ? (
-            <div className="select-bar">
-              <button className="select-close" type="button" aria-label={t('close')} onClick={() => { setSelecting(false); setPicked([]) }}><Icon d="M6 6l12 12M18 6 6 18" /></button>
-              <span>{t('selectedCount', { count: picked.length })}</span>
-              <button type="button" className="danger" disabled={!picked.length} onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('delete')}</button>
-            </div>
-          ) : null}
-          {groups.map(([label, items]) => (
+          {groups.map(([label, items], index) => (
             <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
               <p className="group-label">
                 {label}
-                {label === (groups.some(([name]) => name === t('groupPinned')) ? t('groupPinned') : t('groupToday')) ? (
-                  <button className="icon-btn" type="button" aria-label={t('multiSelect')} aria-pressed={selecting} onClick={() => { setSelecting((value) => !value); setPicked([]) }}>
+                {!selecting && index === 0 ? (
+                  <button className="icon-btn" type="button" aria-label={t('multiSelect')} onClick={() => { setSelecting(true); setPicked([]) }}>
                     <Icon d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01" />
                   </button>
                 ) : null}
@@ -963,6 +984,18 @@ export const Shell = () => {
             </div>
           ))}
         </div>
+        {selecting ? (
+          <div className="select-foot">
+            <button type="button" aria-disabled={!picked.length} className={picked.length ? '' : 'off'} onClick={() => { if (picked.length) void state.pinMany(picked) }}>
+              <Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />
+              <span>{t('pin')}</span>
+            </button>
+            <button type="button" aria-disabled={!picked.length} className={picked.length ? 'danger' : 'off'} onClick={() => { if (!picked.length) return; for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>
+              <Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />
+              <span>{t('delete')}</span>
+            </button>
+          </div>
+        ) : (
         <div className="user-bar">
           <span className="avatar" aria-hidden="true">
             {initial || <Icon d="M4 5h16v11H4zM2 19h20" />}
@@ -971,20 +1004,18 @@ export const Shell = () => {
             <span className="user-label">{who}</span>
           </span>
           <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
-            <Icon d="M6 12h.01M12 12h.01M18 12h.01" />
+            <FillIcon paths={MORE_DOTS} />
           </button>
           {userMenu ? (
             <div className="menu user-menu">
+              <a href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">{t('downloadMobile')}</a>
               <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</button>
               <a href="https://github.com/openlinkos/deepapi/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
-              {state.serverUser ? (
-                <button type="button" onClick={() => void state.logoutServer()}>{t('logout')}</button>
-              ) : (
-                <button type="button" onClick={() => { setUserMenu(false); void state.clearKey() }}>{t('clearKey')}</button>
-              )}
+              <button type="button" onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}>{t('logout')}</button>
             </div>
           ) : null}
         </div>
+        )}
       </aside>
       {collapsed ? (
         <>
@@ -1133,20 +1164,24 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
   const [confirming, setConfirming] = useState(false)
   return (
-    <a className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`} href={`#${conversation.id}`} onClick={(event) => event.preventDefault()}>
-      {picking ? <input type="checkbox" aria-label={conversation.title || t('newChat')} checked={picked} onChange={() => onPick?.()} /> : null}
+    <a className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`} href={`#${conversation.id}`} onClick={(event) => { event.preventDefault(); if (picking) onPick?.() }}>
+      {picking ? (
+        <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('newChat')}>
+          {picked ? <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.1 11.3 2.7 7.9l1.4-1.4 2 2 5.2-5.2 1.4 1.4z" /></svg> : null}
+        </span>
+      ) : null}
       {editing ? (
         <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
-        <button type="button" onClick={() => { setSidebarOpen(false); void openChat(conversation.id); focusComposer() }}>{conversation.title || t('newChat')}</button>
+        <button type="button" onClick={(event) => { if (picking) return; event.stopPropagation(); setSidebarOpen(false); void openChat(conversation.id); focusComposer() }}>{conversation.title || t('newChat')}</button>
       )}
-      <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
+      {picking ? null : <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
         setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
-      }}><Icon d="M6 12h.01M12 12h.01M18 12h.01" /></button>
+      }}><FillIcon paths={MORE_DOTS} /></button>}
       {open ? createPortal(
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
@@ -1181,7 +1216,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
 const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
-  const line = t(hasHistory ? 'welcomeBack' : 'welcomeMessage')
+  const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  // Official home-with-history text: 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
+  const line = t(hasHistory ? (narrow ? 'welcomeBack' : 'welcomeAlt') : 'welcomeMessage')
   return (
     <div className="home">
       <h2 className="greeting"><Mark /><span>{line}</span></h2>
@@ -1498,7 +1535,6 @@ const Settings = () => {
         </details>
         <section className="settings-account">
           <div className="settings-line">
-            <span>{t('currentKey')}</span>
             <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
           <div className="settings-line">
@@ -1508,8 +1544,8 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('nickname')}</span>
             <span className="account-chip wide">
-              <input className="account-value" data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-              <input className="account-value short" data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+              <input className="account-value" data-testid="nickname" value={nickname} placeholder={t('nickname')} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+              <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder={t('nickname')} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
               <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('save')}</span></button>
             </span>
           </div>

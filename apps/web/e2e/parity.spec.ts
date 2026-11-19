@@ -199,7 +199,7 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await row.getByRole('button', { name: '不喜欢', exact: true }).click()
   await expect(row.getByRole('button', { name: '不喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
+  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(1)
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
@@ -321,10 +321,11 @@ test('sidebar', async ({ page }) => {
   await page.locator('.chat-link').hover()
   await page.locator('.chat-link .more').click()
   await page.getByRole('menuitem', { name: '多选' }).click()
-  await page.getByRole('checkbox', { name: '新名字' }).check()
-  page.once('dialog', (dialog) => void dialog.accept())
+  await expect(page.getByText('选择对话')).toBeVisible()
+  await page.getByRole('checkbox', { name: '新名字' }).click()
   await expect(page.getByText('已选择 1 个对话')).toBeVisible()
-  await page.locator('.select-bar').getByRole('button', { name: '删除' }).click()
+  await page.locator('.select-foot').getByRole('button', { name: '置顶' }).click()
+  await page.locator('.select-foot').getByRole('button', { name: '删除' }).click()
   await expect(page.getByTestId('sidebar')).not.toContainText('新名字')
 })
 
@@ -435,7 +436,7 @@ test('sidebar motion', async ({ page }) => {
 test('action row', async ({ page }) => {
   await unlock(page)
   await send(page, '动作')
-  await expect(page.locator('.action-row button')).toHaveCount(5)
+  await expect(page.locator('.action-row button')).toHaveCount(6)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
   await page.screenshot({ path: join(shots, 'actions-light.png') })
   await page.getByTestId('user-menu').click()

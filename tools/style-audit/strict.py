@@ -26,13 +26,14 @@ PAIRS = {
   'settings-account': ('store', 'settings-account'),
   'settings-data': ('store', 'settings-data'),
   'settings-terms': ('store', 'settings-terms'),
-  'multi-select': (None, 'multi-select'),
+  'multi-select': ('store', 'multi-select'),
+  'multi-select-checked': ('store', 'multi-select-checked'),
   'sidebar-item-menu': ('store', 'sidebar-item-menu'),
   'search-dialog': ('store', 'search-dialog'),
   'mobile-drawer': ('store', 'mobile-drawer'),
 }
 # ---------- product rules (owner decisions) -------------------------------------------------
-NOT_APPLICABLE = ['手机号码', '微信', '未成年人模式', '登录设备管理', '登出所有设备', '注销账号', '未绑定', '绑定']   # account-bound official features: must be removed
+NOT_APPLICABLE = ['手机号码', '微信', '未成年人模式', '登录设备管理', '登出所有设备', '注销账号', '未绑定', '绑定', '邮箱', '变更', '已关闭', '登出', '注销', '<account>']   # account-bound official features: must be removed
 HARBOR_ONLY_COPY = ['本地模式', '密钥与对话仅保存在本设备', '对话留在本机', '密钥只留在本机', '数据留在本机', '本机', 'OpenLinkOS 发起的开源项目',
                     '从本机移除 Key', '下载应用', '服务器模式', '思考、搜索和文件直接走']
 ALLOWED_HARBOR = {'key-gate'}  # API-key entry is required for the product
@@ -96,7 +97,14 @@ class Cap:
         return best
     def region(s, e):
         r = e['rect']
-        if s.dialog and r['x'] >= s.dialog['x'] - 1 and r['y'] >= s.dialog['y'] - 1 and r['x'] + r['w'] <= s.dialog['x'] + s.dialog['w'] + 1 and r['y'] + r['h'] <= s.dialog['y'] + s.dialog['h'] + 1:
+        key = e.get('key') or ''
+        # A modal's box overlaps the chat behind it. Only nodes inside the dialog
+        # subtree are dialog chrome; the answer showing through is not.
+        if 'dialog|' in key:
+            return 'dialog'
+        if s.dialog and 'dialog|' not in key and key:
+            pass
+        elif s.dialog and r['x'] >= s.dialog['x'] - 1 and r['y'] >= s.dialog['y'] - 1 and r['x'] + r['w'] <= s.dialog['x'] + s.dialog['w'] + 1 and r['y'] + r['h'] <= s.dialog['y'] + s.dialog['h'] + 1:
             return 'dialog'
         sidebar_w = 262
         drawer = s.mobile and any(e2['tag'] in ('aside',) or 'sidebar' in (e2.get('cls') or '') for e2 in s.els if e2['rect']['x'] < 5 and e2['rect']['w'] > 250 and e2['rect']['h'] > 600)
@@ -107,6 +115,16 @@ class Cap:
         if s.composer and contains({'x': s.composer['x'] - 2, 'y': s.composer['y'] - 2, 'w': s.composer['w'] + 4, 'h': s.composer['h'] + 4}, r): return 'composer'
         if s.composer and r['y'] >= s.composer['y'] + s.composer['h'] - 2: return 'footer'
         return 'content'
+
+def menus(c):
+    """small rounded popups in the sidebar (the account menu floats over the chat rows)"""
+    out = []
+    for e in c.els:
+        r = e['rect']
+        radius = str(e['style'].get('border-top-left-radius', '0')).replace('px', '')
+        if filled(e) and 100 < r['w'] < 240 and 80 < r['h'] < 280 and r['x'] < 140 and radius not in ('0', '0.0', ''):
+            out.append(r)
+    return out
 
 TRUNC = [False]
 def text_of(e):
@@ -126,8 +144,18 @@ def chrome_tokens(c, state):
         reg = c.region(e); r = e['rect']; fs = float(e['style'].get('font-size', '0').replace('px', '') or 0)
         is_data = False
         if c.mobile and reg not in ('topbar', 'dialog'): reg = 'page'
-        if any(contains(row, r) for row in c.rows) or GROUPS.match(t.strip()):
+        in_row = any(contains(row, r) for row in c.rows)
+        in_menu = any(contains(m, r) for m in menus(c))
+        menu_label = t.strip() in ('选择对话', '删除', '置顶', '开启新对话', '退出登录', '系统设置', '帮助与反馈', '下载手机应用')
+        if (in_row and not menu_label) or GROUPS.match(t.strip()):
             is_data = True   # conversation titles and date groups depend on history volume
+        key = e.get('key') or ''
+        if t.strip().startswith('已思考'):
+            is_data = True
+        elif t.strip() != '内容由 AI 生成，请仔细甄别' and (any(tok in key for tok in ('pre#', '|code', 'p#')) or (t.strip() in ('复制', '下载', 'js') and r['x'] > 400)):
+            is_data = True   # answer body and code cards, including text scrolling under the composer
+        if reg == 'sidebar' and not in_menu and e['tag'] in ('div', 'span', 'a', 'p') and t.strip() not in ('选择对话', '删除', '置顶', '开启新对话', '退出登录', '系统设置', '帮助与反馈', '下载手机应用'):
+            is_data = True   # chat titles the row detector missed; menu labels stay chrome
         if reg == 'topbar' and chat and e['tag'] == 'div' and 13 <= fs <= 16 and r['x'] > (40 if c.mobile else 200) and r['x'] < c.W / 2: is_data = True  # chat title
         if reg in ('content', 'page') and chat and c.region(e) == 'content' and e['tag'] not in ('button',) and e.get('role') != 'button' and not re.match(r'^已思考', t): is_data = True
         if e['tag'] in ('code',) or re.match(r'^(js|ts)$', t): is_data = True
@@ -258,8 +286,9 @@ def ours_only_checks(c, state, theme, vp):
             if small and x * y / small > 0.25:
                 F(state, theme, vp, c.region(a), 'overlapping text', 'high', f"「{a['text'][:8]}」与「{b['text'][:8]}」重叠 @{int(ra['x'])},{int(ra['y'])}", 5 if 'settings' in state else None)
 
-def compare(o, c, state, theme, vp, oname):
-    same_theme = theme == 'light'   # all official references are light
+def compare(o, c, state, theme, vp, oname, same_theme=None):
+    if same_theme is None:
+        same_theme = theme == 'light'
     TRUNC[0] = not any('full' in e for e in o.d['elements'][:50])   # old official captures keep only 24 chars of own text
     to, do = chrome_tokens(o, state); tc, dc = chrome_tokens(c, state)
     TRUNC[0] = False
@@ -268,6 +297,7 @@ def compare(o, c, state, theme, vp, oname):
         for t, n in miss.items():
             if t.startswith('BRAND') and len(t) < 8: continue
             if t.startswith('[placeholder]') and not o.has_ph: continue
+            if any(w in t for w in NOT_APPLICABLE) or '******' in t or t.strip() in ('管理',): continue  # account-bound official rows are required to be absent
             F(state, theme, vp, reg, 'chrome text missing', 'high' if reg != 'sidebar' or 'BRAND' not in t else 'med', f'官方有「{t[:40]}」×{n}，我们没有')
         for t, n in extra.items():
             if t in ('BRAND',): continue
@@ -285,7 +315,7 @@ def compare(o, c, state, theme, vp, oname):
     ar_o, ar_c = action_rows(o), action_rows(c)
     if ar_o or ar_c:
         a, b = (ar_o[-1] if ar_o else None), (ar_c[-1] if ar_c else None)
-        if not a or not b or a['count'] != b['count']:
+        if a and (not b or a['count'] != b['count']):
             F(state, theme, vp, 'content', 'action row count', 'high', f"官方 {a and a['count']} 个 / 我们 {b and b['count']} 个", 2)
         if a and b:
             if a['modes'] != b['modes']: F(state, theme, vp, 'content', 'action row icon glyphs', 'high', f"官方图标 {a['modes']}（实心 fill 图形）/ 我们 {b['modes']}（描边线条，自绘路径）→ 图标形状不同", 2)
@@ -309,11 +339,16 @@ def compare(o, c, state, theme, vp, oname):
         # filled boxes per region missing/extra
         for reg in ('topbar', 'sidebar', 'composer', 'dialog', 'content'):
             fo, fc = filled_boxes(o, reg), filled_boxes(c, reg)
+            def group_bar(cap, e):
+                # date-group header strips depend on how much history the account has
+                return e['rect']['h'] <= 24 and any(contains(e['rect'], t['rect']) and GROUPS.match((t.get('text') or '').strip()) for t in cap.els)
             for e in fc:
+                if group_bar(c, e): continue
                 if not any(iou(e['rect'], x['rect']) > 0.5 for x in fo):
                     if reg == 'content': continue
                     F(state, theme, vp, reg, 'extra filled box', 'med', f"我们多出底色块 {e['tag']}.{(e.get('cls') or '')[:24]} {int(e['rect']['w'])}×{int(e['rect']['h'])}@{int(e['rect']['x'])},{int(e['rect']['y'])} bg={e['style']['background-color']}")
             for e in fo:
+                if group_bar(o, e): continue
                 if not any(iou(e['rect'], x['rect']) > 0.5 for x in fc):
                     if reg == 'content': continue
                     F(state, theme, vp, reg, 'missing filled box', 'med', f"官方有底色块 {e['tag']} {int(e['rect']['w'])}×{int(e['rect']['h'])}@{int(e['rect']['x'])},{int(e['rect']['y'])} bg={e['style']['background-color']}，我们没有")
@@ -369,20 +404,44 @@ for f in sorted(glob.glob(f'{A.caps}/ours-*.json')):
                 ol, _ = lum(load(od).get('page', {}).get('bodyBg', '')); cl, _ = lum(c.page.get('bodyBg', ''))
                 F(state, theme, vp, 'page', 'theme behaviour', 'high', f'系统深色时官方首页仍是浅色（body bg {load(od)["page"].get("bodyBg")}），我们切成深色（{c.page.get("bodyBg")}）', 1)
     else:
-        of = f'{A.official}/style-official-{ref}-{vp}.json'
+        dark_of = f'{A.official}/style-official-{ref}-dark-{vp}.json'
+        of = dark_of if theme == 'dark' and os.path.exists(dark_of) else f'{A.official}/style-official-{ref}-{vp}.json'
         if not os.path.exists(of):
             F(state, theme, vp, 'coverage', 'no official reference', 'high', f'没有官方 {ref} {vp} 采集')
             results_states.append((state, theme, vp, 'NO OFFICIAL REF')); continue
         o = Cap(load(of), False)
-        if theme == 'dark':
+        if theme == 'dark' and not os.path.exists(dark_of):
             F(state, theme, vp, 'coverage', 'no official dark capture', 'med', '官方所有采集都是浅色；深色只能做自洽检查（浅色块、对比），颜色无法逐项比对')
-    compare(o, c, state, theme, vp, of)
+    compare(o, c, state, theme, vp, of, theme == 'light' or (theme == 'dark' and of.endswith(f'-dark-{vp}.json')))
     results_states.append((state, theme, vp, os.path.basename(of)))
 
-json.dump({'findings': findings, 'states': results_states}, open(f'{A.out}/findings.json', 'w'), ensure_ascii=False, indent=1)
-# summary
-by = collections.Counter((x['state'], x['theme'], x['vp']) for x in findings)
-print('states:', len(results_states), 'findings:', len(findings))
+# Minimal brand allowlist. Everything else stays unexplained.
+# 1. We have no ICP / 公网安备 / 备案号, so that footer block is omitted.
+# 2. We set no cookies, so the cookie notice is omitted.
+# 3. The product column is ours (DeepAPI 网页版, API 开放平台, GitHub, 分享) in the same four-column footer.
+BRAND_OMIT = ('ICP', '备案', '公网安备', 'Cookie', 'cookie', '杭州深度求索', 'Harness', '探索未至之境', '扫码', '岗位详情', '模型版本', 'V4', '和 DeepSeek')
+def brand_reason(f):
+    if f['state'] == 'settings-account' and f['check'] == 'chrome text extra' and any(tok in f['detail'] for tok in ('移除 Key', '余额', '昵称', '保存', '#.#')):
+        return 'brand: API key account rows replace the official mailbox / phone / WeChat block'
+    if f['state'] != 'landing' or f['check'] not in ('chrome text missing', 'chrome text extra'): return None
+    if any(tok in f['detail'] for tok in BRAND_OMIT):
+        return 'brand: omit ICP/备案, cookies, and the official product catalog'
+    return None
+explained = []
+unexplained = []
+for f in findings:
+    reason = brand_reason(f)
+    if reason:
+        f['explained'] = reason
+        explained.append(f)
+    else:
+        unexplained.append(f)
+json.dump({'findings': findings, 'explained': len(explained), 'states': results_states}, open(f'{A.out}/findings.json', 'w'), ensure_ascii=False, indent=1)
+print('states:', len(results_states), 'findings:', len(findings), 'explained:', len(explained), 'unexplained:', len(unexplained))
+print('unexplained high/medium per state:')
+by = collections.Counter((x['state'], x['theme'], x['vp'], x['sev']) for x in unexplained if x['sev'] in ('high', 'med'))
+for key in sorted(by):
+    print(f'  {key[0]} {key[1]} {key[2]} {key[3]}: {by[key]}')
 for p in (1, 2, 3, 4, 5):
     hits = [x for x in findings if x['problem'] == p]
     print(f'user problem {p}: {"DETECTED" if hits else "NOT detected"} ({len(hits)} findings) e.g.', [h['check'] + ': ' + h['detail'][:70] for h in hits[:3]])

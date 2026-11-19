@@ -15,7 +15,7 @@ if (request.includes('你是 DeepAPI') || request.includes('helpful assistant in
 if (ui.includes('data-testid="key-ack"') || ui.includes('keyAck')) fail.push('the key gate still asks for an acknowledgement')
 if (i18n.includes('从本机移除 Key') || i18n.includes('数据用于优化体验') || i18n.includes('有效期为 7 天')) fail.push('misleading or Harbor-only settings copy is still shipped')
 if (!store.includes("history.every((item) => item.role !== 'assistant')")) fail.push('title.enabled is not limited to the first turn')
-if (!css.includes('border-radius: 6px') || !css.includes('inset 0 0 0 1.5px')) fail.push('batch checkboxes are not the official ds-checkbox')
+if (!css.includes('.pick.on') || !css.includes('border-radius: 50%') || !css.includes('#3964fe')) fail.push('batch checkboxes are not the official round circle')
 
 if (fail.length) {
   console.error(fail.map((item) => `- ${item}`).join('\n'))
