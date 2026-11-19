@@ -1,7 +1,8 @@
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import { createRequire } from 'node:module'
-import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { buildCaptureScripts } from './build.ts'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { diffMatch, loadAllowlistFile, renderReport, type DiffReport } from './diff.ts'
 import { matchCaptures, type Capture } from './match.ts'
@@ -491,25 +492,6 @@ const states: StateSpec[] = [
   },
 ]
 
-const buildBookmarklet = () => {
-  const bins = readdirSync(join(root, 'node_modules/.pnpm')).filter((name) => name.startsWith('esbuild@')).sort()
-  const bin = join(root, 'node_modules/.pnpm', bins[bins.length - 1] || '', 'node_modules/esbuild/bin/esbuild')
-  const tmp = join(root, 'tools/style-audit/.bookmarklet.tmp.js')
-  const result = spawnSync(bin, [
-    join(root, 'tools/style-audit/capture.js'),
-    '--bundle', '--format=iife', '--minify',
-    '--footer:js=globalThis.captureStyleAudit()',
-    `--outfile=${tmp}`,
-  ], { encoding: 'utf8' })
-  if (result.status !== 0) throw new Error(result.stderr || 'esbuild failed')
-  const code = readFileSync(tmp, 'utf8').trim().replace(/\s+/g, ' ').replace(/;$/, '')
-  unlinkSync(tmp)
-  const url = `javascript:void(${code})`
-  const bytes = Buffer.byteLength(url)
-  if (bytes >= 64 * 1024) throw new Error(`bookmarklet is ${bytes} bytes`)
-  writeFileSync(join(root, 'tools/style-audit/bookmarklet.js'), `${url}\n`)
-  return bytes
-}
 
 const findOfficial = (state: string, viewport: string) => {
   try {
@@ -584,7 +566,7 @@ const stopServer = (child: ChildProcess | null) => {
 
 const main = async () => {
   selfCheck()
-  const bytes = buildBookmarklet()
+  const bytes = buildCaptureScripts(root).bytes
   console.log(`bookmarklet ${bytes} bytes`)
   mkdirSync(oursDir, { recursive: true })
   mkdirSync(outDir, { recursive: true })

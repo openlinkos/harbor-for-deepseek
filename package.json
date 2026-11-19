@@ -14,7 +14,7 @@
     "build": "turbo run build --filter=@harbor/web",
     "preview": "pnpm --filter @harbor/web preview",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
+    "test": "turbo run test && node --experimental-strip-types --test tools/style-audit/bookmarklet.test.ts",
     "lint": "turbo run lint",
     "e2e": "pnpm --filter @harbor/web e2e",
     "style:audit": "node --experimental-strip-types tools/style-audit/run.ts",
