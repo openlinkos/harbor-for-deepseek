@@ -1365,11 +1365,15 @@ body[data-ds-dark-theme] .settings-main button:not(.chip) { background: var(--ds
   border: 0;
 }
 .settings-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; min-height: 60px; padding: 12px 0; border: 0; font-size: 14px; font-weight: 400; line-height: 22px; box-shadow: none; }
+.settings-line > span:first-child { flex-shrink: 0; white-space: nowrap; }
+.settings-line.balance-line { height: auto; align-items: center; }
+.settings-line.balance-line > span:first-child { height: 22px; line-height: 22px; }
 .settings-account, .settings-data, .settings-legal { margin-top: -10px; }
 .legal-copy { max-width: 640px; }
 .legal-copy h3 { margin: 16px 0 8px; font-size: 16px; }
 .legal-copy p { margin: 0 0 12px; line-height: 24px; color: var(--dsw-alias-label-secondary); }
-.settings-line .account-side { display: inline-flex; align-items: center; gap: 12px; }
+.settings-line .account-side { display: inline-flex; align-items: center; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+[data-testid='balance-side'] { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; column-gap: 8px; row-gap: 8px; min-width: 0; }
 .settings-line input.account-value:not([type='hidden']):not([type='file']) {
   width: 129px;
   min-width: 129px;

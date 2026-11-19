@@ -383,13 +383,18 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
     const openUp = needed > spaceBelow && spaceAbove > spaceBelow
     const available = Math.max(36, (openUp ? spaceAbove : spaceBelow) - 6)
     const top = openUp ? Math.max(margin, rect.top - 6 - Math.min(needed, available)) : rect.bottom + 6
-    setBox({ top, right: window.innerWidth - rect.right - shiftRight, maxHeight: available })
+    const menuWidth = Math.min(menu.offsetWidth, window.innerWidth - margin * 2)
+    const minRight = margin
+    const maxRight = Math.max(minRight, window.innerWidth - menuWidth - margin)
+    const preferred = window.innerWidth - rect.right - shiftRight
+    const right = Math.min(Math.max(preferred, minRight), maxRight)
+    setBox({ top, right, maxHeight: available })
   }, [open, shiftRight])
   return (
     <div className="pill-menu">
       <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
-        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
+        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, maxWidth: 'calc(100vw - 16px)', overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
@@ -1403,6 +1408,7 @@ const Settings = () => {
   const setPrefs = useHarbor((state) => state.setPrefs)
   const balance = useHarbor((state) => state.balance)
   const balanceError = useHarbor((state) => state.balanceError)
+  const balanceInfo = balance?.balance_infos?.[0]
   const patchSettings = useHarbor((state) => state.patchSettings)
   const setLocale = useHarbor((state) => state.setLocale)
   const refreshBalance = useHarbor((state) => state.refreshBalance)
@@ -1581,17 +1587,17 @@ const Settings = () => {
             <span>API Key</span>
             <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
           </div>
-          <div className="settings-line">
-            <span>{t('balance')}</span>
+          <div className="settings-line balance-line">
+            <span data-testid="balance-label">{t('balance')}</span>
             <span className="account-side">
               <span data-testid="balance-side">
-                {balanceError || !balance?.balance_infos?.[0]
+                {balanceError || !balanceInfo
                   ? t('balanceFailed')
                   : <>
-                      {balance.balance_infos[0].total_balance} {balance.balance_infos[0].currency} {balance.is_available ? t('available') : t('unavailable')}
-                      <span className="hint">
-                        {t('granted')} {balance.balance_infos[0].granted_balance}
-                        {' · '}{t('toppedUp')} {balance.balance_infos[0].topped_up_balance}
+                      <span data-testid="balance-value">{balanceInfo.total_balance} {balanceInfo.currency} {balance.is_available ? t('available') : t('unavailable')}</span>
+                      <span className="hint" data-testid="balance-hint">
+                        {t('granted')} {balanceInfo.granted_balance}
+                        {' · '}{t('toppedUp')} {balanceInfo.topped_up_balance}
                       </span>
                     </>}
               </span>
