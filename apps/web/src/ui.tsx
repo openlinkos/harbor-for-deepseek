@@ -3,7 +3,7 @@ import { presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@harbor/pricing'
 import { activePath, siblingIds } from '@harbor/types'
 import type { ContentBlock, Conversation, Message } from '@harbor/types'
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { Markdown } from './markdown.js'
@@ -741,8 +741,9 @@ export const Shell = () => {
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
-  const frame = useRef(0)
   const consumed = useRef<string | null>(null)
+  const seenChat = useRef<string | null | undefined>(undefined)
+  const seenAssistant = useRef<string | null>(null)
   const [away, setAway] = useState(false)
   const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && !navigator.onLine)
   useEffect(() => {
@@ -755,36 +756,58 @@ export const Shell = () => {
       window.removeEventListener('online', up)
     }
   }, [])
-  useEffect(() => {
+  useLayoutEffect(() => {
     const list = listRef.current
-    if (!list || !stick.current) {
+    const latest = [...path].reverse().find((message) => message.role === 'assistant')
+    const chatId = conversation?.id ?? null
+    const switching = seenChat.current !== undefined && seenChat.current !== chatId && !state.streaming
+    seenChat.current = chatId
+    if (!list) {
       return
     }
-    cancelAnimationFrame(frame.current)
-    frame.current = requestAnimationFrame(() => {
-      const bottom = list.scrollHeight - list.clientHeight
-      const assistant = list.querySelector<HTMLElement>('.turn.assistant.streaming .prose')
-      let target = bottom
-      let stop = false
-      if (assistant && consumed.current !== assistant.dataset.followId) {
-        const bodyTop = assistant.getBoundingClientRect().top - list.getBoundingClientRect().top
-        if (bodyTop >= -1) {
-          const absolute = list.scrollTop + bodyTop
-          if (absolute < bottom - 1) {
-            target = Math.max(absolute, list.scrollTop)
-            stop = true
-          }
-        }
+    if (switching) {
+      seenAssistant.current = latest?.id ?? null
+      consumed.current = latest?.id ?? null
+      stick.current = true
+      list.scrollTo({ left: 0, top: list.scrollHeight, behavior: 'instant' })
+      return
+    }
+    const appeared = Boolean(latest && latest.id !== seenAssistant.current)
+    if (appeared && state.streaming) {
+      stick.current = true
+    }
+    if (!stick.current) {
+      seenAssistant.current = latest?.id ?? null
+      return
+    }
+    const bottom = list.scrollHeight - list.clientHeight
+    const nodes = list.querySelectorAll<HTMLElement>('.turn.assistant .prose')
+    const assistant = nodes[nodes.length - 1]
+    let target = bottom
+    let stop = false
+    const followId = latest?.id ?? null
+    if (assistant && appeared && followId && followId !== consumed.current) {
+      const bodyTop = assistant.getBoundingClientRect().top - list.getBoundingClientRect().top
+      const absolute = list.scrollTop + bodyTop
+      if (Number.isFinite(absolute) && absolute < bottom - 1) {
+        target = Math.max(0, absolute)
+        stop = true
       }
-      list.scrollTo({ left: 0, top: target, behavior: 'instant' })
-      if (stop && assistant) {
-        consumed.current = assistant.dataset.followId ?? 'streaming'
-        stick.current = false
-        const distance = list.scrollHeight - list.scrollTop - list.clientHeight
-        setAway(distance > 52)
-      }
-    })
-  }, [path, state.streaming, state.messages])
+    }
+    if (!stop && appeared && state.streaming) {
+      return
+    }
+    list.scrollTo({ left: 0, top: target, behavior: 'instant' })
+    if (stop && followId) {
+      consumed.current = followId
+      seenAssistant.current = followId
+      stick.current = false
+      const distance = list.scrollHeight - list.scrollTop - list.clientHeight
+      setAway(distance > 52)
+    } else if (!appeared || !state.streaming) {
+      seenAssistant.current = latest?.id ?? null
+    }
+  }, [path, state.streaming, state.messages, conversation?.id])
   useEffect(() => {
     const viewport = window.visualViewport
     if (!viewport) {
@@ -1015,7 +1038,7 @@ export const Shell = () => {
               <div ref={endRef} />
             </div>
             {away ? (
-              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }}>
+              <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); listRef.current?.scrollTo({ left: 0, top: listRef.current.scrollHeight, behavior: 'instant' }) }}>
                 <Icon d="M6 9l6 6 6-6" />
               </button>
             ) : null}

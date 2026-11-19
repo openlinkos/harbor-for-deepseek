@@ -60,7 +60,15 @@ The message list does not use a thin always-on bar.
 - `body { --scroll-color: rgba(0, 0, 0, .08); --scroll-color-hover: rgba(0, 0, 0, .15) }`. Dark theme: `rgba(255, 255, 255, .15)` and `rgba(255, 255, 255, .24)`.
 - `--dsl-scroll-area-gutters-disappear-delay: 1s`.
 
-Harbor’s transcript, sidebar list, settings body, source sheet, and composer textarea use `scrollbar-width: none` and a hidden webkit scrollbar.
+The message list, sidebar list, and composer textarea use `scrollbar-width: none` and a hidden webkit scrollbar at every width. Settings and the source sheet use the `.scrollable` pair: `scrollbar-color: var(--scroll-color) transparent`, switching to `--scroll-color-hover` on hover over `.1s`.
+
+These scroll, greeting, pill, menu, and dialog rules are the same code on desktop, tablet, and phone. Width only changes the layout tokens:
+
+| Viewport | Column | Composer | Sidebar | Pills |
+| --- | --- | --- | --- | --- |
+| ≥1024 (1920, 1440, 1280, 1024) | max 840px, 44px inset | same column | 261px dock, collapse `flex-basis` over `.3s` | labels, collapse on overflow |
+| 768–1023 | max 712px, 36px inset | same column | 261px dock | labels, collapse on overflow |
+| <768 | transcript margin 36px | margin 16px | fixed drawer, 261px | icon-only 34×34 on touch or a mobile UA |
 
 ## Composer pills
 
@@ -80,7 +88,7 @@ A logged-in Android Chrome window at about 393 CSS pixels still shows those two 
 
 ## Scroll follow
 
-From `main.5a15ff2247.js`. Auto-scroll calls `scrollTo({ left: 0, top, behavior: "instant" })`. It does not use `smooth` for follow.
+From `main.5a15ff2247.js`. Auto-scroll and the scroll-to-bottom chevron call `scrollTo({ left: 0, top, behavior: "instant" })`. Follow does not use `smooth`. Sending a message arms follow again. When the new answer is taller than the list, its body is placed at the top and follow stops, which is the same rule at 1920, 1440, 1280, 1024, 768, and 390.
 
 - Re-enable follow on user scroll only when `scrollTop + offsetHeight >= scrollHeight - 1`.
 - The scroll-to-bottom button is hidden when `scrollTop + offsetHeight > scrollHeight - 52`, and shown otherwise.

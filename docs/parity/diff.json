@@ -43,7 +43,7 @@
   },
   {
     "state": "answer-search-final-sources-pill",
-    "mismatch": 7.5,
+    "mismatch": 7.49,
     "status": "justify",
     "note": "Same weather answer and 12 citations; glyphs differ by the face."
   },
@@ -55,7 +55,7 @@
   },
   {
     "state": "answer-search-timeline-expanded-sources-open",
-    "mismatch": 9.58,
+    "mismatch": 9.74,
     "status": "justify",
     "note": "Same timeline and answer; glyphs differ by the face."
   },
