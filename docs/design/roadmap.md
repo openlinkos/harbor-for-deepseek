@@ -10,7 +10,7 @@
 2. **第一期只有私密链接。** 公开列表以后再做，不进下面的里程碑 1 到 6。
 3. **分享默认不加密。** 隐私靠 128 位随机 id、`noindex`、可选过期、可选口令。正文在服务器上是明文：拿到链接的人可以读，持有磁盘和备份的人也可以读。口令只挡住没有口令的访问者。
 4. **界面包不能含脚本。** 只描述外观：设计变量、消毒后的 CSS、布局，以及少量位图。
-5. **分享服务放在 prod-us。** Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 记录与 `hfd.linkos.org` 相同（开启代理，HTTPS 在 Cloudflare 终结）。存储是集群内的 Postgres 加上数据盘上的对象文件。限流在 GoEdge 和应用里各做一层。备份保留 7 天。
+5. **分享服务放在 prod-us。** Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 仅 DNS，CNAME 到 `70c9d096.quic.ing`，与 `hfd.linkos.org` 相同。TLS 在新建的 GoEdge 站点终结，证书由 GoEdge 自动续期，源站是 prod-us 的 Ingress。存储是集群内的 Postgres 加上数据盘上的对象文件。限流在 GoEdge 和应用里各做一层。备份保留 7 天。
 6. **聊天页在用户确认分享之后才连接 `hfd.linkos.io`。** 内容安全策略写上这个域名，未确认时不发请求。
 
 ## 依赖
@@ -91,7 +91,7 @@
 
 **做的事：**
 
-- 按分享文档建命名空间 `harbor-share`、一个应用副本、自带的 Postgres、数据盘上的对象目录、GoEdge Ingress、Cloudflare 上与 `hfd.linkos.org` 相同做法的 DNS 记录。
+- 按分享文档建命名空间 `harbor-share`、一个应用副本、自带的 Postgres、数据盘上的对象目录、作为源站的 Ingress。Cloudflare 上为 `hfd.linkos.io` 建仅 DNS 的 CNAME，指向 `70c9d096.quic.ing`。GoEdge 上新建站点，单独证书，源站指向这份 Ingress。
 - 创建、读取、口令打开、删除令牌删除、过期清理、两层限流、管理密钥删除、每日备份保留 7 天。
 - 只接受 `visibility: "unlisted"`。不提供列表接口。
 - 响应带 `noindex`。`robots.txt` 禁止抓取。
@@ -110,6 +110,7 @@
 - 备份目录在 `/data/storage/harbor-share/backups`，含明文，超过 7 天的被删掉。对象文件不在系统盘的 compose 目录里。
 - CORS 拒绝名单以外的来源。允许 `https://hfd.linkos.org`。
 - `/healthz` 与 `/readyz` 可用。分享的路径不在 `hfd.linkos.org` 上。
+- `hfd.linkos.io` 的 Cloudflare 记录是仅 DNS 的 CNAME，目标为 `70c9d096.quic.ing`。公网证书在 GoEdge 的新站点上，并设置为自动续期。集群 Ingress 是源站，不持有这张证书。
 
 ## 里程碑 5：从聊天页分享一条对话
 

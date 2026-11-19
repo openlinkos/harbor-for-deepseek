@@ -11,7 +11,7 @@ Harbor 的公开站 [hfd.linkos.org](https://hfd.linkos.org) 只发静态文件�
 1. 私密分享没有账号。创建时发一次性删除令牌。
 2. 第一期只有私密链接。公开列表以后再做。
 3. 对话和界面包默认不加密。隐私靠猜不到的链接：128 位随机 id、页面 `noindex`、可选过期、可选口令。取舍见下一节。
-4. 服务跑在现有的 prod-us 集群上，由 Flux（`best/flux-k8s`）发布，入口是 GoEdge，域名 `hfd.linkos.io`。Cloudflare 上的记录与 `hfd.linkos.org` 相同：开启代理，HTTPS 在 Cloudflare 终结。不用 Workers、R2、D1、KV。
+4. 服务跑在现有的 prod-us 集群上，由 Flux（`best/flux-k8s`）发布，入口是 GoEdge，域名 `hfd.linkos.io`。Cloudflare 只做 DNS，记录不走代理，CNAME 到 GoEdge 的 `70c9d096.quic.ing`。证书在 GoEdge 上，由 GoEdge 自动续期。源站是 prod-us 的 Ingress。不用 Workers、R2、D1、KV。
 5. 聊天页只有在用户确认分享之后才连接 `hfd.linkos.io`。
 
 ## 这是哪一类问题
@@ -135,7 +135,7 @@ id 用 128 位随机数的 base64url。不用自增数字。
 
 GoEdge（这台主机的站点配置，和 Ingress 同一次变更）：
 
-- 单个来源地址每分钟最多 30 次请求。来源地址取 `CF-Connecting-IP`，与 `hfd.linkos.org` 一样走 Cloudflare 代理。
+- 单个来源地址每分钟最多 30 次请求。Cloudflare 不代理这条流量，限流按 GoEdge 站点上看到的客户端地址计算。
 - 请求体最大 2 MB。这比应用里的 1 MB 宽一点，给 JSON 和 base64 留余量。应用仍按上一节的字节数拒绝。
 
 应用：
@@ -143,7 +143,7 @@ GoEdge（这台主机的站点配置，和 Ingress 同一次变更）：
 - 同一来源地址每小时最多创建 10 次，每天最多 30 次。
 - 同一来源地址每分钟最多读取 60 次。
 - 同一个 id 每分钟最多读取 30 次。
-- 创建体只接受 JSON。应用信任 `CF-Connecting-IP` 的前提是连接来自集群入口；其它来源忽略这个头，改用套接字上的地址。
+- 创建体只接受 JSON。应用只在连接来自集群入口时信任 `X-Forwarded-For` 里的客户端地址。直连 Pod 时用套接字上的地址。不读取 `CF-Connecting-IP`。
 
 日志记方法、状态码、id 的前 4 个字符、字节数。不记正文、口令、删除令牌和 `Authorization` 头。来源地址只进入限流表，计数几小时后删掉。
 
@@ -175,9 +175,25 @@ Harbor 仓库的 [SECURITY.md](../../SECURITY.md) 在实现时加一小节，指
 
 ## 部署
 
-已决定：prod-us，Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 账号与 `linkos.org` 相同，记录的做法与 `hfd.linkos.org` 相同。按 [docs/deploy-web.md](../deploy-web.md)，那台主机开启代理（橙色云），HTTPS 在 Cloudflare 终结，集群 Ingress 不写公网证书。`hfd.linkos.io` 照这套做。Cloudflare 不运行这份服务，也不存放正文。
+已决定：prod-us，Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 账号与 `linkos.org` 相同，但只做 DNS，不代理、不缓存、不终结 TLS。
 
-本仓库 `deploy/web/k8s` 里的 Ingress 类名是 `nginx`，那是静态站自己的对象。分享服务不改那个类名，也不和 `harbor-web` 挤在同一个 Deployment 里。GoEdge 的 Ingress 类名从 `best/flux-k8s` 里已有的 GoEdge Ingress 抄过来。
+现有公开站的记录是：
+
+```text
+hfd.linkos.org.  CNAME  70c9d096.quic.ing.
+```
+
+这是 GoEdge CDN（`cdn-uspre.quic.ing`）。记录在 Cloudflare 上是「仅 DNS」。访客的 TLS 停在 GoEdge，证书由 GoEdge 管理并自动续期。集群里的 Ingress 是源站，不持有这张公网证书。
+
+`hfd.linkos.io` 用同一套：
+
+1. Cloudflare 上加一条仅 DNS 的 CNAME：`hfd.linkos.io` → `70c9d096.quic.ing`。不要打开代理。
+2. 在 GoEdge 上新建一个站点，主机名 `hfd.linkos.io`，单独一张由 GoEdge 管理、自动续期的证书。
+3. 该站点的源站是 prod-us 上这份服务的 Ingress。源站协议按现有 `hfd.linkos.org` 站点的源站写法，公网证书不放到 Ingress 上。
+
+Cloudflare 不运行这份服务，也不存放正文。
+
+GoEdge 是前面的 CDN 站点，不是集群里的 Ingress 类。分享服务单独一个 Deployment，不并进 `harbor-web`。它的 Kubernetes Ingress 用 prod-us 上 `harbor-web` 源站已经在用的那一个类（本仓库的 kustomization 写成 `nginx`），主机名是 `hfd.linkos.io`。GoEdge 站点把这个 Ingress 当作源站。
 
 镜像沿用静态站的标签习惯：`ghcr.io/openlinkos/harbor-share`，主分支推送时打 `<YYYYMMDDHHmmss>-<sha7>`，供 Flux ImagePolicy 排序（见 `docs/deploy-web.md`）。实现时再加工具流；本文不添加工作流。
 
@@ -191,7 +207,7 @@ Harbor 仓库的 [SECURITY.md](../../SECURITY.md) 在实现时加一小节，指
 | --- | --- |
 | Deployment `harbor-share` | 一个副本。听 8080。`/healthz` 只表示进程在。`/readyz` 同时检查 Postgres |
 | Service `harbor-share` | 把 8080 交给 Ingress |
-| Ingress `harbor-share` | 主机名 `hfd.linkos.io`，类名用 GoEdge 的。不写 `tls`，与静态站的 Ingress 一样 |
+| Ingress `harbor-share` | 源站。类名与现有 `harbor-web` 源站相同。不写公网 `tls` |
 | PersistentVolume + PVC `harbor-share-objects` | `hostPath`：`/data/storage/harbor-share/objects`。应用挂到 `/var/lib/harbor-share/objects` |
 | StatefulSet `harbor-share-postgres` | 一个副本。数据在 `/data/storage/harbor-share/pg` |
 | Secret | 数据库口令、管理密钥。不进 Git |
@@ -203,7 +219,7 @@ Pod 用节点亲和性固定到持有 `/data/storage` 的那台 worker。
 
 ### Ingress 示意
 
-类名在落地时换成 Flux 仓库里 GoEdge 正在用的值。
+这是源站对象。公网证书在 GoEdge 站点上，不写在这里。`ingressClassName` 与 prod-us 上 `harbor-web` 的源站一致。
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -212,7 +228,7 @@ metadata:
   name: harbor-share
   namespace: harbor-share
 spec:
-  ingressClassName: goedge # 换成 best/flux-k8s 里已有的类名
+  ingressClassName: nginx # 与现有 harbor-web 源站相同；以 prod-us 上的实际值为准
   rules:
     - host: hfd.linkos.io
       http:
@@ -226,7 +242,7 @@ spec:
                   name: http
 ```
 
-请求体大小和每分钟次数写在这台主机的 GoEdge 站点配置里，和这份 Ingress 一起提交。数值见「滥用和限额」。
+请求体大小和每分钟次数写在新建的 GoEdge 站点上，和这条 DNS 记录、这张证书一起提交。数值见「滥用和限额」。
 
 ### 备份
 

@@ -31,7 +31,7 @@ kubectl apply -k deploy/web/k8s
 kubectl -n harbor rollout status deployment/harbor-web
 ```
 
-The default image tag is `latest`. Change it in `deploy/web/k8s/kustomization.yaml` (`images.newTag`). The ingress class defaults to `nginx` in that same file. TLS on the Ingress is commented out because Cloudflare terminates HTTPS.
+The default image tag is `latest`. Change it in `deploy/web/k8s/kustomization.yaml` (`images.newTag`). The ingress class defaults to `nginx` in that same file. TLS on the Ingress is commented out because GoEdge terminates HTTPS. The Ingress is the origin.
 
 `deploy/web/k8s/rbac.yaml` is an example ServiceAccount, Role, and RoleBinding for a deployer. It is not applied by the kustomization. The Role can only touch deployments, services, and ingresses in the `harbor` namespace.
 
@@ -52,6 +52,14 @@ It uses `GITHUB_TOKEN` with `packages: write`.
 
 If the repository secret `HARBOR_KUBECONFIG` is set (raw kubeconfig text, or base64 of that text), the workflow sets the deployment image to `sha-<short>`, applies the kustomization, and waits for the rollout. If the secret is absent, that step exits successfully and does not deploy.
 
-## Cloudflare
+## DNS and TLS
 
-Point `hfd.linkos.org` at the ingress with the proxy enabled (orange cloud). Turn on Always Use HTTPS. Cache rules should respect the origin `Cache-Control`: `index.html` and the manifest are `no-cache`, and files under `/assets/` are `public, max-age=31536000, immutable`. Do not cache HTML at the edge longer than the origin allows, or a new release will keep serving the previous `index.html`.
+`hfd.linkos.org` is a Cloudflare DNS-only CNAME. The record is not proxied:
+
+```text
+hfd.linkos.org.  CNAME  70c9d096.quic.ing.
+```
+
+`70c9d096.quic.ing` is the GoEdge CDN (`cdn-uspre.quic.ing`). TLS terminates at GoEdge. GoEdge manages the certificate and renews it. Cloudflare does not cache this host and does not see the HTTP requests.
+
+The cluster Ingress is the origin behind that GoEdge site. Cache behavior belongs on GoEdge, and it should still respect the origin `Cache-Control`: `index.html` and the manifest are `no-cache`, and files under `/assets/` are `public, max-age=31536000, immutable`. Do not cache HTML at the edge longer than the origin allows, or a new release will keep serving the previous `index.html`.
