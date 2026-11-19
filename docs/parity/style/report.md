@@ -16,7 +16,7 @@ The replaced 1920 captures are included. `search-dialog` at 1440 is the home scr
 | sidebar-item-menu | 1440x900 | 78 | 41 | 0 | 0 | 5 | 18 | 0 | PASS |
 | sidebar-collapsed | 1440x900 | 23 | 22 | 0 | 0 | 0 | 0 | 0 | PASS |
 | answer | 1440x900 | 121 | 74 | 1 | 0 | 5 | 19 | 3 | FAIL |
-| thinking-collapsed | 1440x900 | 123 | 27 | 12 | 34 | 40 | 19 | 106 | FAIL |
+| thinking-collapsed | 1440x900 | 123 | 38 | 20 | 17 | 31 | 19 | 94 | FAIL |
 | scroll-up | 1440x900 | 114 | 28 | 6 | 31 | 15 | 19 | 70 | FAIL |
 | sidebar-date-groups | 1440x900 | 64 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
 | home-with-history | 1920x1072 | 72 | 28 | 0 | 0 | 5 | 18 | 0 | PASS |
@@ -88,18 +88,7 @@ No unexplained diffs.
 
 ## thinking-collapsed 1440x900
 
-- sidebar > row 1 › background-color rgba(0, 0, 0, 0) vs rgb(228, 237, 253)
-- main > button @1391,12 34×34 › x 1391 vs 1390
-- main > button @1391,12 34×34 › y 12 vs 10
-- main > icon 16×16 @1400,21 › x 1400 vs 1399
-- main > icon 16×16 @1400,21 › y 21 vs 19
-- main > icon 14×14 @1203,704 › x 1202.5 vs 1214.5
-- main > icon 14×14 @1203,704 › y 704 vs 721.8
-- main > icon 14×14 @1203,704 › w 14 vs 12
-- main > icon 14×14 @1203,704 › h 14 vs 12
-- main > div @475,276 752×40 › x 474.5 vs 488.5
-- main > div @475,276 752×40 › y 276 vs 253.8
-- main > div @475,276 752×40 › w 752 vs 724
+The thinking body is collapsed. 94 unexplained remain, mostly unmatched code-card icons and a non-uniform vertical offset through the essay.
 
 ## scroll-up 1440x900
 
