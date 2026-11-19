@@ -15,9 +15,6 @@ exceptions:
   - id: brand-logo
     brand: logo
     reason: brand — DeepSeek logo maps to the Harbor mark.
-  - id: brand-account-footer
-    brand: account-footer
-    reason: brand — the official account footer maps to the DeepAPI account row.
   - id: brand-chat-list
     brand: chat-list
     property: text
@@ -26,10 +23,6 @@ exceptions:
     unmatched: ours
     text: "DeepAPI"
     reason: brand — the DeepAPI wordmark has no official counterpart beyond the mapped pair.
-  - id: brand-footer-unmatched-ours
-    unmatched: ours
-    text: "本地模式|密钥与对话|DeepAPI"
-    reason: brand — the account row is the DeepAPI account footer.
   - id: brand-footer-unmatched-official
     unmatched: official
     text: "@"

@@ -38,7 +38,6 @@ const unlock = async (page: Page) => {
   await install(page)
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()

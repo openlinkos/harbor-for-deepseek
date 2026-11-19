@@ -134,9 +134,7 @@ export const KeyGate = () => {
   const locale = useHarbor((state) => state.settings.locale)
   const [key, setKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [ack, setAck] = useState(false)
   const [show, setShow] = useState(false)
-  const [advanced, setAdvanced] = useState(false)
   const [keyOpen, setKeyOpen] = useState(false)
   const [draft, setDraft] = useState('')
   const [think, setThink] = useState(true)
@@ -145,11 +143,7 @@ export const KeyGate = () => {
 
   const onSave = (event: FormEvent) => {
     event.preventDefault()
-    if (!ack) {
-      setError(t('needAck'))
-      return
-    }
-    void saveKey(key, passphrase, ack)
+    void saveKey(key, '', true)
   }
   const onUnlock = (event: FormEvent) => {
     event.preventDefault()
@@ -285,26 +279,6 @@ export const KeyGate = () => {
               <button type="button" className="eye" aria-label={show ? t('hide') : t('show')} onClick={() => setShow((value) => !value)}>
                 <EyeIcon off={show} />
               </button>
-            </label>
-            <button type="button" className="advanced" aria-expanded={advanced} onClick={() => setAdvanced((value) => !value)}>
-              {t('advanced')}
-            </button>
-            {advanced ? (
-              <label>
-                {t('passphraseOptional')}
-                <input
-                  data-testid="key-passphrase"
-                  type="password"
-                  value={passphrase}
-                  autoComplete="new-password"
-                  onChange={(event) => setPassphrase(event.target.value)}
-                />
-                <span className="hint">{t('passphraseHint')}</span>
-              </label>
-            ) : null}
-            <label className="check">
-              <input data-testid="key-ack" type="checkbox" checked={ack} onChange={(event) => setAck(event.target.checked)} />
-              <span>{t('keyAck')}</span>
             </label>
             {error ? <p className="form-error">{error}</p> : null}
             <button className="primary block" data-testid="key-save" type="submit">
@@ -866,7 +840,6 @@ export const Shell = () => {
     }
   }, [])
 
-  const total = estimateCost(state.totals, new Date())
   const profile = useProfile()
   const [collapsed, setCollapsed] = useState(false)
   const [filtering, setFiltering] = useState(false)
@@ -1002,15 +975,6 @@ export const Shell = () => {
           </button>
           {userMenu ? (
             <div className="menu user-menu">
-              <p className="side-usage" data-testid="total-usage">
-                {t('totalLine', {
-                  inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
-                  outTokens: state.totals.output_tokens,
-                  cny: formatCny(total.totalCny),
-                })}
-                {state.balance ? <span data-testid="balance-side"> {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
-              </p>
-              <a href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">{t('downloadApp')}</a>
               <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</button>
               <a href="https://github.com/openlinkos/deepapi/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
               {state.serverUser ? (
@@ -1168,9 +1132,8 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [title, setTitle] = useState(conversation.title)
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
   const [confirming, setConfirming] = useState(false)
-  const RowTag = conversation.pinned ? 'a' : 'div'
   return (
-    <RowTag className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`}>
+    <a className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''}`} href={`#${conversation.id}`} onClick={(event) => event.preventDefault()}>
       {picking ? <input type="checkbox" aria-label={conversation.title || t('newChat')} checked={picked} onChange={() => onPick?.()} /> : null}
       {editing ? (
         <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
@@ -1211,27 +1174,14 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           onConfirm={() => { setConfirming(false); void removeChat(conversation.id) }}
         />
       ) : null}
-    </RowTag>
+    </a>
   )
 }
-
-const RETURNING_GREETINGS = ['welcomeBack', 'welcomeAlt', 'welcomeHello'] as const
 
 const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
-  const returning = useMemo(() => {
-    const pinned = sessionStorage.getItem('deepapi-audit-greeting')
-    if (pinned === 'welcomeMessage' || (RETURNING_GREETINGS as readonly string[]).includes(pinned || '')) {
-      return pinned as typeof RETURNING_GREETINGS[number] | 'welcomeMessage'
-    }
-    if (!hasHistory) {
-      return 'welcomeMessage' as const
-    }
-    const index = Math.floor(Math.random() * RETURNING_GREETINGS.length)
-    return RETURNING_GREETINGS[index] ?? 'welcomeBack'
-  }, [hasHistory])
-  const line = t(returning)
+  const line = t(hasHistory ? 'welcomeBack' : 'welcomeMessage')
   return (
     <div className="home">
       <h2 className="greeting"><Mark /><span>{line}</span></h2>
@@ -1413,7 +1363,6 @@ const Settings = () => {
   const [passphrase, setPassphrase] = useState('')
   const [tab, setTab] = useState<'general' | 'account' | 'data' | 'legal'>('general')
   const [exporting, setExporting] = useState(false)
-  const [improve, setImprove] = useState(() => localStorage.getItem('deepapi-improve') !== 'off')
   const [sharedNote, setSharedNote] = useState(false)
   const [confirmAll, setConfirmAll] = useState(false)
   const profile = useProfile()
@@ -1438,6 +1387,7 @@ const Settings = () => {
         </header>
         <nav className="settings-nav" aria-label={t('systemSettings')}>
           <button type="button" className={tab === 'general' ? 'on' : ''} onClick={() => setTab('general')}><Icon d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2" />{t('navGeneral')}</button>
+          <button type="button" className={tab === 'account' ? 'on' : ''} onClick={() => setTab('account')}><Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />{t('navAccount')}</button>
           <button type="button" className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}><Icon d="M4 7h16v12H4zM4 11h16M9 7v12" />{t('navData')}</button>
           <button type="button" className={tab === 'legal' ? 'on' : ''} onClick={() => setTab('legal')}><Icon d="M7 3h8l4 4v14H7zM11 13h6M11 17h6" />{t('navLegal')}</button>
         </nav>
@@ -1546,7 +1496,15 @@ const Settings = () => {
             </label>
           </section>
         </details>
-        <section className="settings-general">
+        <section className="settings-account">
+          <div className="settings-line">
+            <span>{t('currentKey')}</span>
+            <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
+          </div>
+          <div className="settings-line">
+            <span>{t('balance')}</span>
+            <span>{balance?.balance_infos[0]?.total_balance ?? '—'} {t('cny')}</span>
+          </div>
           <div className="settings-line">
             <span>{t('nickname')}</span>
             <span className="account-chip wide">
@@ -1557,13 +1515,6 @@ const Settings = () => {
           </div>
         </section>
         <section className="settings-data">
-          <div className="settings-line stack">
-            <div className="settings-copy">
-              <span>{t('improveToggle')}</span>
-              <p className="hint">{t('improveBody')}</p>
-            </div>
-            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('deepapi-improve', next ? 'on' : 'off') }}><span className="knob" /></button>
-          </div>
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
             <button type="button" className="account-quiet" onClick={() => setSharedNote(true)}>{t('manage')}</button>

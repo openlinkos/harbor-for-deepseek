@@ -56,7 +56,6 @@ test('native shell keeps the key on device and offers a server address', async (
   expect(policy).toContain('capacitor:')
   await expect(page.getByRole('heading', { name: 'DeepAPI' })).toBeVisible()
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()

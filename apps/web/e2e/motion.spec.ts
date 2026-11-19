@@ -59,7 +59,6 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
   }
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()

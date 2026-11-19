@@ -90,7 +90,6 @@ test('mobile states at 390x844', async ({ page }) => {
   await page.route('https://api.deepseek.com/**', fulfill)
   await page.goto('/')
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()

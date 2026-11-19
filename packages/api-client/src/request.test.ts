@@ -32,9 +32,7 @@ describe('harborSystemPrompt', () => {
       timeZone: 'Asia/Shanghai',
       now,
     })
-    expect(english.system).toContain('2026-11-18')
-    expect(english.system).toContain('Asia/Shanghai')
-    expect(english.system).not.toContain('DeepAPI')
+    expect(english.system).toBeUndefined()
     const chinese = buildRequest({
       model: 'deepseek-flash',
       thinking: true,
@@ -48,8 +46,6 @@ describe('harborSystemPrompt', () => {
       timeZone: 'Asia/Shanghai',
       now,
     })
-    expect(chinese.system).not.toContain('DeepAPI')
-    expect(chinese.system).toContain('2026-11-18')
-    expect(chinese.system).not.toContain('official product')
+    expect(chinese.system).toBeUndefined()
   })
 })

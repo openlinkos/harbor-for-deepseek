@@ -176,11 +176,8 @@ const install = async (page: Page) => {
 }
 
 const unlock = async (page: Page) => {
-  const narrow = (page.viewportSize()?.width || 1440) < 500
-  await page.addInitScript((flag) => sessionStorage.setItem('deepapi-audit-greeting', flag ? 'welcomeBack' : 'welcomeAlt'), narrow)
   await page.goto(`${base}/`)
   await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await page.getByTestId('composer').waitFor()

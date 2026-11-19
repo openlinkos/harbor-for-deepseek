@@ -939,7 +939,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     readLink: conversation.readLink,
     effort: conversation.effort as Effort,
     safetyLevel: state.settings.safetyLevel,
-    requestTitle: conversation.titleSource !== 'user',
+    requestTitle: history.every((item) => item.role !== 'assistant') && conversation.titleSource !== 'user',
     messages: history,
     locale: state.settings.locale,
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,

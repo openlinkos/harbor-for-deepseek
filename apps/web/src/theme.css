@@ -44,7 +44,7 @@ body {
   --dsw-static-blue-300: #93c5fd;
   --dsw-static-blue-400: #6b9bff;
   --dsw-static-blue-450: #3b82f6;
-  --dsw-static-blue-500: #2563eb;
+  --dsw-static-blue-500: #3964fe;
   --dsw-static-blue-50: #eff6ff;
   --dsw-static-blue-600: #1d4ed8;
   --dsw-static-blue-800: #1e3a8a;
@@ -100,7 +100,7 @@ body[data-ds-dark-theme] {
   --dsw-static-blue-300: #93c5fd;
   --dsw-static-blue-400: #6b9bff;
   --dsw-static-blue-450: #3b82f6;
-  --dsw-static-blue-500: #2563eb;
+  --dsw-static-blue-500: #3964fe;
   --dsw-static-blue-50: #eff6ff;
   --dsw-static-blue-600: #1d4ed8;
   --dsw-static-blue-800: #1e3a8a;
