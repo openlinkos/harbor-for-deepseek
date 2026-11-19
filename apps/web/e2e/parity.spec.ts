@@ -200,7 +200,7 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await row.getByRole('button', { name: '不喜欢', exact: true }).click()
   await expect(row.getByRole('button', { name: '不喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(row.getByRole('button', { name: '朗读' })).toBeVisible()
+  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
@@ -369,8 +369,8 @@ test('settings', async ({ page }) => {
   await page.getByRole('button', { name: '浅色' }).click()
   await expect(page.locator('body')).not.toHaveAttribute('data-ds-dark-theme', '')
   await page.getByRole('button', { name: '跟随系统' }).click()
-  await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('nickname')).toBeVisible()
+  await expect(page.getByText('微信')).toHaveCount(0)
   await page.getByRole('button', { name: '数据管理' }).click()
   await page.getByTestId('settings-more-data').evaluate((el: HTMLDetailsElement) => { el.open = true })
   await expect(page.getByTestId('balance')).toBeVisible()
@@ -385,14 +385,14 @@ test('settings', async ({ page }) => {
 
 test('key gate', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: '对话留在本机' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'DeepAPI' })).toBeVisible()
   await expect(page.getByTestId('site-footer')).toContainText('商标')
   await page.screenshot({ path: join(shots, 'gate-light.png') })
 })
 
 test('local mode', async ({ page }) => {
   await unlock(page)
-  await expect(page.getByTestId('sidebar')).toContainText('本地模式')
+  await expect(page.getByTestId('sidebar')).toContainText('DeepAPI')
   await expect(page.getByTestId('sidebar')).not.toContainText('OpenLinkOS')
 })
 
@@ -435,7 +435,7 @@ test('sidebar motion', async ({ page }) => {
 test('action row', async ({ page }) => {
   await unlock(page)
   await send(page, '动作')
-  await expect(page.locator('.action-row button')).toHaveCount(6)
+  await expect(page.locator('.action-row button')).toHaveCount(5)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
   await page.screenshot({ path: join(shots, 'actions-light.png') })
   await page.getByTestId('user-menu').click()
@@ -474,7 +474,6 @@ test('official states', async ({ page }) => {
   await page.getByRole('button', { name: '简体中文' }).click()
   await page.getByTestId('voice-select').click()
   await page.screenshot({ path: join(dir, 'settings-general-voice-dropdown.png') })
-  await page.getByRole('button', { name: '账号管理' }).click()
   await page.screenshot({ path: join(dir, 'settings-account.png') })
   await page.getByRole('button', { name: '数据管理' }).click()
   await page.screenshot({ path: join(dir, 'settings-data.png') })

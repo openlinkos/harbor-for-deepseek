@@ -167,7 +167,10 @@ export const KeyGate = () => {
           <Mark />
           <Wordmark />
         </span>
-        <LanguageSwitch locale={locale} onChange={setLocale} />
+        <span className="landing-tools">
+          <a className="landing-app" href="https://github.com/openlinkos/deepapi/releases">{t('downloadApp')}</a>
+          <LanguageSwitch locale={locale} onChange={setLocale} />
+        </span>
       </header>
       <div className="landing-stage">
         {locked ? (
@@ -190,6 +193,7 @@ export const KeyGate = () => {
           </form>
         ) : (
           <>
+            <p className="landing-announce">{t('landingAnnounce')}</p>
             <h1 className="landing-title">{t('landingTitle')}</h1>
             <form className="composer landing-composer" onSubmit={askForKey}>
               <textarea
@@ -241,6 +245,23 @@ export const KeyGate = () => {
           </>
         )}
       </div>
+      <footer className="landing-foot">
+        <div>
+          <strong>{t('product')}</strong>
+          <div>DeepAPI</div>
+          <a href={PLATFORM}>{t('apiPlatform')}</a>
+        </div>
+        <div>
+          <strong>{t('navLegal')}</strong>
+          <div>{t('terms')}</div>
+          <div>{t('privacyPolicy')}</div>
+        </div>
+        <div>
+          <strong>GitHub</strong>
+          <a href={REPO}>openlinkos/deepapi</a>
+          <a href="https://github.com/openlinkos/deepapi/releases">{t('downloadApp')}</a>
+        </div>
+      </footer>
       <SiteFooter />
       {keyOpen && !locked ? (
         <div className="modal" role="dialog" aria-modal="true" data-testid="key-dialog">
@@ -656,7 +677,6 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(textOf)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
   const choose = (next: 'up' | 'down') => {
     const value = vote === next ? null : next
     setVote(value)
@@ -718,22 +738,9 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
               <Icon size={16} d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6" />
             </button>
           ) : null}
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
           <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><Icon size={16} d="M7 11v10H4v-9h3Zm0 0 4-6a2 2 0 0 1 3.5 1L13 11h6l-1 8H7" /></button>
           <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><Icon size={16} d="M17 13V3h3v9h-3Zm0 0-4 6a2 2 0 0 1-3.5-1L11 13H5l1-8h11" /></button>
-          <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
-            if (!textOf || !('speechSynthesis' in window)) return
-            const utterance = new SpeechSynthesisUtterance(textOf)
-            const chosen = localStorage.getItem('deepapi-voice')
-            const voice = window.speechSynthesis.getVoices().find((item) => item.name === chosen)
-            if (voice) utterance.voice = voice
-            utterance.onstart = () => setSpeaking(true)
-            utterance.onend = () => setSpeaking(false)
-            utterance.onerror = () => setSpeaking(false)
-            window.speechSynthesis.cancel()
-            setSpeaking(true)
-            window.speechSynthesis.speak(utterance)
-          }}>{speaking ? <Icon size={16} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={16} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -923,8 +930,7 @@ export const Shell = () => {
     })
   }, [state.conversations, filter, t])
   const serverName = state.serverUser?.username
-  const who = serverName || profile.nickname || t('localMode')
-  const modeLine = serverName ? t('serverChat') : profile.nickname ? t('localMode') : t('localStay')
+  const who = serverName || profile.nickname || t('product')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
 
@@ -955,7 +961,7 @@ export const Shell = () => {
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {selecting ? (
             <div className="select-bar">
-              <button type="button" aria-label={t('close')} onClick={() => { setSelecting(false); setPicked([]) }}>×</button>
+              <button className="select-close" type="button" aria-label={t('close')} onClick={() => { setSelecting(false); setPicked([]) }}><Icon d="M6 6l12 12M18 6 6 18" /></button>
               <span>{t('selectedCount', { count: picked.length })}</span>
               <button type="button" className="danger" disabled={!picked.length} onClick={() => { for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>{t('delete')}</button>
             </div>
@@ -984,20 +990,18 @@ export const Shell = () => {
             </div>
           ))}
         </div>
-        <div className="user-bar" title={modeLine}>
+        <div className="user-bar">
           <span className="avatar" aria-hidden="true">
             {initial || <Icon d="M4 5h16v11H4zM2 19h20" />}
           </span>
           <span className="user-copy">
             <span className="user-label">{who}</span>
-            <small>{modeLine}</small>
           </span>
           <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
             <Icon d="M6 12h.01M12 12h.01M18 12h.01" />
           </button>
           {userMenu ? (
             <div className="menu user-menu">
-              <p className="hint">{serverName ? t('serverChat') : t('localStay')}</p>
               <p className="side-usage" data-testid="total-usage">
                 {t('totalLine', {
                   inTokens: state.totals.input_tokens + state.totals.cache_read_input_tokens,
@@ -1047,7 +1051,6 @@ export const Shell = () => {
       ) : null}
       <section className="stage">
         <header className="topbar">
-          {conversation ? <div className="title-bar" aria-hidden="true" /> : null}
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
@@ -1435,7 +1438,6 @@ const Settings = () => {
         </header>
         <nav className="settings-nav" aria-label={t('systemSettings')}>
           <button type="button" className={tab === 'general' ? 'on' : ''} onClick={() => setTab('general')}><Icon d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2" />{t('navGeneral')}</button>
-          <button type="button" className={tab === 'account' ? 'on' : ''} onClick={() => setTab('account')}><Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />{t('navAccount')}</button>
           <button type="button" className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}><Icon d="M4 7h16v12H4zM4 11h16M9 7v12" />{t('navData')}</button>
           <button type="button" className={tab === 'legal' ? 'on' : ''} onClick={() => setTab('legal')}><Icon d="M7 3h8l4 4v14H7zM11 13h6M11 17h6" />{t('navLegal')}</button>
         </nav>
@@ -1544,43 +1546,14 @@ const Settings = () => {
             </label>
           </section>
         </details>
-        <section className="settings-account">
+        <section className="settings-general">
           <div className="settings-line">
-            <span>{t('accountEmail')}</span>
-            <input className="account-value" data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
-          </div>
-          <div className="settings-line">
-            <span>{t('accountPhone')}</span>
+            <span>{t('nickname')}</span>
             <span className="account-chip wide">
-              <input className="account-value" data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
-              <button type="button" className="account-action phone" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountChange')}</span></button>
+              <input className="account-value" data-testid="nickname" value={nickname} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
+              <input className="account-value short" data-testid="avatar-initial" value={initial} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
+              <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('save')}</span></button>
             </span>
-          </div>
-          <div className="settings-line">
-            <span>{t('accountWechat')}</span>
-            <span className="account-chip">
-              <span className="account-pill">{t('accountUnbound')}</span>
-              <button type="button" className="account-action" onClick={() => saveProfile({ nickname, initial })}><span>{t('accountBind')}</span></button>
-            </span>
-          </div>
-          <div className="settings-line">
-            <span>{t('accountMinor')}</span>
-            <span className="account-chip">
-              <span className="account-pill">{t('accountOff')}</span>
-              <button type="button" className="account-action"><span>{t('accountChange')}</span></button>
-            </span>
-          </div>
-          <div className="settings-line">
-            <span>{t('accountDevices')}</span>
-            <button type="button" className="account-quiet">{t('accountManage')}</button>
-          </div>
-          <div className="settings-line">
-            <span>{t('accountSignOutAll')}</span>
-            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountSignOut')}</button>
-          </div>
-          <div className="settings-line">
-            <span>{t('accountDelete')}</span>
-            <button type="button" className="account-danger" onClick={() => void clearKey()}>{t('accountDeleteAction')}</button>
           </div>
         </section>
         <section className="settings-data">
@@ -1821,14 +1794,14 @@ const Settings = () => {
         </section>
         </details>
         <section className="settings-legal">
-          <div className="settings-line">
-            <span>{t('terms')}</span>
-            <a className="account-quiet" href="https://github.com/openlinkos/deepapi/blob/master/LICENSE"><span>{t('view')}</span></a>
-          </div>
-          <div className="settings-line">
-            <span>{t('privacyPolicy')}</span>
-            <a className="account-quiet" href="https://github.com/openlinkos/deepapi"><span>{t('view')}</span></a>
-          </div>
+          <article className="legal-copy">
+            <h3>{t('terms')}</h3>
+            <p>DeepAPI 是一个独立的聊天客户端。你在本机保存 API Key，消息直接发往 api.deepseek.com。DeepAPI 不代替深度求索提供账号、计费或客服。</p>
+            <p>使用 DeepSeek API 产生的费用由 Key 的持有者承担。请只在你信任的设备上保存 Key。</p>
+            <h3>{t('privacyPolicy')}</h3>
+            <p>Key、对话和设置默认只存在这台浏览器里。DeepAPI 不设账号，也不把对话上传到 OpenLinkOS 的服务器。可选的自建服务只有在你主动连接后才会收到数据。</p>
+            <p>{t('footerMark')}</p>
+          </article>
           <SiteFooter />
           <p className="hint">
             <a href="https://github.com/openlinkos/deepapi">openlinkos/deepapi</a>

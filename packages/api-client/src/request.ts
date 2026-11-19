@@ -24,15 +24,9 @@ export const clampExpireSeconds = (days: number): number => {
   return Math.min(FILE_EXPIRE_MAX_SECONDS, Math.max(FILE_EXPIRE_MIN_SECONDS, seconds))
 }
 
-export const HARBOR_SYSTEM_PROMPT =
-  'You are a helpful assistant inside DeepAPI. ' +
-  'Reply in the language the user writes in, and reason in that same language. ' +
-  'Do not claim to be an official product, a partner, or a support agent.'
+export const HARBOR_SYSTEM_PROMPT = ''
 
-const ZH_SYSTEM_PROMPT =
-  '你是 DeepAPI 里的助手。' +
-  '请使用用户书写的语言回答，思考过程也使用同一种语言。' +
-  '不要声称自己是官方产品、合作伙伴或客服。'
+const ZH_SYSTEM_PROMPT = ''
 
 const timeZoneOrDefault = (timeZone: string | undefined): string => {
   if (!timeZone) {
@@ -60,7 +54,8 @@ export const harborSystemPrompt = (input: { locale?: string; timeZone?: string; 
     hourCycle: 'h23',
   }).format(now)
   const base = input.locale === 'zh' ? ZH_SYSTEM_PROMPT : HARBOR_SYSTEM_PROMPT
-  return `${base} Current date and time: ${stamp} (${timeZone}). Use this when the user says today or now.`
+  const clock = `Current date and time: ${stamp} (${timeZone}).`
+  return base ? `${base} ${clock}` : clock
 }
 
 export type TurnOptions = {

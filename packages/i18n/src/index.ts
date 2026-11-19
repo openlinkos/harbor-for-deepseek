@@ -4,8 +4,9 @@ export type Locale = (typeof locales)[number]
 const zh = {
   product: 'DeepAPI',
   tagline: '密钥只留在本机。',
-  landingTitle: '对话留在本机',
-  landingPlaceholder: '给 DeepSeek 发送消息',
+  landingTitle: 'DeepAPI',
+  landingAnnounce: '密钥只留在本机，请求直接发往 DeepSeek API。',
+  landingPlaceholder: '问点什么，一起探索',
   startChat: '开始对话',
   apiPlatform: 'API 开放平台',
   github: 'GitHub',
@@ -287,8 +288,9 @@ const zh = {
 const en: { [K in keyof typeof zh]: string } = {
   product: 'DeepAPI',
   tagline: 'Your key stays on this device.',
-  landingTitle: 'Your chats stay here',
-  landingPlaceholder: 'Message DeepSeek',
+  landingTitle: 'DeepAPI',
+  landingAnnounce: 'The key stays on this device. Requests go to the DeepSeek API.',
+  landingPlaceholder: 'Ask anything',
   startChat: 'Start a chat',
   apiPlatform: 'API platform',
   github: 'GitHub',

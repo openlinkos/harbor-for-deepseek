@@ -54,7 +54,7 @@ test('native shell keeps the key on device and offers a server address', async (
   const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content')
   expect(policy).toContain('https:')
   expect(policy).toContain('capacitor:')
-  await expect(page.getByRole('heading', { name: '对话留在本机' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'DeepAPI' })).toBeVisible()
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-ack').check()
   await page.getByTestId('key-input').fill('demo-local-key')

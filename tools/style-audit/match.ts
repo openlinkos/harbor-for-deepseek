@@ -147,7 +147,7 @@ const isLogo = (node: StyleNode) =>
 const isFooter = (node: StyleNode, side: 'official' | 'ours', height: number) => {
   if (node.rect.x > 320) return false
   const text = accessibleName(node)
-  if (side === 'ours') return /本地模式|密钥与对话/.test(text)
+  if (side === 'ours') return node.rect.y > height - 220 && /本地模式|密钥与对话|DeepAPI/.test(text)
   return node.rect.y > height - 220 && /@/.test(text)
 }
 

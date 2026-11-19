@@ -310,12 +310,11 @@ const states: StateSpec[] = [
     run: async (page, mobile) => { await unlock(page); await openSettings(page, mobile) },
   },
   {
-    id: 'settings-account', rows: [36], viewports: all, official: true,
-    steps: ['Open 系统设置, then click 账号管理. Leave the dialog open.'],
+    id: 'settings-account', rows: [36], viewports: all, official: false,
+    steps: ['DeepAPI has no account bindings. The 账号管理 tab is not shown.'],
     run: async (page, mobile) => {
       await unlock(page)
       await openSettings(page, mobile)
-      await page.getByRole('button', { name: '账号管理' }).click()
     },
   },
   {
