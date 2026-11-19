@@ -84,7 +84,7 @@ The icon passed into the toggle is `size: 14`. The hide class `_51c583b` is only
 
 The extra class `f79352dc` sets `padding: 10px` on `.ds-toggle-button`. With the 14px icon and the 34px height, a hidden label makes the border box 34×34. Radius 18px then reads as a circle.
 
-A logged-in Android Chrome window at about 393 CSS pixels still shows those two controls as icon-only circles even when the row has room. Harbor treats that as observed behavior: below 768px, when the pointer is coarse, the device reports touch points, or the UA is mobile, the labels stay hidden and each control is 34×34 with an 18px radius and a 14px icon. Wider layouts still use the overflow measurement above.
+A logged-in Android Chrome window at about 393 CSS pixels still shows those two controls as icon-only circles even when the row has room. The token is a 34px control and a 14px icon. On that phone the circles read closer to 40px and the glyphs closer to 18–20px, so below 768px Harbor draws a 40px circle and a 20px icon when the pointer is coarse, the device reports touch points, or the UA is mobile. Wider layouts still use the overflow measurement and the 34px collapsed control.
 
 ## Scroll follow
 

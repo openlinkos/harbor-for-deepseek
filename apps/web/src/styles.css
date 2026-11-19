@@ -76,7 +76,7 @@ a { color: var(--dsw-alias-brand-text); }
 .wordmark {
   display: inline-flex;
   align-items: baseline;
-  gap: 0;
+  gap: 4px;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -639,9 +639,9 @@ body[data-ds-dark-theme] .composer .chip:not(.on) {
 }
 .composer .chip.on,
 .chip.on {
-  background: #e4edfd;
+  background: #d4e4ff;
   color: #3964fe;
-  border: 1px solid #7ea2fe;
+  border: 1.5px solid #3964fe;
   box-shadow: none;
 }
 body[data-ds-dark-theme] .composer .chip.on,
@@ -1252,7 +1252,15 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     box-shadow: 0 8px 24px rgba(15, 17, 21, 0.06);
   }
   .composer textarea { min-height: 36px; width: 100%; }
-  .send, .tool-right .icon-btn { width: 36px; height: 36px; }
+  .send { width: 40px; height: 40px; }
+  .tool-right .icon-btn { width: 40px; height: 40px; }
+  .tool-right .icon-btn svg, .send svg { width: 20px; height: 20px; }
+  .composer.icon-only .chip {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+  .composer.icon-only .chip svg { width: 20px; height: 20px; }
   .item-menu-scrim {
     display: block;
     position: fixed;

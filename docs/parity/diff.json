@@ -1,85 +1,85 @@
 [
   {
     "state": "answer-rich-actionrow-copy-tooltip",
-    "mismatch": 4.23,
+    "mismatch": 4.26,
     "status": "justify",
     "note": "Same answer; CJK and code glyphs differ by the face."
   },
   {
     "state": "answer-rich-actionrow-share-tooltip",
-    "mismatch": 4.21,
+    "mismatch": 4.24,
     "status": "justify",
     "note": "Same answer; CJK and code glyphs differ by the face."
   },
   {
     "state": "answer-rich-code-copy-hover",
-    "mismatch": 4.21,
+    "mismatch": 4.22,
     "status": "justify",
     "note": "Same answer; CJK and code glyphs differ by the face."
   },
   {
     "state": "answer-rich-light",
-    "mismatch": 3.54,
+    "mismatch": 3.75,
     "status": "justify",
     "note": "Same answer on the light theme; glyphs differ by the face."
   },
   {
     "state": "answer-rich-table-math-code",
-    "mismatch": 4.29,
+    "mismatch": 4.3,
     "status": "justify",
     "note": "Same table, formula, and Python; glyphs differ by the face."
   },
   {
     "state": "answer-rich-thinking-collapsed",
-    "mismatch": 4.41,
+    "mismatch": 4.43,
     "status": "justify",
     "note": "Same answer; glyphs differ by the face."
   },
   {
     "state": "answer-rich-thinking-expanded-user-bubble",
-    "mismatch": 5.19,
+    "mismatch": 5.21,
     "status": "justify",
     "note": "Same thinking and answer; glyphs differ by the face."
   },
   {
     "state": "answer-search-final-sources-pill",
-    "mismatch": 7.49,
+    "mismatch": 7.53,
     "status": "justify",
     "note": "Same weather answer and 12 citations; glyphs differ by the face."
   },
   {
     "state": "answer-search-sources-panel",
-    "mismatch": 11.74,
+    "mismatch": 11.77,
     "status": "justify",
     "note": "Same answer and source cards; snippets and favicons differ by the face."
   },
   {
     "state": "answer-search-timeline-expanded-sources-open",
-    "mismatch": 9.74,
+    "mismatch": 9.6,
     "status": "justify",
     "note": "Same timeline and answer; glyphs differ by the face."
   },
   {
     "state": "composer-focus",
-    "mismatch": 1.13,
+    "mismatch": 1.14,
     "status": "pass",
     "note": ""
   },
   {
     "state": "home-light",
-    "mismatch": 0.82,
+    "mismatch": 0.91,
     "status": "pass",
     "note": ""
   },
   {
     "state": "home",
-    "mismatch": 1.11,
+    "mismatch": 1.12,
     "status": "pass",
     "note": ""
   },
   {
     "state": "search-dialog",
-    "mismatch": 0.64,
+    "mismatch": 0.66,
     "status": "pass",
     "note": ""
   },
@@ -97,7 +97,7 @@
   },
   {
     "state": "settings-data",
-    "mismatch": 1.24,
+    "mismatch": 1.25,
     "status": "pass",
     "note": ""
   },
@@ -121,25 +121,25 @@
   },
   {
     "state": "settings-general",
-    "mismatch": 1.32,
+    "mismatch": 1.33,
     "status": "pass",
     "note": ""
   },
   {
     "state": "sidebar-item-menu",
-    "mismatch": 1.94,
+    "mismatch": 1.95,
     "status": "pass",
     "note": ""
   },
   {
     "state": "streaming-stop-button",
-    "mismatch": 3.25,
+    "mismatch": 3.26,
     "status": "justify",
     "note": "Stop control matches. Official is mid-generation of the weather answer; ours is the stop control before tokens arrive."
   },
   {
     "state": "user-menu",
-    "mismatch": 1.2,
+    "mismatch": 1.21,
     "status": "pass",
     "note": ""
   }
