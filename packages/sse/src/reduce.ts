@@ -1,4 +1,4 @@
-import type { ContentBlock, StreamEvent, TextBlock, ThinkingBlock, Usage } from '@harbor/types'
+import type { ContentBlock, StreamEvent, TextBlock, ThinkingBlock, Usage } from '@deepapi/types'
 
 export type AssistantDraft = {
   requestId: string | null

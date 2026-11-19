@@ -2,7 +2,7 @@ export const locales = ['zh', 'en'] as const
 export type Locale = (typeof locales)[number]
 
 const zh = {
-  product: 'Harbor for DeepSeek',
+  product: 'DeepAPI',
   tagline: '密钥只留在本机。',
   landingTitle: '对话留在本机',
   landingPlaceholder: '给 DeepSeek 发送消息',
@@ -103,7 +103,7 @@ const zh = {
   noUsageApi: '官方不提供用量历史，这里只加总本机收到的数字。',
   serverUsageNote: '这是服务器记下的用量。',
   serverPrivacyTitle: '对话存在这台服务器上',
-  serverPrivacyBody: '服务器模式不在本机保存 API Key。对话由你登录的 Harbor 代发。',
+  serverPrivacyBody: '服务器模式不在本机保存 API Key。对话由你登录的 DeepAPI 代发。',
   serverImportNote: '导出的是你在这台服务器上的对话。导入按对话 id 合并，不覆盖已有对话。',
   exportJson: '导出 JSON',
   importJson: '导入 JSON',
@@ -125,7 +125,7 @@ const zh = {
   privacyTitle: '数据留在本机',
   serverTitle: '自部署服务器',
   serverBody: '在你自己的服务器上登录后，对话走那台服务器的 Key 池。公开静态页只保留本机模式，因为页面的连接策略不允许随便访问别的域名。请打开你部署的地址来登录。',
-  nativeServerBody: '应用可以填写任意自托管 Harbor 地址并登录。默认仍是本机 Key，对话直接发往 api.deepseek.com。同步需要你主动打开。',
+  nativeServerBody: '应用可以填写任意自托管 DeepAPI 地址并登录。默认仍是本机 Key，对话直接发往 api.deepseek.com。同步需要你主动打开。',
   serverUrl: '服务器地址',
   allowLanHttp: '允许局域网的 http（仅私有地址）',
   connectServer: '连接并登录',
@@ -133,7 +133,7 @@ const zh = {
   corsOrigins: '允许的应用来源（每行一个）',
   corsSave: '保存来源',
   setupTitle: '创建管理员',
-  setupBody: '这是这台 Harbor 的第一次启动。管理员账号只存在这台你自己的服务器上。',
+  setupBody: '这是这台 DeepAPI 的第一次启动。管理员账号只存在这台你自己的服务器上。',
   setupUser: '用户名',
   setupPassword: '密码（至少 8 位）',
   setupSubmit: '创建并进入',
@@ -238,10 +238,10 @@ const zh = {
   branch: '分支',
   balanceFailed: '没有读到余额。',
   keyMissing: '先保存 Key，才能发送。',
-  riskFooter: '对话会发送到 DeepSeek 并由其生成。Harbor 不运营对话后端，也不代替你完成备案或内容标识。',
+  riskFooter: '对话会发送到 DeepSeek 并由其生成。DeepAPI 不运营对话后端，也不代替你完成备案或内容标识。',
   menu: '菜单',
   you: '你',
-  assistant: 'Harbor for DeepSeek',
+  assistant: 'DeepAPI',
   filesExpire: '文件默认 7 天后在官方侧过期。',
   examples: '试试',
   renameTitle: '对话标题',
@@ -281,11 +281,11 @@ const zh = {
   scrollDown: '回到底部',
   footerAbout: 'OpenLinkOS 发起的开源项目',
   footerLicense: '许可证',
-  footerMark: 'DeepSeek 是其所有者的商标。本项目与深度求索没有隶属关系。',
+  footerMark: 'DeepSeek 是其所有者的商标。DeepAPI 与深度求索没有隶属关系。',
 } as const
 
 const en: { [K in keyof typeof zh]: string } = {
-  product: 'Harbor for DeepSeek',
+  product: 'DeepAPI',
   tagline: 'Your key stays on this device.',
   landingTitle: 'Your chats stay here',
   landingPlaceholder: 'Message DeepSeek',
@@ -386,7 +386,7 @@ const en: { [K in keyof typeof zh]: string } = {
   noUsageApi: 'There is no official usage history. This is only what this device received.',
   serverUsageNote: 'This is the usage the server recorded.',
   serverPrivacyTitle: 'Chats live on this server',
-  serverPrivacyBody: 'Server mode does not keep an API key on this device. The Harbor you signed in to sends the chat.',
+  serverPrivacyBody: 'Server mode does not keep an API key on this device. The DeepAPI you signed in to sends the chat.',
   serverImportNote: 'Export is your chats on this server. Import merges by conversation id and does not replace an existing chat.',
   exportJson: 'Export JSON',
   importJson: 'Import JSON',
@@ -412,7 +412,7 @@ const en: { [K in keyof typeof zh]: string } = {
   serverBody:
     'After you log in on a server you run, chat uses that server’s key pool. The public static site stays on-device, because its connection policy does not allow arbitrary hosts. Open the address of your own deployment to log in.',
   nativeServerBody:
-    'The app can log in to any Harbor server you type. The default is still a key on this device, and chat goes straight to api.deepseek.com. Sync starts only when you turn it on.',
+    'The app can log in to any DeepAPI server you type. The default is still a key on this device, and chat goes straight to api.deepseek.com. Sync starts only when you turn it on.',
   serverUrl: 'Server address',
   allowLanHttp: 'Allow http on a private LAN address',
   connectServer: 'Connect and log in',
@@ -420,7 +420,7 @@ const en: { [K in keyof typeof zh]: string } = {
   corsOrigins: 'Allowed app origins (one per line)',
   corsSave: 'Save origins',
   setupTitle: 'Create the admin',
-  setupBody: 'This is the first start of this Harbor. The admin account exists only on the server you are running.',
+  setupBody: 'This is the first start of this DeepAPI. The admin account exists only on the server you are running.',
   setupUser: 'Username',
   setupPassword: 'Password (at least 8 characters)',
   setupSubmit: 'Create and continue',
@@ -526,10 +526,10 @@ const en: { [K in keyof typeof zh]: string } = {
   balanceFailed: 'Could not read the balance.',
   keyMissing: 'Save a key before sending.',
   riskFooter:
-    'Messages are sent to DeepSeek, which generates the reply. Harbor does not run a chat backend and does not file or label on your behalf.',
+    'Messages are sent to DeepSeek, which generates the reply. DeepAPI does not run a chat backend and does not file or label on your behalf.',
   menu: 'Menu',
   you: 'You',
-  assistant: 'Harbor for DeepSeek',
+  assistant: 'DeepAPI',
   filesExpire: 'Files expire on the official side after 7 days by default.',
   examples: 'Try',
   renameTitle: 'Chat title',
@@ -569,7 +569,7 @@ const en: { [K in keyof typeof zh]: string } = {
   scrollDown: 'Scroll to latest',
   footerAbout: 'Open source by OpenLinkOS',
   footerLicense: 'License',
-  footerMark: 'DeepSeek is a trademark of its owner. This project is not affiliated with DeepSeek.',
+  footerMark: 'DeepSeek is a trademark of its owner. DeepAPI is not affiliated with DeepSeek.',
 }
 
 const catalogs = { zh, en }

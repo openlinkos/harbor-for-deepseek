@@ -74,9 +74,9 @@ export type SealedSecret =
   | { v: 1; enc: true; salt: string; iv: string; ciphertext: string; iterations: number }
 
 export type NativeArchive = {
-  format: 'harbor'
+  format: 'deepapi'
   version: 1
   exportedAt: string
-  app: 'harbor'
+  app: string
   conversations: Array<Conversation & { messages: Message[] }>
 }

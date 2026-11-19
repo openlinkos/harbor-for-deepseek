@@ -39,7 +39,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs
-      - run: pnpm --filter @harbor/mobile exec cap sync android
+      - run: pnpm --filter @deepapi/mobile exec cap sync android
       - name: Decode a keystore only when the repo secrets exist
         id: sign
         env:

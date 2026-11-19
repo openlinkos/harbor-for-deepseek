@@ -1,5 +1,5 @@
-import type { ContentBlock, Conversation, Message, NativeArchive } from '@harbor/types'
-import { NATIVE_ARCHIVE_FORMAT, NATIVE_ARCHIVE_VERSION } from '@harbor/types'
+import type { ContentBlock, Conversation, Message, NativeArchive } from '@deepapi/types'
+import { NATIVE_ARCHIVE_FORMAT, NATIVE_ARCHIVE_VERSION } from '@deepapi/types'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -64,7 +64,7 @@ export const exportNative = (
   format: NATIVE_ARCHIVE_FORMAT,
   version: NATIVE_ARCHIVE_VERSION,
   exportedAt,
-  app: 'harbor',
+  app: 'deepapi',
   conversations: conversations
     .filter((conversation) => !conversation.deletedAt)
     .map((conversation) => ({
@@ -77,8 +77,8 @@ export const readNative = (value: unknown): NativeArchive => {
   if (!isRecord(value)) {
     throw new ArchiveError('archive is not an object')
   }
-  if (value.format !== NATIVE_ARCHIVE_FORMAT || value.version !== NATIVE_ARCHIVE_VERSION) {
-    throw new ArchiveError('unsupported harbor archive')
+  if ((value.format !== NATIVE_ARCHIVE_FORMAT && value.format !== 'harbor') || value.version !== NATIVE_ARCHIVE_VERSION) {
+    throw new ArchiveError('unsupported archive')
   }
   if (!Array.isArray(value.conversations)) {
     throw new ArchiveError('missing conversations')
@@ -99,10 +99,10 @@ export const readNative = (value: unknown): NativeArchive => {
     return { ...conversation, messages }
   })
   return {
-    format: 'harbor',
+    format: 'deepapi',
     version: 1,
     exportedAt: typeof value.exportedAt === 'string' ? value.exportedAt : new Date(0).toISOString(),
-    app: 'harbor',
+    app: 'deepapi',
     conversations,
   }
 }

@@ -2,6 +2,10 @@
 # Do not add a reverse proxy to api.deepseek.com on this host.
 
 hfd.linkos.org {
+	redir https://deepapi.linkos.org{uri} 301
+}
+
+deepapi.linkos.org {
 	root * /srv/harbor
 	encode gzip zstd
 	header {

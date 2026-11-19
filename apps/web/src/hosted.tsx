@@ -1,4 +1,4 @@
-import { translate } from '@harbor/i18n'
+import { translate } from '@deepapi/i18n'
 import { useEffect, useState } from 'react'
 import { api } from './remote.js'
 import { useHarbor } from './store.js'

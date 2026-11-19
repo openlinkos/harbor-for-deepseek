@@ -10,8 +10,8 @@
 2. **第一期只有私密链接。** 公开列表以后再做，不进下面的里程碑 1 到 6。
 3. **分享默认不加密。** 隐私靠 128 位随机 id、`noindex`、可选过期、可选口令。正文在服务器上是明文：拿到链接的人可以读，持有磁盘和备份的人也可以读。口令只挡住没有口令的访问者。
 4. **界面包不能含脚本。** 只描述外观：设计变量、消毒后的 CSS、布局，以及少量位图。
-5. **分享服务放在 prod-us。** Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `hfd.linkos.io`。Cloudflare 仅 DNS，CNAME 到 `70c9d096.quic.ing`，与 `hfd.linkos.org` 相同。TLS 在新建的 GoEdge 站点终结，证书由 GoEdge 自动续期，源站是 prod-us 的 Ingress。存储是集群内的 Postgres 加上数据盘上的对象文件。限流在 GoEdge 和应用里各做一层。备份保留 7 天。
-6. **聊天页在用户确认分享之后才连接 `hfd.linkos.io`。** 内容安全策略写上这个域名，未确认时不发请求。
+5. **分享服务放在 prod-us。** Flux 仓库 `best/flux-k8s`，入口 GoEdge，域名 `deepapi.linkos.io`。Cloudflare 仅 DNS，CNAME 到 `70c9d096.quic.ing`，与 `deepapi.linkos.org` 相同。TLS 在新建的 GoEdge 站点终结，证书由 GoEdge 自动续期，源站是 prod-us 的 Ingress。存储是集群内的 Postgres 加上数据盘上的对象文件。限流在 GoEdge 和应用里各做一层。备份保留 7 天。
+6. **聊天页在用户确认分享之后才连接 `deepapi.linkos.io`。** 内容安全策略写上这个域名，未确认时不发请求。
 
 ## 依赖
 
@@ -51,7 +51,7 @@
 
 **做的事：**
 
-- 新包 `@harbor/ui-package`（名字按仓库的 `@harbor/*` 即可）：解析、校验、选择器改写、版本迁移表。单测不启动浏览器。
+- 新包 `@deepapi/ui-package`（名字按仓库的 `@deepapi/*` 即可）：解析、校验、选择器改写、版本迁移表。单测不启动浏览器。
 - `harbor` 库升到版本 2，对象库 `ui_packages`。不碰 `harbor-secrets`。
 - service worker 对 `GET /ui/applied.css` 只返回本机生成的样式，不进静态缓存，不回源。
 - 设置里能预览、应用、撤销、恢复官方、导出、导入、清空历史。
@@ -91,11 +91,11 @@
 
 **做的事：**
 
-- 按分享文档建命名空间 `harbor-share`、一个应用副本、自带的 Postgres、数据盘上的对象目录、作为源站的 Ingress。Cloudflare 上为 `hfd.linkos.io` 建仅 DNS 的 CNAME，指向 `70c9d096.quic.ing`。GoEdge 上新建站点，单独证书，源站指向这份 Ingress。
+- 按分享文档建命名空间 `harbor-share`、一个应用副本、自带的 Postgres、数据盘上的对象目录、作为源站的 Ingress。Cloudflare 上为 `deepapi.linkos.io` 建仅 DNS 的 CNAME，指向 `70c9d096.quic.ing`。GoEdge 上新建站点，单独证书，源站指向这份 Ingress。
 - 创建、读取、口令打开、删除令牌删除、过期清理、两层限流、管理密钥删除、每日备份保留 7 天。
 - 只接受 `visibility: "unlisted"`。不提供列表接口。
 - 响应带 `noindex`。`robots.txt` 禁止抓取。
-- 隐私说明放到 `hfd.linkos.io`，写明正文是明文。
+- 隐私说明放到 `deepapi.linkos.io`，写明正文是明文。
 
 **验收：**
 
@@ -108,9 +108,9 @@
 - 超过创建频率或 GoEdge 的请求体上限时被拒绝，已有对象不受影响。
 - 管理密钥可以删除。管理密钥不出现在客户端仓库和 Git 里的明文配置中。
 - 备份目录在 `/data/storage/harbor-share/backups`，含明文，超过 7 天的被删掉。对象文件不在系统盘的 compose 目录里。
-- CORS 拒绝名单以外的来源。允许 `https://hfd.linkos.org`。
-- `/healthz` 与 `/readyz` 可用。分享的路径不在 `hfd.linkos.org` 上。
-- `hfd.linkos.io` 的 Cloudflare 记录是仅 DNS 的 CNAME，目标为 `70c9d096.quic.ing`。公网证书在 GoEdge 的新站点上，并设置为自动续期。集群 Ingress 是源站，不持有这张证书。
+- CORS 拒绝名单以外的来源。允许 `https://deepapi.linkos.org`。
+- `/healthz` 与 `/readyz` 可用。分享的路径不在 `deepapi.linkos.org` 上。
+- `deepapi.linkos.io` 的 Cloudflare 记录是仅 DNS 的 CNAME，目标为 `70c9d096.quic.ing`。公网证书在 GoEdge 的新站点上，并设置为自动续期。集群 Ingress 是源站，不持有这张证书。
 
 ## 里程碑 5：从聊天页分享一条对话
 
@@ -120,12 +120,12 @@
 
 - 对话行菜单里现有的「分享」今天会下载 Markdown（`ui.tsx` 的 `ChatLink`）。在它旁边加「生成链接」，保留本地下载。顶栏那个系统分享同样保留。
 - 确认框写明正文会明文保存，并让用户选范围（是否包含思考）、过期时间（含「不过期」）、可选口令。
-- 确认后才请求 `hfd.linkos.io`。`connect-src` 在 `apps/web/src/csp.ts`、`apps/web/public/_headers`、`deploy/web/nginx/security-headers.conf` 三处一起加上这个域名。删除令牌写入 `harbor`。
+- 确认后才请求 `deepapi.linkos.io`。`connect-src` 在 `apps/web/src/csp.ts`、`apps/web/public/_headers`、`deploy/web/nginx/security-headers.conf` 三处一起加上这个域名。删除令牌写入 `harbor`。
 - 数据页「我共享的链接」列出本机还存着令牌的项。
 
 **验收：**
 
-- 未点确认时，网络记录里没有 `hfd.linkos.io`。确认之后才有 POST。
+- 未点确认时，网络记录里没有 `deepapi.linkos.io`。确认之后才有 POST。
 - 上传体里没有 Key，没有文件字节。默认不含思考过程；勾选之后才含。
 - 另一台浏览器打开链接能读到明文。设了口令时要先输入口令。页面不把分享内容写进对方的对话库，除非对方另选「导入」。
 - 本机「我共享的链接」能用删除令牌删掉，对方链接随后失效。
@@ -138,7 +138,7 @@
 
 **做的事：**
 
-- 已应用的包可以生成私密链接。接收方取到明文后跑 `@harbor/ui-package` 的校验，预览，再应用。
+- 已应用的包可以生成私密链接。接收方取到明文后跑 `@deepapi/ui-package` 的校验，预览，再应用。
 
 **验收：**
 
@@ -154,7 +154,7 @@
 ## 不在这些里程碑里
 
 - 改默认界面去贴近官方。那是另一项工作，验收仍是测试矩阵。
-- 在 `hfd.linkos.org` 上加对话代理、Pages Function 或分享接口。
+- 在 `deepapi.linkos.org` 上加对话代理、Pages Function 或分享接口。
 - 让 `apps/server` 保存分享或界面包。
 - 用 Cloudflare Workers、R2、D1 或 KV 跑分享服务。
 - 分享默认加密，或把口令做成连服务器也读不到正文的加密。

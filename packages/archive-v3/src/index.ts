@@ -1,5 +1,5 @@
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'fflate'
-import type { ContentBlock, Conversation, Message } from '@harbor/types'
+import type { ContentBlock, Conversation, Message } from '@deepapi/types'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)

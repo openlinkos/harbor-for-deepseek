@@ -1,13 +1,69 @@
 import { openDB } from 'idb'
-import { defaultSettings } from '@harbor/types'
-import type { Conversation, Message, SealedSecret, Settings, Tombstone } from '@harbor/types'
+import { defaultSettings } from '@deepapi/types'
+import type { Conversation, Message, SealedSecret, Settings, Tombstone } from '@deepapi/types'
 import type { Repository } from './memory.js'
 
-const DATA = 'harbor'
-const SECRETS = 'harbor-secrets'
+const DATA = 'deepapi'
+const SECRETS = 'deepapi-secrets'
+const LEGACY_DATA = 'harbor'
+const LEGACY_SECRETS = 'harbor-secrets'
+const DB_VERSION = 2
+
+const databaseNames = async () => {
+  if (typeof indexedDB.databases !== 'function') return [] as string[]
+  const rows = await indexedDB.databases()
+  return rows.map((row) => row.name).filter((name): name is string => Boolean(name))
+}
+
+const copyDatabase = async (from: string, to: string, setup: (db: import('idb').IDBPDatabase) => void) => {
+  const names = await databaseNames()
+  if (!names.includes(from) || names.includes(to)) return
+  const source = await openDB(from)
+  const target = await openDB(to, DB_VERSION, { upgrade: setup })
+  const stores = [...source.objectStoreNames]
+  for (const name of stores) {
+    if (!target.objectStoreNames.contains(name)) continue
+    const tx = source.transaction(name)
+    const inline = Boolean(tx.store.keyPath)
+    const rows: Array<{ value: unknown; key: IDBValidKey }> = []
+    let cursor = await tx.store.openCursor()
+    while (cursor) {
+      rows.push({ value: cursor.value, key: cursor.key })
+      cursor = await cursor.continue()
+    }
+    await tx.done
+    for (const row of rows) {
+      if (inline) await target.put(name, row.value)
+      else await target.put(name, row.value, row.key)
+    }
+  }
+  source.close()
+  target.close()
+}
+
+const upgradeData = (db: import('idb').IDBPDatabase) => {
+  if (!db.objectStoreNames.contains('conversations')) db.createObjectStore('conversations', { keyPath: 'id' })
+  if (!db.objectStoreNames.contains('messages')) {
+    const messages = db.createObjectStore('messages', { keyPath: 'id' })
+    messages.createIndex('byConversation', 'conversationId')
+  }
+  if (!db.objectStoreNames.contains('tombstones')) db.createObjectStore('tombstones', { keyPath: 'key' })
+  if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv')
+}
+
+const upgradeSecrets = (db: import('idb').IDBPDatabase) => {
+  if (!db.objectStoreNames.contains('secrets')) db.createObjectStore('secrets')
+}
+
+/** Copy chats and the sealed key from the Harbor databases when the DeepAPI ones are absent. */
+export const migrateLegacyIndexedDb = async () => {
+  await copyDatabase(LEGACY_DATA, DATA, upgradeData)
+  await copyDatabase(LEGACY_SECRETS, SECRETS, upgradeSecrets)
+}
 
 export const openIndexedRepository = async (): Promise<Repository> => {
-  const data = await openDB(DATA, 1, {
+  await migrateLegacyIndexedDb()
+  const data = await openDB(DATA, DB_VERSION, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('conversations')) {
         db.createObjectStore('conversations', { keyPath: 'id' })
@@ -24,7 +80,7 @@ export const openIndexedRepository = async (): Promise<Repository> => {
       }
     },
   })
-  const secrets = await openDB(SECRETS, 1, {
+  const secrets = await openDB(SECRETS, DB_VERSION, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('secrets')) {
         db.createObjectStore('secrets')

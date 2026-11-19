@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Conversation, Message } from '@harbor/types'
+import type { Conversation, Message } from '@deepapi/types'
 import { exportNative, planNativeImport, readNative } from './index.js'
 
 const conversation = (): Conversation & { messages: Message[] } => ({
@@ -68,6 +68,12 @@ describe('native archive', () => {
     expect(JSON.stringify(read)).not.toContain('demo-local-key')
     expect(read.conversations[0]?.messages[1]?.blocks[0]).toMatchObject({ signature: 'sig-redacted' })
     expect(read.conversations[0]?.messages[1]?.usage?.output_tokens).toBe(33)
+  })
+
+  it('reads an archive written as harbor', () => {
+    const archive = exportNative([conversation()], '2026-11-18T02:00:00.000Z')
+    const legacy = { ...archive, format: 'harbor', app: 'harbor' }
+    expect(readNative(legacy).conversations[0]?.title).toBe('简单加法')
   })
 
   it('merges by conversation id and can import a copy', () => {

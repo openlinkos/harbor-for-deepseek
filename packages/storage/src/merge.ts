@@ -1,4 +1,4 @@
-import type { Conversation, Message, Tombstone } from '@harbor/types'
+import type { Conversation, Message, Tombstone } from '@deepapi/types'
 
 export type Snapshot = {
   conversations: Conversation[]

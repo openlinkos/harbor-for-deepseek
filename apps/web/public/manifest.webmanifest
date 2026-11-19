@@ -1,7 +1,7 @@
 {
-  "name": "Harbor for DeepSeek",
-  "short_name": "Harbor",
-  "description": "Harbor for DeepSeek is a chat client for the DeepSeek API. The key and chats stay on this device.",
+  "name": "DeepAPI",
+  "short_name": "DeepAPI",
+  "description": "DeepAPI is a chat client for the DeepSeek API. The key and chats stay on this device.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

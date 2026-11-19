@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: harbor-web
 spec:
   rules:
-    - host: hfd.linkos.org
+    - host: deepapi.linkos.org
       http:
         paths:
           - path: /
@@ -20,5 +20,5 @@ spec:
   # Cloudflare DNS for this host is a DNS-only CNAME to 70c9d096.quic.ing.
   # This Ingress is the origin and does not hold the public certificate.
   # tls:
-  #   - hosts: [hfd.linkos.org]
+  #   - hosts: [deepapi.linkos.org]
   #     secretName: harbor-web-tls

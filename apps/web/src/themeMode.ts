@@ -1,6 +1,6 @@
 export type ThemeChoice = 'system' | 'light' | 'dark'
 
-const KEY = 'harbor-theme'
+const KEY = 'deepapi-theme'
 
 export const readTheme = (): ThemeChoice => {
   const stored = localStorage.getItem(KEY)
@@ -17,5 +17,5 @@ export const applyTheme = (choice: ThemeChoice) => {
 export const saveTheme = (choice: ThemeChoice) => {
   localStorage.setItem(KEY, choice)
   applyTheme(choice)
-  window.dispatchEvent(new Event('harbor-theme'))
+  window.dispatchEvent(new Event('deepapi-theme'))
 }

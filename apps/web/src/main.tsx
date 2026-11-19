@@ -6,7 +6,11 @@ import { createRoot } from 'react-dom/client'
 import { App } from './App.js'
 import { isNativeApp, listenForBack } from './native.js'
 import { useHarbor } from './store.js'
+import { migrateSessionMode, migrateStoredKeys } from './migrate.js'
 import { applyTheme, readTheme } from './themeMode.js'
+
+migrateStoredKeys(localStorage)
+migrateSessionMode(sessionStorage)
 import './theme.css'
 import './styles.css'
 

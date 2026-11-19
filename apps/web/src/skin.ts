@@ -1,4 +1,4 @@
-const KEY = 'harbor-ui'
+const KEY = 'deepapi-ui'
 
 const NAME = /^--(?:dsw|ds|dsl|harbor|message-list|sider|composer)-[a-z0-9-]+$/
 const COLOR = /^(?:transparent|#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*(?:0|1|0?\.\d+)\s*)?\))$/
@@ -6,7 +6,7 @@ const LENGTH = /^-?\d+(?:\.\d+)?(?:px|rem|em)$/
 const TIME = /^(?:0|0\.\d|0\.[0-6]\d*)s$/
 
 export type SkinPackage = {
-  format: 'harbor-ui'
+  format: 'deepapi-ui' | 'harbor-ui'
   schema: 1
   name: string
   scripts: 'forbidden'
@@ -23,7 +23,7 @@ const valueOk = (name: string, value: string) => {
 export const parseSkin = (raw: string): SkinPackage => {
   if (/sk-[A-Za-z0-9]{8,}/.test(raw)) throw new Error('skin rejected')
   const data = JSON.parse(raw) as SkinPackage
-  if (data.format !== 'harbor-ui' || data.schema !== 1 || data.scripts !== 'forbidden') throw new Error('skin rejected')
+  if ((data.format !== 'deepapi-ui' && data.format !== 'harbor-ui') || data.schema !== 1 || data.scripts !== 'forbidden') throw new Error('skin rejected')
   if (!data.name || data.name.length > 40) throw new Error('skin rejected')
   for (const side of [data.tokens?.light, data.tokens?.dark]) {
     if (!side) continue
@@ -54,7 +54,7 @@ export const applySkin = (pack: SkinPackage | null) => {
 }
 
 export const saveSkin = (pack: SkinPackage | null) => {
-  if (pack) localStorage.setItem(KEY, JSON.stringify(pack))
+  if (pack) localStorage.setItem(KEY, JSON.stringify({ ...pack, format: 'deepapi-ui' }))
   else localStorage.removeItem(KEY)
   applySkin(pack)
 }

@@ -108,7 +108,7 @@ const send = async (page: Page, text: string) => {
 const age = async (page: Page, days: number) => {
   await page.evaluate(async (days) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('harbor')
+      const request = indexedDB.open('deepapi')
       request.onsuccess = () => resolve(request.result)
       request.onerror = () => reject(request.error)
     })

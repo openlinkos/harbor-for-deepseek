@@ -229,13 +229,13 @@ const tile = (size, { bleed = false, circle = false, small = false } = {}) => {
 }
 
 const markSvg = (ink, accent) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="DeepAPI">` +
   `<path d="${BUBBLE}" fill="${ink}"/>` +
   `<path d="${BAR}" fill="${accent}"/>` +
   `</svg>\n`
 
 const faviconSvg =
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Harbor for DeepSeek">` +
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="DeepAPI">` +
   `<style>.ink{fill:#0f172a}.accent{fill:#2563eb}` +
   `@media (prefers-color-scheme:dark){.ink{fill:#e2e8f0}}</style>` +
   `<path class="ink" d="${BUBBLE}"/><path class="accent" d="${BAR}"/>` +

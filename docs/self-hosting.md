@@ -1,4 +1,4 @@
-# Self-hosting Harbor for DeepSeek
+# Self-hosting DeepAPI
 
 Server mode keeps the API keys on this machine. Local mode stays in the browser and does not call this server.
 
@@ -101,7 +101,7 @@ The Compose project name is `harbor`, so the database volume is `harbor_pgdata`.
 
 An older compose file wrote `master.key` and `db-password` onto a data volume. This version reads neither file. Before upgrading, copy those values into `.env` as `KEY_ENCRYPTION_SECRET` (the 32 bytes in hex) and `POSTGRES_PASSWORD`.
 
-Images are published to `ghcr.io/openlinkos/harbor-for-deepseek` for `linux/amd64` and `linux/arm64`.
+Images are published to `ghcr.io/openlinkos/deepapi` for `linux/amd64` and `linux/arm64`.
 
 ## Backup and restore
 
@@ -114,9 +114,9 @@ docker compose exec -T db pg_dump -U harbor -d harbor -Fc > harbor.dump
 Restore:
 
 ```bash
-docker compose stop harbor
+docker compose stop deepapi
 docker compose exec -T db pg_restore -U harbor -d harbor --clean --if-exists < harbor.dump
-docker compose start harbor
+docker compose start deepapi
 ```
 
 The database volume is `harbor_pgdata` when the Compose project name is `harbor`. `docker volume ls` shows the name if you changed it.

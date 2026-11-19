@@ -1,6 +1,6 @@
 export type LocalProfile = { nickname: string; initial: string }
 
-const KEY = 'harbor-profile'
+const KEY = 'deepapi-profile'
 const empty = (): LocalProfile => ({ nickname: '', initial: '' })
 
 export const readProfile = (): LocalProfile => {
@@ -24,5 +24,5 @@ export const saveProfile = (profile: LocalProfile) => {
     KEY,
     JSON.stringify({ nickname: profile.nickname.trim().slice(0, 32), initial: profile.initial.trim().slice(0, 2) }),
   )
-  window.dispatchEvent(new Event('harbor-profile'))
+  window.dispatchEvent(new Event('deepapi-profile'))
 }

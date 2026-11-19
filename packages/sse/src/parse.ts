@@ -1,4 +1,4 @@
-import type { ContentBlock, StreamEvent, TextCitation, Usage } from '@harbor/types'
+import type { ContentBlock, StreamEvent, TextCitation, Usage } from '@deepapi/types'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)

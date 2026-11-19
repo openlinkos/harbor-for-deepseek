@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'org.linkos.harbor',
-  appName: 'Harbor',
+  appName: 'DeepAPI',
   webDir: 'www',
   android: {
     allowMixedContent: false,

@@ -1,8 +1,8 @@
 # Deploy the static site
 
-Harbor M1 is a static site. The browser talks to `https://api.deepseek.com`. Do not put an API reverse proxy on the same host, and do not add a form that submits the key to your server.
+DeepAPI is a static site. The browser talks to `https://api.deepseek.com`. Do not put an API reverse proxy on the same host, and do not add a form that submits the key to your server.
 
-The intended public URL is <https://hfd.linkos.org>. DNS and the machine that serves the files are left to the maintainers.
+The intended public URL is <https://deepapi.linkos.org>. DNS and the machine that serves the files are left to the maintainers.
 
 ## Build
 
@@ -56,4 +56,4 @@ Node.js 22. No environment variables. After a deploy, the response for `/` shoul
 
 ## If the API stops sending CORS headers
 
-The app will fail in the browser. A stateless proxy is not part of M1. Document the failure and point people at a future native build or at their own server. Do not quietly add a proxy on `hfd.linkos.org`.
+The app will fail in the browser. A stateless proxy is not part of M1. Document the failure and point people at a future native build or at their own server. Do not quietly add a proxy on `deepapi.linkos.org`.

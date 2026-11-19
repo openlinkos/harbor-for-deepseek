@@ -1,4 +1,4 @@
-import type { Usage } from '@harbor/types'
+import type { Usage } from '@deepapi/types'
 
 /**
  * Prices published for 2026-11-18, CNY.

@@ -1,22 +1,22 @@
-# Harbor for DeepSeek
+# DeepAPI
 
 [English](README.md)
 
-![Harbor for DeepSeek](brand/logo-128.png)
+![DeepAPI](brand/logo-128.png)
 
-Harbor for DeepSeek 是面向 [DeepSeek API](https://platform.deepseek.com/) 的开源（MIT）对话客户端。你使用自己的 Key。Key 和对话都留在这台浏览器里。页面是静态的：它们不会发给 Harbor for DeepSeek，`https://hfd.linkos.org` 也不运行对话后端。
+DeepAPI 是面向 [DeepSeek API](https://platform.deepseek.com/) 的开源（MIT）对话客户端。你使用自己的 Key。Key 和对话都留在这台浏览器里。页面是静态的：它们不会发给 DeepAPI，`https://deepapi.linkos.org` 也不运行对话后端。
 
-![Harbor，思考过程展开](docs/screenshots/03-reasoning.png)
+![DeepAPI，思考过程展开](docs/screenshots/03-reasoning.png)
 
 ## 两种用法
 
-**轻量。** 打开 [hfd.linkos.org](https://hfd.linkos.org)，或自己构建静态页。Key 和对话留在这台设备上，可以导出和导入。这种用法没有服务器。
+**轻量。** 打开 [deepapi.linkos.org](https://deepapi.linkos.org)，或自己构建静态页。Key 和对话留在这台设备上，可以导出和导入。这种用法没有服务器。
 
 **服务器。** 可选。`docker compose up` 会在你自己的机器上启动 PostgreSQL 和一个应用容器。管理员添加 Key 池、查看余额、发出邀请账号。登录的人可以在多台设备上同步对话。见 [docs/self-hosting_cn.md](docs/self-hosting_cn.md)。
 
 ## 填入 Key
 
-1. 打开 <https://hfd.linkos.org>。
+1. 打开 <https://deepapi.linkos.org>。
 2. 在 <https://platform.deepseek.com/api_keys> 创建一个 Key。实际使用时，用设了额度的专用 Key。
 3. 粘贴到页面里，确认页面上的说明，保存在这台设备上。
 4. 发送一条消息。浏览器直接请求 `https://api.deepseek.com`。
@@ -45,7 +45,7 @@ Harbor for DeepSeek 是面向 [DeepSeek API](https://platform.deepseek.com/) 的
 
 浏览器里的 Key 可能被恶意扩展或脚本注入读到。开放平台协议要求不要把 Key 放进客户端。使用公开页面时，建议用设了额度的专用 Key。细节见 [SECURITY.md](SECURITY.md)。
 
-对话会发给 DeepSeek，并由对方生成回复。Harbor 不代替你做备案或内容标识。
+对话会发给 DeepSeek，并由对方生成回复。DeepAPI 不代替你做备案或内容标识。
 
 ## 快速开始
 
@@ -67,11 +67,11 @@ pnpm preview
 
 ## Android
 
-应用是同一套界面。不填写你自己的 Harbor 服务器时，对话仍然直接发往 `https://api.deepseek.com`。导出和导入使用系统分享。每个拉取请求会构建调试 APK。打上 `v*` 标签时，把 APK 附到 GitHub Release；只有密钥库密钥都配置了才会签正式包。说明见 [docs/android.zh-CN.md](docs/android.zh-CN.md)。iOS 是同一个应用。拉取请求会构建未签名的模拟器应用。TestFlight 只写在文档里，CI 不签名：见 [docs/ios.zh-CN.md](docs/ios.zh-CN.md)。
+应用是同一套界面。不填写你自己的 DeepAPI 服务器时，对话仍然直接发往 `https://api.deepseek.com`。导出和导入使用系统分享。每个拉取请求会构建调试 APK。打上 `v*` 标签时，把 APK 附到 GitHub Release；只有密钥库密钥都配置了才会签正式包。说明见 [docs/android.zh-CN.md](docs/android.zh-CN.md)。iOS 是同一个应用。拉取请求会构建未签名的模拟器应用。TestFlight 只写在文档里，CI 不签名：见 [docs/ios.zh-CN.md](docs/ios.zh-CN.md)。
 
 ## 自托管
 
-把 `.env.example` 复制为 `.env`，填上 `POSTGRES_PASSWORD`、`KEY_ENCRYPTION_SECRET` 和第一位管理员。然后 `docker compose up -d` 会从 `ghcr.io/openlinkos/harbor-for-deepseek` 启动 Postgres 和应用容器。管理员添加 API Key、邀请码和每人每天的额度。朋友在这个地址登录。说明见 [docs/self-hosting_cn.md](docs/self-hosting_cn.md)。
+把 `.env.example` 复制为 `.env`，填上 `POSTGRES_PASSWORD`、`KEY_ENCRYPTION_SECRET` 和第一位管理员。然后 `docker compose up -d` 会从 `ghcr.io/openlinkos/deepapi` 启动 Postgres 和应用容器。管理员添加 API Key、邀请码和每人每天的额度。朋友在这个地址登录。说明见 [docs/self-hosting_cn.md](docs/self-hosting_cn.md)。
 
 如果官方 API 以后不再返回 CORS 头，静态页面会无法直连。这一版没有代理。不要在公开站点上悄悄加一个。
 
@@ -92,12 +92,12 @@ pnpm e2e
 
 [MIT](LICENSE) © 2026 OpenLinkOS
 
-`pnpm build` 会把 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 复制到 `apps/web/dist`。协议行为和 v3 归档参照公开 API，以及 [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo)（MIT，`Copyright (c) 2026 DeepSeek`）文档中的归档结构。该版权和许可证在 NOTICE。Harbor for DeepSeek 不使用该项目的名称、标志或字标。MIT 不授予商标权。
+`pnpm build` 会把 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 复制到 `apps/web/dist`。协议行为和 v3 归档参照公开 API，以及 [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo)（MIT，`Copyright (c) 2026 DeepSeek`）文档中的归档结构。该版权和许可证在 NOTICE。DeepAPI 不使用该项目的名称、标志或字标。MIT 不授予商标权。
 
 ---
 
-Harbor for DeepSeek · [OpenLinkOS](https://openlinkos.com/zh/) 发起的开源项目
+DeepAPI · [OpenLinkOS](https://openlinkos.com/zh/) 发起的开源项目
 
-[GitHub](https://github.com/openlinkos/harbor-for-deepseek) · [许可证](LICENSE) · [OpenLinkOS](https://openlinkos.com/zh/)
+[GitHub](https://github.com/openlinkos/deepapi) · [许可证](LICENSE) · [OpenLinkOS](https://openlinkos.com/zh/)
 
 DeepSeek 是其所有者的商标。本项目与深度求索没有隶属关系。

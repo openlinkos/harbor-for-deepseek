@@ -1,8 +1,8 @@
-import { translate, type Locale } from '@harbor/i18n'
+import { translate, type Locale } from '@deepapi/i18n'
 import { presentBlocks } from './blocks.js'
-import { estimateCost, formatCny } from '@harbor/pricing'
-import { activePath, siblingIds } from '@harbor/types'
-import type { ContentBlock, Conversation, Message } from '@harbor/types'
+import { estimateCost, formatCny } from '@deepapi/pricing'
+import { activePath, siblingIds } from '@deepapi/types'
+import type { ContentBlock, Conversation, Message } from '@deepapi/types'
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
@@ -15,8 +15,8 @@ const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
   useEffect(() => {
     const sync = () => setProfile(readProfile())
-    window.addEventListener('harbor-profile', sync)
-    return () => window.removeEventListener('harbor-profile', sync)
+    window.addEventListener('deepapi-profile', sync)
+    return () => window.removeEventListener('deepapi-profile', sync)
   }, [])
   return profile
 }
@@ -35,9 +35,9 @@ export const SiteFooter = () => {
     <footer className="site-footer" data-testid="site-footer">
       <p>{t('footerAbout')}</p>
       <p>
-        <a href="https://github.com/openlinkos/harbor-for-deepseek">GitHub</a>
+        <a href="https://github.com/openlinkos/deepapi">GitHub</a>
         <span aria-hidden="true"> · </span>
-        <a href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE">{t('footerLicense')}</a>
+        <a href="https://github.com/openlinkos/deepapi/blob/master/LICENSE">{t('footerLicense')}</a>
         <span aria-hidden="true"> · </span>
         <a href={locale === 'zh' ? 'https://openlinkos.com/zh/' : 'https://openlinkos.com/'}>OpenLinkOS</a>
       </p>
@@ -71,9 +71,7 @@ const shortcutHint = () => {
 
 const Wordmark = () => (
   <span className="wordmark">
-    <span className="wordmark-name">Harbor</span>
-    {' '}
-    <span className="wordmark-sub">for DeepSeek</span>
+    <span className="wordmark-name">DeepAPI</span>
   </span>
 )
 
@@ -121,9 +119,9 @@ const EyeIcon = ({ off }: { off?: boolean }) => (
   </svg>
 )
 
-const DOCS = 'https://github.com/openlinkos/harbor-for-deepseek/blob/master/SECURITY.md'
+const DOCS = 'https://github.com/openlinkos/deepapi/blob/master/SECURITY.md'
 const PLATFORM = 'https://platform.deepseek.com'
-const REPO = 'https://github.com/openlinkos/harbor-for-deepseek'
+const REPO = 'https://github.com/openlinkos/deepapi'
 
 export const KeyGate = () => {
   const t = useT()
@@ -364,7 +362,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
 }
 
 const VoiceSelect = () => {
-  const [name, setName] = useState(() => localStorage.getItem('harbor-voice') || '贝壳')
+  const [name, setName] = useState(() => localStorage.getItem('deepapi-voice') || '贝壳')
   return (
     <AnchoredMenu
       testId="voice-select"
@@ -374,7 +372,7 @@ const VoiceSelect = () => {
       options={VOICES}
       onPick={(value) => {
         setName(value)
-        localStorage.setItem('harbor-voice', value)
+        localStorage.setItem('deepapi-voice', value)
       }}
     />
   )
@@ -650,7 +648,7 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
   const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const [copied, setCopied] = useState(false)
-  const voteKey = `harbor-vote:${message.id}`
+  const voteKey = `deepapi-vote:${message.id}`
   const [vote, setVote] = useState<'up' | 'down' | null>(() => {
     const saved = localStorage.getItem(voteKey)
     return saved === 'up' || saved === 'down' ? saved : null
@@ -725,7 +723,7 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
           <button type="button" data-tip={t('speak')} aria-label={t('speak')} aria-busy={speaking} onClick={() => {
             if (!textOf || !('speechSynthesis' in window)) return
             const utterance = new SpeechSynthesisUtterance(textOf)
-            const chosen = localStorage.getItem('harbor-voice')
+            const chosen = localStorage.getItem('deepapi-voice')
             const voice = window.speechSynthesis.getVoices().find((item) => item.name === chosen)
             if (voice) utterance.voice = voice
             utterance.onstart = () => setSpeaking(true)
@@ -735,12 +733,12 @@ const MessageRow = ({ message, conversation }: { message: Message; conversation:
             setSpeaking(true)
             window.speechSynthesis.speak(utterance)
           }}>{speaking ? <Icon size={16} d="M8 12h.01M12 12h.01M16 12h.01" /> : <Icon size={16} d="M4 10v4h3l4 4V6L7 10H4Zm10 2a3 3 0 0 0-1.5-2.6M16 6a6 6 0 0 1 0 12" />}</button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('harbor-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
+          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><Icon size={16} d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /></button>
         </div>
       ) : null}
       {feedbackOpen ? (
         <div className="modal" role="dialog" aria-label={t('feedbackTitle')}>
-          <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`harbor-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>
+          <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`deepapi-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>
             <h2>{t('feedbackTitle')}</h2>
             <div className="feedback-chips">
               {[t('feedbackHarm'), t('feedbackFake'), t('feedbackUseless'), t('feedbackOther')].map((label) => (
@@ -764,8 +762,8 @@ export const Shell = () => {
   useEffect(() => {
     loadSkin()
     const onTheme = () => loadSkin()
-    window.addEventListener('harbor-theme', onTheme)
-    return () => window.removeEventListener('harbor-theme', onTheme)
+    window.addEventListener('deepapi-theme', onTheme)
+    return () => window.removeEventListener('deepapi-theme', onTheme)
   }, [])
   const state = useHarbor()
   const conversation = state.conversations.find((item) => item.id === state.activeId) ?? null
@@ -1008,9 +1006,9 @@ export const Shell = () => {
                 })}
                 {state.balance ? <span data-testid="balance-side"> {t('balance')} {state.balance.balance_infos[0]?.total_balance} {t('cny')}</span> : null}
               </p>
-              <a href="https://github.com/openlinkos/harbor-for-deepseek/releases" target="_blank" rel="noreferrer noopener">{t('downloadApp')}</a>
+              <a href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">{t('downloadApp')}</a>
               <button type="button" data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</button>
-              <a href="https://github.com/openlinkos/harbor-for-deepseek/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
+              <a href="https://github.com/openlinkos/deepapi/issues" target="_blank" rel="noreferrer noopener">{t('helpFeedback')}</a>
               {state.serverUser ? (
                 <button type="button" onClick={() => void state.logoutServer()}>{t('logout')}</button>
               ) : (
@@ -1059,7 +1057,7 @@ export const Shell = () => {
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
           <span className="top-actions">
-            <a className="download-app" href="https://github.com/openlinkos/harbor-for-deepseek/releases" target="_blank" rel="noreferrer noopener">
+            <a className="download-app" href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">
               <Icon d="M12 4v10M8 10l4 4 4-4M5 18h14" />
               <span>{t('downloadApp')}</span>
             </a>
@@ -1067,7 +1065,7 @@ export const Shell = () => {
               <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
             {path.length > 0 ? (
-              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'Harbor for DeepSeek', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
+              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'DeepAPI', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
                 <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
               </button>
             ) : null}
@@ -1195,7 +1193,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
               const text = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
               return `**${message.role}**\n\n${text}`
             }).join('\n\n')
-            downloadText(`${conversation.title || 'harbor'}.md`, `# ${conversation.title || 'Harbor'}\n\n${body}\n`)
+            downloadText(`${conversation.title || 'deepapi'}.md`, `# ${conversation.title || 'DeepAPI'}\n\n${body}\n`)
           }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
           <div role="menuitem" tabIndex={0} className="danger" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" /><span>{t('delete')}</span></div>
@@ -1220,7 +1218,7 @@ const Empty = () => {
   const t = useT()
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const returning = useMemo(() => {
-    const pinned = sessionStorage.getItem('harbor-audit-greeting')
+    const pinned = sessionStorage.getItem('deepapi-audit-greeting')
     if (pinned === 'welcomeMessage' || (RETURNING_GREETINGS as readonly string[]).includes(pinned || '')) {
       return pinned as typeof RETURNING_GREETINGS[number] | 'welcomeMessage'
     }
@@ -1289,8 +1287,8 @@ const Composer = () => {
       setText((event as CustomEvent<string>).detail)
       box.current?.focus()
     }
-    window.addEventListener('harbor-prefill', onPrefill)
-    return () => window.removeEventListener('harbor-prefill', onPrefill)
+    window.addEventListener('deepapi-prefill', onPrefill)
+    return () => window.removeEventListener('deepapi-prefill', onPrefill)
   }, [])
   const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
@@ -1412,7 +1410,7 @@ const Settings = () => {
   const [passphrase, setPassphrase] = useState('')
   const [tab, setTab] = useState<'general' | 'account' | 'data' | 'legal'>('general')
   const [exporting, setExporting] = useState(false)
-  const [improve, setImprove] = useState(() => localStorage.getItem('harbor-improve') !== 'off')
+  const [improve, setImprove] = useState(() => localStorage.getItem('deepapi-improve') !== 'off')
   const [sharedNote, setSharedNote] = useState(false)
   const [confirmAll, setConfirmAll] = useState(false)
   const profile = useProfile()
@@ -1591,7 +1589,7 @@ const Settings = () => {
               <span>{t('improveToggle')}</span>
               <p className="hint">{t('improveBody')}</p>
             </div>
-            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('harbor-improve', next ? 'on' : 'off') }}><span className="knob" /></button>
+            <button type="button" className={improve ? 'switch on' : 'switch'} aria-pressed={improve} aria-label={t('improveToggle')} onClick={() => { const next = !improve; setImprove(next); localStorage.setItem('deepapi-improve', next ? 'on' : 'off') }}><span className="knob" /></button>
           </div>
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
@@ -1825,15 +1823,15 @@ const Settings = () => {
         <section className="settings-legal">
           <div className="settings-line">
             <span>{t('terms')}</span>
-            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek/blob/master/LICENSE"><span>{t('view')}</span></a>
+            <a className="account-quiet" href="https://github.com/openlinkos/deepapi/blob/master/LICENSE"><span>{t('view')}</span></a>
           </div>
           <div className="settings-line">
             <span>{t('privacyPolicy')}</span>
-            <a className="account-quiet" href="https://github.com/openlinkos/harbor-for-deepseek"><span>{t('view')}</span></a>
+            <a className="account-quiet" href="https://github.com/openlinkos/deepapi"><span>{t('view')}</span></a>
           </div>
           <SiteFooter />
           <p className="hint">
-            <a href="https://github.com/openlinkos/harbor-for-deepseek">openlinkos/harbor-for-deepseek</a>
+            <a href="https://github.com/openlinkos/deepapi">openlinkos/deepapi</a>
             {' · '}
             <a href="https://platform.deepseek.com/">platform.deepseek.com</a>
           </p>

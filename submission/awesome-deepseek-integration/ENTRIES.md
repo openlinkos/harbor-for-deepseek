@@ -2,7 +2,7 @@
 
 Paste one set into the Applications table. The list name is not decided. Replace `{{NAME}}` with one variant:
 
-- Variant A: `Harbor for DeepSeek`
+- Variant A: `DeepAPI`
 - Variant B: `Harbor`
 
 Directory: `docs/harbor/`. Icon: `docs/harbor/assets/logo.png`, width 64. Chinese rows link to `docs/harbor/README_cn.md`. The other rows link to `docs/harbor/README.md`.

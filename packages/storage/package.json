@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/storage",
+  "name": "@deepapi/storage",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@harbor/types": "workspace:*",
+    "@deepapi/types": "workspace:*",
     "idb": "8.0.3"
   },
   "devDependencies": {

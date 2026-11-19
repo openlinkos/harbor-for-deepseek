@@ -1,3 +1,3 @@
-# Self-hosting Harbor for DeepSeek
+# Self-hosting DeepAPI
 
 See [self-hosting.md](self-hosting.md).

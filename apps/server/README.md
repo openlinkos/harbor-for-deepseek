@@ -1,4 +1,4 @@
-# Harbor for DeepSeek server
+# DeepAPI server
 
 Server mode. Postgres is the database.
 

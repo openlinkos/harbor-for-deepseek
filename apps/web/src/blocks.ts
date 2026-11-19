@@ -1,4 +1,4 @@
-import type { ContentBlock, TextBlock } from '@harbor/types'
+import type { ContentBlock, TextBlock } from '@deepapi/types'
 
 const ONLY_PUNCT = /^[\s。．.!?！？…,，、；;：:]+$/u
 

@@ -1,12 +1,12 @@
-Harbor
+DeepAPI
 Copyright (c) 2026 OpenLinkOS
 
-Harbor is an independent community client. It is not affiliated with, endorsed by,
+DeepAPI is an independent community client. It is not affiliated with, endorsed by,
 or sponsored by DeepSeek. DeepSeek is a trademark of its owner. The MIT License
 does not grant any trademark rights.
 
 The chat layout, color tokens, and several component styles are adapted from
-deepseek-ai/chat-demo (MIT). Harbor does not use that project's name, logo, or
+deepseek-ai/chat-demo (MIT). DeepAPI does not use that project's name, logo, or
 wordmark. The Messages API shapes and the version-3 history archive also follow
 the public API and the archive layout documented by that repository:
 
@@ -14,7 +14,7 @@ the public API and the archive layout documented by that repository:
   commit 5d5dd754ebc1948e977ddb880a9eb5aa25f37b4c (v0.1.1)
 
 That project is MIT licensed. Its license is reproduced below, as required for
-redistribution of a derived understanding of its protocol code. Harbor's own
+redistribution of a derived understanding of its protocol code. DeepAPI's own
 source is under the MIT license in the root LICENSE file.
 
 ---

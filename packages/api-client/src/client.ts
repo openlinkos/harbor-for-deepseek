@@ -1,5 +1,5 @@
-import { readApiError, readStreamEvent, ServerSentEventDecoder } from '@harbor/sse'
-import type { Balance, CreateMessageBody, ModelInfo, StreamEvent, UploadedFile } from '@harbor/types'
+import { readApiError, readStreamEvent, ServerSentEventDecoder } from '@deepapi/sse'
+import type { Balance, CreateMessageBody, ModelInfo, StreamEvent, UploadedFile } from '@deepapi/types'
 import { API_ORIGIN, FILES_BETA } from './request.js'
 
 export class ApiClientError extends Error {

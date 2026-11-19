@@ -1,7 +1,8 @@
 import 'fake-indexeddb/auto'
+import { openDB } from 'idb'
 import { describe, expect, it } from 'vitest'
-import type { Conversation, Message } from '@harbor/types'
-import { openIndexedRepository } from './indexeddb.js'
+import type { Conversation, Message } from '@deepapi/types'
+import { migrateLegacyIndexedDb, openIndexedRepository } from './indexeddb.js'
 import { mergeSnapshot } from './merge.js'
 import { createMemoryRepository } from './memory.js'
 import { openSecret, sealSecret } from './secret.js'
@@ -97,6 +98,37 @@ describe('secrets', () => {
 })
 
 describe('indexeddb repository', () => {
+  it('does nothing when the Harbor database was never created', async () => {
+    await migrateLegacyIndexedDb()
+  })
+
+  it('copies chats and the sealed key from the Harbor databases', async () => {
+    await new Promise<void>((resolve) => {
+      const request = indexedDB.deleteDatabase('deepapi')
+      request.onsuccess = () => resolve()
+      request.onerror = () => resolve()
+    })
+    const legacy = await openDB('harbor', 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('conversations')) db.createObjectStore('conversations', { keyPath: 'id' })
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv')
+      },
+    })
+    await legacy.put('conversations', conversation('c1', 1, 'Kept chat'))
+    legacy.close()
+    const legacySecrets = await openDB('harbor-secrets', 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('secrets')) db.createObjectStore('secrets')
+      },
+    })
+    await legacySecrets.put('secrets', { v: 1, enc: false, value: 'demo-local-key' }, 'api-key')
+    legacySecrets.close()
+    await migrateLegacyIndexedDb()
+    const repo = await openIndexedRepository()
+    expect((await repo.listConversations()).map((item) => item.title)).toContain('Kept chat')
+    expect(await repo.readSecret()).toEqual({ v: 1, enc: false, value: 'demo-local-key' })
+  })
+
   it('keeps the key out of the conversation database and deletes by tombstone', async () => {
     const repo = await openIndexedRepository()
     const settings = await repo.loadSettings()

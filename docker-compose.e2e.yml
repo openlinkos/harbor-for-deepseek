@@ -14,7 +14,7 @@ services:
       start_period: 3s
     restart: unless-stopped
 
-  harbor:
+  deepapi:
     environment:
       DEEPSEEK_API_ORIGIN: http://mock:8081
     depends_on:

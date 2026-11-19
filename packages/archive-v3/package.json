@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/archive-v3",
+  "name": "@deepapi/archive-v3",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@harbor/types": "workspace:*",
+    "@deepapi/types": "workspace:*",
     "fflate": "0.8.2"
   },
   "devDependencies": {

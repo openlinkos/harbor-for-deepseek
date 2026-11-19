@@ -1,5 +1,5 @@
-import { readStreamEvent, ServerSentEventDecoder } from '@harbor/sse'
-import type { StreamEvent } from '@harbor/types'
+import { readStreamEvent, ServerSentEventDecoder } from '@deepapi/sse'
+import type { StreamEvent } from '@deepapi/types'
 
 let csrf = ''
 let remoteBase = ''
@@ -50,7 +50,7 @@ export const api = async <T>(path: string, init: RequestInit = {}): Promise<T> =
 }
 
 export const hostedPage = () =>
-  typeof document !== 'undefined' && document.querySelector('meta[name="harbor-server"]') !== null
+  typeof document !== 'undefined' && document.querySelector('meta[name="deepapi-server"]') !== null
 
 export type ServerUser = { id: string; username: string; role: 'admin' | 'member' }
 

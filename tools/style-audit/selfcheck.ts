@@ -67,7 +67,7 @@ export const selfCheck = () => {
 
   const brand = diffMatch('s', '1440x900', matchCaptures(
     capture([node({ key: 'logo', text: 'DeepSeek', tag: 'span', role: '', rect: { x: 40, y: 20, w: 80, h: 18 }, style: { color: 'black', 'font-size': '16px' } })]),
-    capture([node({ key: 'mark', text: 'Harbor', tag: 'span', role: '', rect: { x: 40, y: 20, w: 70, h: 18 }, style: { color: 'red', 'font-size': '15px' } })]),
+    capture([node({ key: 'mark', text: 'DeepAPI', tag: 'span', role: '', rect: { x: 40, y: 20, w: 70, h: 18 }, style: { color: 'red', 'font-size': '15px' } })]),
   ), allow)
   assert(brand.pass, 'wordmark brand diffs are allowed')
   assert(brand.mismatches.some((item) => item.id === 'brand-wordmark'), 'wordmark exception is cited')

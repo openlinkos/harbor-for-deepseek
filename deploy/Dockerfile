@@ -9,13 +9,13 @@ COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @harbor/web build && pnpm --filter @harbor/server build
+RUN pnpm --filter @deepapi/web build && pnpm --filter @deepapi/server build
 
 FROM node:22-alpine
 LABEL org.opencontainers.image.title="Harbor for DeepSeek" \
       org.opencontainers.image.description="Harbor for DeepSeek server" \
-      org.opencontainers.image.source="https://github.com/openlinkos/harbor-for-deepseek" \
-      org.opencontainers.image.url="https://hfd.linkos.org" \
+      org.opencontainers.image.source="https://github.com/openlinkos/deepapi" \
+      org.opencontainers.image.url="https://deepapi.linkos.org" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.vendor="OpenLinkOS"
 WORKDIR /app

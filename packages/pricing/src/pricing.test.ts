@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Usage } from '@harbor/types'
+import type { Usage } from '@deepapi/types'
 import { estimateCost, isPeakInstant, sumUsage } from './index.js'
 
 const weatherUsage: Usage = {
