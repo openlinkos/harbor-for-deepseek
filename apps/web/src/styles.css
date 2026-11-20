@@ -2794,3 +2794,194 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   white-space: nowrap;
   border: 0;
 }
+
+/* Share selection. Sizes follow frozen ds-checkbox--l / ds-button / ds-modal-content tokens.
+   The 1280 captures are a 2/3 scale of the 1920 CSS frame, so they are not the pixel source. */
+.turn.share-on {
+  position: relative;
+  content-visibility: visible;
+  margin-bottom: 55px;
+}
+.turn.share-on > .share-box {
+  position: absolute;
+  left: -41px;
+  z-index: 2;
+}
+.turn.user.share-on > .share-box { top: -12px; }
+.turn.assistant.share-on > .share-box { top: 5px; }
+.turn.share-on .action-row,
+.turn.share-on .user-actions { display: none; }
+.turn.share-on { isolation: isolate; }
+.turn.share-on > :not(.share-box):not(.share-halo) { position: relative; z-index: 1; }
+.bubble { position: relative; }
+.share-halo {
+  display: none;
+  position: absolute;
+  border-radius: 18px;
+  background: var(--dsw-static-neutral-bluish-60);
+  pointer-events: none;
+  z-index: 0;
+}
+.turn > .share-halo { top: -15px; right: -15px; bottom: -15px; left: -15px; }
+.turn.assistant > .share-halo { top: -28px; }
+.turn.share-picked > .share-halo { display: block; }
+body[data-ds-dark-theme] .share-halo { background: var(--dsw-static-neutral-bluish-850); }
+input.share-box.ds-checkbox,
+.share-bar input.ds-checkbox {
+  --dsl-checkbox-size: 16px;
+  --dsl-checkbox-border-radius: 6px;
+  --dsl-checkbox-border-width: 1.5px;
+  --dsl-checkbox-icon-color: var(--dsw-alias-label-primary-inverted);
+  appearance: none;
+  width: var(--dsl-checkbox-size);
+  height: var(--dsl-checkbox-size);
+  margin: 0;
+  flex: none;
+  border: 0;
+  border-radius: var(--dsl-checkbox-border-radius);
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsw-alias-border-l3);
+  background: transparent;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+input.share-box[hidden] { display: none; }
+input.share-box.ds-checkbox.ds-checkbox--l,
+.share-bar input.ds-checkbox.ds-checkbox--l { --dsl-checkbox-size: 18px; }
+input.share-box.ds-checkbox::after,
+.share-bar input.ds-checkbox::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border: 2px solid transparent;
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg) translate(-0.5px, -0.5px);
+}
+input.share-box.ds-checkbox:checked,
+.share-bar input.ds-checkbox:checked {
+  background: var(--dsw-alias-button-primary-fill);
+  box-shadow: none;
+}
+input.share-box.ds-checkbox:checked::after,
+.share-bar input.ds-checkbox:checked::after { border-color: var(--dsl-checkbox-icon-color); }
+.share-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  box-sizing: border-box;
+  height: 65px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-bg-base);
+}
+.share-bar-inner {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: calc(min(752px, calc(100% - 88px)) + 56px);
+  height: 100%;
+  margin-left: calc((100% - min(752px, calc(100% - 88px))) / 2 - 41px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.share-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  flex: none;
+}
+.share-split {
+  width: 1px;
+  height: 14px;
+  background: var(--dsw-alias-border-l2);
+  flex: none;
+}
+.share-count {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--dsw-alias-label-secondary);
+}
+.share-gap { flex: 1 1 auto; min-width: 0; }
+.share-bar .ds-button { flex: 0 0 auto; }
+.share-bar .ds-button__content { gap: 4px; }
+.modal.share-modal { z-index: 1400; }
+.share-soon-card {
+  position: relative;
+  width: min(408px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv3);
+}
+.share-soon-card h2 {
+  margin: 0 28px 8px 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.share-soon-card p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--dsw-alias-label-secondary);
+}
+.share-soon-card .ds-button { width: 100%; }
+.share-soon-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4096px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+@media (max-width: 767px) {
+  .turn.share-on > .share-halo {
+    left: -20px;
+    right: -1px;
+    background: rgb(236, 242, 249);
+  }
+  body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
+  .turn.share-on > .share-box { left: 0; }
+  .share-bar-inner {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 36px;
+  }
+  .share-bar .share-split,
+  .share-bar .share-count,
+  .share-bar [data-testid="share-cancel"] { display: none; }
+  .share-top-cancel {
+    border: 0;
+    background: transparent;
+    color: var(--dsw-alias-label-primary);
+    font: inherit;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 0 4px;
+    cursor: pointer;
+  }
+}

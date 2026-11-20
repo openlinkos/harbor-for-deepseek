@@ -57,8 +57,6 @@ const knownFailure = (width: number, title: string): string | null => {
   if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
   // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
   if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
-  // fb1132 调查，没有单独修复项。顶栏是系统分享或复制标题；操作栏和 ⋯ 菜单直接下载 Markdown。官方流程是勾选消息后创建链接。
-  if (title === 'share entries agree and open the share flow') return 'fb1132 调查: 三个分享入口都没有进入勾选消息并创建链接，顶栏不打开分享流程，另外两个入口会下载 Markdown'
   // 390 上 ⋯ 是底部 sheet，.item-menu-scrim 挡住触发器。Esc 与点遮罩在同视口已通过。不得 skip。
   if (title === 'chat ⋯ menu cancels on retoggle' && width < 768) return 'fb1132 调查: 390 上 ⋯ 底部 sheet 的遮罩挡住触发器，再点 ⋯ 点不到'
   return null
@@ -146,7 +144,20 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         const dl = page.waitForEvent('download', { timeout: 1500 }).then((d) => d.suggestedFilename()).catch(() => null)
         await go()
         expect(await dl, `${name} 分享不应直接下载文件`).toBeNull()
-        await expect(page.locator('[role="dialog"], .share-bar, input[type="checkbox"]').first(), `${name} 分享必须进入分享模式`).toBeVisible()
+        await expect(page.locator('.share-bar'), `${name} 必须出现分享底栏`).toBeVisible()
+        const boxes = page.locator('input.share-box')
+        await expect(boxes.first(), `${name} 必须出现消息复选框`).toBeVisible()
+        const checked = await boxes.evaluateAll((nodes) => nodes.map((node) => (node as HTMLInputElement).checked))
+        expect(checked.length, `${name} 至少有一组问答`).toBeGreaterThanOrEqual(2)
+        if (name === 'action row') {
+          expect(checked.slice(0, -2).every((on) => !on), `${name} 只预选这一组`).toBe(true)
+          expect(checked.slice(-2), `${name} 这一组的问答都选中`).toEqual([true, true])
+          if (vp.width >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
+        } else {
+          expect(checked.every((on) => on), `${name} 全选`).toBe(true)
+          if (vp.width >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
+        }
+        if (vp.width < 768) await expect(page.getByTestId('share-count')).toBeHidden()
         await page.keyboard.press('Escape')
       }
     })
