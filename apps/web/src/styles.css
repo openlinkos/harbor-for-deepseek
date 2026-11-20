@@ -1640,14 +1640,15 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
 @media (max-width: 767px) {
   .settings-line.balance-line:has(button) { align-items: flex-start; }
   .settings-line.balance-line:has(button) > span:first-child { margin-top: 7px; }
-  .settings-line.balance-line .account-side > button { order: 1; }
-  .settings-line.balance-line .account-side > .hint { order: 2; }
+  .settings-line.balance-line .account-side > button { order: 1; margin-left: auto; }
+  .settings-line.balance-line .account-side > .hint { order: 2; flex-basis: 100%; margin-left: 0; margin-top: 4px; }
 }
 .settings-account, .settings-data, .settings-legal { margin-top: -10px; }
 .legal-copy { max-width: 640px; }
 .legal-copy h3 { margin: 16px 0 8px; font-size: 16px; }
 .legal-copy p { margin: 0 0 12px; line-height: 24px; color: var(--dsw-alias-label-secondary); }
 .settings-line .account-side { display: inline-flex; align-items: center; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.settings-line .account-side.ds-button-stack { flex-direction: column; flex-wrap: nowrap; align-items: flex-end; gap: 8px; }
 [data-testid='balance-side'] { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; column-gap: 8px; row-gap: 8px; min-width: 0; }
 .settings-line input.account-value:not([type='hidden']):not([type='file']) {
   width: 129px;

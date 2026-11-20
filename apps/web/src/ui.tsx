@@ -1935,7 +1935,7 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('skin')}</span>
-            <span className="account-side">
+            <span className="account-side ds-button-stack">
               <DsButton type="button" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</DsButton>
               <DsFileButton
                 testId="skin-file"
