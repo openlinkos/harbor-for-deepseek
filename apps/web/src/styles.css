@@ -1605,7 +1605,7 @@ body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-
 body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
 .settings-main { grid-column: 2; grid-row: 2; overflow: auto; padding: 10px 24px 0; min-width: 0; }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
-.settings-main button:not(.chip) {
+.settings-main button:not(.chip):not(.ds-button) {
   height: 36px;
   padding: 0 14px;
   border: 0;
@@ -1616,9 +1616,9 @@ body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-
   font-weight: 400;
   line-height: 22px;
 }
-body[data-ds-dark-theme] .settings-main button:not(.chip) { background: var(--dsw-static-neutral-bluish-800); }
+body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { background: var(--dsw-static-neutral-bluish-800); }
 .settings-main button.primary { background: var(--dsw-alias-button-primary-fill); color: #fff; }
-.settings-main label:not(.check) { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 40px; }
+.settings-main label:not(.check):not(:has(input[type=file])) { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 40px; }
 .settings-more:not([open]) > :not(summary) { display: none; }
 .settings-more > summary {
   position: absolute;
@@ -2555,4 +2555,144 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Official ds-button (main.dc093a796f.css): outlined neutral, filled primary, outlined error. */
+.ds-button {
+  --dsl-button-border-radius: 4096px;
+  --dsl-button-box-shadow: none;
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: transparent;
+  --dsl-button-border-color: transparent;
+  --dsl-button-text-color: var(--dsw-alias-label-primary);
+  --dsl-button-font-weight: 400;
+  --dsl-button-height: var(--ds-control-height-m);
+  --dsl-button-font-size: 14px;
+  --dsl-button-line-height: 22px;
+  --dsl-button-padding: 0 14px;
+  --dsl-button-icon-gap: 4px;
+  --dsl-button-min-width: 72px;
+  height: var(--dsl-button-height);
+  line-height: var(--dsl-button-line-height);
+  font-size: var(--dsl-button-font-size);
+  font-weight: var(--dsl-button-font-weight);
+  font-family: inherit;
+  border-radius: var(--dsl-button-border-radius);
+  box-shadow: var(--dsl-button-box-shadow);
+  padding: var(--dsl-button-padding);
+  user-select: none;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+  align-items: center;
+  gap: var(--dsl-button-icon-gap);
+  outline: none;
+  justify-content: center;
+  text-decoration: none;
+  display: inline-flex;
+  position: relative;
+  color: var(--dsl-button-text-color);
+  background-color: transparent;
+  border: 0;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.ds-button.ds-button--min-width { min-width: var(--dsl-button-min-width); }
+.ds-button.ds-button--xl {
+  --dsl-button-height: var(--ds-control-height-xl);
+  --dsl-button-padding: 0 14px;
+  --dsl-button-icon-gap: 6px;
+  --dsl-button-min-width: 72px;
+  --dsl-button-font-weight: 500;
+}
+.ds-button.ds-button--l {
+  --dsl-button-height: var(--ds-control-height-l);
+  --dsl-button-padding: 0 14px;
+  --dsl-button-icon-gap: 6px;
+  --dsl-button-min-width: 72px;
+}
+.ds-button.ds-button--m {
+  --dsl-button-height: var(--ds-control-height-m);
+  --dsl-button-font-size: 14px;
+  --dsl-button-line-height: 22px;
+  --dsl-button-padding: 0 14px;
+  --dsl-button-icon-gap: 4px;
+  --dsl-button-min-width: 72px;
+}
+.ds-button.ds-button--s {
+  --dsl-button-height: var(--ds-control-height-s);
+  --dsl-button-padding: 0 14px;
+  --dsl-button-icon-gap: 4px;
+  --dsl-button-min-width: 58px;
+}
+.ds-button.ds-button--xs {
+  --dsl-button-height: var(--ds-control-height-xs);
+  --dsl-button-font-size: 13px;
+  --dsl-button-line-height: 20px;
+  --dsl-button-padding: 0 10px;
+  --dsl-button-icon-gap: 3px;
+  --dsl-button-min-width: 58px;
+}
+.ds-button.ds-button--filled.ds-button--primary {
+  --dsl-button-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-color-hover: var(--dsw-alias-button-primary-hover);
+  --dsl-button-text-color: var(--dsw-alias-label-primary-foreground);
+  --dsl-button-font-weight: 500;
+}
+.ds-button.ds-button--outlined.ds-button--outlinedNeutral {
+  --dsl-button-border-color: var(--dsw-alias-border-l2);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-text-color: var(--dsw-alias-label-primary);
+}
+.ds-button.ds-button--outlined.ds-button--error {
+  --dsl-button-border-color: var(--dsw-alias-state-error-primary);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover-danger);
+  --dsl-button-text-color: var(--dsw-alias-state-error-primary);
+}
+.ds-button > .ds-button__background {
+  box-sizing: border-box;
+  border-radius: inherit;
+  background-color: var(--dsl-button-color);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ds-button > .ds-button__background::after {
+  content: "";
+  border-radius: calc(var(--dsl-button-border-radius) + 2px);
+  pointer-events: none;
+  position: absolute;
+  inset: -2px;
+}
+.ds-button:hover:not(:disabled) > .ds-button__background { background-color: var(--dsl-button-color-hover); }
+.ds-button:focus-visible > .ds-button__background::after { box-shadow: 0 0 0 2px var(--dsw-alias-button-primary-fill); }
+.ds-button.ds-button--outlined > .ds-button__border {
+  box-sizing: border-box;
+  border: 1px solid var(--dsl-button-border-color);
+  border-radius: inherit;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+.ds-button > .ds-button__content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ds-button:disabled { opacity: 0.45; cursor: not-allowed; }
+.ds-file { position: relative; display: inline-flex; flex: none; }
+.ds-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
