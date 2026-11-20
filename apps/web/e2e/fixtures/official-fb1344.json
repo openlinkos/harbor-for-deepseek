@@ -1,0 +1,170 @@
+{
+ "source": "frozen/baseline/official-source dom-answer.html + dom-item-menu.html rendered with main.dc093a796f.css (fb1344/official-render.mjs)",
+ "cells": {
+  "light|1440x900": {
+   "thinkLeadHash": "7f13f22",
+   "thinkLeadFill": "rgb(57, 100, 254)",
+   "thinkChevronHash": "8634df9d",
+   "thinkChevronW": 14,
+   "thinkLabelColor": "rgb(97, 102, 107)",
+   "thinkLabelFont": [
+    "16px",
+    "28px"
+   ],
+   "searchIconHash": "abea5225",
+   "searchIconW": 14,
+   "searchColor": "rgb(97, 102, 107)",
+   "browseIconHash": "6aa47b08",
+   "browseIconW": 14,
+   "pillH": 34,
+   "pillPad": [
+    "4px",
+    "10px"
+   ],
+   "pillBg": "rgb(255, 255, 255)",
+   "pillBorder": "rgba(0, 0, 0, 0.1)",
+   "actionColor": "rgb(129, 133, 140)",
+   "actionHashes": [
+    "ae4e6054",
+    "7064ea2b",
+    "888d5160",
+    "9b087e69",
+    "62db06c4"
+   ],
+   "avatarWeight": "500",
+   "avatarColor": "rgb(129, 133, 140)"
+  },
+  "light|390x844": {
+   "thinkLeadHash": "7f13f22",
+   "thinkLeadFill": "rgb(57, 100, 254)",
+   "thinkChevronHash": "8634df9d",
+   "thinkChevronW": 14,
+   "thinkLabelColor": "rgb(97, 102, 107)",
+   "thinkLabelFont": [
+    "16px",
+    "28px"
+   ],
+   "searchIconHash": "abea5225",
+   "searchIconW": 14,
+   "searchColor": "rgb(97, 102, 107)",
+   "browseIconHash": "6aa47b08",
+   "browseIconW": 14,
+   "pillH": 34,
+   "pillPad": [
+    "4px",
+    "10px"
+   ],
+   "pillBg": "rgb(255, 255, 255)",
+   "pillBorder": "rgba(0, 0, 0, 0.1)",
+   "actionColor": "rgb(129, 133, 140)",
+   "actionHashes": [
+    "ae4e6054",
+    "7064ea2b",
+    "888d5160",
+    "9b087e69",
+    "62db06c4"
+   ],
+   "avatarWeight": "500",
+   "avatarColor": "rgb(129, 133, 140)"
+  },
+  "dark|1440x900": {
+   "thinkLeadHash": "7f13f22",
+   "thinkLeadFill": "rgb(86, 134, 254)",
+   "thinkChevronHash": "8634df9d",
+   "thinkChevronW": 14,
+   "thinkLabelColor": "rgb(207, 211, 214)",
+   "thinkLabelFont": [
+    "16px",
+    "28px"
+   ],
+   "searchIconHash": "abea5225",
+   "searchIconW": 14,
+   "searchColor": "rgb(207, 211, 214)",
+   "browseIconHash": "6aa47b08",
+   "browseIconW": 14,
+   "pillH": 34,
+   "pillPad": [
+    "4px",
+    "10px"
+   ],
+   "pillBg": "rgb(21, 21, 23)",
+   "pillBorder": "rgba(255, 255, 255, 0.12)",
+   "actionColor": "rgb(173, 178, 184)",
+   "actionHashes": [
+    "ae4e6054",
+    "7064ea2b",
+    "888d5160",
+    "9b087e69",
+    "62db06c4"
+   ],
+   "avatarWeight": "500",
+   "avatarColor": "rgb(173, 178, 184)"
+  },
+  "dark|390x844": {
+   "thinkLeadHash": "7f13f22",
+   "thinkLeadFill": "rgb(86, 134, 254)",
+   "thinkChevronHash": "8634df9d",
+   "thinkChevronW": 14,
+   "thinkLabelColor": "rgb(207, 211, 214)",
+   "thinkLabelFont": [
+    "16px",
+    "28px"
+   ],
+   "searchIconHash": "abea5225",
+   "searchIconW": 14,
+   "searchColor": "rgb(207, 211, 214)",
+   "browseIconHash": "6aa47b08",
+   "browseIconW": 14,
+   "pillH": 34,
+   "pillPad": [
+    "4px",
+    "10px"
+   ],
+   "pillBg": "rgb(21, 21, 23)",
+   "pillBorder": "rgba(255, 255, 255, 0.12)",
+   "actionColor": "rgb(173, 178, 184)",
+   "actionHashes": [
+    "ae4e6054",
+    "7064ea2b",
+    "888d5160",
+    "9b087e69",
+    "62db06c4"
+   ],
+   "avatarWeight": "500",
+   "avatarColor": "rgb(173, 178, 184)"
+  }
+ },
+ "constants": {
+  "settingsButton": {
+   "h": 36,
+   "minW": 72,
+   "padX": "14px",
+   "border": {
+    "light": "rgba(0, 0, 0, 0.1)",
+    "dark": "rgba(255, 255, 255, 0.12)"
+   },
+   "note": "style-official-settings-data-*.json + .ds-button--m / --dsw-alias-border-l2"
+  },
+  "tooltipPlacement": "below",
+  "tooltipNote": "bundle: message action Tooltip placement:\"bottom\"; .ds-tooltip--s 4px 8px, 12px/1.5, radius 10px",
+  "phaseTitles": {
+   "thinking": "正在思考",
+   "searching": "正在搜索",
+   "browsing": "正在浏览网页",
+   "done": "^已思考（用时 \\d+ 秒）$"
+  },
+  "shimmer": {
+   "duration": "2s",
+   "timing": "ease-out",
+   "iteration": "infinite",
+   "keyframes": "translateX(-100%) → translateX(100%) at 90%..100%",
+   "width": "120px",
+   "gradient": {
+    "light": "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 54.51%, rgba(255,255,255,0) 109.02%)",
+    "dark": "linear-gradient(90deg, rgba(21,21,23,0) 0%, rgba(21,21,23,.5) 54.51%, rgba(21,21,23,0) 109.02%)"
+   },
+   "direction": "ltr (rtl: -1)"
+  },
+  "busyHint": "有消息正在生成，请稍后再试"
+ }
+}
