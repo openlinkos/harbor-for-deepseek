@@ -20,7 +20,6 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // 已知失败用 knownFailure(id)。FB1554_STRICT=1 时全部按真失败跑。修好一项就删掉对应 id，过期的 id 会让 test.fail 变红。
 // fb1554-M1 多 text block 分开渲染（段落/列表被切断、跨块加粗残留 **、行首标点）：corpus-structure、corpus-no-literal
 // fb1554-M2 中文标点旁的 ** 不渲染（CommonMark 左右侧规则；官方 micromark 已放宽）：cjk-strong-single-block
-// fb1554-M3 浏览行同一 URL 出现两次、链接颜色和 ↗ 图标：browse-unique、browse-style
 // fb1554-M4 角标 vertical-align: super、组间距、390 换行：cite-style，以及 cite-inline-same-line 的 390。
 //   1440 的 cite-inline-same-line 已经同行，不要标失败，否则意外通过会让 CI 变红。
 // fb1554-M5 搜索行 favicon 不重叠（.thinking button 规则漏到 button.favicons）：favicon-overlap
@@ -29,7 +28,6 @@ const STRICT = process.env.FB1554_STRICT === '1'
 const KNOWN: Record<string, string> = {
   'fb1554-M1': 'fb1554-M1: 每个 text block 一个 .prose，段落和列表在引用处断开',
   'fb1554-M2': 'fb1554-M2: **「…」** 原样显示',
-  'fb1554-M3': 'fb1554-M3: 浏览 4 个页面显示成 8 个链接；链接色 caption、官方 secondary；图标 16 视框 12px 在链接内、官方 8×14 视框 14px 在链接外',
   'fb1554-M4': 'fb1554-M4: 角标 vertical-align super，比官方高 5.3px；首个角标间距 2、官方 4',
   'fb1554-M5': 'fb1554-M5: 搜索行 favicon 间距 +2、官方重叠 4',
   'fb1554-T1': 'fb1554-T1: 用时按挂载后墙钟、全局 streaming 计',
@@ -77,11 +75,11 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       expect(r.metrics.counts.strong).toEqual(EXPECT.strong); expect(r.metrics.literal).toEqual([]) })
     test('cite-inline-same-line', async ({ page }) => { if (w < 768) knownFailure('fb1554-M4'); await boot(page, theme); await ask(page); const r = await md(page)
       expect(r.fails.filter((f: { rule: string }) => f.rule === 'cite-inline-same-line')).toEqual([]) })
-    test('browse-unique', async ({ page }) => { knownFailure('fb1554-M3'); await boot(page, theme); await ask(page); const r = await md(page)
+    test('browse-unique', async ({ page }) => { await boot(page, theme); await ask(page); const r = await md(page)
       expect(r.metrics.browse.count).toBe(EXPECT.browseLinks); expect(r.metrics.labels.browse).toBe(`浏览 ${EXPECT.browseLinks} 个页面`) })
     if (w === 1440) {
       const o = OFF.cells[theme]
-      test('browse-style', async ({ page }) => { knownFailure('fb1554-M3'); await boot(page, theme); await ask(page); const b = (await md(page)).metrics.browse
+      test('browse-style', async ({ page }) => { await boot(page, theme); await ask(page); const b = (await md(page)).metrics.browse
         expect(b.link).toEqual(o.browseLink); expect(b.icon).toEqual(o.browseIcon); expect(Math.abs(b.rowGap - o.browseItemGap)).toBeLessThanOrEqual(0.5) })
       test('cite-style', async ({ page }) => { knownFailure('fb1554-M4'); await boot(page, theme); await ask(page); const m = (await md(page)).metrics
         for (const k of Object.keys(o.cite).filter((k) => !/Px$|PrevChar$/.test(k))) expect(m.citeStyle[k], k).toBe(o.cite[k])
