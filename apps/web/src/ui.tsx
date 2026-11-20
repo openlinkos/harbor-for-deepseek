@@ -470,6 +470,10 @@ type ShareModeValue = {
 
 const ShareMode = createContext<ShareModeValue | null>(null)
 
+/** No DOM node unless selecting, so article > .prose stays a direct child for the markdown gate. */
+const ShareSlot = ({ on, className, children }: { on: boolean; className?: string; children: ReactNode }) =>
+  on ? <div className={className}>{children}</div> : <>{children}</>
+
 const LinkMark = () => (
   <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
     <path fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M6.6 9.4 9.4 6.6M7.2 5.4l.6-.6a2.3 2.3 0 0 1 3.2 3.2l-.6.6M8.8 10.6l-.6.6a2.3 2.3 0 0 1-3.2-3.2l.6-.6" />
@@ -1103,7 +1107,7 @@ const MessageRow = ({ message }: { message: Message }) => {
       {share?.on && groupId ? (
         <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" checked={picked} aria-label={textOf || t('share')} onChange={() => share.toggle(groupId)} />
       ) : null}
-      <div className={share?.on ? `share-block${picked ? ' on' : ''}` : 'share-slot'}>
+      <ShareSlot on={!!share?.on} className={share?.on ? `share-block${picked ? ' on' : ''}` : undefined}>
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1170,7 +1174,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           </HoverTip>
         </div>
       ) : null}
-      </div>
+      </ShareSlot>
       {feedbackOpen ? (
         <div className="modal" role="dialog" aria-label={t('feedbackTitle')}>
           <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`deepapi-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>

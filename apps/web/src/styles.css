@@ -2797,7 +2797,6 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 
 /* Share selection. Sizes follow frozen ds-checkbox--l / ds-button / ds-modal-content tokens.
    The 1280 captures are a 2/3 scale of the 1920 CSS frame, so they are not the pixel source. */
-.share-slot { display: contents; }
 .turn.share-on {
   position: relative;
   content-visibility: visible;
