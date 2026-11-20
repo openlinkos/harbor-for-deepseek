@@ -16,16 +16,10 @@ const SSE = readFileSync(join(HERE, 'lib/fb1344-sse.js'), 'utf8')
 const STRICT = process.env.FB1344_STRICT === '1'
 
 // 在 master 4734e7f 上会失败的用例。修复 PR 删掉自己那几条；修好了却没删，会因为意外通过让 CI 变红。
-// fb1344-P2 回答底部：pill-geometry、pill-bg-dark、action-color-dark、share-tooltip。
 // fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing。phase-done 在 master 已通过，不要标失败。
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P2 回答底部（胶囊几何、深色底色、深色操作栏、hover tooltip）
-  'pill-geometry': 'fb1344-P2: 来源胶囊高 32.1 / 左内边距 6，官方 34 / 4',
-  'pill-bg-dark': 'fb1344-P2: 深色来源胶囊底色 rgb(44,44,46)，官方 rgb(21,21,23)',
-  'action-color-dark': 'fb1344-P2: 深色操作栏图标色 rgb(129,133,140)，官方 rgb(173,178,184)',
-  'share-tooltip': 'fb1344-P2: 操作栏 tooltip 在按钮上方且无箭头，官方 placement bottom',
   // fb1344-P5 分阶段 SSE：正在思考 / 正在搜索 / 正在浏览网页
   'phase-thinking': 'fb1344-P5: 流式中标题一直是「已思考（用时 N 秒）」，没有「正在思考」与 shimmer',
   'phase-searching': 'fb1344-P5: 搜索进行中无「正在搜索」标题，也没有进行中的搜索行',
