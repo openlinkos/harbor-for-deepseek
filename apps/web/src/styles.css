@@ -2046,20 +2046,34 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 }
 .timeline-browse { padding: 5px 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-small); }
 .timeline-browse.is-last { padding-bottom: 0; }
-.timeline-browse > svg:first-of-type { margin-top: 4px; }
+.timeline-browse > svg:first-of-type { margin-top: 4px; margin-right: 6px; }
 .browse-line { flex-wrap: wrap; align-items: center; row-gap: 6px; }
+.browse-count { margin-right: 6px; }
+.browse-item { display: inline-flex; align-items: center; max-width: 100%; margin-right: 6px; }
 .browse-link {
   font: var(--dsw-font-xs-13);
-  color: var(--dsw-alias-label-caption);
-  text-decoration: underline dotted;
+  color: var(--dsw-alias-label-secondary);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--dsw-alias-label-caption);
   text-underline-offset: 4px;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.browse-link:hover { color: var(--dsw-alias-label-primary); }
-.browse-link svg { width: 12px; height: 12px; }
+.browse-link:visited { color: var(--dsw-alias-label-secondary); }
+.browse-link:hover { color: var(--dsw-alias-label-primary); text-decoration-color: var(--dsw-alias-label-tertiary); }
+.browse-ext {
+  display: inline-flex;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  position: relative;
+  bottom: 1px;
+  color: var(--dsw-alias-label-secondary);
+}
+.browse-ext svg { display: block; width: 14px; height: 14px; }
 .usage-tip { position: relative; }
 .usage-tip .usage { display: none; position: absolute; left: 0; bottom: 32px; width: max-content; max-width: 280px; padding: 8px 10px; border-radius: 10px; background: var(--dsw-alias-tooltip-bg, #2c2c2e); color: #fff; z-index: 3; }
 .usage-tip:hover .usage, .usage-tip:focus-within .usage { display: block; }
@@ -2086,6 +2100,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 }
 .thinking-body .found-line { display: flex; align-items: center; gap: 6px; margin: 0; }
 .thinking-body .timeline-browse.found-line { align-items: flex-start; }
+.thinking-body .timeline-browse.browse-line { column-gap: 0; }
 
 .offline-banner {
   position: fixed;
