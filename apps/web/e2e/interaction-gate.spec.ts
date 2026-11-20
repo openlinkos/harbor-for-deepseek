@@ -1,6 +1,9 @@
-// fb1132 draft: required CI e2e gate for 「能点 → 有正确结果，能开 → 能取消」.
-// Drop into apps/web/e2e/. Runs in the existing `pnpm e2e` CI job (ci.yml:43), both viewports.
-// Each test is one class of interaction; new feedback of the same class = one new row in a table here.
+// fb1132: required CI e2e gate for 「能点 → 有正确结果，能开 → 能取消」.
+// Picked up by `pnpm e2e` (ci.yml) through apps/web/playwright.config.ts:
+// testDir ./e2e, testMatch *.spec.ts, testIgnore only android.spec.ts and server.spec.ts.
+// Same single Desktop Chrome project as the other specs; viewports are set per describe.
+// Failures measured on master e903ed1 are test.fail() with the fb1132 id and the cause.
+// Assertions are unchanged. There is no test.skip. An unexpected pass fails the run.
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const sse = (events: unknown[]) => events.map((e) => `event: ${(e as { type: string }).type}\ndata: ${JSON.stringify(e)}\n\n`).join('')
@@ -46,6 +49,33 @@ const sidebar = async (page: Page) => { if (mobile(page) && !(await page.locator
 const row = (page: Page, title: string) => page.locator('.chat-link', { hasText: title })
 const current = (page: Page) => page.getByTestId('message-list')
 
+// 在 master e903ed1 上会失败的用例。修掉对应问题后删掉这条，否则意外通过会让 CI 失败。
+// fb1132-4 搜索弹窗结果列表与切换；fb1132-5 删除确认 Esc/遮罩与重命名 Esc。
+// fb1132-5 明确不改「设置点遮罩」和「重命名点外部」（待确认），这两项仍失败。
+const knownFailure = (width: number, title: string): string | null => {
+  // fb1132-4：.search-dialog 只有输入框，没有匹配会话。输入只过滤侧栏；1440 上 .search-scrim 盖住侧栏。
+  if (title === 'switch conversation via search') return 'fb1132-4: 搜索弹窗没有结果列表，1440 上侧栏还被 .search-scrim 盖住'
+  // fb1132-5 待确认，不在该修复范围：.settings-modal 没有遮罩点击关闭。Esc 已能关。
+  if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
+  // fb1132-5：ConfirmDialog 没有 Esc，只有「取消」按钮能关。
+  if (title === 'delete confirm cancels on esc') return 'fb1132-5: ConfirmDialog 没有 Esc 监听'
+  // fb1132-5：ConfirmDialog 没有遮罩点击关闭。
+  if (title === 'delete confirm cancels on outside') return 'fb1132-5: ConfirmDialog 没有遮罩点击关闭'
+  // fb1132-5：重命名 form 没有 Esc，不能退出编辑、也不能恢复原标题。
+  if (title === 'rename edit cancels on esc') return 'fb1132-5: 重命名 form 没有处理 Esc'
+  // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
+  if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
+  // fb1132 调查，没有单独修复项。顶栏是系统分享或复制标题；操作栏和 ⋯ 菜单直接下载 Markdown。官方流程是勾选消息后创建链接。
+  if (title === 'share entries agree and open the share flow') return 'fb1132 调查: 三个分享入口都没有进入勾选消息并创建链接，顶栏不打开分享流程，另外两个入口会下载 Markdown'
+  // 390 上 ⋯ 是底部 sheet，.item-menu-scrim 挡住触发器。Esc 与点遮罩在同视口已通过。不得 skip。
+  if (title === 'chat ⋯ menu cancels on retoggle' && width < 768) return 'fb1132 调查: 390 上 ⋯ 底部 sheet 的遮罩挡住触发器，再点 ⋯ 点不到'
+  return null
+}
+const noteFailure = (width: number, title: string) => {
+  const reason = knownFailure(width, title)
+  if (reason) test.fail(true, reason)
+}
+
 for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
   test.describe(`interaction gate ${vp.width}`, () => {
     test.use({ viewport: vp })
@@ -53,6 +83,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     // A1 切换历史对话：文字、行内空白、搜索结果三种入口都必须打开对应会话
     for (const how of ['text', 'blank', 'search'] as const) {
       test(`switch conversation via ${how}`, async ({ page }) => {
+        noteFailure(vp.width, `switch conversation via ${how}`)
         await seed(page)
         for (const title of [TITLES[1], TITLES[2], TITLES[0]]) {
           if (how === 'search') {
@@ -89,7 +120,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     ]
     for (const [name, open, target, ways] of opens) for (const way of ways) {
       test(`${name} cancels on ${way}`, async ({ page }) => {
-        test.skip(way === 'retoggle' && vp.width < 768, '390 上 ⋯ 是底部 sheet，触发器被遮住，改用 Esc/遮罩')
+        noteFailure(vp.width, `${name} cancels on ${way}`)
         await seed(page)
         await open(page)
         const t = target(page)
@@ -97,7 +128,9 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         if (name === 'rename edit') await t.fill('改了一半')
         if (way === 'esc') await page.keyboard.press('Escape')
         else if (way === 'outside') await page.mouse.click(vp.width - 8, vp.height / 2) // 弹层/对话框外的遮罩或页面
-        else await page.locator('.chat-link .more').first().click()
+        // 390 上遮罩会一直挡住 ⋯，不设上限时 click 拖到整例 60s 测试超时。
+        // 那种 timedOut 不会被 test.fail 当成预期失败。5s 动作超时仍是失败，断言未改。
+        else await page.locator('.chat-link .more').first().click({ timeout: 5_000 })
         await expect(t, `${name} 必须能用 ${way} 取消`).toBeHidden()
         await sidebar(page)
         for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)
@@ -106,6 +139,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
 
     // A3 分享：三个入口行为一致，进入同一个分享流程（官方：勾选消息 → 创建分享链接弹窗）
     test('share entries agree and open the share flow', async ({ page }) => {
+      noteFailure(vp.width, 'share entries agree and open the share flow')
       await seed(page)
       await sidebar(page)
       await row(page, TITLES[0]).click()
