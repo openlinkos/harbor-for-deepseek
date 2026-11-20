@@ -116,11 +116,44 @@ const Wordmark = () => (
   </span>
 )
 
-const Favicon = ({ label }: { label: string }) => (
-  <i className="favicon" aria-hidden="true">{(label.trim().slice(0, 1) || '?').toUpperCase()}</i>
-)
+/** Official chat shows the first four site logos on a source strip. */
+const SOURCE_MARKS = 4
 
-type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string }
+const siteIconSrc = (icon?: string | null) => (typeof icon === 'string' ? icon.trim() : '')
+
+const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
+  const src = siteIconSrc(icon)
+  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
+  const [failed, setFailed] = useState(false)
+  const [ready, setReady] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
+  useEffect(() => {
+    setFailed(false)
+    setReady(false)
+  }, [src])
+  useEffect(() => {
+    const img = imgRef.current
+    if (!img || !src || failed) return
+    if (img.complete && img.naturalWidth > 0) setReady(true)
+  }, [src, failed])
+  if (!src || failed) {
+    return <i className="favicon" aria-hidden="true">{letter}</i>
+  }
+  return (
+    <i className="favicon" aria-hidden="true">
+      <img
+        ref={imgRef}
+        src={src}
+        alt=""
+        className={ready ? 'on' : ''}
+        onLoad={() => setReady(true)}
+        onError={() => setFailed(true)}
+      />
+    </i>
+  )
+}
+
+type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string; icon?: string | null }
 const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
 
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
@@ -508,11 +541,12 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     snippet: result.snippet ?? '',
     site: result.site_name || result.url,
     date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
+    icon: result.site_icon,
   }))
   const marks = (
     <span className="favicons">
-      {results.slice(0, 3).map((result) => (
-        <Favicon key={result.url} label={result.site_name || result.title} />
+      {results.slice(0, SOURCE_MARKS).map((result) => (
+        <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
       ))}
     </span>
   )
@@ -525,8 +559,8 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
       </p>
       <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
         <span className="favicons">
-          {results.slice(0, 3).map((result) => (
-            <Favicon key={result.url} label={result.site_name || result.title} />
+          {results.slice(0, SOURCE_MARKS).map((result) => (
+            <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
           ))}
         </span>
         {t('pagesPill', { count: results.length })}
@@ -613,6 +647,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         snippet: result.snippet ?? '',
         site: result.site_name || result.url,
         date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
+        icon: result.site_icon,
       }))
       sources.push(...items)
       if (items.length) steps.push({ type: 'search', items })
@@ -648,7 +683,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
                 <p key={index} className="timeline-step found-line">
                   <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
                   {t('foundPages', { count: step.items.length })}
-                  <span className="favicons">{step.items.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+                  <span className="favicons">{step.items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
                 </p>
               ) : (
                 <p key={index} className="timeline-step found-line browse-line">
@@ -673,7 +708,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       ))}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
-          <span className="favicons">{sources.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+          <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
           {t('pagesPill', { count: sources.length })}
         </button>
       ) : null}
@@ -1150,7 +1185,7 @@ export const Shell = () => {
               <li key={item.url}>
                 <a className="source-card" href={item.url} target="_blank" rel="noreferrer noopener">
                   <span className="source-meta">
-                    <Favicon label={item.site} />
+                    <Favicon label={item.site} icon={item.icon} />
                     <span className="source-site">{item.site}</span>
                     {item.date ? <span>{item.date}</span> : null}
                     <span className="source-index">{index + 1}</span>
