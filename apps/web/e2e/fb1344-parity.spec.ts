@@ -19,7 +19,6 @@ const STRICT = process.env.FB1344_STRICT === '1'
 // fb1344-P1 思考/搜索/浏览标题：think-lead-icon、think-chevron、think-label-color、search-icon-size、browse-icon。
 // fb1344-P2 回答底部：pill-geometry、pill-bg-dark、action-color-dark、share-tooltip。
 // fb1344-P3 设置行内按钮（含 label/file-input）：settings-buttons、centring-scan（导入 label |dx|>1）。
-// fb1344-P4 侧栏用户行：user-row-centre。同一个 PR 还要删 scripts/check-css.mjs 里的 fb1344-P4（styles.css:587-591）。
 // fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing。phase-done 在 master 已通过，不要标失败。
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
@@ -38,8 +37,6 @@ const KNOWN: Record<string, string> = {
   // fb1344-P3 设置行内按钮，label/file-input 也算按钮；居中误差 >1px
   'settings-buttons': 'fb1344-P3: 设置行内按钮：导入是 label 72×40 文字偏 9px；全部按钮 padding 12px（官方 14px），深色边框 .16（官方 .12）',
   'centring-scan': 'fb1344-P3: 全站居中扫描：导入 label |dx|>1。用户行不在这次扫描里，归 fb1344-P4 的 user-row-centre',
-  // fb1344-P4 侧栏用户行。CSS 游离声明的例外在 scripts/check-css.mjs，也标 fb1344-P4
-  'user-row-centre': 'fb1344-P4: 侧栏用户行头像/名字/⋯ 比行心高 3.5–3.9px；头像字重 400、颜色不同',
   // fb1344-P5 分阶段 SSE：正在思考 / 正在搜索 / 正在浏览网页
   'phase-thinking': 'fb1344-P5: 流式中标题一直是「已思考（用时 N 秒）」，没有「正在思考」与 shimmer',
   'phase-searching': 'fb1344-P5: 搜索进行中无「正在搜索」标题，也没有进行中的搜索行',
