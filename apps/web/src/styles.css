@@ -2267,6 +2267,31 @@ body[data-ds-dark-theme] .landing .lang {
 body[data-ds-dark-theme] .landing .lang button,
 body[data-ds-dark-theme] .landing .lang button.on { color: rgb(15, 17, 21); background: transparent; }
 body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
+.new-chat,
+.new-chat *,
+.composer .chip,
+.composer .chip *,
+.sider-icons .icon-btn,
+.sider-icons .icon-btn *,
+.settings-shell .theme-cards button.chip,
+.settings-shell .theme-cards button.chip *,
+.settings-general .pill-menu > div,
+.settings-general .pill-menu > div * {
+  cursor: pointer;
+}
+.send:not(:disabled),
+.send:not(:disabled) * {
+  cursor: pointer;
+}
+.send:disabled {
+  color: #fff;
+  background: #3964fe;
+  opacity: 0.4;
+}
+.send:disabled,
+.send:disabled * {
+  cursor: not-allowed;
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

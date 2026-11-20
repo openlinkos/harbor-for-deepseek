@@ -1228,7 +1228,24 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
   const [confirming, setConfirming] = useState(false)
   return (
-    <a className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`} href={`#${conversation.id}`} onClick={(event) => { event.preventDefault(); if (picking) onPick?.() }}>
+    <a
+      className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`}
+      href={`#${conversation.id}`}
+      onClick={(event) => {
+        event.preventDefault()
+        const target = event.target
+        // Menu rows and the phone scrim are portaled to document.body, so a click there is not a hit on this row.
+        if (!(target instanceof Element) || !event.currentTarget.contains(target)) return
+        if (target.closest('.more') || target.closest('form')) return
+        if (picking) {
+          onPick?.()
+          return
+        }
+        setSidebarOpen(false)
+        void openChat(conversation.id)
+        focusComposer()
+      }}
+    >
       <div className="chat-row">
       {picking ? (
         <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('newChat')}>
@@ -1240,7 +1257,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
           <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
-        <button type="button" onClick={(event) => { if (picking) return; event.stopPropagation(); setSidebarOpen(false); void openChat(conversation.id); focusComposer() }}>{conversation.title || t('newChat')}</button>
+        <button type="button">{conversation.title || t('newChat')}</button>
       )}
       {picking ? null : <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
@@ -1350,7 +1367,12 @@ const Composer = () => {
     window.addEventListener('deepapi-prefill', onPrefill)
     return () => window.removeEventListener('deepapi-prefill', onPrefill)
   }, [])
+  const trimmed = text.trim()
+  const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
+  const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
+  const canSend = !filesBlocking && (trimmed.length > 0 || hasFile)
   const submit = () => {
+    if (!canSend) return
     const value = text
     setText('')
     void send(value)
@@ -1420,7 +1442,7 @@ const Composer = () => {
           {streaming ? (
             <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
-            <button className={`send ${text.trim() ? 'ready' : ''}`} data-testid="send" type="button" onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
+            <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
           )}
         </div>
       </div>
