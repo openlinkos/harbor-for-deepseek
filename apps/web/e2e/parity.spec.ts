@@ -529,8 +529,9 @@ test('markdown surfaces', async ({ page }) => {
   await expect(prose.locator('img')).toHaveAttribute('alt', '图')
   await expect(prose.locator('table')).toContainText('优势')
   await expect(prose.locator('.box-drawing')).toContainText('┌──┐')
-  const spacing = await prose.locator('.box-drawing code').evaluate((node) => getComputedStyle(node).letterSpacing)
-  expect(['normal', '0px']).toContain(spacing)
+  // React replaces the code node as the last stream frame lands, so a one-shot
+  // getComputedStyle can see a detached element and return "". Retry the same values.
+  await expect(prose.locator('.box-drawing code')).toHaveCSS('letter-spacing', /^(normal|0px)$/)
   await expect(prose.locator('.code-card').filter({ hasText: 'const n = 1' })).toBeVisible()
   await expect(prose.locator('.katex')).toBeVisible()
   await page.screenshot({ path: join(shots, 'markdown-light.png') })
