@@ -121,7 +121,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await expect(page.getByTestId('sidebar')).toContainText('简单加法')
   await page.screenshot({ path: join(shots, '03-reasoning.png') })
   await page.screenshot({ path: join(process.cwd(), '../../submission/awesome-deepseek-integration/docs/harbor/assets/chat.png') })
-  await expect(page.locator('.action-row button')).toHaveCount(6)
+  await expect(page.locator('.action-row button')).toHaveCount(5)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
 
   await page.getByTestId('user-menu').click()

@@ -1586,7 +1586,6 @@ body[data-ds-dark-theme] .anchored-menu { background: rgb(53, 54, 56); color: #f
 .anchored-menu button:hover { background: rgba(127, 127, 127, 0.12); }
 .anchored-menu hr { border: 0; border-top: 1px solid rgba(127, 127, 127, 0.25); margin: 4px 6px; }
 .lang-menu { width: 200px; min-width: 200px; max-height: none; }
-.voice-menu { min-width: 128px; width: 128px; }
 .lang { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--dsw-static-neutral-bluish-75); }
 body[data-ds-dark-theme] .lang { background: var(--dsw-static-neutral-bluish-800); }
 .lang button { border: 0; background: transparent; color: inherit; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 13px; }
