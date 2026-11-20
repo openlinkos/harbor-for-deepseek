@@ -53,6 +53,10 @@ export type DraftFile = {
 
 type Prefs = Pick<Conversation, 'thinking' | 'search' | 'readLink'>
 
+const TOGGLE_KEY = 'deepapi-toggles'
+
+type Toggles = Pick<Prefs, 'thinking' | 'search'>
+
 const defaultPrefs = (): Prefs => ({
   thinking: true,
   search: true,
@@ -64,6 +68,42 @@ const withFixedModel = (prefs: Prefs) => ({
   model: DEFAULT_CHAT_MODEL,
   effort: DEFAULT_EFFORT,
 })
+
+const readToggles = (): Toggles => {
+  const fallback: Toggles = { thinking: true, search: true }
+  try {
+    const raw = localStorage.getItem(TOGGLE_KEY)
+    if (!raw) return fallback
+    const parsed = JSON.parse(raw) as Partial<Toggles>
+    return {
+      thinking: typeof parsed.thinking === 'boolean' ? parsed.thinking : fallback.thinking,
+      search: typeof parsed.search === 'boolean' ? parsed.search : fallback.search,
+    }
+  } catch {
+    return fallback
+  }
+}
+
+const writeToggles = (toggles: Toggles) => {
+  try {
+    localStorage.setItem(TOGGLE_KEY, JSON.stringify({ thinking: toggles.thinking, search: toggles.search }))
+  } catch {
+    // Storage can be unavailable in private mode. The in-memory prefs still apply for this tab.
+  }
+}
+
+const withToggles = (base: Prefs): Prefs => ({ ...base, ...readToggles() })
+
+const prefsFor = (conversation: Conversation | undefined, fallback: Prefs): Prefs =>
+  withToggles(
+    conversation
+      ? {
+          thinking: conversation.thinking,
+          search: conversation.search,
+          readLink: conversation.readLink,
+        }
+      : fallback,
+  )
 
 const nowIso = () => new Date().toISOString()
 const nid = () => crypto.randomUUID()
@@ -207,7 +247,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   settingsOpen: false,
   sidebarOpen: false,
   notice: null,
-  prefs: defaultPrefs(),
+  prefs: withToggles(defaultPrefs()),
   drafts: [],
   hosted: false,
   setupRequired: false,
@@ -258,13 +298,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       activeId,
       messages,
       totals: sumUsage(usages),
-      prefs: conversations[0]
-        ? {
-            thinking: conversations[0].thinking,
-            search: conversations[0].search,
-            readLink: conversations[0].readLink,
-          }
-        : defaultPrefs(),
+      prefs: prefsFor(conversations[0], defaultPrefs()),
     })
     if (key) {
       void get().refreshBalance()
@@ -342,6 +376,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async setPrefs(patch) {
     const prefs = { ...get().prefs, ...patch }
+    if ('thinking' in patch || 'search' in patch) {
+      const stored = readToggles()
+      writeToggles({
+        thinking: 'thinking' in patch ? prefs.thinking : stored.thinking,
+        search: 'search' in patch ? prefs.search : stored.search,
+      })
+    }
     set({ prefs })
     const { activeId, conversations } = get()
     if (!activeId) {
@@ -357,7 +398,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async newChat() {
-    set({ activeId: null, messages: [], drafts: [], sidebarOpen: false, prefs: defaultPrefs() })
+    set({ activeId: null, messages: [], drafts: [], sidebarOpen: false, prefs: withToggles(defaultPrefs()) })
   },
 
   async openChat(id) {
@@ -369,13 +410,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         messages: data.messages,
         sidebarOpen: false,
         drafts: [],
-        prefs: conversation
-          ? {
-              thinking: conversation.thinking,
-              search: conversation.search,
-              readLink: conversation.readLink,
-            }
-          : get().prefs,
+        prefs: prefsFor(conversation, get().prefs),
       })
       return
     }
@@ -387,13 +422,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       messages,
       sidebarOpen: false,
       drafts: [],
-      prefs: conversation
-        ? {
-            thinking: conversation.thinking,
-            search: conversation.search,
-            readLink: conversation.readLink,
-          }
-        : get().prefs,
+      prefs: prefsFor(conversation, get().prefs),
     })
   },
 
