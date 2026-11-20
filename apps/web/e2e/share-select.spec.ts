@@ -292,9 +292,18 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(boxes.nth(1)).not.toBeChecked()
       await expect(boxes.nth(2)).toBeChecked()
       await expect(boxes.nth(3)).toBeChecked()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
-      await expect(page.locator('.chat-title')).toHaveText('分享样本')
+      if (w >= 768) {
+        await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
+        await expect(page.locator('.chat-title')).toHaveText('分享样本')
+      } else {
+        await expect(page.getByTestId('share-count')).toBeHidden()
+        await expect(page.getByTestId('share-cancel')).toBeHidden()
+        await expect(page.getByTestId('share-top-cancel')).toBeVisible()
+        await expect(page.locator('.chat-title')).toHaveText('选择对话')
+        expect(Math.abs(columnAfter.x - 20), 'question column left').toBeLessThanOrEqual(1)
+        expect(Math.abs(columnAfter.x + columnAfter.width - 370), 'question column right').toBeLessThanOrEqual(1)
+      }
       await expect(page.getByRole('heading', { name: '选择对话' })).toHaveCount(0)
       await expect(page.locator('.share-halo:visible')).toHaveCount(2)
       await expect(page.getByTestId('composer')).toBeHidden()
@@ -316,25 +325,43 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       for (const turn of [page.locator('.turn.user').first(), page.locator('.turn.assistant').first(), userTurn, answerTurn]) {
         const rect = (await turn.locator('.share-box').boundingBox())!
         fits(rect, 'message checkbox')
-        if (w >= 768) expect(Math.abs(rect.x - (text!.x - 41)), 'checkbox is 41px left of the body text').toBeLessThanOrEqual(1)
-        expect(Math.abs(rect.x - allBox.x), 'select-all shares the checkbox column').toBeLessThanOrEqual(1)
+        if (w >= 768) {
+          expect(Math.abs(rect.x - (text!.x - 41)), 'checkbox is 41px left of the body text').toBeLessThanOrEqual(1)
+          expect(Math.abs(rect.x - allBox.x), 'select-all shares the checkbox column').toBeLessThanOrEqual(1)
+        } else {
+          expect(Math.abs(rect.x - 20), 'checkbox x').toBeLessThanOrEqual(1)
+          expect(Math.abs(rect.width - 18), 'checkbox width').toBeLessThanOrEqual(0.5)
+          expect(Math.abs(rect.height - 18), 'checkbox height').toBeLessThanOrEqual(0.5)
+        }
       }
+      if (w < 768) expect(Math.abs(allBox.x - 36), 'select-all x').toBeLessThanOrEqual(1)
       const userGrey = (await userTurn.locator('.share-halo').boundingBox())!
       const answerGrey = (await answerTurn.locator('.share-halo').boundingBox())!
       expect(Math.abs(userGrey.x - answerGrey.x), 'question and answer grey left edges').toBeLessThanOrEqual(1)
       expect(Math.abs(userGrey.x + userGrey.width - (answerGrey.x + answerGrey.width)), 'question and answer grey right edges').toBeLessThanOrEqual(1)
       const userCheck = (await userTurn.locator('.share-box').boundingBox())!
       const answerCheck = (await answerTurn.locator('.share-box').boundingBox())!
-      expect(overlaps(userCheck, userGrey), 'user checkbox stays outside its grey block').toBe(false)
-      expect(overlaps(answerCheck, answerGrey), 'answer checkbox stays outside its grey block').toBe(false)
+      const contained = (inner: { x: number; y: number; width: number; height: number }, outer: { x: number; y: number; width: number; height: number }) =>
+        inner.x >= outer.x - 0.5 && inner.y >= outer.y - 0.5 && inner.x + inner.width <= outer.x + outer.width + 0.5 && inner.y + inner.height <= outer.y + outer.height + 0.5
+      if (w >= 768) {
+        expect(overlaps(userCheck, userGrey), 'user checkbox stays outside its grey block').toBe(false)
+        expect(overlaps(answerCheck, answerGrey), 'answer checkbox stays outside its grey block').toBe(false)
+      } else {
+        expect(Math.abs(userGrey.x - 0), 'selected fill left').toBeLessThanOrEqual(1)
+        expect(Math.abs(userGrey.x + userGrey.width - 371), 'selected fill right').toBeLessThanOrEqual(1)
+        expect(Math.abs(answerGrey.x - 0), 'answer fill left').toBeLessThanOrEqual(1)
+        expect(Math.abs(answerGrey.x + answerGrey.width - 371), 'answer fill right').toBeLessThanOrEqual(1)
+        expect(contained(userCheck, userGrey), 'user checkbox sits inside the selected fill').toBe(true)
+        expect(contained(answerCheck, answerGrey), 'answer checkbox sits inside the selected fill').toBe(true)
+      }
       expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 12), 'grey blocks in one pair are 12px apart').toBeLessThanOrEqual(1)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(32)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)
       expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)), 'answer checkbox aligns with the first line').toBeLessThanOrEqual(2)
       expect(Math.abs(userCheck.y - userGrey.y - 3), 'user checkbox is about 3px from the grey top').toBeLessThanOrEqual(1)
       const createRect = (await page.getByTestId('share-create').boundingBox())!
-      expect(Math.abs(createRect.x + createRect.width - (answerGrey.x + answerGrey.width)), 'create button right edge').toBeLessThanOrEqual(1)
-      for (const id of ['share-cancel', 'share-create'] as const) {
+      if (w >= 768) expect(Math.abs(createRect.x + createRect.width - (answerGrey.x + answerGrey.width)), 'create button right edge').toBeLessThanOrEqual(1)
+      for (const id of (w >= 768 ? ['share-cancel', 'share-create'] : ['share-create']) as ('share-cancel' | 'share-create')[]) {
         const rect = (await page.getByTestId(id).boundingBox())!
         expect(rect.x, `${id} left`).toBeGreaterThanOrEqual(-0.5)
         expect(rect.x + rect.width, `${id} right`).toBeLessThanOrEqual(w + 0.5)
@@ -344,7 +371,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
 
       await boxes.nth(0).click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
+      if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-all')).toBeChecked()
       await expect(page.locator('.share-halo:visible')).toHaveCount(4)
       for (const index of [0, 1]) {
@@ -356,12 +383,12 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
 
       await page.getByTestId('share-all').click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).not.toBeChecked()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 0 组对话')
+      if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 0 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
       await expect(page.getByTestId('share-create')).toBeDisabled()
 
       await page.getByTestId('share-all').click()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
+      if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-create')).toBeEnabled()
       await boxes.nth(0).click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
@@ -393,13 +420,13 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         const style = getComputedStyle(node)
         return { bg: style.backgroundColor, radius: style.borderTopLeftRadius }
       })
-      expect(block.bg).toBe(tone.block)
+      expect(block.bg).toBe(w < 768 && theme === 'light' ? 'rgb(236, 242, 249)' : tone.block)
       expect(block.radius).toBe('18px')
 
       const create = page.getByTestId('share-create')
       const cancel = page.getByTestId('share-cancel')
       await expect(create).toHaveClass(/ds-button--primary/)
-      await expect(cancel).toHaveClass(/ds-button--outlined/)
+      if (w >= 768) await expect(cancel).toHaveClass(/ds-button--outlined/)
       const createBox = await create.evaluate((node) => {
         const style = getComputedStyle(node)
         const fill = node.querySelector('.ds-button__background')
@@ -414,6 +441,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(createBox.radius).toBe(OFF.buttonRadius)
       expect(createBox.color).toBe('rgb(255, 255, 255)')
       expect(createBox.fill).toBe(tone.primary)
+      if (w >= 768) {
       const cancelBox = await cancel.evaluate((node) => {
         const style = getComputedStyle(node)
         const border = node.querySelector('.ds-button__border')
@@ -426,9 +454,10 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(cancelBox.h).toBeCloseTo(OFF.buttonHeight, 0)
       expect(cancelBox.radius).toBe(OFF.buttonRadius)
       expect(cancelBox.border).toBe(tone.outline)
+      }
 
       await page.getByTestId('share-all').click()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
+      if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await page.getByTestId('share-all').click()
       await expect(page.getByTestId('share-create')).toBeDisabled()
       const faded = await page.getByTestId('share-create').evaluate((node) => getComputedStyle(node).opacity)
@@ -436,14 +465,16 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const fadedFill = await page.getByTestId('share-create').locator('.ds-button__background').evaluate((node) => getComputedStyle(node).backgroundColor)
       expect(fadedFill).toBe(tone.primary)
 
-      await page.getByTestId('share-cancel').click()
+      await (w >= 768 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(page.locator('input.share-box:visible')).toHaveCount(0)
       await expect(page.getByTestId('composer')).toBeVisible()
       await expect(page.locator('.chat-title')).toHaveText('分享样本')
 
       await page.locator('.topbar button[aria-label="share"]').click()
-      await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
+      for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
+      await expect(page.getByTestId('share-all')).toBeChecked()
+      if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await page.getByTestId('share-create').click()
       const dialog = page.getByTestId('share-soon')
       await expect(dialog).toBeVisible()
@@ -522,6 +553,13 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.locator('.share-bar')).toBeVisible()
       await page.keyboard.press('Escape')
       await expect(page.locator('.share-bar')).toHaveCount(0)
+
+      await page.locator('.action-row button[aria-label="分享"]').first().click()
+      await expect(boxes.nth(0)).toBeChecked()
+      await expect(boxes.nth(1)).toBeChecked()
+      await expect(boxes.nth(2)).not.toBeChecked()
+      await expect(boxes.nth(3)).not.toBeChecked()
+      await expect(page.getByTestId('share-all')).not.toBeChecked()
       console.log(`SHARE_METRICS ${JSON.stringify({ theme, w, check: idle.w, bar: bar.h, button: createBox.h, dialogButton: buttonHit.h, dialog: hit.w })}`)
     })
 
@@ -564,7 +602,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(toggle).toHaveAttribute('aria-expanded', 'false')
       expect(await label()).toBe(before)
       await expect(page.locator('article.turn.assistant > .prose').last()).toBeVisible()
-      await page.getByTestId('share-cancel').click()
+      await ((page.viewportSize()?.width ?? 1440) >= 768 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(toggle).toHaveAttribute('aria-expanded', 'false')
       expect(await label()).toBe(before)

@@ -2959,10 +2959,29 @@ input.share-box.ds-checkbox:checked::after,
   cursor: pointer;
 }
 @media (max-width: 767px) {
-  .turn.share-on > .share-halo { left: 0; }
-  .turn.share-on > .share-box { left: calc((100% - 100vw) / 2); }
+  .turn.share-on > .share-halo {
+    left: -20px;
+    right: -1px;
+    background: rgb(236, 242, 249);
+  }
+  body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
+  .turn.share-on > .share-box { left: 0; }
   .share-bar-inner {
-    width: calc(100% - 5px);
+    width: 100%;
     margin-left: 0;
+    padding-left: 36px;
+  }
+  .share-bar .share-split,
+  .share-bar .share-count,
+  .share-bar [data-testid="share-cancel"] { display: none; }
+  .share-top-cancel {
+    border: 0;
+    background: transparent;
+    color: var(--dsw-alias-label-primary);
+    font: inherit;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 0 4px;
+    cursor: pointer;
   }
 }

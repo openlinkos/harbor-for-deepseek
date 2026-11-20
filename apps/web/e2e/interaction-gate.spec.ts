@@ -149,9 +149,15 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         await expect(boxes.first(), `${name} 必须出现消息复选框`).toBeVisible()
         const checked = await boxes.evaluateAll((nodes) => nodes.map((node) => (node as HTMLInputElement).checked))
         expect(checked.length, `${name} 至少有一组问答`).toBeGreaterThanOrEqual(2)
-        expect(checked.slice(0, -2).every((on) => !on), `${name} 只预选最后一组`).toBe(true)
-        expect(checked.slice(-2), `${name} 最后一组的问答都选中`).toEqual([true, true])
-        await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
+        if (name === 'action row') {
+          expect(checked.slice(0, -2).every((on) => !on), `${name} 只预选这一组`).toBe(true)
+          expect(checked.slice(-2), `${name} 这一组的问答都选中`).toEqual([true, true])
+          if (vp.width >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
+        } else {
+          expect(checked.every((on) => on), `${name} 全选`).toBe(true)
+          if (vp.width >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
+        }
+        if (vp.width < 768) await expect(page.getByTestId('share-count')).toBeHidden()
         await page.keyboard.press('Escape')
       }
     })

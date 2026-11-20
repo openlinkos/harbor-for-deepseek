@@ -465,7 +465,7 @@ type ShareModeValue = {
   groupOf: (messageId: string) => string | null
   selected: ReadonlySet<string>
   toggle: (groupId: string) => void
-  enter: () => void
+  enter: (messageId: string) => void
 }
 
 const ShareMode = createContext<ShareModeValue | null>(null)
@@ -1165,7 +1165,7 @@ const MessageRow = ({ message }: { message: Message }) => {
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
           <HoverTip text={t('share')}>
-            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter()}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
+            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
         </div>
       ) : null}
@@ -1209,16 +1209,27 @@ export const Shell = () => {
   const [shareIds, setShareIds] = useState<string[] | null>(null)
   const [sharePrimed, setSharePrimed] = useState(false)
   const [shareSoon, setShareSoon] = useState(false)
+  const [shareAll, setShareAll] = useState(true)
+  const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)
   const sharing = shareIds !== null
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)')
+    const apply = () => setPhone(media.matches)
+    apply()
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [])
   const exitShare = () => {
     setShareConv(null)
     setShareIds(null)
     setSharePrimed(false)
     setShareSoon(false)
+    setShareAll(true)
   }
   const enterShare = (id: string | null) => {
     if (!id) return
     setShareSoon(false)
+    setShareAll(true)
     setShareConv(id)
     if (id !== conversation?.id) {
       setSharePrimed(false)
@@ -1226,8 +1237,16 @@ export const Shell = () => {
       void state.openChat(id)
       return
     }
-    const last = turns.at(-1)
-    setShareIds(last ? [last.id] : [])
+    setShareIds(turns.map((group) => group.id))
+    setSharePrimed(true)
+  }
+  const enterGroup = (messageId: string) => {
+    if (!conversation?.id) return
+    const group = turns.find((item) => item.messageIds.includes(messageId))
+    setShareSoon(false)
+    setShareAll(false)
+    setShareConv(conversation.id)
+    setShareIds(group ? [group.id] : [])
     setSharePrimed(true)
   }
   useEffect(() => {
@@ -1237,10 +1256,9 @@ export const Shell = () => {
       setSharePrimed(true)
       return
     }
-    const last = turns[turns.length - 1]
-    setShareIds([last.id])
+    setShareIds(shareAll ? turns.map((group) => group.id) : [turns[turns.length - 1].id])
     setSharePrimed(true)
-  }, [shareConv, sharePrimed, conversation?.id, turns])
+  }, [shareConv, sharePrimed, shareAll, conversation?.id, turns])
   const shareConvRef = useRef(shareConv)
   useEffect(() => {
     const previous = shareConvRef.current
@@ -1266,7 +1284,7 @@ export const Shell = () => {
       const ids = current ?? []
       return ids.includes(groupId) ? ids.filter((item) => item !== groupId) : [...ids, groupId]
     }),
-    enter: () => enterShare(conversation?.id ?? null),
+    enter: (messageId) => enterGroup(messageId),
   }
   const selectedCount = turns.filter((group) => (shareIds ?? []).includes(group.id)).length
   const allTurns = turns.length > 0 && selectedCount === turns.length
@@ -1714,24 +1732,30 @@ export const Shell = () => {
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
-          {conversation?.title ? <div className="chat-title">{conversation.title}</div> : null}
+          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation?.title ? <div className="chat-title">{conversation.title}</div> : null}
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
           ) : null}
           <span className="top-actions">
-            <a className="download-app" href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">
-              <Icon d="M12 4v10M8 10l4 4 4-4M5 18h14" />
-              <span>{t('downloadApp')}</span>
-            </a>
-            <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
-              <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
-            </button>
-            {path.length > 0 ? (
-              <button className="icon-btn" type="button" aria-label="share" onClick={() => enterShare(conversation?.id ?? null)}>
-                <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
-              </button>
-            ) : null}
+            {sharing && phone ? (
+              <button className="share-top-cancel" data-testid="share-top-cancel" type="button" onClick={exitShare}>{t('cancel')}</button>
+            ) : (
+              <>
+                <a className="download-app" href="https://github.com/openlinkos/deepapi/releases" target="_blank" rel="noreferrer noopener">
+                  <Icon d="M12 4v10M8 10l4 4 4-4M5 18h14" />
+                  <span>{t('downloadApp')}</span>
+                </a>
+                <button className="icon-btn top-new" data-testid="top-new" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
+                  <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
+                </button>
+                {path.length > 0 ? (
+                  <button className="icon-btn" type="button" aria-label="share" onClick={() => enterShare(conversation?.id ?? null)}>
+                    <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
+                  </button>
+                ) : null}
+              </>
+            )}
           </span>
         </header>
         {path.length === 0 ? (
