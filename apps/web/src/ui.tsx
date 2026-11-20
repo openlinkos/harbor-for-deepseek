@@ -105,11 +105,9 @@ const focusComposer = () => {
   })
 }
 
-const shortcutHint = () => {
-  if (typeof navigator === 'undefined') return 'Ctrl J'
-  const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
-  const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
-  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
+const shortcutWindows = () => {
+  if (typeof navigator === 'undefined') return false
+  return navigator.userAgent.toLowerCase().includes('windows')
 }
 
 const Wordmark = () => (
@@ -988,15 +986,14 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-          <div className="new-chat" data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
+          <div className={shortcutWindows() ? 'new-chat shortcut-win' : 'new-chat'} data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
-            <kbd className="kbd">{shortcutHint()}</kbd>
           </div>
         )}
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {groups.map(([label, items], index) => (
-            <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
+            <div key={label} className={`group${index === 0 ? ' is-first' : ''}${label === t('groupPinned') ? ' pinned' : ''}`}>
               <p className="group-label">
                 {label}
                 {!selecting && index === 0 ? (
@@ -1016,6 +1013,7 @@ export const Shell = () => {
                   onMulti={() => { setSelecting(true); setPicked([]) }}
                 />
               ))}
+              {label === t('groupPinned') ? <div className="group-rule" data-testid="pinned-rule" /> : null}
             </div>
           ))}
         </div>
