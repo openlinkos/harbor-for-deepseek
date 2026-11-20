@@ -14,7 +14,7 @@
     "build": "turbo run build --filter=@deepapi/web",
     "preview": "pnpm --filter @deepapi/web preview",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test && node --experimental-strip-types --test tools/style-audit/bookmarklet.test.ts && node --test scripts/check-version.test.mjs",
+    "test": "turbo run test && node --experimental-strip-types --test tools/style-audit/bookmarklet.test.ts && node --test scripts/check-version.test.mjs scripts/check-css.test.mjs",
     "check-version": "node scripts/check-version.mjs",
     "lint": "turbo run lint",
     "e2e": "pnpm --filter @deepapi/web e2e",

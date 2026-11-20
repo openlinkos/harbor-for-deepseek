@@ -13,7 +13,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { events, sse, EXPECT } from './fixtures/fb1554-corpus'
+import { adjacentCitationEvents, events, sse, EXPECT } from './fixtures/fb1554-corpus'
 const HERE = dirname(fileURLToPath(import.meta.url))
 
 // 语料按真实接口形状把正文在引用处切成多个 text block。规则在冻结官方 DOM 上全绿。
@@ -85,6 +85,29 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         expect(Math.abs(m.cites[0].dyTop - o.cite.dyTopVsPrevChar)).toBeLessThanOrEqual(0.5); expect(Math.abs(m.cites[0].dxGap - o.cite.firstGapPx)).toBeLessThanOrEqual(0.5) })
       test('favicon-overlap', async ({ page }) => { await boot(page, theme); await ask(page); const m = (await md(page)).metrics
         expect(m.search.icon).toEqual(o.searchFavicon); expect(m.pill.icon).toEqual(o.pillFavicon) })
+      test('adjacent-citations', async ({ page }) => {
+        await boot(page, theme)
+        await page.unroute('https://api.deepseek.com/**')
+        await page.route('https://api.deepseek.com/**', async (route) => {
+          const url = route.request().url()
+          if (url.endsWith('/user/balance')) return route.fulfill({ json: { is_available: true, balance_infos: [{ currency: 'CNY', total_balance: '1', granted_balance: '0', topped_up_balance: '1' }] } })
+          if (url.endsWith('/models')) return route.fulfill({ json: { data: [{ id: 'deepseek-flash' }] } })
+          if (!url.includes('/messages')) return route.fulfill({ status: 404, json: {} })
+          return route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(adjacentCitationEvents(JSON.parse(route.request().postData() || '{}'))) })
+        })
+        await ask(page, '[筑衡测试] 相邻引用')
+        const gap = await page.evaluate(() => {
+          const group = document.querySelector('[data-citation-group]')
+          const cites = [...(group?.querySelectorAll('.cite') ?? [])]
+          if (cites.length < 2) return null
+          const a = cites[0].getBoundingClientRect()
+          const b = cites[1].getBoundingClientRect()
+          return { n: cites.length, gap: b.left - a.right, oneGroup: group === cites[1].parentElement }
+        })
+        expect(gap?.oneGroup).toBe(true)
+        expect(gap?.n).toBe(2)
+        expect(Math.abs((gap?.gap ?? 99) - 4)).toBeLessThanOrEqual(0.5)
+      })
     }
     // 「用时 N 秒」：思考结束后冻结、刷新后不变、别的回答生成时不变
     test('thought-seconds-frozen', async ({ page }) => { knownFailure('fb1554-T1'); await boot(page, theme, { staged: true })

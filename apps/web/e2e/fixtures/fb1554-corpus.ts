@@ -39,3 +39,17 @@ export const events = (req: any, { split = true }: { split?: boolean } = {}) => 
   return o
 }
 export const sse = (evs: any[]) => evs.map((e: any) => `event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join('')
+
+// 相邻引用：官方输入形如「文本。[citation:1][citation:2]」，落在同一个 data-citation-group 里。
+export const adjacentCitationEvents = (req: any = {}) => {
+  const pair = RESULTS.slice(0, 2)
+  const o: any[] = [{ type: 'message_start', message: { id: 'adj', model: req?.model || 'deepseek-flash' } }]
+  o.push({ type: 'content_block_start', index: 0, content_block: { type: 'web_search_tool_result', tool_use_id: 's-adj', content: pair } })
+  o.push({ type: 'content_block_stop', index: 0 })
+  o.push({ type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } })
+  o.push({ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '文本。' } })
+  pair.forEach((item) => o.push({ type: 'content_block_delta', index: 1, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: item.url, title: item.title, cited_text: '', encrypted_index: '' } } }))
+  o.push({ type: 'content_block_stop', index: 1 })
+  o.push({ type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null, title: '[筑衡测试] 相邻引用' }, usage: { input_tokens: 1, output_tokens: 1 } }, { type: 'message_stop' })
+  return o
+}

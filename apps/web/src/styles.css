@@ -922,10 +922,8 @@ button.chip { appearance: none; margin: 0; }
   height: 18px;
   box-shadow: none;
 }
-/* Group margin is official ._5f9bba8 (0 2px). firstGapPx in official-fb1554.json is 4 CSS px.
-   top 1px is CSS px, not a screenshot: Playwright CI installs fonts-wqy-zenhei, and with that face
-   inline-flex plus cite top -5px measures dyTop 0. One CSS px down lands on the fixture's 1. */
-.cite-wrap { display: inline; position: relative; margin: 0 2px; top: 1px; }
+/* Official ._5f9bba8: margin only. The -5px offset stays on .cite. */
+[data-citation-group] { display: inline; margin: 0 2px; }
 .cite {
   display: inline-flex;
   align-items: center;
@@ -956,7 +954,6 @@ a.cite:hover, .cite:hover {
   text-decoration: none;
   background: var(--dsw-alias-markdown-citation);
 }
-.cite + .cite, .cite-wrap + .cite-wrap .cite { margin-left: 0; }
 .search-view-card {
   position: fixed;
   z-index: 40;
@@ -1162,7 +1159,8 @@ a.cite:hover, .cite:hover {
   background: linear-gradient(180deg, transparent 0, var(--dsw-alias-bg-base) 24px);
   pointer-events: none;
 }
-.stage:not(:has(.home)) .composer-wrap > * { pointer-events: auto; width: 100%; }
+.stage:not(:has(.home)) .composer-wrap > .composer,
+.stage:not(:has(.home)) .composer-wrap > .ai-note { pointer-events: auto; width: 100%; }
 @media (min-width: 768px) {
   .stage:not(:has(.home)) .composer {
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;

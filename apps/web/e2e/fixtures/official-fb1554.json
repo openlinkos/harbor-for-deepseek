@@ -1,5 +1,12 @@
 {
- "source": "frozen/baseline/official-source/dom-answer.html + main.dc093a796f.css，proposals/fb1554/probe-official.mjs 离线渲染 1440x900（390 未采，见 report 补采清单）",
+ "source": "frozen official cite CSS (main.dc093a796f.css .ds-markdown-cite + ._5f9bba8) remeasured at 1440x900. Geometry only; other cells are unchanged.",
+ "fontEnvironment": {
+  "face": "WenQuanYi Zen Hei",
+  "package": "fonts-wqy-zenhei",
+  "where": "Playwright CI installs this face via playwright install --with-deps. dyTopVsPrevChar was remeasured under it.",
+  "viewport": "1440x900",
+  "deviceScaleFactor": 1
+ },
  "rules": {
   "oneMarkdownRoot": true,
   "citeInlineSameLine": true,
@@ -51,7 +58,7 @@
     "top": "-5px",
     "min-width": "14px",
     "height": "14px",
-    "dyTopVsPrevChar": 1,
+    "dyTopVsPrevChar": 0,
     "firstGapPx": 4
    }
   },
@@ -97,7 +104,7 @@
     "top": "-5px",
     "min-width": "14px",
     "height": "14px",
-    "dyTopVsPrevChar": 1,
+    "dyTopVsPrevChar": 0,
     "firstGapPx": 4
    }
   }
