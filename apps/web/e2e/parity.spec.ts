@@ -237,12 +237,14 @@ test('search citations', async ({ page }) => {
   await send(page, '人口')
   await expect(page.locator('.cite')).toHaveText(['1'])
   await page.locator('.cite').hover()
-  await expect(page.locator('.hover-card')).toContainText('Iceland')
-  await expect(page.locator('.hover-card')).toContainText('394,000')
+  await expect(page.locator('.search-view-card')).toContainText('Iceland')
+  await expect(page.locator('.search-view-card')).toContainText('394,000')
 })
 
+const iconPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
 const searchResults = [
-  { type: 'web_search_result', title: '冰岛人口统计', url: 'https://example.com/pop', snippet: '约三十九万', site_name: '国家统计局' },
+  { type: 'web_search_result', title: '冰岛人口统计', url: 'https://example.com/pop', snippet: '约三十九万', site_name: '国家统计局', site_icon: iconPixel, page_age: '2026-11-16' },
   { type: 'web_search_result', title: '未引用甲', url: 'https://example.com/a', snippet: '甲', site_name: '甲站' },
   { type: 'web_search_result', title: '未引用乙', url: 'https://example.com/b', snippet: '乙', site_name: '乙站' },
   { type: 'web_search_result', title: '未引用丙', url: 'https://example.com/c', snippet: '丙', site_name: '丙站' },
@@ -317,20 +319,20 @@ test('search cite marks sit at the end of the cited sentence', async ({ page }) 
 test('search cite hover shows the result title and site', async ({ page }) => {
   const cites = await openSearchAnswer(page)
   await cites.nth(0).hover()
-  const first = page.getByTestId('assistant-text').locator('.hover-card').nth(0)
+  const first = page.locator('.search-view-card').filter({ hasText: '冰岛人口统计' })
   await expect(first).toBeVisible()
   await expect(first).toContainText('冰岛人口统计')
   await expect(first).toContainText('国家统计局')
   await expect(first).not.toContainText('模型引用标题')
-  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-hover-1.png') })
+  await page.screenshot({ path: join(artifacts, 'cite-hover-1.png') })
   await page.mouse.move(8, 8)
   await cites.nth(1).hover()
-  const second = page.getByTestId('assistant-text').locator('.hover-card').nth(1)
+  const second = page.locator('.search-view-card').filter({ hasText: '雷克雅未克概况' })
   await expect(second).toBeVisible()
   await expect(second).toContainText('雷克雅未克概况')
   await expect(second).toContainText('地理志')
   await expect(second).not.toContainText('模型城市标题')
-  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-hover-5.png') })
+  await page.screenshot({ path: join(artifacts, 'cite-hover-5.png') })
 })
 
 test('search cite click opens the result url in a new tab', async ({ page }) => {
@@ -387,8 +389,129 @@ test('non-search citations keep citation-order marks', async ({ page }) => {
   const between = await cites.nth(1).evaluate((node) => node.parentElement?.previousElementSibling?.className ?? '')
   expect(between).toContain('cite-wrap')
   await cites.nth(0).hover()
-  await expect(page.locator('.hover-card').nth(0)).toContainText('甲来源')
+  await expect(page.locator('.search-view-card')).toContainText('甲来源')
   await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-nonssearch.png') })
+})
+
+test('search cite hover card matches the official source card', async ({ page }) => {
+  await page.context().route('https://example.com/**', async (route) => {
+    const url = route.request().url()
+    await route.fulfill({ status: 200, contentType: 'text/html', body: `<!doctype html><title>${url}</title><h1>${url}</h1>` })
+  })
+  const cites = await openSearchAnswer(page)
+  const started = Date.now()
+  await cites.nth(0).hover()
+  expect(await page.locator('.search-view-card').count()).toBe(0)
+  const card = page.locator('.search-view-card')
+  await expect(card).toBeVisible()
+  expect(Date.now() - started).toBeGreaterThanOrEqual(280)
+  const shape = await card.evaluate((node) => {
+    const style = getComputedStyle(node)
+    const title = node.querySelector('.search-view-card__title')
+    const snippet = node.querySelector('.search-view-card__snippet')
+    const icon = node.querySelector('.search-view-card__icon')
+    const titleStyle = title ? getComputedStyle(title) : null
+    const snippetStyle = snippet ? getComputedStyle(snippet) : null
+    const iconStyle = icon ? getComputedStyle(icon) : null
+    return {
+      maxWidth: style.maxWidth,
+      padding: style.padding,
+      radius: style.borderRadius,
+      titleWeight: titleStyle?.fontWeight ?? '',
+      titleSize: titleStyle?.fontSize ?? '',
+      titleLine: titleStyle?.lineHeight ?? '',
+      snippetSize: snippetStyle?.fontSize ?? '',
+      snippetLine: snippetStyle?.lineHeight ?? '',
+      icon: iconStyle ? `${iconStyle.width}x${iconStyle.height}` : '',
+      order: [...node.querySelectorAll('.search-view-card__icon, .search-view-card__site, .search-view-card__date, .search-view-card__title, .search-view-card__snippet')].map((el) => el.className),
+    }
+  })
+  expect(shape).toMatchObject({
+    maxWidth: '355px',
+    padding: '16px',
+    radius: '12px',
+    titleWeight: '500',
+    titleSize: '16px',
+    titleLine: '25px',
+    snippetSize: '13px',
+    snippetLine: '20px',
+    icon: '18pxx18px',
+    order: ['search-view-card__icon', 'search-view-card__site', 'search-view-card__date', 'search-view-card__title', 'search-view-card__snippet'],
+  })
+  await expect(card).toContainText('国家统计局')
+  await expect(card).toContainText('2026/11/16')
+  await expect(card).toContainText('冰岛人口统计')
+  await expect(card).toContainText('约三十九万')
+  await page.screenshot({ path: join(artifacts, 'cite-hover-card.png') })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await cites.nth(0).hover()
+  await expect(card).toBeVisible()
+  const hit = await cites.nth(0).evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+    return Boolean(target && (target === node || node.contains(target)))
+  })
+  expect(hit).toBe(true)
+  const [popup] = await Promise.all([
+    page.context().waitForEvent('page'),
+    cites.nth(0).click(),
+  ])
+  await popup.waitForLoadState('domcontentloaded')
+  await expect(popup).toHaveURL('https://example.com/pop')
+  await popup.close()
+})
+
+test('search cite badge hover uses the citation color', async ({ page }) => {
+  await unlock(page)
+  await page.unroute('https://api.deepseek.com/**')
+  await page.route('https://api.deepseek.com/**', async (route) => {
+    if (!route.request().url().includes('/messages')) {
+      await fulfill(route)
+      return
+    }
+    const results = Array.from({ length: 10 }, (_, index) => ({
+      type: 'web_search_result',
+      title: `结果${index + 1}`,
+      url: `https://example.com/r${index + 1}`,
+      snippet: `摘要${index + 1}`,
+      site_name: `站点${index + 1}`,
+    }))
+    const events = [
+      { type: 'message_start', message: { id: 'req-wide', model: 'deepseek-flash' } },
+      { type: 'content_block_start', index: 0, content_block: { type: 'web_search_tool_result', tool_use_id: 'tool-wide', kind: 'search', content: results } },
+      { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
+      { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '第一句。' } },
+      { type: 'content_block_delta', index: 1, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/r1', title: '模型1', cited_text: 'source one', encrypted_index: '' } } },
+      { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '第十句。' } },
+      { type: 'content_block_delta', index: 1, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/r10', title: '模型10', cited_text: 'source ten', encrypted_index: '' } } },
+      { type: 'message_delta', delta: { stop_reason: 'end_turn', title: '两位' }, usage: { input_tokens: 4, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: 4, service_tier: 'standard' } },
+      { type: 'message_stop' },
+    ]
+    await route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: sse(events) })
+  })
+  await send(page, '两位数字')
+  const cites = page.getByTestId('assistant-text').locator('.cite')
+  await expect(cites).toHaveText(['1', '10'])
+  const read = async (index: number) => page.getByTestId('assistant-text').evaluate((root, index) => {
+    const node = root.querySelectorAll('.cite')[index]
+    if (!node) return { background: '', variant: '', space: '', minWidth: '' }
+    const style = getComputedStyle(node)
+    return {
+      background: style.backgroundColor,
+      variant: style.fontVariantNumeric,
+      space: style.whiteSpace,
+      minWidth: style.minWidth,
+    }
+  }, index)
+  expect(await read(0)).toMatchObject({ background: 'rgb(245, 246, 247)', minWidth: '14px' })
+  await cites.nth(0).hover()
+  expect(await read(0)).toMatchObject({
+    background: 'rgb(235, 238, 242)',
+    variant: 'tabular-nums',
+    space: 'nowrap',
+    minWidth: '14px',
+  })
+  expect(await read(1)).toMatchObject({ variant: 'tabular-nums', space: 'nowrap', minWidth: '20px' })
 })
 
 test('markdown surfaces', async ({ page }) => {

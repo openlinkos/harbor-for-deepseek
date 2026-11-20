@@ -77,6 +77,24 @@ const sentenceEnd = (text: string, at: number): number => {
   return text.length
 }
 
+export type SearchCiteSource = {
+  url: string
+  title: string
+  site: string
+  snippet?: string
+  date?: string
+  icon?: string | null
+}
+
+export type SearchCiteCard = {
+  title: string
+  site: string
+  snippet: string
+  date?: string
+  icon?: string | null
+  url: string
+}
+
 const citationAt = (text: string, citation: TextCitation): number => {
   if (typeof citation.at === 'number' && Number.isFinite(citation.at)) return sentenceEnd(text, citation.at)
   const needle = citation.cited_text.trim()
@@ -95,21 +113,31 @@ const citationAt = (text: string, citation: TextCitation): number => {
 export const markSearchCitations = (
   text: string,
   citations: TextCitation[] | undefined,
-  sources: { url: string; title: string; site: string }[],
-): { text: string; citations: TextCitation[]; sites: string[] } => {
+  sources: SearchCiteSource[],
+): { text: string; citations: TextCitation[]; sites: string[]; cards: SearchCiteCard[] } => {
   if (!citations?.length || sources.length === 0) {
-    return { text, citations: citations ?? [], sites: [] }
+    return { text, citations: citations ?? [], sites: [], cards: [] }
   }
   const aligned: TextCitation[] = []
   const sites: string[] = []
+  const cards: SearchCiteCard[] = []
   const inserts: { at: number; n: number }[] = []
   for (const citation of citations) {
     const index = sources.findIndex((item) => item.url === citation.url)
     if (index < 0) continue
     const source = sources[index]
     if (!source) continue
-    aligned[index] = { ...citation, title: source.title || citation.title }
+    const title = source.title || citation.title || citation.url
+    aligned[index] = { ...citation, title }
     sites[index] = source.site
+    cards[index] = {
+      title,
+      site: source.site,
+      snippet: source.snippet ?? '',
+      date: source.date,
+      icon: source.icon ?? null,
+      url: source.url,
+    }
     inserts.push({ at: citationAt(text, citation), n: index + 1 })
   }
   inserts.sort((a, b) => a.at - b.at || a.n - b.n)
@@ -125,5 +153,5 @@ export const markSearchCitations = (
     if (!insert) continue
     marked = `${marked.slice(0, insert.at)}〔${insert.n}〕${marked.slice(insert.at)}`
   }
-  return { text: marked, citations: aligned, sites }
+  return { text: marked, citations: aligned, sites, cards }
 }

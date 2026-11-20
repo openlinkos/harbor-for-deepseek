@@ -80,6 +80,6 @@ describe('markSearchCitations', () => {
   it('does not rewrite an answer that has no search results', () => {
     const text = '人口约 394,000〔1〕〔2〕'
     const citations = [cite('https://example.com/pop', '394,000'), cite('https://example.com/city', '人口')]
-    expect(markSearchCitations(text, citations, [])).toEqual({ text, citations, sites: [] })
+    expect(markSearchCitations(text, citations, [])).toEqual({ text, citations, sites: [], cards: [] })
   })
 })

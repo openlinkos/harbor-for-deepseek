@@ -707,7 +707,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         const marked = markSearchCitations(block.text, block.citations, sources)
         return (
           <div className="prose" data-testid={index === 0 ? 'assistant-text' : undefined} key={index}>
-            <Markdown text={marked.text} citations={marked.citations} sites={marked.sites} />
+            <Markdown text={marked.text} citations={marked.citations} cards={marked.cards} />
           </div>
         )
       })}

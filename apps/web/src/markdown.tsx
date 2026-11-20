@@ -14,7 +14,9 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
 import type { TextCitation } from '@deepapi/types'
-import { Children, Component, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, Component, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import type { SearchCiteCard } from './blocks.js'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -196,7 +198,163 @@ class Boundary extends Component<{ text: string; children: ReactNode }, { failed
   }
 }
 
-const citeChildren = (children: ReactNode, citations?: TextCitation[], sites?: string[]) =>
+const OPEN_MS = 300
+const CLOSE_MS = 100
+
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}
+
+const CiteIcon = ({ label, icon }: { label: string; icon?: string | null }) => {
+  const src = typeof icon === 'string' ? icon.trim() : ''
+  const [failed, setFailed] = useState(false)
+  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
+  if (!src || failed) {
+    return <i className="search-view-card__icon" aria-hidden="true">{letter}</i>
+  }
+  return (
+    <i className="search-view-card__icon" aria-hidden="true">
+      <img src={src} alt="" onError={() => setFailed(true)} />
+    </i>
+  )
+}
+
+const CiteCardBody = ({ card }: { card: SearchCiteCard }) => (
+  <>
+    <span className="search-view-card__meta">
+      <CiteIcon label={card.site || card.title} icon={card.icon} />
+      <span className="search-view-card__site">{card.site}</span>
+      {card.date ? (
+        <>
+          <span className="search-view-card__rule" aria-hidden="true" />
+          <span className="search-view-card__date">{card.date}</span>
+        </>
+      ) : null}
+    </span>
+    <span className="search-view-card__title">{card.title}</span>
+    {card.snippet ? <span className="search-view-card__snippet">{card.snippet}</span> : null}
+  </>
+)
+
+const placeCard = (badge: DOMRect, card: DOMRect) => {
+  const margin = 8
+  const width = Math.min(card.width, window.innerWidth - margin * 2)
+  let left = badge.left
+  if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width
+  if (left < margin) left = margin
+  let top = badge.top - margin - card.height
+  if (top < margin) top = badge.bottom + margin
+  const coversBadge = top < badge.bottom && top + card.height > badge.top && left < badge.right && left + width > badge.left
+  if (coversBadge) top = badge.bottom + margin
+  return { left, top }
+}
+
+const CiteMark = ({ n, href, card }: { n: string; href?: string; card: SearchCiteCard }) => {
+  const anchor = useRef<HTMLElement | null>(null)
+  const float = useRef<HTMLElement | null>(null)
+  const openTimer = useRef(0)
+  const closeTimer = useRef(0)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
+  const place = () => {
+    const badge = anchor.current?.getBoundingClientRect()
+    const layer = float.current?.getBoundingClientRect()
+    if (!badge || !layer) return
+    setPos(placeCard(badge, layer))
+  }
+  useLayoutEffect(() => {
+    if (!open) return
+    place()
+  }, [open, card])
+  useEffect(() => {
+    if (!open) return
+    const onMove = () => place()
+    window.addEventListener('scroll', onMove, true)
+    window.addEventListener('resize', onMove)
+    return () => {
+      window.removeEventListener('scroll', onMove, true)
+      window.removeEventListener('resize', onMove)
+    }
+  }, [open])
+  useEffect(() => () => {
+    window.clearTimeout(openTimer.current)
+    window.clearTimeout(closeTimer.current)
+  }, [])
+  const show = () => {
+    window.clearTimeout(closeTimer.current)
+    if (open) return
+    window.clearTimeout(openTimer.current)
+    openTimer.current = window.setTimeout(() => setOpen(true), OPEN_MS)
+  }
+  const hide = () => {
+    window.clearTimeout(openTimer.current)
+    closeTimer.current = window.setTimeout(() => {
+      setOpen(false)
+      setPos(null)
+    }, CLOSE_MS)
+  }
+  const className = n.length > 1 ? 'cite wide' : 'cite'
+  const badge = href ? (
+    <a
+      ref={(node) => { anchor.current = node }}
+      className={className}
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+    >
+      {n}
+    </a>
+  ) : (
+    <span ref={(node) => { anchor.current = node }} className={className} onMouseEnter={show} onMouseLeave={hide}>
+      {n}
+    </span>
+  )
+  const layer = open
+    ? createPortal(
+        href ? (
+          <a
+            ref={(node) => { float.current = node }}
+            className="search-view-card"
+            href={href}
+            target="_blank"
+            rel="noreferrer noopener"
+            style={pos ? { left: pos.left, top: pos.top } : { left: 0, top: 0, visibility: 'hidden' }}
+            onMouseEnter={show}
+            onMouseLeave={hide}
+          >
+            <CiteCardBody card={card} />
+          </a>
+        ) : (
+          <span
+            ref={(node) => { float.current = node }}
+            className="search-view-card"
+            style={pos ? { left: pos.left, top: pos.top } : { left: 0, top: 0, visibility: 'hidden' }}
+            onMouseEnter={show}
+            onMouseLeave={hide}
+          >
+            <CiteCardBody card={card} />
+          </span>
+        ),
+        document.body,
+      )
+    : null
+  return (
+    <span className="cite-wrap">
+      {badge}
+      {layer}
+    </span>
+  )
+}
+
+const citeChildren = (children: ReactNode, citations?: TextCitation[], cards?: SearchCiteCard[]) =>
   Children.map(children, (child) => {
     if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
       return child
@@ -208,37 +366,29 @@ const citeChildren = (children: ReactNode, citations?: TextCitation[], sites?: s
         return bit
       }
       const href = /^https?:\/\//i.test(citation.url) ? citation.url : undefined
-      const site = sites?.[Number(match[1]) - 1]
-      const badge = href ? (
-        <a className="cite" href={href} target="_blank" rel="noreferrer noopener">
-          {match[1]}
-        </a>
-      ) : (
-        <span className="cite">{match[1]}</span>
-      )
-      return (
-        <span className="cite-wrap" key={`${citation.url}-${match[1]}-${index}`}>
-          {badge}
-          <span className="hover-card">
-            <strong>{citation.title || citation.url}</strong>
-            {site ? <p>{site}</p> : citation.cited_text ? <p>{citation.cited_text}</p> : null}
-          </span>
-        </span>
-      )
+      const known = cards?.[Number(match[1]) - 1]
+      const card: SearchCiteCard = known ?? {
+        title: citation.title || citation.url,
+        site: hostOf(citation.url),
+        snippet: citation.cited_text,
+        url: citation.url,
+        icon: null,
+      }
+      return <CiteMark key={`${citation.url}-${match[1]}-${index}`} n={match[1]} href={href} card={card} />
     })
   })
 
-export const Markdown = ({ text, citations, sites }: { text: string; citations?: TextCitation[]; sites?: string[] }) => (
+export const Markdown = ({ text, citations, cards }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[] }) => (
   <Boundary text={text}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
         p({ children }) {
-          return <p>{citeChildren(children, citations, sites)}</p>
+          return <p>{citeChildren(children, citations, cards)}</p>
         },
         li({ children }) {
-          return <li>{citeChildren(children, citations, sites)}</li>
+          return <li>{citeChildren(children, citations, cards)}</li>
         },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined
