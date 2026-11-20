@@ -4,6 +4,12 @@ export type SafetyLevel = 'high' | 'low'
 
 export type Effort = 'low' | 'high' | 'max'
 
+/** Request model. Matches the previous settings default and the server column default. */
+export const DEFAULT_CHAT_MODEL: ChatModel = 'deepseek-flash'
+
+/** Request reasoning effort. Matches the previous settings default and the server column default. */
+export const DEFAULT_EFFORT: Effort = 'high'
+
 export type ThinkingMode = 'enabled' | 'disabled'
 
 /** Server tools exist on deepseek-flash. deepseek-v4-pro is text-only. */

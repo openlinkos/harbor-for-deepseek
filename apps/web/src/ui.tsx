@@ -9,7 +9,7 @@ import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
-import { useHarbor, type HarborState } from './store.js'
+import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 
@@ -1366,7 +1366,6 @@ const Composer = () => {
     window.addEventListener('deepapi-prefill', onPrefill)
     return () => window.removeEventListener('deepapi-prefill', onPrefill)
   }, [])
-  const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
     const value = text
     setText('')
@@ -1424,16 +1423,16 @@ const Composer = () => {
               <span className="chip-label">{t('thinking')}</span>
             </div>
           </span>
-          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} aria-disabled={flash ? 'false' : 'true'} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
+          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
           </div>
         </div>
         <div className="tool-right">
-          <button type="button" className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')} disabled={!flash} onClick={() => fileRef.current?.click()}>
+          <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
             <Glyph name="attach" size={16} />
           </button>
-          <input ref={fileRef} data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
+          <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
@@ -1561,26 +1560,6 @@ const Settings = () => {
             </span>
           </div>
           <div className="settings-line">
-            <span>{t('model')}</span>
-            <AnchoredMenu
-              testId="model-select"
-              label={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              selected={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              options={[`DeepSeek ${t('flash')}`, `DeepSeek ${t('pro')}`]}
-              onPick={(value) => void setPrefs({ model: value.endsWith(t('pro')) ? 'deepseek-v4-pro' : 'deepseek-flash' })}
-            />
-          </div>
-          <div className="settings-line">
-            <span>{t('effort')}</span>
-            <AnchoredMenu
-              testId="effort-select"
-              label={prefs.effort}
-              selected={prefs.effort}
-              options={['low', 'high', 'max']}
-              onPick={(value) => void setPrefs({ effort: value as HarborState['prefs']['effort'] })}
-            />
-          </div>
-          <div className="settings-line">
             <span>{t('safety')}</span>
             <AnchoredMenu
               testId="safety-select"
@@ -1597,7 +1576,6 @@ const Settings = () => {
               data-testid="toggle-read"
               className={prefs.readLink ? 'switch on' : 'switch'}
               aria-pressed={prefs.readLink}
-              disabled={prefs.model !== 'deepseek-flash'}
               onClick={() => void setPrefs({ readLink: !prefs.readLink })}
             >
               <span className="knob" />
