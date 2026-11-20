@@ -4,6 +4,10 @@
 
 Uploaded files are kept. Settings no longer include an upload expiry, and neither on-device nor server mode sends `expires_after` to the Files API.
 
+## 0.1.1 — 2026-11-20
+
+Settings → 服务协议 shows the running build as DeepAPI vX.Y.Z. The same build writes `/version.json`.
+
 ## 0.5.5 — 2026-11-18
 
 The first screen follows the DeepSeek landing: a light gradient, a centered line, and a rounded input card. The API key step is a card, not a full-page form. Dark surfaces are neutral grey. The web image label is DeepAPI.
