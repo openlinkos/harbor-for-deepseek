@@ -14,10 +14,11 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
 import type { TextCitation } from '@deepapi/types'
-import { Children, Component, isValidElement, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
-import ReactMarkdown from 'react-markdown'
+import { citationNumbers, holdDelimitedMath, remarkCitations, stripPartialCitation } from './citations.js'
+import ReactMarkdown, { type Components } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -354,10 +355,45 @@ const CiteMark = ({ n, href, card }: { n: string; href?: string; card: SearchCit
   )
 }
 
+const cardFor = (n: number, citations?: TextCitation[], cards?: SearchCiteCard[]): SearchCiteCard => {
+  const known = cards?.[n - 1]
+  if (known) return known
+  const citation = citations?.[n - 1]
+  return {
+    title: citation?.title || citation?.url || '',
+    site: citation ? hostOf(citation.url) : '',
+    snippet: citation?.cited_text ?? '',
+    url: citation?.url ?? '',
+    icon: null,
+  }
+}
+
+const citeMarkFor = (value: number, citations: TextCitation[] | undefined, cards: SearchCiteCard[] | undefined) => {
+  const citation = citations?.[value - 1]
+  const href = citation && /^https?:\/\//i.test(citation.url) ? citation.url : undefined
+  return <CiteMark n={String(value)} href={href} card={cardFor(value, citations, cards)} />
+}
+
+const readCiteNumber = (n: string | number | undefined, node?: { properties?: { n?: string | number } }) =>
+  Number(n ?? node?.properties?.n)
+
+const CiteContext = createContext<{ citations?: TextCitation[]; cards?: SearchCiteCard[] }>({})
+
+const CitationView = ({ n, node }: { n?: string | number; node?: { properties?: { n?: string | number } } }) => {
+  const { citations, cards } = useContext(CiteContext)
+  const value = readCiteNumber(n, node)
+  if (!Number.isFinite(value) || value <= 0) return null
+  return citeMarkFor(value, citations, cards)
+}
+
+const CitationGroupView = ({ children }: { children?: ReactNode }) => (
+  <span data-citation-group="">{children}</span>
+)
+
 const PHRASING = new Set(['a', 'abbr', 'b', 'br', 'cite', 'code', 'em', 'i', 'img', 'kbd', 'mark', 's', 'small', 'span', 'strong', 'sub', 'sup', 'u'])
-const isPhrasing = (node: ReactNode) => typeof node === 'string' || typeof node === 'number' || (isValidElement(node) && typeof node.type === 'string' && PHRASING.has(node.type))
-// Official answers put each list item's text in <p class="ds-markdown-paragraph">. The paragraph's margin is what opens the gap before a nested list.
-const itemBlocks = (children: ReactNode, citations?: TextCitation[], cards?: SearchCiteCard[]) => {
+const isPhrasing = (node: ReactNode) => typeof node === 'string' || typeof node === 'number' || (isValidElement(node) && ((typeof node.type === 'string' && PHRASING.has(node.type)) || node.type === CitationGroupView))
+// Official answers put each list item's text in a paragraph. The paragraph's margin is what opens the gap before a nested list.
+const itemBlocks = (children: ReactNode) => {
   const nodes = Children.toArray(children)
   const out: ReactNode[] = []
   let inline: ReactNode[] = []
@@ -365,7 +401,7 @@ const itemBlocks = (children: ReactNode, citations?: TextCitation[], cards?: Sea
     const text = inline.some((node) => typeof node !== 'string' || node.trim() !== '')
     if (text) {
       if (inline.length === 1 && isValidElement(inline[0]) && inline[0].type === 'p') out.push(inline[0])
-      else out.push(<p key={out.length}>{citeChildren(inline, citations, cards)}</p>)
+      else out.push(<p key={out.length}>{inline}</p>)
     }
     inline = []
   }
@@ -380,91 +416,51 @@ const itemBlocks = (children: ReactNode, citations?: TextCitation[], cards?: Sea
   return out
 }
 
-const citeChildren = (children: ReactNode, citations?: TextCitation[], cards?: SearchCiteCard[]) =>
-  Children.map(children, (child) => {
-    if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
-      return child
+const components = {
+  citation: CitationView,
+  'citation-group': CitationGroupView,
+  li({ children }: { children?: ReactNode }) {
+    return <li>{itemBlocks(children)}</li>
+  },
+  a({ href, children }: { href?: string; children?: ReactNode }) {
+    const safe = href && /^https?:\/\//i.test(href) ? href : undefined
+    return (
+      <a href={safe} target="_blank" rel="noreferrer noopener">
+        {children}
+      </a>
+    )
+  },
+  code({ className, children }: { className?: string; children?: ReactNode }) {
+    const value = String(children).replace(/\n$/, '')
+    const language = /language-([\w-]+)/.exec(className ?? '')?.[1]
+    const block = Boolean(className) || value.includes('\n')
+    if (!block) {
+      return <code className="inline-code">{children}</code>
     }
-    const out: ReactNode[] = []
-    const run: ReactNode[] = []
-    let runKey = ''
-    const flush = () => {
-      if (!run.length) return
-      out.push(<span data-citation-group key={runKey}>{run.splice(0)}</span>)
-      runKey = ''
+    if (language === 'mermaid') {
+      return <Mermaid chart={value} />
     }
-    child.split(/(〔\d+〕|\[\d+\]|\(\d+\))/g).forEach((bit, index) => {
-      const match = /^(?:〔|\[|\()(\d+)(?:〕|\]|\))$/.exec(bit)
-      const citation = match ? citations?.[Number(match[1]) - 1] : undefined
-      if (!match || !citation) {
-        if (!bit) return
-        flush()
-        out.push(bit)
-        return
-      }
-      const href = /^https?:\/\//i.test(citation.url) ? citation.url : undefined
-      const known = cards?.[Number(match[1]) - 1]
-      const card: SearchCiteCard = known ?? {
-        title: citation.title || citation.url,
-        site: hostOf(citation.url),
-        snippet: citation.cited_text,
-        url: citation.url,
-        icon: null,
-      }
-      const key = `${citation.url}-${match[1]}-${index}`
-      if (!runKey) runKey = key
-      run.push(<CiteMark key={key} n={match[1]} href={href} card={card} />)
-    })
-    flush()
-    return out
-  })
+    if (BOX.test(value)) {
+      return (
+        <div className="code-card">
+          <pre className="box-drawing"><code>{value}</code></pre>
+        </div>
+      )
+    }
+    return <CodeBlock language={language} value={value} />
+  },
+  img({ src, alt }: { src?: string; alt?: string }) {
+    const safe = src && (/^https:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) ? src : undefined
+    return <img className="md-img" src={safe} alt={alt ?? ''} />
+  },
+} as unknown as Components
 
-export const Markdown = ({ text, citations, cards }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[] }) => (
-  <Boundary text={text}>
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={{
-        p({ children }) {
-          return <p>{citeChildren(children, citations, cards)}</p>
-        },
-        li({ children }) {
-          return <li>{itemBlocks(children, citations, cards)}</li>
-        },
-        a({ href, children }) {
-          const safe = href && /^https?:\/\//i.test(href) ? href : undefined
-          return (
-            <a href={safe} target="_blank" rel="noreferrer noopener">
-              {children}
-            </a>
-          )
-        },
-        code({ className, children }) {
-          const value = String(children).replace(/\n$/, '')
-          const language = /language-([\w-]+)/.exec(className ?? '')?.[1]
-          const block = Boolean(className) || value.includes('\n')
-          if (!block) {
-            return <code className="inline-code">{children}</code>
-          }
-          if (language === 'mermaid') {
-            return <Mermaid chart={value} />
-          }
-          if (BOX.test(value)) {
-            return (
-              <div className="code-card">
-                <pre className="box-drawing"><code>{value}</code></pre>
-              </div>
-            )
-          }
-          return <CodeBlock language={language} value={value} />
-        },
-        img({ src, alt }) {
-          const safe = src && (/^https:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) ? src : undefined
-          return <img className="md-img" src={safe} alt={alt ?? ''} />
-        },
-      }}
-    >
-      {text}
-    </ReactMarkdown>
-  </Boundary>
+export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => (
+  <CiteContext.Provider value={{ citations, cards }}>
+    <Boundary text={text}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath, remarkCitations(citationNumbers(citations))]} rehypePlugins={[rehypeKatex]} components={components}>
+        {holdDelimitedMath(stripPartialCitation(text, streaming))}
+      </ReactMarkdown>
+    </Boundary>
+    </CiteContext.Provider>
 )
