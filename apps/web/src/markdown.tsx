@@ -347,10 +347,10 @@ const CiteMark = ({ n, href, card }: { n: string; href?: string; card: SearchCit
       )
     : null
   return (
-    <span className="cite-wrap">
+    <>
       {badge}
       {layer}
-    </span>
+    </>
   )
 }
 
@@ -359,11 +359,22 @@ const citeChildren = (children: ReactNode, citations?: TextCitation[], cards?: S
     if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
       return child
     }
-    return child.split(/(〔\d+〕|\[\d+\]|\(\d+\))/g).map((bit, index) => {
+    const out: ReactNode[] = []
+    const run: ReactNode[] = []
+    let runKey = ''
+    const flush = () => {
+      if (!run.length) return
+      out.push(<span data-citation-group key={runKey}>{run.splice(0)}</span>)
+      runKey = ''
+    }
+    child.split(/(〔\d+〕|\[\d+\]|\(\d+\))/g).forEach((bit, index) => {
       const match = /^(?:〔|\[|\()(\d+)(?:〕|\]|\))$/.exec(bit)
       const citation = match ? citations?.[Number(match[1]) - 1] : undefined
       if (!match || !citation) {
-        return bit
+        if (!bit) return
+        flush()
+        out.push(bit)
+        return
       }
       const href = /^https?:\/\//i.test(citation.url) ? citation.url : undefined
       const known = cards?.[Number(match[1]) - 1]
@@ -374,8 +385,12 @@ const citeChildren = (children: ReactNode, citations?: TextCitation[], cards?: S
         url: citation.url,
         icon: null,
       }
-      return <CiteMark key={`${citation.url}-${match[1]}-${index}`} n={match[1]} href={href} card={card} />
+      const key = `${citation.url}-${match[1]}-${index}`
+      if (!runKey) runKey = key
+      run.push(<CiteMark key={key} n={match[1]} href={href} card={card} />)
     })
+    flush()
+    return out
   })
 
 export const Markdown = ({ text, citations, cards }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[] }) => (

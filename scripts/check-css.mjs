@@ -6,8 +6,21 @@
 //
 // A known exception is allowed only while it still fails. When that problem is gone, this script exits 1
 // so the fix PR has to delete the exception (same rule as test.fail in the e2e gate).
-import { readFileSync } from 'node:fs'
+//
+// broad-descendant-button（没有例外列表，也不能用注释关掉）:
+// 只报这一种选择器：逗号拆开后，主体是裸 button（类型是 button，没有类、没有 id、没有 :not；
+// 属性或 :hover 不算收窄，因为 button.favicons 同样可以带 aria-expanded 和 :hover），
+// 并且它紧左边是「只有类」的容器复合选择器，中间的组合符是后代空格，不是 > + ~。
+// 还要真的漏得进去才报：同一份样式表里有独立的 `button.<类>`（没有再套一层容器，目前是 button.favicons / button.chip），
+// 并且 apps/web/src 的 JSX 里，这个容器的子树（直接子节点不算；同一文件里的函数组件、以及全仓库唯一的组件名会展开）
+// 嵌着带这个类的 <button>。`.code-head button` 这种本来就要选中里面的裸按钮、里面也没有 button.favicons，不报。
+// 同样拦住这些变体：`:is(button)`、`[data-testid=thinking] button`、`.thinking button > svg`（后代组合符后面的裸 button 不是主体也算）、
+// `.thinking > *`（容器后面的万能选择器，子组合符也算）。
+// 引用组 `[data-citation-group]` / `.cite-wrap` 和 `.favicons` 上禁止 top/left 这种定位微调。角标自己的 top:-5px 不在此列。
+// a / svg / p 不在这条规则里。收窄方式：改成子组合符（`.thinking > button`），或给标题按钮加类。
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
 
 const KNOWN_EXCEPTIONS = []
 
@@ -15,11 +28,405 @@ const require = createRequire(process.cwd() + '/')
 const postcss = require(process.env.POSTCSS || 'postcss')
 const norm = (p) => p.replaceAll('\\', '/')
 const lineOfIndex = (src, index) => src.slice(0, index).split('\n').length
+const ts = require('typescript')
 
-const parseProblems = (file, src) => {
+const readBalanced = (raw, i, open, close) => {
+  let depth = 0
+  let quote = ''
+  for (; i < raw.length; i++) {
+    const c = raw[i]
+    if (quote) {
+      if (c === '\\') { i++; continue }
+      if (c === quote) quote = ''
+      continue
+    }
+    if (c === '"' || c === "'") { quote = c; continue }
+    if (c === open) depth++
+    else if (c === close) {
+      depth--
+      if (depth === 0) return i + 1
+    }
+  }
+  return raw.length
+}
+
+const splitSelectors = (selector) => {
+  const parts = []
+  let current = ''
+  let depth = 0
+  let quote = ''
+  for (let i = 0; i < selector.length; i++) {
+    const c = selector[i]
+    if (quote) {
+      current += c
+      if (c === quote && selector[i - 1] !== '\\') quote = ''
+      continue
+    }
+    if (c === '"' || c === "'") { quote = c; current += c; continue }
+    if (c === '(' || c === '[') { depth++; current += c; continue }
+    if (c === ')' || c === ']') { depth = Math.max(0, depth - 1); current += c; continue }
+    if (c === ',' && depth === 0) { parts.push(current); current = ''; continue }
+    current += c
+  }
+  if (current.trim()) parts.push(current)
+  return parts.map((s) => s.trim()).filter(Boolean)
+}
+
+const parseComplex = (sel) => {
+  const items = []
+  let i = 0
+  while (i < sel.length) {
+    while (i < sel.length && /\s/.test(sel[i])) i++
+    if (i >= sel.length) break
+    if (sel[i] === '>' || sel[i] === '+' || sel[i] === '~') {
+      items.push({ kind: 'combinator', op: sel[i] })
+      i++
+      continue
+    }
+    const start = i
+    let depth = 0
+    let quote = ''
+    while (i < sel.length) {
+      const c = sel[i]
+      if (quote) {
+        if (c === '\\') { i += 2; continue }
+        if (c === quote) quote = ''
+        i++
+        continue
+      }
+      if (c === '"' || c === "'") { quote = c; i++; continue }
+      if (c === '(' || c === '[') { depth++; i++; continue }
+      if ((c === ')' || c === ']') && depth > 0) { depth--; i++; continue }
+      if (depth === 0 && (/\s/.test(c) || c === '>' || c === '+' || c === '~')) break
+      i++
+    }
+    const raw = sel.slice(start, i).trim()
+    if (!raw) continue
+    if (items.length && items[items.length - 1].kind === 'compound') items.push({ kind: 'combinator', op: ' ' })
+    items.push({ kind: 'compound', raw })
+  }
+  return items
+}
+
+const analyzeCompound = (raw) => {
+  const classes = []
+  let type = null
+  let id = null
+  let hasNot = false
+  let hasAttr = false
+  let testId = null
+  let bareIsButton = false
+  let citesGroup = false
+  let favicon = false
+  let i = 0
+  while (i < raw.length) {
+    const c = raw[i]
+    if (c === '.') {
+      const name = /^[\w-]+/.exec(raw.slice(i + 1))
+      if (!name) { i++; continue }
+      classes.push(name[0])
+      if (name[0] === 'cite-wrap') citesGroup = true
+      if (name[0] === 'favicons' || name[0] === 'favicon') favicon = true
+      i += 1 + name[0].length
+      continue
+    }
+    if (c === '#') {
+      const name = /^[\w-]+/.exec(raw.slice(i + 1))
+      if (!name) { i++; continue }
+      id = name[0]
+      i += 1 + name[0].length
+      continue
+    }
+    if (c === '[') {
+      hasAttr = true
+      const end = readBalanced(raw, i, '[', ']')
+      const body = raw.slice(i + 1, end - 1)
+      const named = /^\s*data-testid\s*=\s*["']?([\w-]+)/.exec(body)
+      if (named) testId = named[1]
+      if (/data-citation-group/.test(body)) citesGroup = true
+      i = end
+      continue
+    }
+    if (c === ':') {
+      const pseudo = raw[i + 1] === ':'
+      i += pseudo ? 2 : 1
+      const name = /^[\w-]+/.exec(raw.slice(i))
+      const ident = name ? name[0] : ''
+      i += ident.length
+      if (raw[i] === '(') {
+        const end = readBalanced(raw, i, '(', ')')
+        const inner = raw.slice(i + 1, end - 1)
+        if (!pseudo && ident === 'not') hasNot = true
+        if (!pseudo && (ident === 'is' || ident === 'where') && inner.split(',').some((part) => part.trim() === 'button')) bareIsButton = true
+        i = end
+      }
+      continue
+    }
+    if (c === '*') { type = '*'; i++; continue }
+    if (/[a-zA-Z]/.test(c)) {
+      const name = /^[\w-]+/.exec(raw.slice(i))
+      type = (name ? name[0] : '').toLowerCase()
+      i += name ? name[0].length : 1
+      continue
+    }
+    i++
+  }
+  return { type, classes, id, hasNot, hasAttr, testId, bareIsButton, citesGroup, favicon }
+}
+
+const isBareButton = (info) => info.bareIsButton || (info.type === 'button' && !info.classes.length && !info.id && !info.hasNot)
+const isStar = (info) => info.type === '*' && !info.classes.length && !info.id
+const isContainer = (info) => !info.type && !info.id && !info.hasNot && !info.bareIsButton && (info.classes.length > 0 || Boolean(info.testId))
+
+const portableButtonClasses = (root) => {
+  const set = new Set()
+  root.walkRules((rule) => {
+    for (const sel of splitSelectors(rule.selector)) {
+      const compounds = parseComplex(sel).filter((item) => item.kind === 'compound')
+      if (compounds.length !== 1) continue
+      const info = analyzeCompound(compounds[0].raw)
+      if (info.type === 'button') for (const name of info.classes) set.add(name)
+    }
+  })
+  return set
+}
+
+const tsxFiles = (dir, acc = []) => {
+  for (const name of readdirSync(dir)) {
+    if (name === 'node_modules' || name === 'dist') continue
+    const path = join(dir, name)
+    if (statSync(path).isDirectory()) tsxFiles(path, acc)
+    else if (name.endsWith('.tsx')) acc.push(path)
+  }
+  return acc
+}
+
+const classTokens = (expr) => {
+  if (!expr) return []
+  if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return expr.text.split(/\s+/).filter(Boolean)
+  if (ts.isTemplateExpression(expr)) {
+    const bits = [expr.head.text]
+    for (const span of expr.templateSpans) bits.push(span.literal.text)
+    return bits.join(' ').split(/\s+/).filter((bit) => bit && !bit.includes('$'))
+  }
+  if (ts.isJsxExpression(expr)) return classTokens(expr.expression)
+  if (ts.isParenthesizedExpression(expr)) return classTokens(expr.expression)
+  if (ts.isConditionalExpression(expr)) return [...classTokens(expr.whenTrue), ...classTokens(expr.whenFalse)]
+  if (ts.isBinaryExpression(expr)) return [...classTokens(expr.left), ...classTokens(expr.right)]
+  if (ts.isArrayLiteralExpression(expr)) return expr.elements.flatMap((el) => classTokens(el))
+  if (ts.isCallExpression(expr)) return expr.arguments.flatMap((arg) => classTokens(arg))
+  return []
+}
+
+const jsxAttr = (opening, name) => {
+  const attr = opening.attributes.properties.find((prop) => prop.name && ts.isIdentifier(prop.name) && prop.name.text === name)
+  if (!attr || !ts.isJsxAttribute(attr)) return ''
+  const bits = classTokens(attr.initializer)
+  return bits[0] ?? ''
+}
+
+const jsxClassTokens = (opening) => {
+  const attr = opening.attributes.properties.find((prop) => prop.name && ts.isIdentifier(prop.name) && prop.name.text === 'className')
+  return attr && ts.isJsxAttribute(attr) ? classTokens(attr.initializer) : []
+}
+
+const tagNameOf = (opening) => ts.isIdentifier(opening.tagName) ? opening.tagName.text : null
+
+const buildJsxIndex = (srcDir) => {
+  const byFile = new Map()
+  const byName = new Map()
+  for (const path of tsxFiles(srcDir)) {
+    const sf = ts.createSourceFile(path, readFileSync(path, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const local = new Map()
+    const visit = (node) => {
+      if (ts.isFunctionDeclaration(node) && node.name) local.set(node.name.text, node)
+      if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) {
+        local.set(node.name.text, node.initializer)
+      }
+      ts.forEachChild(node, visit)
+    }
+    visit(sf)
+    byFile.set(path, { sf, local })
+    for (const name of local.keys()) {
+      const hit = byName.get(name)
+      if (!hit) byName.set(name, path)
+      else if (hit !== path) byName.set(name, null)
+    }
+  }
+  return { byFile, byName }
+}
+
+let jsxCache = null
+const jsxIndex = (cssFile) => {
+  if (jsxCache) return jsxCache
+  const dir = dirname(cssFile)
+  jsxCache = statSync(dir).isDirectory() ? buildJsxIndex(dir) : { byFile: new Map(), byName: new Map() }
+  return jsxCache
+}
+
+const lookupFn = (index, file, name) => {
+  const here = index.byFile.get(file)
+  if (here?.local.get(name)) return { sf: here.sf, fn: here.local.get(name), file }
+  const other = index.byName.get(name)
+  if (!other) return null
+  const there = index.byFile.get(other)
+  const fn = there?.local.get(name)
+  return fn ? { sf: there.sf, fn, file: other } : null
+}
+
+const nestedPortableButton = (index, file, containerClasses, testIdWanted, portable) => {
+  const found = []
+  const see = (opening, direct) => {
+    if (direct || tagNameOf(opening) !== 'button') return
+    const hit = jsxClassTokens(opening).find((name) => portable.has(name))
+    if (hit) found.push(hit)
+  }
+  const walkExpr = (expr, sf, fromFile, direct, stack) => {
+    if (!expr || found.length) return
+    if (ts.isParenthesizedExpression(expr)) return walkExpr(expr.expression, sf, fromFile, direct, stack)
+    if (ts.isConditionalExpression(expr) || (ts.isBinaryExpression(expr) && (expr.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken || expr.operatorToken.kind === ts.SyntaxKind.BarBarToken || expr.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken))) {
+      walkExpr(expr.left ?? expr.whenTrue, sf, fromFile, direct, stack)
+      walkExpr(expr.right ?? expr.whenFalse, sf, fromFile, direct, stack)
+      return
+    }
+    if (ts.isCallExpression(expr)) {
+      const callee = expr.expression
+      if (ts.isPropertyAccessExpression(callee) && callee.name.text === 'map' && expr.arguments[0]) {
+        const arg = expr.arguments[0]
+        if (ts.isIdentifier(arg)) return expand(arg.text, fromFile, direct, stack)
+        if (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg)) return walkFn(arg, sf, fromFile, direct, stack)
+      }
+      if (ts.isIdentifier(callee)) return expand(callee.text, fromFile, direct, stack)
+      return
+    }
+    if (ts.isIdentifier(expr)) return expand(expr.text, fromFile, direct, stack)
+    if (ts.isJsxElement(expr) || ts.isJsxSelfClosingElement(expr) || ts.isJsxFragment(expr)) walkSlot(expr, sf, fromFile, direct, stack)
+  }
+  const walkSlot = (node, sf, fromFile, direct, stack) => {
+    if (found.length) return
+    if (ts.isJsxText(node)) return
+    if (ts.isJsxExpression(node)) return walkExpr(node.expression, sf, fromFile, direct, stack)
+    if (ts.isJsxFragment(node)) {
+      for (const child of node.children) walkSlot(child, sf, fromFile, direct, stack)
+      return
+    }
+    if (!ts.isJsxElement(node) && !ts.isJsxSelfClosingElement(node)) return
+    const opening = ts.isJsxElement(node) ? node.openingElement : node
+    const name = tagNameOf(opening)
+    see(opening, direct)
+    if (name && /^[A-Z]/.test(name)) expand(name, fromFile, direct, stack)
+    if (ts.isJsxElement(node)) for (const child of node.children) walkSlot(child, sf, fromFile, false, stack)
+  }
+  const walkFn = (fn, sf, fromFile, direct, stack) => {
+    if (found.length || stack.has(fn)) return
+    stack.add(fn)
+    const body = fn.body
+    if (body && ts.isBlock(body)) {
+      const visit = (node) => {
+        if (found.length) return
+        if (ts.isReturnStatement(node)) {
+          if (node.expression) walkExpr(node.expression, sf, fromFile, direct, stack)
+          return
+        }
+        if (ts.isFunctionLike(node) || ts.isClassLike(node)) return
+        ts.forEachChild(node, visit)
+      }
+      visit(body)
+    } else if (body) walkExpr(body, sf, fromFile, direct, stack)
+    stack.delete(fn)
+  }
+  const expand = (name, fromFile, direct, stack) => {
+    const hit = lookupFn(index, fromFile, name)
+    if (hit) walkFn(hit.fn, hit.sf, hit.file, direct, stack)
+  }
+  for (const { sf } of index.byFile.values()) {
+    const visit = (node) => {
+      if (found.length) return
+      if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+        const opening = ts.isJsxElement(node) ? node.openingElement : node
+        const tokens = jsxClassTokens(opening)
+        const classOk = !containerClasses.length || containerClasses.every((name) => tokens.includes(name))
+        const testOk = !testIdWanted || jsxAttr(opening, 'data-testid') === testIdWanted
+        if (classOk && testOk && (containerClasses.length || testIdWanted) && ts.isJsxElement(node)) {
+          for (const child of node.children) walkSlot(child, sf, sf.fileName, true, new Set())
+        }
+      }
+      if (!found.length) ts.forEachChild(node, visit)
+    }
+    visit(sf)
+    if (found.length) break
+  }
+  return found[0] ?? null
+}
+
+const broadButtonProblems = (file, root) => {
+  const portable = portableButtonClasses(root)
+  if (!portable.size) return []
+  const index = jsxIndex(file)
+  const problems = []
+  root.walkRules((rule) => {
+    for (const sel of splitSelectors(rule.selector)) {
+      const items = parseComplex(sel)
+      let combBefore = ''
+      const compounds = []
+      for (const item of items) {
+        if (item.kind === 'combinator') combBefore = item.op
+        else compounds.push({ raw: item.raw, info: analyzeCompound(item.raw), combBefore })
+      }
+      const shown = sel.replace(/\s+/g, ' ')
+      for (let i = 1; i < compounds.length; i++) {
+        const box = compounds[i - 1].info
+        const here = compounds[i]
+        if (!isContainer(box)) continue
+        const star = isStar(here.info) && (here.combBefore === ' ' || here.combBefore === '>')
+        const bare = isBareButton(here.info) && here.combBefore === ' '
+        if (!star && !bare) continue
+        const leaked = nestedPortableButton(index, file, box.classes, box.testId, portable)
+        if (!leaked) continue
+        const where = box.classes.length ? `.${box.classes.join('.')}` : `[data-testid=${box.testId}]`
+        problems.push({
+          line: rule.source?.start?.line ?? 0,
+          message: `${file}:${rule.source?.start?.line ?? '?'} 宽泛后代选择器 \`${shown}\` 会套到 \`${where}\` 里面的 \`button.${leaked}\`。范围：容器（类或 data-testid）用后代组合符接裸 button / :is(button)，或用 >、空格接 *；\`.thinking button > svg\` 里那个裸 button 也算。子组合符接到具体按钮不报。没有例外。收窄成 \`${where} > button\`，或给标题按钮加类。`,
+        })
+        break
+      }
+    }
+  })
+  return problems
+}
+
+const nonzeroOffset = (value) => {
+  if (!value) return false
+  const v = value.trim().toLowerCase()
+  return v !== '0' && v !== '0px' && v !== 'auto'
+}
+
+const positionNudgeProblems = (file, root) => {
+  const problems = []
+  root.walkRules((rule) => {
+    const parts = parseComplex(rule.selector).filter((item) => item.kind === 'compound').map((item) => analyzeCompound(item.raw))
+    if (!parts.some((info) => info.citesGroup || info.favicon)) return
+    let top = ''
+    let left = ''
+    rule.walkDecls((decl) => {
+      if (decl.prop === 'top') top = decl.value
+      if (decl.prop === 'left') left = decl.value
+    })
+    if (!nonzeroOffset(top) && !nonzeroOffset(left)) return
+    problems.push({
+      line: rule.source?.start?.line ?? 0,
+      message: `${file}:${rule.source?.start?.line ?? '?'} 引用组或 favicon 上禁止 top/left 定位微调（${rule.selector.replace(/\s+/g, ' ').slice(0, 80)}）。官方引用组只有 margin，偏移在角标自己的 top:-5px。`,
+    })
+  })
+  return problems
+}
+
+export const parseProblems = (file, src) => {
   try {
     const root = postcss.parse(src, { from: file })
     const problems = []
+    problems.push(...broadButtonProblems(file, root))
+    problems.push(...positionNudgeProblems(file, root))
     root.walk((n) => {
       if (n.type === 'decl' && (n.parent.type === 'root' || (n.parent.type === 'atrule' && /^(media|supports|layer|container)$/.test(n.parent.name)))) {
         problems.push({ line: n.source.start.line, message: `${file}:${n.source.start.line} declaration outside a rule: ${n.prop}: ${n.value}` })

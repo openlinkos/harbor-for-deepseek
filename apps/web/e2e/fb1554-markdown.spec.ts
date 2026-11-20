@@ -3,33 +3,32 @@
 // testDir ./e2e, testMatch *.spec.ts. There is no second playwright config.
 // Corpus and rules: e2e/fixtures/fb1554-corpus.ts, e2e/lib/fb1554-md-checks.js.
 // Official numbers: e2e/fixtures/official-fb1554.json (frozen offline render; do not edit in feature PRs).
-// sha256 cf34ff7a7f101b19ec90f8f77e0266aad9a0a5e4af64d1a53785c1f926c0164d.
+// sha256 b32ab0665cec907d32b99fc2bd1489ac7a65f4444d289447936f00a9f36b5442.
 // Staged SSE reuses e2e/lib/fb1344-sse.js. The route mock matches fb1344 (balance, models, messages).
 // 34 cases = 4 cells × 7 + 1440 × 3 × 2. Red cases on master are test.fail() via knownFailure().
-// IDs are fb1554-M1 … fb1554-M5 and fb1554-T1. A fix PR deletes only its own id.
+// IDs still open: fb1554-M1, M2, T1, and M4 only for the 390 cite wrap. A fix PR deletes only its own id.
 // An unexpected pass fails the run. FB1554_STRICT=1 ignores knownFailure.
 // FB1344_STRICT does not open this file: that switch is the fb1344 baseline.
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { events, sse, EXPECT } from './fixtures/fb1554-corpus'
+import { adjacentCitationEvents, events, sse, EXPECT } from './fixtures/fb1554-corpus'
 const HERE = dirname(fileURLToPath(import.meta.url))
 
 // 语料按真实接口形状把正文在引用处切成多个 text block。规则在冻结官方 DOM 上全绿。
 // 已知失败用 knownFailure(id)。FB1554_STRICT=1 时全部按真失败跑。修好一项就删掉对应 id，过期的 id 会让 test.fail 变红。
 // fb1554-M1 多 text block 分开渲染（段落/列表被切断、跨块加粗残留 **、行首标点）：corpus-structure、corpus-no-literal
 // fb1554-M2 中文标点旁的 ** 不渲染（CommonMark 左右侧规则；官方 micromark 已放宽）：cjk-strong-single-block
-// fb1554-M4 角标 vertical-align: super、组间距、390 换行：cite-style，以及 cite-inline-same-line 的 390。
+// fb1554-M4 只剩 390 的 cite-inline-same-line（角标单独换行，等官方补采）。cite-style 已对齐，不再挂这个 id。
 //   1440 的 cite-inline-same-line 已经同行，不要标失败，否则意外通过会让 CI 变红。
-// fb1554-M5 搜索行 favicon 不重叠（.thinking button 规则漏到 button.favicons）：favicon-overlap
+// fb1554-M5 已删：搜索行 favicon 重叠 4px（.thinking > button 不再漏到 button.favicons）。
 // fb1554-T1 「用时 N 秒」：正文阶段还在涨、刷新后变 1 秒、别的回答生成时旧回答也在涨：thought-seconds-*
 const STRICT = process.env.FB1554_STRICT === '1'
 const KNOWN: Record<string, string> = {
   'fb1554-M1': 'fb1554-M1: 每个 text block 一个 .prose，段落和列表在引用处断开',
   'fb1554-M2': 'fb1554-M2: **「…」** 原样显示',
-  'fb1554-M4': 'fb1554-M4: 角标 vertical-align super，比官方高 5.3px；首个角标间距 2、官方 4',
-  'fb1554-M5': 'fb1554-M5: 搜索行 favicon 间距 +2、官方重叠 4',
+  'fb1554-M4': 'fb1554-M4: 390 下列表项角标被单独换到下一行，等官方补采后再决定是否不断行',
   'fb1554-T1': 'fb1554-T1: 用时按挂载后墙钟、全局 streaming 计',
 }
 // Same shape as fb1344-parity.spec.ts. FB1344_STRICT is intentionally not read here.
@@ -81,11 +80,34 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       const o = OFF.cells[theme]
       test('browse-style', async ({ page }) => { await boot(page, theme); await ask(page); const b = (await md(page)).metrics.browse
         expect(b.link).toEqual(o.browseLink); expect(b.icon).toEqual(o.browseIcon); expect(Math.abs(b.rowGap - o.browseItemGap)).toBeLessThanOrEqual(0.5) })
-      test('cite-style', async ({ page }) => { knownFailure('fb1554-M4'); await boot(page, theme); await ask(page); const m = (await md(page)).metrics
+      test('cite-style', async ({ page }) => { await boot(page, theme); await ask(page); const m = (await md(page)).metrics
         for (const k of Object.keys(o.cite).filter((k) => !/Px$|PrevChar$/.test(k))) expect(m.citeStyle[k], k).toBe(o.cite[k])
         expect(Math.abs(m.cites[0].dyTop - o.cite.dyTopVsPrevChar)).toBeLessThanOrEqual(0.5); expect(Math.abs(m.cites[0].dxGap - o.cite.firstGapPx)).toBeLessThanOrEqual(0.5) })
-      test('favicon-overlap', async ({ page }) => { knownFailure('fb1554-M5'); await boot(page, theme); await ask(page); const m = (await md(page)).metrics
+      test('favicon-overlap', async ({ page }) => { await boot(page, theme); await ask(page); const m = (await md(page)).metrics
         expect(m.search.icon).toEqual(o.searchFavicon); expect(m.pill.icon).toEqual(o.pillFavicon) })
+      test('adjacent-citations', async ({ page }) => {
+        await boot(page, theme)
+        await page.unroute('https://api.deepseek.com/**')
+        await page.route('https://api.deepseek.com/**', async (route) => {
+          const url = route.request().url()
+          if (url.endsWith('/user/balance')) return route.fulfill({ json: { is_available: true, balance_infos: [{ currency: 'CNY', total_balance: '1', granted_balance: '0', topped_up_balance: '1' }] } })
+          if (url.endsWith('/models')) return route.fulfill({ json: { data: [{ id: 'deepseek-flash' }] } })
+          if (!url.includes('/messages')) return route.fulfill({ status: 404, json: {} })
+          return route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(adjacentCitationEvents(JSON.parse(route.request().postData() || '{}'))) })
+        })
+        await ask(page, '[筑衡测试] 相邻引用')
+        const gap = await page.evaluate(() => {
+          const group = document.querySelector('[data-citation-group]')
+          const cites = [...(group?.querySelectorAll('.cite') ?? [])]
+          if (cites.length < 2) return null
+          const a = cites[0].getBoundingClientRect()
+          const b = cites[1].getBoundingClientRect()
+          return { n: cites.length, gap: b.left - a.right, oneGroup: group === cites[1].parentElement }
+        })
+        expect(gap?.oneGroup).toBe(true)
+        expect(gap?.n).toBe(2)
+        expect(Math.abs((gap?.gap ?? 99) - 4)).toBeLessThanOrEqual(0.5)
+      })
     }
     // 「用时 N 秒」：思考结束后冻结、刷新后不变、别的回答生成时不变
     test('thought-seconds-frozen', async ({ page }) => { knownFailure('fb1554-T1'); await boot(page, theme, { staged: true })

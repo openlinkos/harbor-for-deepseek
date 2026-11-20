@@ -386,8 +386,11 @@ test('non-search citations keep citation-order marks', async ({ page }) => {
   await expect(cites).toHaveText(['1', '2'])
   const tail = await cites.nth(0).evaluate((node) => node.parentElement?.previousSibling?.textContent ?? '')
   expect(tail.endsWith('乙结论。')).toBe(true)
-  const between = await cites.nth(1).evaluate((node) => node.parentElement?.previousElementSibling?.className ?? '')
-  expect(between).toContain('cite-wrap')
+  const grouped = await cites.nth(1).evaluate((node) => {
+    const parent = node.parentElement
+    return Boolean(parent?.hasAttribute('data-citation-group') && parent.querySelectorAll('.cite').length === 2)
+  })
+  expect(grouped).toBe(true)
   await cites.nth(0).hover()
   await expect(page.locator('.search-view-card')).toContainText('甲来源')
   await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-nonssearch.png') })
