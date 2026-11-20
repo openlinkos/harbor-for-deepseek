@@ -18,10 +18,9 @@ import { Children, Component, createContext, isValidElement, useContext, useEffe
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
 import { citationNumbers, holdDelimitedMath, remarkCitations, stripPartialCitation } from './citations.js'
+import { MathBlock, MathInline, remarkDeepseekMath } from './math.js'
 import ReactMarkdown, { type Components } from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
 
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('sh', bash)
@@ -391,7 +390,7 @@ const CitationGroupView = ({ children }: { children?: ReactNode }) => (
 )
 
 const PHRASING = new Set(['a', 'abbr', 'b', 'br', 'cite', 'code', 'em', 'i', 'img', 'kbd', 'mark', 's', 'small', 'span', 'strong', 'sub', 'sup', 'u'])
-const isPhrasing = (node: ReactNode) => typeof node === 'string' || typeof node === 'number' || (isValidElement(node) && ((typeof node.type === 'string' && PHRASING.has(node.type)) || node.type === CitationGroupView))
+const isPhrasing = (node: ReactNode) => typeof node === 'string' || typeof node === 'number' || (isValidElement(node) && ((typeof node.type === 'string' && PHRASING.has(node.type)) || node.type === CitationGroupView || node.type === MathInline))
 // Official answers put each list item's text in a paragraph. The paragraph's margin is what opens the gap before a nested list.
 const itemBlocks = (children: ReactNode) => {
   const nodes = Children.toArray(children)
@@ -419,6 +418,8 @@ const itemBlocks = (children: ReactNode) => {
 const components = {
   citation: CitationView,
   'citation-group': CitationGroupView,
+  'math-inline': MathInline,
+  'math-block': MathBlock,
   li({ children }: { children?: ReactNode }) {
     return <li>{itemBlocks(children)}</li>
   },
@@ -458,8 +459,8 @@ const components = {
 export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => (
   <CiteContext.Provider value={{ citations, cards }}>
     <Boundary text={text}>
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath, remarkCitations(citationNumbers(citations))]} rehypePlugins={[rehypeKatex]} components={components}>
-        {holdDelimitedMath(stripPartialCitation(text, streaming))}
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkCitations(citationNumbers(citations))]} components={components}>
+        {holdDelimitedMath(stripPartialCitation(text, streaming), streaming)}
       </ReactMarkdown>
     </Boundary>
     </CiteContext.Provider>

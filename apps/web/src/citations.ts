@@ -66,12 +66,83 @@ const fenceIsOpen = (text: string): boolean => {
   return marker.length > 0
 }
 
+// While streaming, an unclosed `\(` / `\[` is closed so KaTeX can draw the partial formula the way an unclosed `$$` already does.
+// A bare opener with no body is dropped, so the raw delimiter does not flash before the formula arrives.
+const closePartialTex = (text: string): string => {
+  if (fenceIsOpen(text)) return text
+  let fence = ''
+  let ticks = 0
+  const stack: { at: number; close: string }[] = []
+  for (let i = 0; i < text.length; i++) {
+    const lineStart = i === 0 || text[i - 1] === '\n'
+    if (fence) {
+      if (!lineStart) continue
+      const found = /^( {0,3})(`{3,}|~{3,})(.*)$/.exec(text.slice(i).split('\n')[0] ?? '')
+      if (found && found[2]?.[0] === fence[0] && (found[2]?.length ?? 0) >= fence.length && (found[3] ?? '').trim() === '') {
+        fence = ''
+        i += (found[1]?.length ?? 0) + (found[2]?.length ?? 0) - 1
+      }
+      continue
+    }
+    if (ticks) {
+      if (text.startsWith('`'.repeat(ticks), i)) {
+        i += ticks - 1
+        ticks = 0
+      }
+      continue
+    }
+    if (lineStart) {
+      const found = /^( {0,3})(`{3,}|~{3,})/.exec(text.slice(i))
+      if (found?.[2]) {
+        fence = found[2]
+        i += found[0].length - 1
+        continue
+      }
+    }
+    if (text[i] === '`') {
+      let n = 1
+      while (text[i + n] === '`') n++
+      ticks = n
+      i += n - 1
+      continue
+    }
+    const next = text[i + 1]
+    if (text[i] !== '\\' || (next !== '(' && next !== '[' && next !== ')' && next !== ']')) continue
+    if (text[i - 1] === '\\') {
+      i += 1
+      continue
+    }
+    if (next === '(' || next === '[') stack.push({ at: i, close: next === '(' ? '\\)' : '\\]' })
+    else {
+      const want = next === ')' ? '\\)' : '\\]'
+      for (let s = stack.length - 1; s >= 0; s--) {
+        if (stack[s]?.close === want) {
+          stack.splice(s, 1)
+          break
+        }
+      }
+    }
+    i += 1
+  }
+  const opener = stack[0]
+  if (!opener) return text
+  const body = text.slice(opener.at + 2)
+  if (!body.trim()) return text.slice(0, opener.at)
+  return text + opener.close
+}
+
 /** Keep `[citation:N]` inside `\(...\)` and `\[...\]` literal. CommonMark would otherwise drop the backslash before we see the text node. */
-export const holdDelimitedMath = (text: string): string =>
-  text.replace(/\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/g, (full) => full.replace(/\[(citation|reference):(\d+)\]/g, 'CITEHOLD$2'))
+export const holdDelimitedMath = (text: string, streaming = false): string => {
+  const prepared = streaming ? closePartialTex(text) : text
+  return prepared.replace(/\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/g, (full) => full.replace(/\[(citation|reference):(\d+)\]/g, 'CITEHOLD$2'))
+}
 
 const restoreHeld = (node: MdNode) => {
-  if (typeof node.value === 'string') node.value = node.value.replace(/CITEHOLD(\d+)/g, '[citation:$1]')
+  const put = (value: string) => value.replace(/CITEHOLD(\d+)/g, '[citation:$1]')
+  if (typeof node.value === 'string') node.value = put(node.value)
+  node.data?.hChildren?.forEach((child) => {
+    if (typeof child.value === 'string') child.value = put(child.value)
+  })
   node.children?.forEach(restoreHeld)
 }
 
@@ -185,7 +256,7 @@ type MdNode = {
   value?: string
   n?: number
   children?: MdNode[]
-  data?: { hName?: string; hProperties?: Record<string, string> }
+  data?: { hName?: string; hProperties?: Record<string, string>; hChildren?: Array<{ type?: string; value?: string }> }
 }
 
 const CONTAINERS = new Set(['paragraph', 'heading', 'tableCell'])
