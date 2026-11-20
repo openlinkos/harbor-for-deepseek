@@ -48,14 +48,14 @@ export const SiteFooter = () => {
   )
 }
 
-const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16' }: { paths: readonly string[]; size?: number; viewBox?: string }) => (
+const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16', fillRule }: { paths: readonly string[]; size?: number; viewBox?: string; fillRule?: 'evenodd' | 'nonzero' }) => (
   <svg width={size} height={size} viewBox={viewBox} fill="currentColor" aria-hidden="true">
-    {paths.map((d) => <path key={d.slice(0, 24)} d={d} fill="currentColor" />)}
+    {paths.map((d, index) => <path key={`${index}:${d.slice(0, 16)}`} d={d} fill="currentColor" fillRule={fillRule} />)}
   </svg>
 )
 const Glyph = ({ name, size = 16 }: { name: GlyphName; size?: number }) => {
   const glyph = GLYPHS[name]
-  return <FillIcon paths={glyph.paths} viewBox={glyph.vb} size={size} />
+  return <FillIcon paths={glyph.paths} viewBox={glyph.vb} size={size} fillRule={'fill' in glyph ? glyph.fill : undefined} />
 }
 const MORE_DOTS = [
   'M4.55146 8.00001C4.55146 8.63513 4.03659 9.15001 3.40146 9.15001C2.76634 9.15001 2.25146 8.63513 2.25146 8.00001C2.25146 7.36488 2.76634 6.85001 3.40146 6.85001C4.03659 6.85001 4.55146 7.36488 4.55146 8.00001Z',
@@ -84,6 +84,12 @@ const ICON_GLYPH: Record<string, GlyphName> = {
   'M8 12h8M12 8v8': 'plus',
   'M6 4h9l3 3v13H6z': 'attach',
   'M21.4 11.1 12.7 19.8a5 5 0 0 1-7.1-7.1l8.5-8.4a3.5 3.5 0 0 1 4.9 5L10.5 17.8a2 2 0 1 1-2.8-2.8l7.8-7.8': 'attach',
+  'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2': 'settingsGeneral',
+  'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0': 'settingsAccount',
+  'M4 7h16v12H4zM4 11h16M9 7v12': 'settingsData',
+  'M7 3h8l4 4v14H7zM11 13h6M11 17h6': 'settingsPolicy',
+  'M6 6l12 12M18 6 6 18': 'dismiss',
+  'M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17': 'multi',
 }
 const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: number }) => {
   const name = ICON_GLYPH[d]
@@ -1484,7 +1490,7 @@ const Settings = () => {
       <div className="settings-shell" data-tab={tab}>
         <header className="settings-head">
           <h2>{t('systemSettings')}</h2>
-          <button type="button" className="settings-x" aria-label={t('close')} onClick={() => {
+          <button type="button" className="settings-x" data-testid="settings-close" aria-label={t('close')} onClick={() => {
             const modal = document.querySelector('.settings-modal')
             modal?.classList.add('closing')
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -1494,10 +1500,10 @@ const Settings = () => {
           </button>
         </header>
         <nav className="settings-nav" aria-label={t('systemSettings')}>
-          <button type="button" className={tab === 'general' ? 'on' : ''} onClick={() => setTab('general')}><Icon d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2" />{t('navGeneral')}</button>
-          <button type="button" className={tab === 'account' ? 'on' : ''} onClick={() => setTab('account')}><Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />{t('navAccount')}</button>
-          <button type="button" className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}><Icon d="M4 7h16v12H4zM4 11h16M9 7v12" />{t('navData')}</button>
-          <button type="button" className={tab === 'legal' ? 'on' : ''} onClick={() => setTab('legal')}><Icon d="M7 3h8l4 4v14H7zM11 13h6M11 17h6" />{t('navLegal')}</button>
+          <button type="button" data-testid="settings-nav-general" className={tab === 'general' ? 'on' : ''} onClick={() => setTab('general')}><Icon d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2" />{t('navGeneral')}</button>
+          <button type="button" data-testid="settings-nav-account" className={tab === 'account' ? 'on' : ''} onClick={() => setTab('account')}><Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />{t('navAccount')}</button>
+          <button type="button" data-testid="settings-nav-data" className={tab === 'data' ? 'on' : ''} onClick={() => setTab('data')}><Icon d="M4 7h16v12H4zM4 11h16M9 7v12" />{t('navData')}</button>
+          <button type="button" data-testid="settings-nav-legal" className={tab === 'legal' ? 'on' : ''} onClick={() => setTab('legal')}><Icon d="M7 3h8l4 4v14H7zM11 13h6M11 17h6" />{t('navLegal')}</button>
         </nav>
         <div className="settings-main">
         <section className="settings-general">
