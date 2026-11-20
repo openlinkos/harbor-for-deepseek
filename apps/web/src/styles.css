@@ -1812,13 +1812,52 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   color: rgb(185, 188, 194);
 }
 .theme-cards { display: grid; grid-template-columns: repeat(3, 164px); gap: 12px; margin: 0 0 10px; justify-content: start; }
-.settings-shell .theme-cards button.chip { position: relative; width: 164px; height: 82px; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px; background: transparent; border: 0; color: rgb(15, 17, 21); font-size: 14px; font-weight: 400; line-height: 22px; padding: 21px 32px; }
-.settings-shell .theme-cards button.chip .theme-face { position: absolute; inset: 0; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.1); background: transparent; }
-.settings-shell .theme-cards button.chip.on { background: rgb(241, 243, 245); color: rgb(15, 17, 21); font-weight: 400; }
-.settings-shell .theme-cards button.chip.on .theme-face { background: rgb(241, 243, 245); border: 0; }
-body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on .theme-face { background: rgb(67, 69, 74); border: 0; }
-body[data-ds-dark-theme] .settings-shell .theme-cards button.chip { background: transparent; border: 1px solid rgba(255, 255, 255, 0.12); color: #f5f6f7; }
-body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { background: rgb(67, 69, 74); border-color: transparent; color: #f5f6f7; }
+.settings-shell .theme-cards button.chip {
+  position: relative;
+  width: 164px;
+  height: 82px;
+  border-radius: 12px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgb(15, 17, 21);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  padding: 21px 32px;
+}
+.settings-shell .theme-cards button.chip .theme-face {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+}
+.settings-shell .theme-cards button.chip > svg,
+.settings-shell .theme-cards button.chip .theme-label {
+  position: relative;
+  z-index: 1;
+}
+.settings-shell .theme-cards button.chip.on {
+  background: rgb(241, 243, 245);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgb(15, 17, 21);
+  font-weight: 400;
+}
+body[data-ds-dark-theme] .settings-shell .theme-cards button.chip,
+body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f5f6f7;
+}
+body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
+  background: rgb(67, 69, 74);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
 .timeline-step { margin: 0; padding: 5px 0 5px 22px; position: relative; }
 .browse-line { flex-wrap: wrap; align-items: center; row-gap: 6px; }
 .browse-link {
@@ -2210,7 +2249,16 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on { backgroun
     padding: 12px 4px;
     border-radius: 14px;
   }
-  .theme-cards .chip.on { background: var(--dsw-alias-bg-layer-3); border-color: var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); }
+  .settings-shell .theme-cards button.chip.on {
+    background: var(--dsw-specific-selector);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--dsw-alias-label-primary);
+  }
+  body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
+    background: rgb(67, 69, 74);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #f5f6f7;
+  }
 }
 
 @media (max-width: 440px) {
