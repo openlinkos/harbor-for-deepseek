@@ -446,7 +446,7 @@ const ThemeSwitch = () => {
             setTheme(choice)
           }}
         >
-          <span className="theme-face" />
+          <span className="theme-face" aria-hidden="true" />
           <Icon
             d={
               choice === 'light'
@@ -456,7 +456,7 @@ const ThemeSwitch = () => {
                   : 'M4 5h16v10H4zM8 19h8'
             }
           />
-          {choice === 'system' ? t('themeSystem') : choice === 'light' ? t('themeLight') : t('themeDark')}
+          <span className="theme-label">{choice === 'system' ? t('themeSystem') : choice === 'light' ? t('themeLight') : t('themeDark')}</span>
         </button>
       ))}
     </div>
