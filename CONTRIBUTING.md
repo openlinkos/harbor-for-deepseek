@@ -31,6 +31,8 @@ pnpm e2e
 
 `pnpm build` writes a static site to `apps/web/dist`, with Subresource Integrity attributes, `LICENSE`, `NOTICE`, and `SHA256SUMS`.
 
+`pnpm e2e` includes the long-answer markdown gate in `apps/web/e2e/fb1554-markdown.spec.ts`. A fix PR may delete only the fb1554 `knownFailure` id it owns (`fb1554-M1`, `fb1554-M2`, `fb1554-M3`, `fb1554-M4`, `fb1554-M5`, or `fb1554-T1`) and must leave the other fb1554 ids in place.
+
 ## Layout
 
 - `apps/web` is the M1 app.

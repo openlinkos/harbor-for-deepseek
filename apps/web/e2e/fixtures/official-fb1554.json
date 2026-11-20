@@ -1,0 +1,105 @@
+{
+ "source": "frozen/baseline/official-source/dom-answer.html + main.dc093a796f.css，proposals/fb1554/probe-official.mjs 离线渲染 1440x900（390 未采，见 report 补采清单）",
+ "rules": {
+  "oneMarkdownRoot": true,
+  "citeInlineSameLine": true,
+  "citeAtBlockEndAfterPunct": "官方 3 处 data-citation-group 都在段落/列表项末尾、标点之后",
+  "noLineStart": "。，、；：？！）」』》”’〕】,.;:?!)]}…%",
+  "browseTitleVerbatim": "官方逐字显示页面标题，含「X - X」重复（dom-answer.html：王芝斌 相关企业 - 王芝斌 相关企业）",
+  "cjkStrong": "官方 micromark attention 改过：* 的 open=后一字符非空白，close=前一字符非空白（bundle default-vendors.a63ee0213e.js tokenize t1）"
+ },
+ "cells": {
+  "light": {
+   "browseLink": {
+    "color": "rgb(97, 102, 107)",
+    "font-size": "13px",
+    "line-height": "20px",
+    "text-decoration-line": "underline",
+    "text-decoration-style": "dotted",
+    "text-decoration-color": "rgb(173, 178, 184)",
+    "text-underline-offset": "4px",
+    "white-space": "nowrap"
+   },
+   "browseIcon": {
+    "viewBox": "0 0 8 14",
+    "w": 14,
+    "h": 14,
+    "inLink": false,
+    "color": "rgb(97, 102, 107)"
+   },
+   "browseItemGap": 6,
+   "searchFavicon": {
+    "w": 16,
+    "h": 16,
+    "radius": "50%",
+    "overlap": 4
+   },
+   "pillFavicon": {
+    "w": 16,
+    "h": 16,
+    "overlap": 4
+   },
+   "cite": {
+    "font-size": "9px",
+    "font-weight": "500",
+    "line-height": "14px",
+    "color": "rgb(129, 133, 140)",
+    "background-color": "rgb(245, 246, 247)",
+    "border-top-left-radius": "6px",
+    "border-bottom-left-radius": "0px",
+    "vertical-align": "baseline",
+    "top": "-5px",
+    "min-width": "14px",
+    "height": "14px",
+    "dyTopVsPrevChar": 1,
+    "firstGapPx": 4
+   }
+  },
+  "dark": {
+   "browseLink": {
+    "color": "rgb(207, 211, 214)",
+    "font-size": "13px",
+    "line-height": "20px",
+    "text-decoration-line": "underline",
+    "text-decoration-style": "dotted",
+    "text-decoration-color": "rgb(129, 133, 140)",
+    "text-underline-offset": "4px",
+    "white-space": "nowrap"
+   },
+   "browseIcon": {
+    "viewBox": "0 0 8 14",
+    "w": 14,
+    "h": 14,
+    "inLink": false,
+    "color": "rgb(207, 211, 214)"
+   },
+   "browseItemGap": 6,
+   "searchFavicon": {
+    "w": 16,
+    "h": 16,
+    "radius": "50%",
+    "overlap": 4
+   },
+   "pillFavicon": {
+    "w": 16,
+    "h": 16,
+    "overlap": 4
+   },
+   "cite": {
+    "font-size": "9px",
+    "font-weight": "500",
+    "line-height": "14px",
+    "color": "rgb(173, 178, 184)",
+    "background-color": "rgb(44, 44, 46)",
+    "border-top-left-radius": "6px",
+    "border-bottom-left-radius": "0px",
+    "vertical-align": "baseline",
+    "top": "-5px",
+    "min-width": "14px",
+    "height": "14px",
+    "dyTopVsPrevChar": 1,
+    "firstGapPx": 4
+   }
+  }
+ }
+}
