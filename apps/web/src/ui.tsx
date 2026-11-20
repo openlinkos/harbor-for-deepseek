@@ -64,7 +64,7 @@ const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16', fillRule }: { paths
 )
 
 /** Official ds-tooltip--s, portaled to body so a turn's content-visibility cannot clip it. */
-const HoverTip = ({ text, children }: { text: string; children: ReactElement<React.HTMLAttributes<HTMLElement>> }) => {
+const HoverTip = ({ text, children, className }: { text: string; children: ReactElement<React.HTMLAttributes<HTMLElement>>; className?: string }) => {
   const anchor = useRef<HTMLElement>(null)
   const [open, setOpen] = useState(false)
   const [pos, setPos] = useState({ left: 0, top: 0 })
@@ -111,7 +111,7 @@ const HoverTip = ({ text, children }: { text: string; children: ReactElement<Rea
     <>
       {child}
       {open ? createPortal(
-        <span className="ds-tooltip ds-tooltip--s is-open" role="tooltip" style={{ left: pos.left, top: pos.top }}>
+        <span className={`ds-tooltip ds-tooltip--s is-open${className ? ` ${className}` : ''}`} role="tooltip" style={{ left: pos.left, top: pos.top }}>
           {text}
           <span className="ds-tooltip__arrow ds-tooltip__arrow--sharp" aria-hidden="true" />
         </span>,
@@ -1982,7 +1982,7 @@ const Composer = () => {
           <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             generating ? (
-              <HoverTip text={t('stopGenerating')}>
+              <HoverTip text={t('stopGenerating')} className="is-above-composer">
                 <button className="send stop" data-testid="stop" type="button" aria-label={t('stopGenerating')} data-tip={t('stopGenerating')} onClick={stop}>
                   <svg className="stop-square" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
                     <rect x="4" y="4" width="8" height="8" rx="1.5" fill="currentColor" />
