@@ -858,26 +858,41 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   }
   flush()
   const hasThinking = steps.some((step) => step.type === 'think')
-  const renderStep = (step: (typeof steps)[number], index: number) => step.type === 'think' ? (
-    <div key={index} className="timeline-step think-copy"><Markdown text={step.text} /></div>
-  ) : step.type === 'search' ? (
-    <p key={index} className="timeline-step found-line">
-      <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
-      {t('foundPages', { count: step.items.length })}
-      <SourceMarks items={step.items} />
-    </p>
-  ) : (
-    <p key={index} className="timeline-step found-line browse-line">
-      <Icon d="M6 4h9l3 3v13H6z" />
-      {t('browsedPages', { count: step.items.length })}
-      {step.items.map((item) => (
-        <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
-          {item.title}
-          <Icon size={12} d="M7 17 17 7M9 7h8v8" />
-        </a>
-      ))}
-    </p>
-  )
+  const renderStep = (step: (typeof steps)[number], index: number) => {
+    const last = index === steps.length - 1 ? 'is-last' : ''
+    if (step.type === 'think') {
+      return (
+        <div key={index} className={`timeline-step timeline-think think-copy ${last}`}>
+          <span className="timeline-dot" aria-hidden="true" />
+          <span className="timeline-line" aria-hidden="true" />
+          <Markdown text={step.text} />
+        </div>
+      )
+    }
+    if (step.type === 'search') {
+      return (
+        <p key={index} className={`timeline-step timeline-search found-line ${last}`}>
+          <span className="timeline-line" aria-hidden="true" />
+          <Icon size={14} d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+          {t('foundPages', { count: step.items.length })}
+          <SourceMarks items={step.items} />
+        </p>
+      )
+    }
+    return (
+      <p key={index} className={`timeline-step timeline-browse found-line browse-line ${last}`}>
+        <span className="timeline-line" aria-hidden="true" />
+        <Icon size={14} d="M6 4h9l3 3v13H6z" />
+        {t('browsedPages', { count: step.items.length })}
+        {step.items.map((item) => (
+          <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
+            {item.title}
+            <Icon size={12} d="M7 17 17 7M9 7h8v8" />
+          </a>
+        ))}
+      </p>
+    )
+  }
   return (
     <>
       {hasThinking ? (
