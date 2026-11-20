@@ -617,9 +617,9 @@ test('sidebar', async ({ page }) => {
     const pathFill = path ? getComputedStyle(path).fill : style.fill
     return { fill: style.fill, stroke: style.stroke, pathFill }
   })
-  expect(closeIcon.fill === 'none' || closeIcon.fill === 'rgba(0, 0, 0, 0)').toBe(true)
-  expect(closeIcon.stroke).not.toBe('none')
-  expect(closeIcon.pathFill === 'none' || closeIcon.pathFill === 'rgba(0, 0, 0, 0)').toBe(true)
+  expect(closeIcon.fill === 'none' || closeIcon.fill === 'rgba(0, 0, 0, 0)').toBe(false)
+  expect(closeIcon.stroke === 'none' || closeIcon.stroke === 'rgba(0, 0, 0, 0)').toBe(true)
+  expect(closeIcon.pathFill === 'none' || closeIcon.pathFill === 'rgba(0, 0, 0, 0)').toBe(false)
   await page.getByRole('checkbox', { name: '新名字' }).click()
   await expect(page.getByText('已选择 1 个对话')).toBeVisible()
   await page.locator('.select-foot').getByRole('button', { name: '置顶' }).click()
