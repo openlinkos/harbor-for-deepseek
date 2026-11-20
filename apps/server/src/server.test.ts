@@ -478,7 +478,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     `
   })
 
-  it('rejects a cookie write without the csrf header and uploads files with a 7 day expiry', async () => {
+  it('rejects a cookie write without the csrf header and stores an uploaded file', async () => {
     const setup = await harbor.app.request('/api/setup/admin', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -505,10 +505,41 @@ describe.skipIf(!postgresReady)('harbor server', () => {
       body: form,
     })
     expect(uploaded.status).toBe(200)
-    expect(fileBody).toContain('expires_after[anchor]')
-    expect(fileBody).toContain('604800')
     const saved = await harbor.sql<{ expires_at: Date | null }[]>`select expires_at from files`
     expect(saved[0]?.expires_at).toBeTruthy()
+  })
+
+  it('uploads to the Files API without expires_after even when the client sends one', async () => {
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...authed(session, created.csrf, true) },
+      body: JSON.stringify({ secret: 'good-pool-key', accountGroup: 'healthy' }),
+    })
+    const form = new FormData()
+    form.set('purpose', 'user_data')
+    form.set('expires_after[anchor]', 'created_at')
+    form.set('expires_after[seconds]', '3600')
+    form.set('expires_at', '1794940246')
+    form.set('file', new File(['hello'], 'note.txt', { type: 'text/plain' }))
+    const uploaded = await harbor.app.request('/api/files', {
+      method: 'POST',
+      headers: authed(session, created.csrf, true),
+      body: form,
+    })
+    expect(uploaded.status).toBe(200)
+    expect(fileBody).toContain('user_data')
+    expect(fileBody).toContain('note.txt')
+    expect(fileBody.toLowerCase()).not.toContain('expir')
+    const payload = (await uploaded.json()) as { id?: string; defaultExpireSeconds?: number }
+    expect(payload.id).toBeTruthy()
+    expect(payload).not.toHaveProperty('defaultExpireSeconds')
   })
 
   it('applies migrations once and serves health checks', async () => {

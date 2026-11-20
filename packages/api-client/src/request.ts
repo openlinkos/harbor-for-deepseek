@@ -14,16 +14,6 @@ import type {
 export const API_ORIGIN = BRAND.apiOrigin
 export const FILES_BETA = 'files-api-2025-04-14'
 
-/** Minimum and maximum file lifetime accepted by POST /files. */
-export const FILE_EXPIRE_MIN_SECONDS = 3600
-export const FILE_EXPIRE_MAX_SECONDS = 2_592_000
-export const DEFAULT_FILE_EXPIRE_SECONDS = 7 * 24 * 3600
-
-export const clampExpireSeconds = (days: number): number => {
-  const seconds = Math.round(days * 24 * 3600)
-  return Math.min(FILE_EXPIRE_MAX_SECONDS, Math.max(FILE_EXPIRE_MIN_SECONDS, seconds))
-}
-
 /** Official web chat does not send a client persona or a clock. */
 export const HARBOR_SYSTEM_PROMPT = ''
 

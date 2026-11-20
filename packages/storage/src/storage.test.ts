@@ -129,27 +129,27 @@ describe('indexeddb repository', () => {
     expect(await repo.readSecret()).toEqual({ v: 1, enc: false, value: 'demo-local-key' })
   })
 
-  it('drops a legacy documentPurpose without touching file expiry', async () => {
+  it('drops a legacy documentPurpose and fileExpireDays', async () => {
     const repo = await openIndexedRepository()
     const current = await repo.loadSettings()
     const db = await openDB('deepapi', 2)
     await db.put('kv', { ...current, documentPurpose: 'text_recognition', fileExpireDays: 11 }, 'settings')
     db.close()
     const loaded = await (await openIndexedRepository()).loadSettings()
-    expect(loaded.fileExpireDays).toBe(11)
     expect(loaded.deviceId).toBe(current.deviceId)
     expect('documentPurpose' in loaded).toBe(false)
+    expect('fileExpireDays' in loaded).toBe(false)
     await (await openIndexedRepository()).saveSettings(loaded)
     const raw = await (await openDB('deepapi', 2)).get('kv', 'settings') as { documentPurpose?: unknown; fileExpireDays?: number }
     expect(raw.documentPurpose).toBeUndefined()
-    expect(raw.fileExpireDays).toBe(11)
+    expect(raw.fileExpireDays).toBeUndefined()
     const nested = await openDB('deepapi', 2)
     await nested.put('kv', { ...current, documentPurpose: { mode: 'text_recognition' }, fileExpireDays: 3 }, 'settings')
     nested.close()
     const odd = await (await openIndexedRepository()).loadSettings()
-    expect(odd.fileExpireDays).toBe(3)
     expect(odd.deviceId).toBe(current.deviceId)
     expect('documentPurpose' in odd).toBe(false)
+    expect('fileExpireDays' in odd).toBe(false)
   })
 
   it('keeps the key out of the conversation database and deletes by tombstone', async () => {
@@ -168,5 +168,34 @@ describe('indexeddb repository', () => {
     expect(opened).toBe('demo-local-key')
     const memory = createMemoryRepository()
     expect(await memory.listConversations()).toEqual([])
+  })
+
+  it('loads when stored settings still include fileExpireDays', async () => {
+    const db = await openDB('deepapi', 2, {
+      upgrade(database) {
+        if (!database.objectStoreNames.contains('kv')) database.createObjectStore('kv')
+      },
+    })
+    await db.put(
+      'kv',
+      {
+        locale: 'en',
+        safetyLevel: 'low',
+        fileExpireDays: 3,
+        documentPurpose: 'text_recognition',
+        acknowledgedKeyRisk: true,
+        deviceId: 'legacy-device',
+      },
+      'settings',
+    )
+    db.close()
+    const repo = await openIndexedRepository()
+    const settings = await repo.loadSettings()
+    expect(settings.locale).toBe('en')
+    expect(settings.safetyLevel).toBe('low')
+    expect(settings.acknowledgedKeyRisk).toBe(true)
+    expect(settings.deviceId).toBe('legacy-device')
+    expect(settings).not.toHaveProperty('fileExpireDays')
+    expect(settings).not.toHaveProperty('documentPurpose')
   })
 })

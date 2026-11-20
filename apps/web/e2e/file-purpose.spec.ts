@@ -100,21 +100,18 @@ const assertNoPurposeRow = async (page: Page, locale: 'zh' | 'en') => {
     await expect(page.getByTestId('purpose-select')).toHaveCount(0)
   }
   await page.getByRole('button', { name: tabs[locale][0], exact: true }).click()
-  const expiry = locale === 'zh' ? '上传文件过期（天）' : 'Uploaded files expire (days)'
-  await expect(dialog.getByText(expiry)).toBeVisible()
-  await expect(page.getByTestId('file-expiry')).toBeVisible()
-  await expect(page.getByTestId('file-expiry')).toHaveValue('9')
-  const gap = await page.getByTestId('file-expiry').evaluate((node) => {
-    const row = node.closest('.settings-line')
-    const next = row?.nextElementSibling
-    const lines = [...(row?.parentElement?.querySelectorAll(':scope > .settings-line') ?? [])]
-    return {
-      followedByLine: Boolean(next?.classList.contains('settings-line')),
-      blanks: lines.filter((line) => line.textContent?.trim() === '').length,
-    }
+  await expect(dialog).not.toContainText('上传文件过期')
+  await expect(dialog).not.toContainText('Uploaded files expire')
+  await expect(page.getByTestId('file-expiry')).toHaveCount(0)
+  if (locale === 'zh') {
+    const labels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
+    expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+  }
+  const blanks = await page.locator('.settings-general').evaluate((node) => {
+    const lines = [...node.querySelectorAll(':scope > .settings-line')]
+    return lines.filter((line) => line.textContent?.trim() === '').length
   })
-  expect(gap.followedByLine).toBe(false)
-  expect(gap.blanks).toBe(0)
+  expect(blanks).toBe(0)
 }
 
 test('settings omit PDF / Office parsing in both languages at 1440 and 390', async ({ page }) => {
@@ -190,8 +187,7 @@ test('a legacy text_recognition preference still uploads pdf as rich layout', as
     expect(body).toContain('name="purpose"')
     expect(body).toContain(file.purpose)
     expect(body).not.toContain('text_recognition')
-    expect(body).toContain('name="expires_after[seconds]"')
-    expect(body).toContain('777600')
+    expect(body).not.toContain('expires_after')
   }
   expect(pageerrors).toEqual([])
 })

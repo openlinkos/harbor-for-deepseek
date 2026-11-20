@@ -260,7 +260,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.screenshot({ path: join(shots, 'm-dark.png') })
 })
 
-test('uploads a file with an expiry and keeps safety review on', async ({ page }) => {
+test('uploads a file and keeps safety review on', async ({ page }) => {
   const bodies: Array<Record<string, unknown>> = []
   await page.route('https://api.deepseek.com/**', async (route) => {
     if (route.request().url().includes('/messages')) {
@@ -397,7 +397,6 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
       savePair: paired('[data-testid="replace-save"]'),
       server: label('[data-testid="server-note"] .settings-copy > span'),
       serverHint: hint('[data-testid="server-note"] .hint'),
-      expiry: box('[data-testid="file-expiry"]'),
     }
   })
   await page.getByRole('button', { name: '数据管理' }).click()
@@ -416,8 +415,8 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(light.server.h).toBeGreaterThanOrEqual(86)
   expect(light.serverHint).toMatchObject({ fs: '12px', lh: '18px', fits: true })
   await page.getByRole('button', { name: '通用设置' }).click()
-  const general = await measure()
-  expect(general.expiry.h).toBe(36)
+  const generalLabels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
+  expect(generalLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
   await page.getByRole('button', { name: '深色' }).click()
   await page.getByRole('button', { name: '数据管理' }).click()
   const dark = await measure()
@@ -429,8 +428,8 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(dark.save.color).not.toBe('rgb(15, 17, 21)')
   expect(dark.save.h).toBe(36)
   await page.getByRole('button', { name: '通用设置' }).click()
-  const darkGeneral = await measure()
-  expect(darkGeneral.expiry.h).toBe(36)
+  const darkLabels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
+  expect(darkLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
 })
 
 test('390 balance label stays on one line', async ({ page }) => {
@@ -646,6 +645,94 @@ test('dark landing matches the light landing', async ({ page }) => {
     expect(key.card).toBe('rgb(255, 255, 255)')
     expect(key.border).toBe('rgba(0, 0, 0, 0.1)')
   }
+})
+
+const enterChat = async (page: Page) => {
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await expect(page.getByTestId('composer')).toBeVisible()
+}
+
+const openSettings = async (page: Page) => {
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await expect(page.getByTestId('settings-dialog')).toBeVisible()
+}
+
+test('settings no longer show an upload file expiry row', async ({ page }) => {
+  await install(page)
+  await enterChat(page)
+  await openSettings(page)
+  await expect(page.getByTestId('file-expiry')).toHaveCount(0)
+  await expect(page.getByTestId('purpose-select')).toHaveCount(0)
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('上传文件过期')
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('PDF / Office')
+  const labels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
+  expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+  await page.getByTestId('language-trigger').click()
+  await page.getByRole('option', { name: 'English' }).click()
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('Uploaded files expire')
+  await expect(page.getByTestId('file-expiry')).toHaveCount(0)
+})
+
+test('a local upload does not send expires_after', async ({ page }) => {
+  let fileBody = ''
+  await page.route('https://api.deepseek.com/**', async (route) => {
+    if (route.request().method() === 'POST' && route.request().url().endsWith('/files')) {
+      fileBody = route.request().postData() ?? ''
+    }
+    await fulfill(route)
+  })
+  await enterChat(page)
+  await page.getByTestId('file-input').setInputFiles({
+    name: 'note.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello harbor'),
+  })
+  await expect(page.locator('.drafts')).toContainText('note.txt')
+  expect(fileBody).toContain('user_data')
+  expect(fileBody).toContain('note.txt')
+  expect(fileBody).not.toContain('expires_after')
+  expect(fileBody.toLowerCase()).not.toContain('expire')
+})
+
+test('a stored fileExpireDays value still lets the page load', async ({ page }) => {
+  const pageErrors: string[] = []
+  page.on('pageerror', (error) => pageErrors.push(error.message))
+  await install(page)
+  await enterChat(page)
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('deepapi')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('kv', 'readwrite')
+      const store = tx.objectStore('kv')
+      const read = store.get('settings')
+      read.onerror = () => reject(read.error)
+      read.onsuccess = () => {
+        const current = read.result
+        if (!current || typeof current !== 'object') {
+          reject(new Error('settings missing'))
+          return
+        }
+        store.put({ ...current, fileExpireDays: 3 }, 'settings')
+      }
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+    db.close()
+  })
+  await page.reload()
+  await expect(page.getByTestId('composer')).toBeVisible()
+  await openSettings(page)
+  await expect(page.getByTestId('file-expiry')).toHaveCount(0)
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('上传文件过期')
+  expect(pageErrors).toEqual([])
 })
 
 test('a dark settings switch stays brand blue when on', async ({ page }) => {

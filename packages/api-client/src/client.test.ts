@@ -2,7 +2,7 @@ import { eventsToSse, fileObjectFixture, thinkingEvents } from '@deepapi/sse'
 import type { Message } from '@deepapi/types'
 import { describe, expect, it } from 'vitest'
 import { createClient } from './client.js'
-import { buildRequest, clampExpireSeconds, purposeForFile, toApiMessages } from './request.js'
+import { buildRequest, purposeForFile, toApiMessages } from './request.js'
 
 const user = (id: string, text: string): Message => ({
   id,
@@ -142,7 +142,7 @@ describe('createClient', () => {
     expect(sent.safety_check.level).toBe('high')
   })
 
-  it('sends file expiry as form fields and the files beta header when a file is attached', async () => {
+  it('sends the files beta header when a file is attached', async () => {
     let form: FormData | undefined
     let messageHeaders: HeadersInit | undefined
     const fetchImpl: typeof fetch = async (input, init) => {
@@ -157,11 +157,9 @@ describe('createClient', () => {
       })
     }
     const client = createClient({ fetch: fetchImpl })
-    const uploaded = await client.uploadFile('demo-local-key', new Blob(['%PDF']), 'probe.pdf', 'text_recognition', 3600)
+    const uploaded = await client.uploadFile('demo-local-key', new Blob(['%PDF']), 'probe.pdf', 'text_recognition')
     expect(uploaded.expires_at).toBe(1794940246)
     expect(form?.get('purpose')).toBe('text_recognition')
-    expect(form?.get('expires_after[anchor]')).toBe('created_at')
-    expect(form?.get('expires_after[seconds]')).toBe('3600')
     expect(form?.get('file')).toBeTruthy()
     const attached: Message = {
       ...user('u', 'what is the answer'),
@@ -194,12 +192,9 @@ describe('createClient', () => {
     expect(messageHeaders).toMatchObject({ 'anthropic-beta': 'files-api-2025-04-14' })
   })
 
-  it('maps purposes and clamps expiry into the documented window', () => {
+  it('maps images and plain text to user_data', () => {
     expect(purposeForFile('a.png', 'image/png').media).toBe('image')
     expect(purposeForFile('notes.txt', 'text/plain').purpose).toBe('user_data')
-    expect(clampExpireSeconds(7)).toBe(7 * 24 * 3600)
-    expect(clampExpireSeconds(0)).toBe(3600)
-    expect(clampExpireSeconds(90)).toBe(2_592_000)
   })
 
   it('always parses pdf and office files with rich layout', () => {

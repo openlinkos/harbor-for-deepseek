@@ -24,7 +24,7 @@ DeepAPI is an open-source (MIT) chat client for the [DeepSeek API](https://platf
 ## What it does
 
 - Streams replies from `deepseek-flash` and `deepseek-v4-pro`, including the reasoning text.
-- On Flash: web search, link reading, file upload (files expire on the official side, 7 days by default), and an automatic title.
+- On Flash: web search, link reading, file upload (files are kept), and an automatic title.
 - Several conversations, rename, delete, stop, and regenerate (kept as a branch).
 - Markdown, highlighted code, KaTeX math, and Mermaid.
 - Chinese and English. The layout works on a phone and can be installed as a PWA.

@@ -126,7 +126,6 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
         '界面包',
         '安全审核',
         '打开网页',
-        '上传文件过期（天）',
       ])
       expect(labels).not.toContain('模型')
       expect(labels).not.toContain('思考强度')
@@ -137,7 +136,7 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
         expect(row.borderTopWidth).toBe('0px')
         expect(row.boxShadow).toBe(index === 0 ? 'none' : 'rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset')
       }
-      await expect(page.getByTestId('file-expiry')).toHaveValue('7')
+      await expect(page.getByTestId('file-expiry')).toHaveCount(0)
       await page.locator('.settings-main').evaluate((node) => { node.scrollTop = 0 })
       await page.locator('.settings-shell').screenshot({ path: join(shots, `settings-${theme === '浅色' ? 'light' : 'dark'}-${viewport.name}.png`) })
       for (const tab of ['通用设置', '账号管理', '数据管理', '服务协议']) {

@@ -1,4 +1,4 @@
-import { buildRequest, clampExpireSeconds, CONTENT_SECURITY_POLICY, DEFAULT_FILE_EXPIRE_SECONDS } from '@deepapi/api-client'
+import { buildRequest, CONTENT_SECURITY_POLICY } from '@deepapi/api-client'
 import { estimateCost } from '@deepapi/pricing'
 import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@deepapi/sse'
 import type { ContentBlock, Message, Usage } from '@deepapi/types'
@@ -1354,8 +1354,6 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     const purpose = String(form.get('purpose') ?? 'user_data')
     const outgoing = new FormData()
     outgoing.set('purpose', purpose)
-    outgoing.set('expires_after[anchor]', 'created_at')
-    outgoing.set('expires_after[seconds]', String(clampExpireSeconds(7)))
     outgoing.set('file', file, file.name)
     const result = await upstreamCall('/files', { method: 'POST', body: outgoing }, new Set())
     if (!result.response?.ok) {
@@ -1377,7 +1375,6 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       bytes: raw.bytes ?? file.size,
       purpose: raw.purpose ?? purpose,
       expires_at: raw.expires_at ?? null,
-      defaultExpireSeconds: DEFAULT_FILE_EXPIRE_SECONDS,
     })
   })
 
