@@ -3,6 +3,7 @@ import { exportNative, planNativeImport, readNative } from '@deepapi/archive-nat
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
 import { createDraft, reduceEvent } from '@deepapi/sse'
+import { createThinkingClock } from './thinkingClock.js'
 import { openIndexedRepository, openSecret, sealSecret } from '@deepapi/storage'
 import { isNativeApp, shareDownload } from './native.js'
 import { readRemoteSession, writeRemoteSession } from './nativeSession.js'
@@ -1015,6 +1016,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   })
   abort = new AbortController()
   let draft = createDraft()
+  const clock = createThinkingClock()
   const publish = (patch: Partial<Message>) => {
     const next = { ...assistant, ...patch, updatedAt: nowIso() }
     Object.assign(assistant, next)
@@ -1028,6 +1030,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   try {
     for await (const event of client.streamMessage(key, body, abort.signal)) {
       draft = reduceEvent(draft, event)
+      clock.onEvent(event, draft.blocks)
       if (event.type === 'message_delta' && event.delta.title && conversation.titleSource !== 'user') {
         conversation = stamp({ ...conversation, title: event.delta.title, titleSource: 'auto' })
         await store.saveConversation(conversation)
@@ -1040,14 +1043,15 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
       publish({
         blocks: draft.blocks.filter(Boolean),
         usage: draft.usage,
+        thinkingSeconds: clock.seconds(),
       })
       window.clearTimeout(persistTimer)
       persistTimer = window.setTimeout(persist, 200)
     }
     if (draft.stopReason === 'refusal') {
-      publish({ status: 'refused', blocks: [], usage: draft.usage, errorMessage: null })
+      publish({ status: 'refused', blocks: [], usage: draft.usage, errorMessage: null, thinkingSeconds: clock.seconds() })
     } else {
-      publish({ status: 'complete', blocks: draft.blocks.filter(Boolean), usage: draft.usage, errorMessage: null })
+      publish({ status: 'complete', blocks: draft.blocks.filter(Boolean), usage: draft.usage, errorMessage: null, thinkingSeconds: clock.seconds() })
     }
   } catch (error) {
     const aborted = abort.signal.aborted
@@ -1056,6 +1060,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
       blocks: draft.blocks.filter(Boolean),
       usage: draft.usage,
       errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
+      thinkingSeconds: clock.seconds(),
     })
   } finally {
     window.clearTimeout(persistTimer)
@@ -1217,11 +1222,13 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
   })
   serverAbort = new AbortController()
   let draft = createDraft()
+  const clock = createThinkingClock()
   try {
     await readRun(
       started.runId,
       (event) => {
         draft = reduceEvent(draft, event)
+        clock.onEvent(event, draft.blocks)
         if (event.type === 'message_delta' && event.delta.title) {
           useHarbor.setState({
             conversations: useHarbor.getState().conversations.map((item) =>
@@ -1233,7 +1240,9 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
         }
         useHarbor.setState({
           messages: useHarbor.getState().messages.map((item) =>
-            item.id === assistant.id ? { ...item, blocks: draft.blocks.filter(Boolean), usage: draft.usage } : item,
+            item.id === assistant.id
+              ? { ...item, blocks: draft.blocks.filter(Boolean), usage: draft.usage, thinkingSeconds: clock.seconds() }
+              : item,
           ),
         })
       },
@@ -1243,7 +1252,13 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) =>
         item.id === assistant.id
-          ? { ...item, status, blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean), usage: draft.usage }
+          ? {
+              ...item,
+              status,
+              blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
+              usage: draft.usage,
+              thinkingSeconds: clock.seconds(),
+            }
           : item,
       ),
     })
@@ -1251,7 +1266,13 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) =>
         item.id === assistant.id
-          ? { ...item, status: 'error', errorMessage: error instanceof Error ? error.message : 'error', blocks: draft.blocks.filter(Boolean) }
+          ? {
+              ...item,
+              status: 'error',
+              errorMessage: error instanceof Error ? error.message : 'error',
+              blocks: draft.blocks.filter(Boolean),
+              thinkingSeconds: clock.seconds(),
+            }
           : item,
       ),
     })

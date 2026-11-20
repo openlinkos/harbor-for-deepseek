@@ -16,14 +16,10 @@ const SSE = readFileSync(join(HERE, 'lib/fb1344-sse.js'), 'utf8')
 const STRICT = process.env.FB1344_STRICT === '1'
 
 // 在 master 4734e7f 上会失败的用例。修复 PR 删掉自己那几条；修好了却没删，会因为意外通过让 CI 变红。
-// fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing。phase-done 在 master 已通过，不要标失败。
+// fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing 已落地。phase-done 保持通过。
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P5 分阶段 SSE：正在思考 / 正在搜索 / 正在浏览网页
-  'phase-thinking': 'fb1344-P5: 流式中标题一直是「已思考（用时 N 秒）」，没有「正在思考」与 shimmer',
-  'phase-searching': 'fb1344-P5: 搜索进行中无「正在搜索」标题，也没有进行中的搜索行',
-  'phase-browsing': 'fb1344-P5: 浏览进行中无「正在浏览网页」',
   // fb1344-P6 另一会话生成中再发送
   'concurrent-send': 'fb1344-P6: 另一会话生成中时新会话的发送键是停止键，点击会中断第一条；没有「有消息正在生成，请稍后再试」',
 }
@@ -138,6 +134,76 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(head(page)).toHaveText(K.phaseTitles.browsing) })
     test('phase-done', async ({ page }) => { await staged(page); for (const p of [PH.thinking, PH.searching, PH.browsing, PH.answer]) await push(page, p); await page.evaluate(() => (window as any).__sse.end()); await page.waitForTimeout(500)
       await expect(head(page)).toHaveText(new RegExp(K.phaseTitles.done)); expect(await shimmer(page)).toEqual([]) })
+    test('phase-live', async ({ page }) => {
+      const lead = cell.thinkLeadFill
+      const label = cell.thinkLabelColor
+      const dot = theme === 'dark' ? 'rgb(173, 178, 184)' : 'rgb(129, 133, 140)'
+      const stopBg = theme === 'dark' ? 'rgb(86, 134, 254)' : 'rgb(57, 100, 254)'
+      const capsule = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(255, 255, 255)'
+      const capsuleBorder = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)'
+      const sweep = async () => head(page).evaluate((h) => [...h.querySelectorAll('*')].map((e) => getComputedStyle(e)).filter((s) => s.animationIterationCount === 'infinite' && s.animationName !== 'none').map((s) => ({ name: s.animationName, d: s.animationDuration, t: s.animationTimingFunction })))
+      const bar = async () => head(page).locator('.phase-shimmer-bar').evaluate((e) => getComputedStyle(e).backgroundImage)
+      await staged(page)
+      await expect(page.getByTestId('reply-dots').locator('i')).toHaveCount(3)
+      await expect(page.getByTestId('reply-dots').locator('i').first()).toHaveCSS('background-color', dot)
+      await expect(page.getByTestId('stop').locator('.send-spinner')).toBeVisible()
+      await expect(page.getByTestId('stop').locator('.stop-square')).toHaveCount(0)
+      await expect(page.getByTestId('thinking')).toHaveCount(0)
+      const spin = await page.getByTestId('stop').locator('.send-spinner').evaluate((e) => getComputedStyle(e).animationName)
+      expect(spin).toBe('send-spin')
+      await push(page, PH.thinking)
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await expect(head(page).locator('.phase-label')).toHaveCSS('color', label)
+      expect(await sweep()).toContainEqual({ name: '_5a7d2fc', d: K.shimmer.duration, t: K.shimmer.timing })
+      await expect(head(page).locator('.phase-shimmer-bar')).toHaveCSS('width', '120px')
+      expect(await bar()).toContain('109.02%')
+      expect(await bar()).toContain(theme === 'dark' ? 'rgba(21, 21, 23, 0.5)' : 'rgba(255, 255, 255, 0.7)')
+      let c = await comp(page)
+      expect(c.thinkHead.iconLead.dHash).toBe(cell.thinkLeadHash)
+      expect(c.thinkHead.iconLead.fill).toBe(lead)
+      expect(c.thinkHead.iconChevron.dir).toBe('down')
+      const stopBtn = page.getByTestId('stop')
+      await expect(stopBtn).toHaveAttribute('aria-label', '停止生成')
+      await expect(stopBtn).toHaveAttribute('data-tip', '停止生成')
+      await expect(stopBtn.locator('.stop-square')).toBeVisible()
+      await expect(stopBtn).toHaveCSS('background-color', stopBg)
+      await expect(stopBtn.locator('.stop-square rect')).toHaveCSS('fill', 'rgb(255, 255, 255)')
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      await expect(page.getByTestId('search-pending')).toHaveText('搜索')
+      expect((await sweep()).length).toBeGreaterThan(0)
+      await push(page, PH.browsing)
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await expect(page.getByTestId('search-pending')).toHaveCount(0)
+      await expect(page.locator('.timeline-search').last()).toContainText('搜索到 17 个网页')
+      await expect(page.locator('.timeline-browse').last()).toContainText('浏览 1 个页面')
+      expect(await sweep()).toContainEqual({ name: '_5a7d2fc', d: K.shimmer.duration, t: K.shimmer.timing })
+      await stopBtn.click()
+      await expect(head(page)).toHaveText('已停止')
+      expect(await sweep()).toEqual([])
+      await expect(page.getByTestId('thinking')).toContainText('用户想知道今天上海的天气')
+      c = await comp(page)
+      expect(c.thinkHead.iconLead.dHash).toBe(cell.thinkLeadHash)
+      expect(c.thinkHead.iconLead.fill).toBe(dot)
+      expect(c.thinkHead.iconChevron.dir).toBe('down')
+      const below = await page.evaluate(() => {
+        const body = document.querySelector('.thinking-body')!.getBoundingClientRect()
+        const row = document.querySelector('.action-row')!.getBoundingClientRect()
+        return row.top >= body.bottom - 1
+      })
+      expect(below).toBe(true)
+      const cont = page.getByTestId('continue')
+      await expect(cont).toHaveText('继续生成')
+      await expect(cont).toHaveCSS('background-color', capsule)
+      await expect(cont).toHaveCSS('border-top-color', capsuleBorder)
+      const edge = await page.evaluate(() => {
+        const row = document.querySelector('.action-row')!.getBoundingClientRect()
+        const button = document.querySelector('[data-testid=continue]')!.getBoundingClientRect()
+        return { gap: row.right - button.right, left: button.left - row.left }
+      })
+      expect(Math.abs(edge.gap)).toBeLessThanOrEqual(2)
+      expect(edge.left).toBeGreaterThan(40)
+    })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
       await page.getByTestId('composer').fill('[筑衡测试] 第二条'); await page.locator('[data-testid=send], [data-testid=stop]').first().click(); await page.waitForTimeout(500)

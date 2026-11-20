@@ -12,6 +12,7 @@ import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
+import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
 import { USER_MENU_ICONS } from './user-menu-icons.js'
 import { DsButton, DsFileButton } from './ds-button.js'
 
@@ -825,20 +826,31 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
   )
 }
 
+const PhaseTitle = ({ text, live }: { text: string; live: boolean }) =>
+  live ? (
+    <span className="phase-label phase-shimmer">
+      {text}
+      <span className="phase-shimmer-sweep" aria-hidden="true">
+        <span className="phase-shimmer-bar" />
+      </span>
+    </span>
+  ) : (
+    <span className="phase-label">{text}</span>
+  )
+
+const phaseLabel = (phase: ThinkPhase, seconds: number, t: ReturnType<typeof useT>) => {
+  if (phase === 'stopped') return t('stopped')
+  if (phase === 'searching') return t('phaseSearching')
+  if (phase === 'browsing') return t('phaseBrowsing')
+  if (phase === 'finding') return t('phaseFinding')
+  if (phase === 'thinking' || phase === 'pending') return t('phaseThinking')
+  return t('thoughtFor', { seconds })
+}
+
 const Thinking = ({ text }: { text: string }) => {
   const t = useT()
   const streaming = useHarbor((state) => state.streaming)
-  const started = useRef(Date.now())
   const [open, setOpen] = useState(true)
-  const [seconds, setSeconds] = useState(1)
-  useEffect(() => {
-    if (streaming) {
-      const timer = window.setInterval(() => setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000))), 500)
-      return () => window.clearInterval(timer)
-    }
-    setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000)))
-    return undefined
-  }, [streaming])
   if (!text) {
     return null
   }
@@ -846,7 +858,7 @@ const Thinking = ({ text }: { text: string }) => {
     <section className="thinking" data-testid="thinking">
       <button type="button" onClick={() => setOpen((value) => !value)}>
         <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
-        {t('thoughtFor', { seconds })}
+        <PhaseTitle text={streaming ? t('phaseThinking') : t('thoughtFor', { seconds: 1 })} live={streaming} />
         <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
       </button>
       {open ? <div className="thinking-body think-copy"><Markdown text={text} /></div> : null}
@@ -898,21 +910,11 @@ const BrowseExternalIcon = () => (
 const AssistantTurn = ({ message }: { message: Message }) => {
   const t = useT()
   const sourcesApi = useContext(SourcesPanel)
-  const streaming = useHarbor((state) => state.streaming)
-  const started = useRef(Date.now())
   const [open, setOpen] = useState(true)
-  const [seconds, setSeconds] = useState(1)
-  useEffect(() => {
-    if (!streaming) {
-      setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000)))
-      return undefined
-    }
-    const timer = window.setInterval(() => setSeconds(Math.max(1, Math.round((Date.now() - started.current) / 1000))), 500)
-    return () => window.clearInterval(timer)
-  }, [streaming])
   const steps: Array<
     | { type: 'think'; text: string }
     | { type: 'search'; items: SourceItem[] }
+    | { type: 'searching' }
     | { type: 'browse'; items: BrowsePage[] }
   > = []
   const texts: Extract<ContentBlock, { type: 'text' }>[] = []
@@ -924,12 +926,14 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     }
   }
   const sources: SourceItem[] = []
+  let pendingSearch = false
   for (const block of presentBlocks(message.blocks)) {
     if (block.type === 'thinking') {
       flush()
       if (block.thinking.trim()) steps.push({ type: 'think', text: block.thinking })
     } else if (block.type === 'web_search_tool_result') {
       flush()
+      pendingSearch = false
       const items = block.content.filter((item) => item.type === 'web_search_result').map((result) => ({
         url: result.url,
         title: result.title,
@@ -945,6 +949,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       pushBrowse(browse, url, block.content.content?.title || hostOf(url), true)
     } else if (block.type === 'server_tool_use') {
       const action = block.input.action
+      if (action === 'search') pendingSearch = true
       if ((action === 'open_page' || action === 'read_link') && 'url' in block.input && typeof block.input.url === 'string') {
         pushBrowse(browse, block.input.url, hostOf(block.input.url), false)
       }
@@ -956,7 +961,14 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     }
   }
   flush()
-  const hasThinking = steps.some((step) => step.type === 'think')
+  if (pendingSearch && message.status === 'streaming') steps.push({ type: 'searching' })
+  const phase = phaseOf(message)
+  const hasThink = steps.some((step) => step.type === 'think')
+  const showHead =
+    hasThink ||
+    (message.status === 'aborted' && phase === 'stopped' && steps.length > 0) ||
+    (message.status === 'streaming' && livePhase(phase) && (steps.length > 0 || message.blocks.some((block) => block.type === 'thinking')))
+  const title = phaseLabel(phase, message.thinkingSeconds ?? 1, t)
   const renderStep = (step: (typeof steps)[number], index: number) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
@@ -978,6 +990,15 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         </p>
       )
     }
+    if (step.type === 'searching') {
+      return (
+        <p key={index} className={`timeline-step timeline-search found-line search-live ${last}`} data-testid="search-pending">
+          <span className="timeline-line" aria-hidden="true" />
+          <Glyph name="search" size={14} />
+          {t('searchQueries')}
+        </p>
+      )
+    }
     return (
       <p key={index} className={`timeline-step timeline-browse found-line browse-line ${last}`}>
         <span className="timeline-line" aria-hidden="true" />
@@ -994,11 +1015,11 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   }
   return (
     <>
-      {hasThinking ? (
-        <section className="thinking" data-testid="thinking">
+      {showHead ? (
+        <section className={`thinking${phase === 'stopped' ? ' is-stopped' : ''}`} data-testid="thinking" data-phase={phase}>
           <button type="button" data-testid="thinking-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
             <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
-            {t('thoughtFor', { seconds })}
+            <PhaseTitle text={title} live={livePhase(phase)} />
             <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
@@ -1089,6 +1110,9 @@ const MessageRow = ({ message }: { message: Message }) => {
         )
       ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
+      {message.role === 'assistant' && message.status === 'streaming' && phaseOf(message) === 'pending' ? (
+        <div className="reply-dots" data-testid="reply-dots" aria-hidden="true"><i /><i /><i /></div>
+      ) : null}
       {message.role === 'assistant' ? <AssistantTurn message={message} /> : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
             <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
           ))}
@@ -1098,7 +1122,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
         </p>
       ) : null}
-      {message.status === 'aborted' ? <p className="hint">{t('stopped')}</p> : null}
+      {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
           {versionIds.length > 1 ? (
@@ -1125,6 +1149,9 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('share')}>
             <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
+          {message.status === 'aborted' ? (
+            <button type="button" className="continue-gen" data-testid="continue" onClick={() => void regenerate(message.id)}>{t('continueGenerating')}</button>
+          ) : null}
         </div>
       ) : null}
       {feedbackOpen ? (
@@ -1823,6 +1850,7 @@ const Composer = () => {
   const send = useHarbor((state) => state.send)
   const stop = useHarbor((state) => state.stop)
   const streaming = useHarbor((state) => state.streaming)
+  const generating = useHarbor((state) => state.streaming && state.messages.some((item) => item.status === 'streaming' && item.blocks.length > 0))
   const drafts = useHarbor((state) => state.drafts)
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
@@ -1943,7 +1971,19 @@ const Composer = () => {
           </button>
           <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
-            <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
+            generating ? (
+              <HoverTip text={t('stopGenerating')}>
+                <button className="send stop" data-testid="stop" type="button" aria-label={t('stopGenerating')} data-tip={t('stopGenerating')} onClick={stop}>
+                  <svg className="stop-square" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                    <rect x="4" y="4" width="8" height="8" rx="1.5" fill="currentColor" />
+                  </svg>
+                </button>
+              </HoverTip>
+            ) : (
+              <button className="send stop" data-testid="stop" type="button" aria-label={t('stopGenerating')} onClick={stop}>
+                <span className="send-spinner" aria-hidden="true" />
+              </button>
+            )
           ) : (
             <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
           )}
