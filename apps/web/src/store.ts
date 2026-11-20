@@ -12,10 +12,11 @@ import type { Repository } from '@deepapi/storage'
 import {
   activePath,
   childIds,
+  DEFAULT_CHAT_MODEL,
+  DEFAULT_EFFORT,
   defaultSettings,
   type Balance,
   type Conversation,
-  type Effort,
   type Message,
   type Settings,
   type Usage,
@@ -50,14 +51,18 @@ export type DraftFile = {
   error?: string
 }
 
-type Prefs = Pick<Conversation, 'model' | 'thinking' | 'search' | 'readLink' | 'effort'>
+type Prefs = Pick<Conversation, 'thinking' | 'search' | 'readLink'>
 
 const defaultPrefs = (): Prefs => ({
-  model: 'deepseek-flash',
   thinking: true,
   search: true,
   readLink: false,
-  effort: 'high',
+})
+
+const withFixedModel = (prefs: Prefs) => ({
+  ...prefs,
+  model: DEFAULT_CHAT_MODEL,
+  effort: DEFAULT_EFFORT,
 })
 
 const nowIso = () => new Date().toISOString()
@@ -69,7 +74,7 @@ const blankConversation = (prefs: Prefs): Conversation => {
     id: nid(),
     title: '',
     titleSource: 'default',
-    ...prefs,
+    ...withFixedModel(prefs),
     pinned: false,
     archived: false,
     activeLeafId: null,
@@ -255,11 +260,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
       totals: sumUsage(usages),
       prefs: conversations[0]
         ? {
-            model: conversations[0].model,
             thinking: conversations[0].thinking,
             search: conversations[0].search,
             readLink: conversations[0].readLink,
-            effort: conversations[0].effort,
           }
         : defaultPrefs(),
     })
@@ -339,10 +342,6 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async setPrefs(patch) {
     const prefs = { ...get().prefs, ...patch }
-    if (prefs.model !== 'deepseek-flash') {
-      prefs.search = false
-      prefs.readLink = false
-    }
     set({ prefs })
     const { activeId, conversations } = get()
     if (!activeId) {
@@ -372,11 +371,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
         drafts: [],
         prefs: conversation
           ? {
-              model: conversation.model,
               thinking: conversation.thinking,
               search: conversation.search,
               readLink: conversation.readLink,
-              effort: conversation.effort,
             }
           : get().prefs,
       })
@@ -392,11 +389,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
       drafts: [],
       prefs: conversation
         ? {
-            model: conversation.model,
             thinking: conversation.thinking,
             search: conversation.search,
             readLink: conversation.readLink,
-            effort: conversation.effort,
           }
         : get().prefs,
     })
@@ -600,7 +595,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     }
     const key = get().key
     const settings = get().settings
-    if (!key || get().prefs.model !== 'deepseek-flash') {
+    if (!key) {
       return
     }
     const seconds = clampExpireSeconds(settings.fileExpireDays)
@@ -929,7 +924,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     deletedAt: null,
   }
   messages.push(assistant)
-  conversation = stamp({ ...conversation, ...state.prefs, activeLeafId: assistant.id })
+  conversation = stamp({ ...conversation, ...withFixedModel(state.prefs), activeLeafId: assistant.id })
   await store.saveConversation(conversation)
   await store.saveMessage(assistant)
   const conversations = created
@@ -946,11 +941,11 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
 
   const history = activePath(messages, parentId)
   const body = buildRequest({
-    model: conversation.model,
+    model: DEFAULT_CHAT_MODEL,
     thinking: conversation.thinking,
     search: conversation.search,
     readLink: conversation.readLink,
-    effort: conversation.effort as Effort,
+    effort: DEFAULT_EFFORT,
     safetyLevel: state.settings.safetyLevel,
     requestTitle: history.every((item) => item.role !== 'assistant') && conversation.titleSource !== 'user',
     messages: history,
@@ -1076,7 +1071,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
     conversationId = nid()
     await api('/api/conversations', {
       method: 'POST',
-      body: JSON.stringify({ id: conversationId, ...state.prefs }),
+      body: JSON.stringify({ id: conversationId, ...withFixedModel(state.prefs) }),
     })
   }
   const files = state.drafts.filter((file) => file.fileId)
@@ -1096,7 +1091,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
           bytes: file.bytes,
           expiresAt: file.expiresAt,
         })),
-        ...state.prefs,
+        ...withFixedModel(state.prefs),
         locale: state.settings.locale,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       }),
@@ -1143,7 +1138,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
           id: conversationId,
           title: '',
           titleSource: 'default' as const,
-          ...state.prefs,
+          ...withFixedModel(state.prefs),
           pinned: false,
           archived: false,
           activeLeafId: assistant.id,
