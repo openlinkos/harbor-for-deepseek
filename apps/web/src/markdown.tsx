@@ -14,7 +14,7 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
 import type { TextCitation } from '@deepapi/types'
-import { Children, Component, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, Component, isValidElement, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
 import ReactMarkdown from 'react-markdown'
@@ -354,6 +354,32 @@ const CiteMark = ({ n, href, card }: { n: string; href?: string; card: SearchCit
   )
 }
 
+const PHRASING = new Set(['a', 'abbr', 'b', 'br', 'cite', 'code', 'em', 'i', 'img', 'kbd', 'mark', 's', 'small', 'span', 'strong', 'sub', 'sup', 'u'])
+const isPhrasing = (node: ReactNode) => typeof node === 'string' || typeof node === 'number' || (isValidElement(node) && typeof node.type === 'string' && PHRASING.has(node.type))
+// Official answers put each list item's text in <p class="ds-markdown-paragraph">. The paragraph's margin is what opens the gap before a nested list.
+const itemBlocks = (children: ReactNode, citations?: TextCitation[], cards?: SearchCiteCard[]) => {
+  const nodes = Children.toArray(children)
+  const out: ReactNode[] = []
+  let inline: ReactNode[] = []
+  const flush = () => {
+    const text = inline.some((node) => typeof node !== 'string' || node.trim() !== '')
+    if (text) {
+      if (inline.length === 1 && isValidElement(inline[0]) && inline[0].type === 'p') out.push(inline[0])
+      else out.push(<p key={out.length}>{citeChildren(inline, citations, cards)}</p>)
+    }
+    inline = []
+  }
+  for (const node of nodes) {
+    if (isPhrasing(node)) inline.push(node)
+    else {
+      flush()
+      out.push(node)
+    }
+  }
+  flush()
+  return out
+}
+
 const citeChildren = (children: ReactNode, citations?: TextCitation[], cards?: SearchCiteCard[]) =>
   Children.map(children, (child) => {
     if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
@@ -388,7 +414,7 @@ export const Markdown = ({ text, citations, cards }: { text: string; citations?:
           return <p>{citeChildren(children, citations, cards)}</p>
         },
         li({ children }) {
-          return <li>{citeChildren(children, citations, cards)}</li>
+          return <li>{itemBlocks(children, citations, cards)}</li>
         },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined

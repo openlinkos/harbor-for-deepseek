@@ -766,6 +766,9 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
 .prose li + li { margin-top: 6px; }
+.prose li > ul,
+.prose li > ol { margin-top: 4px; margin-bottom: 0; }
+.prose li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose h1 { font: var(--dsw-font-markdown-h1); margin: 16px 0; }
 .prose h2 { font: var(--dsw-font-markdown-h2); margin: 16px 0; }
 .prose h3 { font: var(--dsw-font-markdown-h3); margin: 16px 0; }
