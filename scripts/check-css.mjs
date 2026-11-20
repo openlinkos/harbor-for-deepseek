@@ -9,21 +9,7 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
-// fb1344-P4 侧栏用户行 + CSS 语法。P4 把这段放回规则里之后，必须删掉本条。
-// 例外还在就放行；不再报错时脚本变红，提醒删掉。
-const KNOWN_EXCEPTIONS = [
-  {
-    id: 'fb1344-P4',
-    file: 'apps/web/src/styles.css',
-    // master 4734e7f 的 styles.css:587-591。规则外面的四条声明，加上把下一条 `.user-row small` 一起丢掉的 `}`。
-    snippet:
-      '  color: var(--dsw-alias-label-tertiary);\n' +
-      '  font-size: 16px;\n' +
-      '  font-weight: 500;\n' +
-      '  line-height: normal;\n' +
-      '}',
-  },
-]
+const KNOWN_EXCEPTIONS = []
 
 const require = createRequire(process.cwd() + '/')
 const postcss = require(process.env.POSTCSS || 'postcss')
