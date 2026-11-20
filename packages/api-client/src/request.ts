@@ -139,10 +139,10 @@ export const buildRequest = (options: TurnOptions): CreateMessageBody => {
   }
 }
 
+/** Images and plain text stay `user_data`. PDF, Office, and other parsed files always use rich layout. */
 export const purposeForFile = (
   filename: string,
   mime: string,
-  documentPurpose: FilePurpose,
 ): { purpose: FilePurpose; media: 'image' | 'document' } => {
   if (mime.startsWith('image/') || /\.(png|jpe?g|gif|webp)$/i.test(filename)) {
     return { purpose: 'user_data', media: 'image' }
@@ -150,6 +150,5 @@ export const purposeForFile = (
   if (/\.(txt|md|csv|json|log)$/i.test(filename) || mime.startsWith('text/')) {
     return { purpose: 'user_data', media: 'document' }
   }
-  const purpose = documentPurpose === 'text_recognition' ? 'text_recognition' : 'rich_layout_recognition'
-  return { purpose, media: 'document' }
+  return { purpose: 'rich_layout_recognition', media: 'document' }
 }

@@ -1,4 +1,4 @@
-import type { ChatModel, ContentBlock, Effort, FilePurpose, Usage } from './api.js'
+import type { ChatModel, ContentBlock, Effort, Usage } from './api.js'
 
 export type MessageStatus = 'complete' | 'streaming' | 'error' | 'aborted' | 'refused'
 
@@ -53,7 +53,6 @@ export type Settings = {
   safetyLevel: 'high' | 'low'
   /** Whole days. The API allows 3600–2592000 seconds; the client clamps. */
   fileExpireDays: number
-  documentPurpose: Extract<FilePurpose, 'rich_layout_recognition' | 'text_recognition'>
   acknowledgedKeyRisk: boolean
   deviceId: string
 }
@@ -64,7 +63,6 @@ export const defaultSettings = (deviceId: string): Settings => ({
   locale: 'zh',
   safetyLevel: 'high',
   fileExpireDays: DEFAULT_FILE_EXPIRE_DAYS,
-  documentPurpose: 'rich_layout_recognition',
   acknowledgedKeyRisk: false,
   deviceId,
 })

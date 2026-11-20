@@ -1571,16 +1571,6 @@ const Settings = () => {
               onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
             />
           </div>
-          <div className="settings-line">
-            <span>{t('filePurpose')}</span>
-            <AnchoredMenu
-              testId="purpose-select"
-              label={settings.documentPurpose === 'text_recognition' ? t('textRecognition') : t('richLayout')}
-              selected={settings.documentPurpose === 'text_recognition' ? t('textRecognition') : t('richLayout')}
-              options={[t('richLayout'), t('textRecognition')]}
-              onPick={(value) => void patchSettings({ documentPurpose: value === t('textRecognition') ? 'text_recognition' : 'rich_layout_recognition' })}
-            />
-          </div>
         </section>
         <section className="settings-account">
           <div className="settings-line">

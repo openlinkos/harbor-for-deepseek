@@ -407,7 +407,6 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
       server: label('[data-testid="server-note"] .settings-copy > span'),
       serverHint: hint('[data-testid="server-note"] .hint'),
       expiry: box('[data-testid="file-expiry"]'),
-      purpose: box('[data-testid="purpose-select"]'),
     }
   })
   await page.getByRole('button', { name: '数据管理' }).click()
@@ -428,7 +427,6 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   await page.getByRole('button', { name: '通用设置' }).click()
   const general = await measure()
   expect(general.expiry.h).toBe(36)
-  expect(general.purpose.h).toBe(36)
   await page.getByRole('button', { name: '深色' }).click()
   await page.getByRole('button', { name: '数据管理' }).click()
   const dark = await measure()
@@ -442,30 +440,6 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   await page.getByRole('button', { name: '通用设置' }).click()
   const darkGeneral = await measure()
   expect(darkGeneral.expiry.h).toBe(36)
-  expect(darkGeneral.purpose.h).toBe(36)
-  expect(darkGeneral.purpose.tag).not.toBe('SELECT')
-  expect(darkGeneral.purpose.bg).toBe('rgb(67, 69, 74)')
-})
-
-test('390 purpose menu picks 文本识别', async ({ page }) => {
-  await install(page)
-  await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
-  await page.getByTestId('landing-send').click()
-  await page.getByTestId('key-input').fill('demo-local-key')
-  await page.getByTestId('key-save').click()
-  await page.getByTestId('menu').click()
-  await page.getByTestId('user-menu').click()
-  await page.getByTestId('settings-open').click()
-  await page.getByTestId('purpose-select').click()
-  const option = page.getByRole('option', { name: '文本识别' })
-  await expect(option).toBeVisible()
-  const box = await option.boundingBox()
-  expect(box).toBeTruthy()
-  expect(box!.y).toBeGreaterThanOrEqual(0)
-  expect(box!.y + box!.height).toBeLessThanOrEqual(844)
-  await option.click()
-  await expect(page.getByTestId('purpose-select')).toContainText('文本识别')
 })
 
 test('390 balance label stays on one line', async ({ page }) => {

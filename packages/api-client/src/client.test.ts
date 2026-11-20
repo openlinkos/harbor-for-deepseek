@@ -195,11 +195,21 @@ describe('createClient', () => {
   })
 
   it('maps purposes and clamps expiry into the documented window', () => {
-    expect(purposeForFile('a.png', 'image/png', 'rich_layout_recognition').media).toBe('image')
-    expect(purposeForFile('notes.txt', 'text/plain', 'rich_layout_recognition').purpose).toBe('user_data')
-    expect(purposeForFile('probe.pdf', 'application/pdf', 'text_recognition').purpose).toBe('text_recognition')
+    expect(purposeForFile('a.png', 'image/png').media).toBe('image')
+    expect(purposeForFile('notes.txt', 'text/plain').purpose).toBe('user_data')
     expect(clampExpireSeconds(7)).toBe(7 * 24 * 3600)
     expect(clampExpireSeconds(0)).toBe(3600)
     expect(clampExpireSeconds(90)).toBe(2_592_000)
+  })
+
+  it('always parses pdf and office files with rich layout', () => {
+    expect(purposeForFile('probe.pdf', 'application/pdf').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('memo.doc', 'application/msword').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('memo.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('slides.ppt', 'application/vnd.ms-powerpoint').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('slides.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('sheet.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet').purpose).toBe('rich_layout_recognition')
+    expect(purposeForFile('photo.jpg', '').purpose).toBe('user_data')
+    expect(purposeForFile('notes.md', '').purpose).toBe('user_data')
   })
 })
