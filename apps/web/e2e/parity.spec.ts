@@ -856,6 +856,7 @@ test('welcome back', async ({ page }) => {
     return { content: style.content, windows }
   })
   expect(shortcut.content).toBe(shortcut.windows ? '"Ctrl + J"' : '"⌘ J"')
+  await page.mouse.move(0, 0)
   await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('0')
   await page.getByTestId('new-chat').hover()
   await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('1')
