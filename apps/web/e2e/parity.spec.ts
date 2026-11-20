@@ -569,14 +569,15 @@ test('welcome back', async ({ page }) => {
   await unlock(page)
   await send(page, '回来')
   await page.getByTestId('new-chat').click()
+  await page.mouse.move(0, 0)
   await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
   const shortcut = await page.locator('.new-chat').evaluate((node) => {
     const style = getComputedStyle(node, '::after')
     const windows = navigator.userAgent.toLowerCase().includes('windows')
-    return { content: style.content, opacity: style.opacity, windows }
+    return { content: style.content, windows }
   })
   expect(shortcut.content).toBe(shortcut.windows ? '"Ctrl + J"' : '"⌘ J"')
-  expect(shortcut.opacity).toBe('0')
+  await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('0')
   await page.getByTestId('new-chat').hover()
   await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('1')
   await expect(page.locator('.new-chat')).toHaveCSS('justify-content', 'center')

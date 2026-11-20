@@ -76,7 +76,7 @@ const assertTabsClean = async (page: Page, tabs: readonly string[], forbidden: R
   }
 }
 
-const GENERAL_LABELS = ['语言', '朗读音色', '界面包', '安全审核', '打开网页', '上传文件过期（天）', 'PDF / Office 解析']
+const GENERAL_LABELS = ['语言', '界面包', '安全审核', '打开网页', '上传文件过期（天）', 'PDF / Office 解析']
 
 const assertOfficialRows = async (page: Page) => {
   const rows = page.locator('.settings-general .settings-line')
