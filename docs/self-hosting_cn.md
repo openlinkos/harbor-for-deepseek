@@ -95,7 +95,15 @@ docker compose pull
 docker compose up -d
 ```
 
-镜像启动时会执行数据库迁移。再执行一次不会删账号或 API Key。本地构建用 `docker compose up -d --build`。
+镜像启动时会执行数据库迁移。再执行一次不会删账号或 API Key。镜像构建里没有 `.git`，先在宿主机算出版本再构建：
+
+```bash
+export SOURCE_COMMIT="$(git rev-parse HEAD)"
+export DEEPAPI_VERSION="$(node scripts/release-meta.mjs)"
+docker compose up -d --build
+```
+
+如果目录不是 git 检出，把 `DEEPAPI_VERSION` 设成 `X.Y.Z`（major.minor 与根目录 `package.json` 相同），`SOURCE_COMMIT` 设成 40 位 commit。没有 `.git` 又没传 `DEEPAPI_VERSION` 时构建会停，不会把 patch 当成 0。
 
 Compose 项目名是 `harbor`，数据库卷是 `harbor_pgdata`。改名之前创建的卷用 `docker volume ls` 查看。把 `COMPOSE_PROJECT_NAME` 设成旧项目名，或把转储恢复进新卷。
 

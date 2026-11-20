@@ -28,6 +28,9 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/anthropic/')) {
     return
   }
+  if (url.pathname === '/version.json') {
+    return
+  }
   if (event.request.method !== 'GET') {
     return
   }

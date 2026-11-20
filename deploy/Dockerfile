@@ -9,6 +9,10 @@ COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
 RUN pnpm install --frozen-lockfile
+ARG SOURCE_COMMIT=
+ENV SOURCE_COMMIT=$SOURCE_COMMIT
+ARG DEEPAPI_VERSION=
+ENV DEEPAPI_VERSION=$DEEPAPI_VERSION
 RUN pnpm --filter @deepapi/web build && pnpm --filter @deepapi/server build
 
 FROM node:22-alpine

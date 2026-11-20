@@ -31,4 +31,11 @@ printf '%s' "$asset_headers" | grep -qi 'cache-control: public, max-age=31536000
 curl -fsS "$base/LICENSE" | grep -q 'MIT License'
 curl -fsS "$base/NOTICE" | grep -q 'DeepAPI'
 
+version_headers="$(curl -fsSI "$base/version.json")"
+printf '%s' "$version_headers" | grep -qi 'cache-control: no-store'
+version_body="$(curl -fsS "$base/version.json")"
+printf '%s' "$version_body" | grep -q '"version"'
+printf '%s' "$version_body" | grep -q '"commit"'
+printf '%s' "$version_body" | grep -q '"builtAt"'
+
 echo "harbor-web smoke ok"

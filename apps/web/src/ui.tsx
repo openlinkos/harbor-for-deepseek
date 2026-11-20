@@ -32,6 +32,12 @@ const Mark = () => (
   </svg>
 )
 
+export const ProductVersion = () => (
+  <p className="product-version" data-testid="product-version" data-commit={__DEEPAPI_COMMIT__} title={__DEEPAPI_COMMIT__}>
+    {`DeepAPI v${__DEEPAPI_VERSION__}`}
+  </p>
+)
+
 export const SiteFooter = () => {
   const t = useT()
   const locale = useHarbor((state) => state.settings.locale)
@@ -2278,6 +2284,7 @@ const Settings = () => {
             {' · '}
             <a href="https://platform.deepseek.com/">platform.deepseek.com</a>
           </p>
+          <ProductVersion />
         </section>
         </div>
       </div>

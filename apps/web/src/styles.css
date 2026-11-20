@@ -1660,6 +1660,14 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
 .legal-copy { max-width: 640px; }
 .legal-copy h3 { margin: 16px 0 8px; font-size: 16px; }
 .legal-copy p { margin: 0 0 12px; line-height: 24px; color: var(--dsw-alias-label-secondary); }
+.settings-legal .product-version {
+  margin: 16px 0 20px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: left;
+  color: var(--dsw-alias-label-tertiary);
+}
 .settings-line .account-side { display: inline-flex; align-items: center; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
 .settings-line .account-side.ds-button-stack { flex-direction: column; flex-wrap: nowrap; align-items: flex-end; gap: 8px; }
 [data-testid='balance-side'] { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; column-gap: 8px; row-gap: 8px; min-width: 0; }

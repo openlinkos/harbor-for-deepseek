@@ -33,6 +33,8 @@ pnpm e2e
 
 `pnpm e2e` includes the long-answer markdown gate in `apps/web/e2e/fb1554-markdown.spec.ts`. A fix PR may delete only the fb1554 `knownFailure` id it owns (`fb1554-M1`, `fb1554-M2`, `fb1554-M3`, `fb1554-M4`, `fb1554-M5`, or `fb1554-T1`) and must leave the other fb1554 ids in place.
 
+The root `package.json` `version` is only `major.minor` (leave the patch at 0). The build sets the patch to the number of first-parent commits since that `major.minor` was introduced, so each merge to `master` publishes a new `vX.Y.Z` and pull requests do not edit that line. A pull request that changes shipped files under `apps/` or `packages/` adds `changes/<short-name>.md` with one or two lines in Chinese. When tagging, a maintainer folds those fragments into `CHANGELOG.md` and tags `vX.Y.Z`.
+
 ## Layout
 
 - `apps/web` is the M1 app.

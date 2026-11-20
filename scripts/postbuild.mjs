@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readCommit, readVersion } from './release-meta.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const dist = join(root, 'apps/web/dist')
@@ -56,6 +57,16 @@ for (const line of [
 if (headers.includes('unsafe-eval')) {
   throw new Error('dist/_headers allows unsafe-eval')
 }
+
+const versionFile = {
+  version: readVersion(),
+  commit: readCommit(),
+  builtAt: new Date().toISOString(),
+}
+if (!/^\d+\.\d+\.\d+$/.test(versionFile.version) || !/^(?:[0-9a-f]{40}|unknown)$/.test(versionFile.commit) || Number.isNaN(Date.parse(versionFile.builtAt))) {
+  throw new Error(`refusing to write version.json: ${JSON.stringify(versionFile)}`)
+}
+writeFileSync(join(dist, 'version.json'), `${JSON.stringify(versionFile)}\n`)
 
 const files = []
 const walk = (dir) => {
