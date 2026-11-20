@@ -82,6 +82,28 @@ const sessionOf = (response) => {
 const main = async () => {
   await waitReady()
   must(await call('/healthz'), 200)
+  const version = await call('/version.json')
+  must(version, 200)
+  const cache = version.response.headers.get('cache-control') ?? ''
+  if (!/no-store/i.test(cache)) {
+    throw new Error(`version.json cache-control is ${cache || 'missing'}`)
+  }
+  const doc = version.body
+  if (!doc || !/^\d+\.\d+\.\d+$/.test(doc.version)) {
+    throw new Error(`version.json version is ${JSON.stringify(doc?.version)}`)
+  }
+  if (typeof doc.commit !== 'string' || !/^(?:[0-9a-f]{40}|unknown)$/.test(doc.commit)) {
+    throw new Error(`version.json commit is ${JSON.stringify(doc?.commit)}`)
+  }
+  if (typeof doc.builtAt !== 'string' || Number.isNaN(Date.parse(doc.builtAt))) {
+    throw new Error(`version.json builtAt is ${JSON.stringify(doc?.builtAt)}`)
+  }
+  if (process.env.DEEPAPI_VERSION && doc.version !== process.env.DEEPAPI_VERSION) {
+    throw new Error(`version.json version ${doc.version} != ${process.env.DEEPAPI_VERSION}`)
+  }
+  if (process.env.SOURCE_COMMIT && doc.commit !== process.env.SOURCE_COMMIT.toLowerCase()) {
+    throw new Error(`version.json commit ${doc.commit} != ${process.env.SOURCE_COMMIT}`)
+  }
   must(await call('/readyz'), 200)
 
   const setup = must(

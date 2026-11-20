@@ -68,23 +68,30 @@ const firstParent = (root, rev) => {
   return line ? line.slice('parent '.length).trim() : ''
 }
 
+const incompleteHistory = (detail, declared) =>
+  `历史不完整（${detail}），算不出 ${declared} 的 patch。用 fetch-depth: 0 重新检出，或传入 DEEPAPI_VERSION=X.Y.Z。拒绝把 patch 当成 0。`
+
 // Patch is the number of first-parent commits after the commit that introduced
 // the current major.minor. The introducing commit itself is X.Y.0. Each later
 // first-parent commit (a merge to master counts as one) adds one. A missing
-// parent means the clone is shallow: fail instead of pretending the patch is 0.
+// parent, or no .git at all, fails with the same message. The patch is never
+// silently treated as 0.
 export const patchSinceMinor = (root, declared) => {
-  let rev = git(root, ['rev-parse', 'HEAD'])
+  let rev
+  try {
+    rev = git(root, ['rev-parse', 'HEAD'])
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error)
+    if (/not a git repository|\.git/i.test(detail)) throw new Error(incompleteHistory('没有 .git', declared))
+    throw error
+  }
   let steps = 0
   for (let guard = 0; guard < 100000; guard += 1) {
     const here = majorMinor(versionAt(root, rev) ?? '')
     if (here !== declared) return Math.max(0, steps - 1)
     const parent = firstParent(root, rev)
     if (!parent) return steps
-    if (!hasCommit(root, parent)) {
-      throw new Error(
-        `历史不完整（浅克隆停在 ${rev.slice(0, 7)}），算不出 ${declared} 的 patch。用 fetch-depth: 0 重新检出，或传入 DEEPAPI_VERSION=X.Y.Z。拒绝把 patch 当成 0。`,
-      )
-    }
+    if (!hasCommit(root, parent)) throw new Error(incompleteHistory(`浅克隆停在 ${rev.slice(0, 7)}`, declared))
     steps += 1
     rev = parent
   }

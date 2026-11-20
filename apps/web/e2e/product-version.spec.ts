@@ -86,6 +86,22 @@ for (const theme of ['light', 'dark'] as const) {
       expect(place.fontWeight).toBe('400')
       expect(place.lineHeight).toBe('18px')
       expect(place.color).toBe(theme === 'dark' ? 'rgb(173, 178, 184)' : 'rgb(129, 133, 140)')
+      const align = await page.evaluate(() => {
+        const textLeft = (node) => {
+          if (!node) return null
+          const range = document.createRange()
+          range.selectNodeContents(node)
+          const rects = [...range.getClientRects()].filter((rect) => rect.width > 0)
+          return rects.length ? Math.min(...rects.map((rect) => rect.left)) : null
+        }
+        return {
+          version: textLeft(document.querySelector('[data-testid="product-version"]')),
+          paragraph: textLeft(document.querySelector('.legal-copy p')),
+        }
+      })
+      expect(align.version, 'version text left').not.toBeNull()
+      expect(align.paragraph, 'terms paragraph left').not.toBeNull()
+      expect(Math.abs((align.version ?? 0) - (align.paragraph ?? 0)), 'version text lines up with the terms paragraph').toBeLessThanOrEqual(1)
       if (theme === 'dark') await expect(page.locator('body')).toHaveAttribute('data-ds-dark-theme', '')
       else await expect(page.locator('body')).not.toHaveAttribute('data-ds-dark-theme', '')
     })

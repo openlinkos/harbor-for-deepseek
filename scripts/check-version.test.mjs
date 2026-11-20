@@ -90,6 +90,19 @@ test('a merge counts once on the first parent', () => {
   }
 })
 
+test('a directory without git fails with the same hint and does not use patch 0', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'deepapi-nogit-'))
+  try {
+    writeFileSync(join(dir, 'package.json'), '{"version":"0.1.0"}\n')
+    assert.throws(() => productVersion(dir, {}), /没有 \.git/)
+    assert.throws(() => productVersion(dir, {}), /拒绝把 patch 当成 0/)
+    assert.throws(() => productVersion(dir, {}), /DEEPAPI_VERSION=X\.Y\.Z/)
+    assert.equal(productVersion(dir, { DEEPAPI_VERSION: '0.1.7' }), '0.1.7')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
 test('a shallow clone fails instead of reporting patch 0', () => {
   const dir = initRepo()
   const shallow = mkdtempSync(join(tmpdir(), 'deepapi-shallow-'))

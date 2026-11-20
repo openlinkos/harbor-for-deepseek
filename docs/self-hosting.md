@@ -95,7 +95,15 @@ docker compose pull
 docker compose up -d
 ```
 
-The image runs database migrations on start. Running them again does not remove accounts or keys. A local build is `docker compose up -d --build`.
+The image runs database migrations on start. Running them again does not remove accounts or keys. The image build has no `.git`, so compute the version on the host, then build:
+
+```bash
+export SOURCE_COMMIT="$(git rev-parse HEAD)"
+export DEEPAPI_VERSION="$(node scripts/release-meta.mjs)"
+docker compose up -d --build
+```
+
+Without a checkout, set `DEEPAPI_VERSION` to `X.Y.Z` (same major.minor as the root `package.json`) and `SOURCE_COMMIT` to the 40-character commit. If `DEEPAPI_VERSION` is unset and there is no `.git`, the build stops and does not use patch 0.
 
 The Compose project name is `harbor`, so the database volume is `harbor_pgdata`. A volume created before that name was set is listed by `docker volume ls`. Point `COMPOSE_PROJECT_NAME` at the old project, or restore a dump into the new volume.
 
