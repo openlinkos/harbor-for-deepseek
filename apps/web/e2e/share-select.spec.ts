@@ -1,7 +1,8 @@
-// Share selection mode, measured from the 2026-11-20 official captures (1280×800 light, English UI).
-// h1_01 / h6_01 are 1920×1200 and scale 1.5× against the 1280 set, so CSS pixels come from the 1280 files.
-// Button colors follow the existing ds-button tokens and swap with the theme.
-// Ink + elementFromPoint follow e2e/theme-cards.spec.ts (there is no overlay-paint.spec.ts in this repo).
+// Share selection mode. The 1280×800 captures are a 1920×1200 DPR1 frame scaled to 2/3,
+// so CSS pixels are those ink sizes × 1.5, then the frozen official tokens where they exist
+// (ds-checkbox--l 18/6/1.5 border-l3, bar 65 + border-l2, ds-button m 36, modal radius 24
+// and padding 22/24, ds-button xl 44). Dialog width 408 is the scaled card; no modal token is 408.
+// Ink + elementFromPoint follow e2e/overlay-paint.spec.ts.
 import { expect, test, type Page, type Route } from '@playwright/test'
 import { inflateSync } from 'node:zlib'
 
@@ -15,33 +16,36 @@ const reply = [
   { type: 'message_stop' },
 ]
 
-// Screenshot pixels (1280-wide captures). Listed uncertainties are in the PR.
+// Official CSS pixels. Colors are the computed tokens (border-l3, brand fill, border-l2, inverted label).
 const OFF = {
-  check: 12,
-  checkRadius: '3px',
-  blockRadius: '12px',
-  barHeight: 44,
-  buttonHeight: '24px',
+  check: 18,
+  checkRadius: '6px',
+  checkBorderWidth: '1.5px',
+  blockPad: 15,
+  barHeight: 65,
+  buttonHeight: 36,
   buttonRadius: '4096px',
-  dialogWidth: 272,
-  dialogRadius: '16px',
-  dialogButtonHeight: '28px',
+  dialogWidth: 408,
+  dialogRadius: '24px',
+  dialogButtonHeight: 44,
   disabledOpacity: '0.45',
   light: {
-    checkBg: 'rgb(255, 255, 255)',
-    checkBorder: 'rgba(0, 0, 0, 0.1)',
+    checkBg: 'rgba(0, 0, 0, 0)',
+    checkBorder: 'rgba(0, 0, 0, 0.12)',
     checkOn: 'rgb(57, 100, 254)',
+    checkMark: 'rgb(255, 255, 255)',
     block: 'rgb(245, 246, 247)',
     barBg: 'rgb(255, 255, 255)',
-    barBorder: 'rgb(245, 245, 245)',
+    barBorder: 'rgba(0, 0, 0, 0.1)',
     primary: 'rgb(57, 100, 254)',
     outline: 'rgba(0, 0, 0, 0.1)',
     dialogBg: 'rgb(255, 255, 255)',
   },
   dark: {
-    checkBg: 'rgb(21, 21, 23)',
-    checkBorder: 'rgba(255, 255, 255, 0.12)',
+    checkBg: 'rgba(0, 0, 0, 0)',
+    checkBorder: 'rgba(255, 255, 255, 0.16)',
     checkOn: 'rgb(86, 134, 254)',
+    checkMark: 'rgb(53, 54, 56)',
     block: 'rgb(44, 44, 46)',
     barBg: 'rgb(21, 21, 23)',
     barBorder: 'rgba(255, 255, 255, 0.12)',
@@ -81,6 +85,11 @@ const seed = async (page: Page) => {
     tx.objectStore('messages').put(message('a1', 'u1', 'assistant', '第一答', '2026-11-20T00:00:01.000Z'))
     tx.objectStore('messages').put(message('u2', 'a1', 'user', '第二问', '2026-11-20T00:00:02.000Z'))
     tx.objectStore('messages').put(message('a2', 'u2', 'assistant', '第二答', '2026-11-20T00:00:03.000Z'))
+    const other = 'share-other'
+    tx.objectStore('conversations').put({
+      id: other, title: '另一会话', titleSource: 'user', model: 'deepseek-flash', thinking: false, search: false, readLink: false, effort: 'high', pinned: false, archived: false, activeLeafId: 'ou1', createdAt: when, updatedAt: when, rev: 1, deletedAt: null,
+    })
+    tx.objectStore('messages').put({ id: 'ou1', conversationId: other, parentId: null, role: 'user', blocks: [{ type: 'text', text: '旁边的问题' }], status: 'complete', usage: null, errorMessage: null, createdAt: when, updatedAt: when, rev: 1, deletedAt: null })
     await new Promise((ok, ko) => { tx.oncomplete = () => ok(null); tx.onerror = () => ko(tx.error) })
     db.close()
   })
@@ -212,7 +221,24 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
     test('selection, count, dialog, and measured chrome', async ({ page }) => {
       test.setTimeout(90_000)
       await boot(page, theme)
+      const boxOf = async (selector: string) => (await page.locator(selector).first().boundingBox())!
+      const columnBefore = await boxOf('.chat-column')
+      const proseBefore = await boxOf('.turn.assistant .prose')
+      const bubbleBefore = await boxOf('.turn.user .bubble')
       await page.locator('.action-row button[aria-label="分享"]').last().click()
+      const columnAfter = await boxOf('.chat-column')
+      const proseAfter = await boxOf('.turn.assistant .prose')
+      const bubbleAfter = await boxOf('.turn.user .bubble')
+      expect(Math.abs(columnAfter.x - columnBefore.x), 'column x').toBeLessThanOrEqual(1)
+      expect(Math.abs(columnAfter.width - columnBefore.width), 'column width').toBeLessThanOrEqual(1)
+      expect(Math.abs(proseAfter.x - proseBefore.x), 'prose x').toBeLessThanOrEqual(1)
+      expect(Math.abs(proseAfter.width - proseBefore.width), 'prose width').toBeLessThanOrEqual(1)
+      expect(Math.abs(bubbleAfter.x - bubbleBefore.x), 'bubble x').toBeLessThanOrEqual(1)
+      expect(Math.abs(bubbleAfter.width - bubbleBefore.width), 'bubble width').toBeLessThanOrEqual(1)
+      await expect(page.locator('.action-row:visible')).toHaveCount(0)
+      const barInner = await boxOf('.share-bar-inner')
+      expect(Math.abs(barInner.x - columnAfter.x), 'bar left').toBeLessThanOrEqual(1)
+      expect(Math.abs(barInner.x + barInner.width - (columnAfter.x + columnAfter.width)), 'bar right').toBeLessThanOrEqual(1)
 
       const boxes = page.locator('input.share-box')
       await expect(boxes).toHaveCount(4)
@@ -247,8 +273,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByTestId('share-all')).not.toBeChecked()
 
       const bar = await cssOf(page, '.share-bar')
-      expect(bar.h).toBeGreaterThanOrEqual(OFF.barHeight - 0.5)
-      expect(bar.h).toBeLessThanOrEqual(OFF.barHeight + 0.5)
+      expect(Math.abs(bar.h - OFF.barHeight)).toBeLessThanOrEqual(0.5)
       expect(bar.bg).toBe(tone.barBg)
       expect(bar.borderTopWidth).toBe('1px')
       expect(bar.borderTopStyle).toBe('solid')
@@ -262,13 +287,21 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(idle.radius).toBe(OFF.checkRadius)
       expect(idle.bg).toBe(tone.checkBg)
       expect(idle.borderTopColor).toBe(tone.checkBorder)
-      expect(idle.borderTopWidth).toBe('1px')
+      const specifiedBorder = await page.locator('input.share-box').first().evaluate((node) => getComputedStyle(node).getPropertyValue('--dsl-checkbox-border-width').trim())
+      expect(specifiedBorder).toBe(OFF.checkBorderWidth)
       const on = await cssOf(page, 'input.share-box:checked')
       expect(on.bg).toBe(tone.checkOn)
-      expect(on.mark).toBe('rgb(255, 255, 255)')
-      const block = await cssOf(page, '.share-block.on')
+      expect(on.mark).toBe(tone.checkMark)
+      const halo = await page.locator('.share-block.on').first().evaluate((node) => getComputedStyle(node, '::before').top)
+      expect(halo).toBe('-15px')
+      const checkTop = await page.locator('.turn.share-on > .share-box').first().evaluate((node) => getComputedStyle(node).top)
+      expect(checkTop).toBe('-12px')
+      const block = await page.locator('.share-block.on').first().evaluate((node) => {
+        const before = getComputedStyle(node, '::before')
+        return { bg: before.backgroundColor, radius: before.borderTopLeftRadius }
+      })
       expect(block.bg).toBe(tone.block)
-      expect(block.radius).toBe(OFF.blockRadius)
+      expect(block.radius).toBe('18px')
 
       const create = page.getByTestId('share-create')
       const cancel = page.getByTestId('share-cancel')
@@ -284,7 +317,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
           fill: fill ? getComputedStyle(fill).backgroundColor : '',
         }
       })
-      expect(createBox.h).toBeCloseTo(24, 0)
+      expect(createBox.h).toBeCloseTo(OFF.buttonHeight, 0)
       expect(createBox.radius).toBe(OFF.buttonRadius)
       expect(createBox.color).toBe('rgb(255, 255, 255)')
       expect(createBox.fill).toBe(tone.primary)
@@ -297,7 +330,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
           border: border ? getComputedStyle(border).borderTopColor : '',
         }
       })
-      expect(cancelBox.h).toBeCloseTo(24, 0)
+      expect(cancelBox.h).toBeCloseTo(OFF.buttonHeight, 0)
       expect(cancelBox.radius).toBe(OFF.buttonRadius)
       expect(cancelBox.border).toBe(tone.outline)
 
@@ -343,11 +376,13 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
           })(),
         }
       })
-      expect(Math.abs(hit.w - OFF.dialogWidth)).toBeLessThanOrEqual(1)
+      if (w >= 768) expect(Math.abs(hit.w - OFF.dialogWidth)).toBeLessThanOrEqual(1)
+      else expect(hit.w).toBeLessThanOrEqual(w - 16)
       expect(hit.radius).toBe(OFF.dialogRadius)
       expect(hit.bg).toBe(tone.dialogBg)
       expect(hit.center, 'dialog center must be the top element').toBe(true)
       expect(hit.title, 'dialog title must be the top element').toBe(true)
+      await page.mouse.move(0, 0)
       const buttonHit = await page.getByTestId('share-soon-ok').evaluate((node) => {
         const box = node.getBoundingClientRect()
         const target = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
@@ -364,12 +399,12 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         }
       })
       expect(buttonHit.inside, 'dialog button must be the top element').toBe(true)
-      expect(buttonHit.h).toBeCloseTo(28, 0)
+      expect(buttonHit.h).toBeCloseTo(OFF.dialogButtonHeight, 0)
       expect(buttonHit.radius).toBe(OFF.buttonRadius)
       expect(buttonHit.fill).toBe(tone.primary)
       expect(buttonHit.color).toBe('rgb(255, 255, 255)')
-      expect(buttonHit.cardW - buttonHit.w).toBeGreaterThan(24)
-      expect(buttonHit.cardW - buttonHit.w).toBeLessThan(40)
+      expect(buttonHit.cardW - buttonHit.w).toBeGreaterThan(44)
+      expect(buttonHit.cardW - buttonHit.w).toBeLessThan(52)
       const ink = inkRatio(await dialog.locator('.share-soon-card').screenshot())
       expect(ink, `dialog ink ${ink}`).toBeGreaterThan(0.08)
 
@@ -389,6 +424,21 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.locator('.share-bar')).toBeVisible()
       await page.keyboard.press('Escape')
       await expect(page.locator('.share-bar')).toHaveCount(0)
+      console.log(`SHARE_METRICS ${JSON.stringify({ theme, w, check: idle.w, bar: bar.h, button: createBox.h, dialogButton: buttonHit.h, dialog: hit.w })}`)
+    })
+
+    test('opening another chat leaves selection mode', async ({ page }) => {
+      await boot(page, theme)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      if (w < 768) {
+        await page.getByTestId('menu').click()
+        await page.waitForTimeout(400)
+      }
+      await page.locator('.chat-link', { hasText: '另一会话' }).click()
+      await expect(page.getByText('旁边的问题')).toBeVisible()
+      await expect(page.locator('.share-bar')).toHaveCount(0)
+      await expect(page.getByText('已选择 0 组对话')).toHaveCount(0)
     })
   })
 }

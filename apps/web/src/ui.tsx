@@ -1101,7 +1101,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
       {share?.on && groupId ? (
-        <input className="share-box" type="checkbox" checked={picked} aria-label={textOf || t('share')} onChange={() => share.toggle(groupId)} />
+        <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" checked={picked} aria-label={textOf || t('share')} onChange={() => share.toggle(groupId)} />
       ) : null}
       <div className={share?.on ? `share-block${picked ? ' on' : ''}` : 'share-slot'}>
       {message.role === 'user' ? (
@@ -1243,6 +1243,13 @@ export const Shell = () => {
     setShareIds([last.id])
     setSharePrimed(true)
   }, [shareConv, sharePrimed, conversation?.id, turns])
+  const shareConvRef = useRef(shareConv)
+  useEffect(() => {
+    const previous = shareConvRef.current
+    shareConvRef.current = shareConv
+    if (!sharing || !previous) return
+    if (shareConv === previous && conversation?.id !== previous) exitShare()
+  }, [sharing, shareConv, conversation?.id])
   useEffect(() => {
     if (!sharing) return undefined
     const onKey = (event: KeyboardEvent) => {
@@ -1759,23 +1766,26 @@ export const Shell = () => {
             </div>
             {sharing ? (
               <div className="share-bar">
-                <label className="share-all">
-                  <input
-                    data-testid="share-all"
-                    type="checkbox"
-                    checked={allTurns}
-                    onChange={() => setShareIds(allTurns ? [] : turns.map((group) => group.id))}
-                  />
-                  <span>{t('shareSelectAll')}</span>
-                </label>
-                <span className="share-split" aria-hidden="true" />
-                <span className="share-count" data-testid="share-count">{t('shareSelected', { count: selectedCount })}</span>
-                <span className="share-gap" />
-                <DsButton data-testid="share-cancel" onClick={exitShare}>{t('cancel')}</DsButton>
-                <DsButton data-testid="share-create" variant="primary" disabled={selectedCount === 0} onClick={() => setShareSoon(true)}>
-                  <LinkMark />
-                  {t('createShareLink')}
-                </DsButton>
+                <div className="share-bar-inner">
+                  <label className="share-all">
+                    <input
+                      className="ds-checkbox ds-checkbox--l"
+                      data-testid="share-all"
+                      type="checkbox"
+                      checked={allTurns}
+                      onChange={() => setShareIds(allTurns ? [] : turns.map((group) => group.id))}
+                    />
+                    <span>{t('shareSelectAll')}</span>
+                  </label>
+                  <span className="share-split" aria-hidden="true" />
+                  <span className="share-count" data-testid="share-count">{t('shareSelected', { count: selectedCount })}</span>
+                  <span className="share-gap" />
+                  <DsButton data-testid="share-cancel" onClick={exitShare}>{t('cancel')}</DsButton>
+                  <DsButton data-testid="share-create" variant="primary" disabled={selectedCount === 0} onClick={() => setShareSoon(true)}>
+                    <LinkMark />
+                    {t('createShareLink')}
+                  </DsButton>
+                </div>
               </div>
             ) : null}
             {away && !sharing ? (
@@ -1824,7 +1834,7 @@ export const Shell = () => {
             </button>
             <h2 id="share-soon-title">{t('shareSoonTitle')}</h2>
             <p>{t('shareSoonBody')}</p>
-            <DsButton variant="primary" size="xs" data-testid="share-soon-ok" onClick={exitShare}>{t('shareSoonOk')}</DsButton>
+            <DsButton variant="primary" size="xl" data-testid="share-soon-ok" onClick={exitShare}>{t('shareSoonOk')}</DsButton>
           </div>
         </div>
       ) : null}
