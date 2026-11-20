@@ -29,6 +29,14 @@ describe('phaseOf', () => {
     expect(phaseOf(message('complete', [think(), answer()]))).toBe('done')
   })
 
+  it('does not call a streaming thought "已思考", even after the thinking block stops', () => {
+    const open = message('streaming', [think('第一句')])
+    expect(phaseOf(open)).toBe('thinking')
+    expect(phaseOf({ ...open, blocks: [think('')] })).toBe('thinking')
+    expect(phaseOf(message('streaming', []))).toBe('pending')
+    expect(livePhase(phaseOf(open))).toBe(true)
+  })
+
   it('uses 已停止 only when the reply was aborted before any answer', () => {
     const aborted = message('aborted', [think()])
     expect(phaseOf(aborted)).toBe('stopped')

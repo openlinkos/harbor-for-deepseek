@@ -11,22 +11,26 @@ const toolAction = (block: ContentBlock) =>
 /**
  * Official order (useCollapsibleAreaTitle), keyed off the last fragment while the message is still streaming:
  * thinking → searching → browsing (open/read) or finding (find_in_page) → done once answer text exists.
- * Stopped, with no answer, is its own state even if that frame is short.
+ * A streaming message with no answer text is never "已思考", including the first event and a reload
+ * of a turn that is still in progress. Stopped, with no answer, is its own state.
  */
 export const phaseOf = (message: Pick<Message, 'status' | 'blocks'>): ThinkPhase => {
   if (message.status === 'aborted' && !hasAnswer(message.blocks)) return 'stopped'
-  if (message.status !== 'streaming' || hasAnswer(message.blocks)) return 'done'
-  if (message.blocks.length === 0) return 'pending'
-  for (let index = message.blocks.length - 1; index >= 0; index -= 1) {
-    const block = message.blocks[index]
-    if (!block || (block.type === 'text' && !block.text.trim())) continue
-    const action = toolAction(block)
-    if (action === 'find_in_page') return 'finding'
-    if (action === 'open_page' || action === 'read_link' || block.type === 'web_fetch_tool_result') return 'browsing'
-    if (action === 'search' || block.type === 'web_search_tool_result') return 'searching'
-    if (block.type === 'thinking') return 'thinking'
+  // Still generating, and the answer has not started: never "已思考".
+  if (message.status === 'streaming' && !hasAnswer(message.blocks)) {
+    if (message.blocks.length === 0) return 'pending'
+    for (let index = message.blocks.length - 1; index >= 0; index -= 1) {
+      const block = message.blocks[index]
+      if (!block || (block.type === 'text' && !block.text.trim())) continue
+      const action = toolAction(block)
+      if (action === 'find_in_page') return 'finding'
+      if (action === 'open_page' || action === 'read_link' || block.type === 'web_fetch_tool_result') return 'browsing'
+      if (action === 'search' || block.type === 'web_search_tool_result') return 'searching'
+      if (block.type === 'thinking') return 'thinking'
+    }
+    return 'thinking'
   }
-  return 'thinking'
+  return 'done'
 }
 
 export const livePhase = (phase: ThinkPhase) =>

@@ -30,6 +30,26 @@ let abort: AbortController | null = null
 let serverAbort: AbortController | null = null
 let serverRunId: string | null = null
 let persistTimer = 0
+/** In-flight assistant. openChat and a refresh must not replace it with a finished title. */
+let liveTurn: { conversationId: string; message: Message } | null = null
+
+const rememberLive = (message: Message) => {
+  liveTurn = { conversationId: message.conversationId, message: structuredClone(message) }
+}
+
+const clearLive = (id: string) => {
+  if (liveTurn?.message.id === id) liveTurn = null
+}
+
+const withLive = (conversationId: string | null, messages: Message[]): Message[] => {
+  const live = liveTurn
+  if (!conversationId || !live || live.conversationId !== conversationId) return messages
+  const next = live.message
+  if (messages.some((item) => item.id === next.id)) {
+    return messages.map((item) => (item.id === next.id ? next : item))
+  }
+  return [...messages, next]
+}
 
 export type ServerQuota = {
   tokenUsed: number
@@ -286,7 +306,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         usages.push(row.usage)
       }
       if (conversation.id === activeId) {
-        messages = rows
+        messages = withLive(activeId, rows)
       }
     }
     let key: string | null = previousKey
@@ -418,7 +438,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       const conversation = get().conversations.find((item) => item.id === id)
       set({
         activeId: id,
-        messages: data.messages,
+        messages: withLive(id, data.messages),
         sidebarOpen: false,
         drafts: [],
         prefs: prefsFor(conversation, get().prefs),
@@ -426,7 +446,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const store = await repository()
-    const messages = await store.listMessages(id)
+    const messages = withLive(id, await store.listMessages(id))
     const conversation = get().conversations.find((item) => item.id === id)
     set({
       activeId: id,
@@ -1017,15 +1037,16 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   abort = new AbortController()
   let draft = createDraft()
   const clock = createThinkingClock()
+  let persistChain = Promise.resolve()
   const publish = (patch: Partial<Message>) => {
     const next = { ...assistant, ...patch, updatedAt: nowIso() }
     Object.assign(assistant, next)
+    rememberLive(assistant)
+    const snapshot = structuredClone(assistant)
+    persistChain = persistChain.then(() => store.saveMessage(snapshot)).catch(() => undefined)
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
     })
-  }
-  const persist = () => {
-    void store.saveMessage({ ...assistant })
   }
   try {
     for await (const event of client.streamMessage(key, body, abort.signal)) {
@@ -1045,8 +1066,6 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         usage: draft.usage,
         thinkingSeconds: clock.seconds(),
       })
-      window.clearTimeout(persistTimer)
-      persistTimer = window.setTimeout(persist, 200)
     }
     if (draft.stopReason === 'refusal') {
       publish({ status: 'refused', blocks: [], usage: draft.usage, errorMessage: null, thinkingSeconds: clock.seconds() })
@@ -1064,7 +1083,9 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     })
   } finally {
     window.clearTimeout(persistTimer)
+    await persistChain
     await store.saveMessage({ ...assistant })
+    clearLive(assistant.id)
     abort = null
     const usages = []
     for (const item of await store.listConversations()) {
@@ -1088,7 +1109,7 @@ const reloadLocal = async (set: Setter) => {
   const store = await repository()
   const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const activeId = conversations[0]?.id ?? null
-  const messages = activeId ? await store.listMessages(activeId) : []
+  const messages = activeId ? withLive(activeId, await store.listMessages(activeId)) : []
   set({ conversations, activeId, messages, serverMode: false })
 }
 
@@ -1245,6 +1266,8 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
               : item,
           ),
         })
+        const current = useHarbor.getState().messages.find((item) => item.id === assistant.id)
+        if (current) rememberLive(current)
       },
       serverAbort.signal,
     )
@@ -1286,6 +1309,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
     } catch {
       // The chat total still updates from the stream if the quota read fails.
     }
+    clearLive(assistant.id)
     useHarbor.setState({ streaming: false, totals: sumUsage([previous, draft.usage]), quota })
   }
 }
