@@ -23,8 +23,6 @@ const SHOTS = process.env.SHOTS
 const STRICT = process.env.FB1721_STRICT === '1'
 const KNOWN: Record<string, string> = {
   'fb1721-M': 'fb1721-M: 只认 $ / $$；\\( \\) 与 \\[ \\] 原样显示（反斜杠被 CommonMark 转义吃掉）；「$5 和 $10」被误当成公式',
-  'fb1721-L': 'fb1721-L: 思考块 markdown 段落/列表间距、缩进与官方 .ds-think-content 不一致',
-  'fb1721-N': 'fb1721-N: 正文列表嵌套间距与官方 .ds-markdown 不一致',
 }
 const knownFailure = (id: string) => { if (!STRICT && KNOWN[id]) test.fail(true, KNOWN[id]) }
 const reply = (where: 'body' | 'think', text: string) => (_req: unknown) => {
@@ -69,7 +67,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         if (!d.overflowing) expect.soft(Math.abs(d.centreDx), 'formula centred in column').toBeLessThanOrEqual(1) }
       // official katex.css: .katex{font:1.21em/1.2 …}
       expect(m.katexFontRatio).toEqual([1.21]) })
-    test('lists-spacing', async ({ page }) => { knownFailure(where === 'think' ? 'fb1721-L' : 'fb1721-N'); const c = await run(page, theme, where, LISTS)
+    test('lists-spacing', async ({ page }) => { const c = await run(page, theme, where, LISTS)
       const L = await c.evaluate((e) => (window as any).__lists(e))
       if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await c.screenshot({ path: join(SHOTS, `lists-${cell.replace(/ /g, '-')}.png`) }) }
       const ref = OFF.reference[`${theme}|${w}`][where]

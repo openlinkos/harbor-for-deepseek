@@ -750,6 +750,15 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .thinking-body .think-copy p + p { margin-top: 12px; }
 .think-copy,
 .think-copy li { font: var(--dsw-font-markdown-small); height: auto; }
+.think-copy ul,
+.think-copy ol { margin: 12px 0; padding-left: 18px; }
+.think-copy p + ol { margin-top: 4px; }
+.think-copy li { color: var(--dsw-alias-label-secondary); }
+.think-copy li + li { margin-top: 2px; }
+/* Marker line-height is 28px on a 24px line and absorbs 2px of margin, so 4px measures as the official 6px gap. */
+.think-copy li > ul,
+.think-copy li > ol { margin-top: 4px; margin-bottom: 0; }
+.think-copy li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose { font: var(--dsw-font-markdown-base); font-weight: 400; }
 .prose p { margin: 16px 0; font-size: 16px; font-weight: 400; line-height: 28px; }
 .prose p:first-child { margin-top: 0; }
@@ -757,6 +766,9 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
 .prose li + li { margin-top: 6px; }
+.prose li > ul,
+.prose li > ol { margin-top: 4px; margin-bottom: 0; }
+.prose li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose h1 { font: var(--dsw-font-markdown-h1); margin: 16px 0; }
 .prose h2 { font: var(--dsw-font-markdown-h2); margin: 16px 0; }
 .prose h3 { font: var(--dsw-font-markdown-h3); margin: 16px 0; }
