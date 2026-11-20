@@ -866,7 +866,7 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
   white-space: pre;
 }
 .code-card pre > code { display: block; }
-.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: rgb(129, 133, 140); }
+.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); }
 .action-row button {
   width: 28px;
   height: 28px;
@@ -874,13 +874,15 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
   border: 0;
   border-radius: 4096px;
   background: transparent;
-  color: rgb(129, 133, 140);
+  color: var(--dsw-alias-label-tertiary);
   font-size: 13px;
   line-height: 20px;
   display: grid;
   place-items: center;
 }
-.action-row button:hover, .action-row button.on { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+/* Official ds-button--iconLabelTertiary: hover wash only, icon color stays tertiary. */
+.action-row button:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.action-row button.on { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .usage, .hint { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .found-line { color: var(--dsw-alias-label-secondary); font-size: 14px; margin-bottom: 8px; }
 .favicons { display: inline-flex; align-items: center; margin-left: 6px; user-select: none; }
@@ -1031,18 +1033,29 @@ a.cite:hover, .cite:hover {
   font: 400 13px/20px var(--dsw-font-family);
   color: var(--dsw-alias-label-secondary);
 }
+/* Official .f93f59e4: 34px = 24px line + 8px padding + 2px border, padding 4px 10px 4px 4px, radius 100px, bg-base. */
 .sources-pill {
-  margin: 8px 0;
+  box-sizing: border-box;
+  height: 34px;
+  margin: 16px 0 0;
   border: 1px solid var(--dsw-alias-border-l2);
-  background: var(--dsw-alias-bg-layer-2);
-  border-radius: 999px;
-  padding: 4px 10px 4px 6px;
-  font-size: 13px;
+  background-color: var(--search-sites-summary-bg-color, var(--dsw-alias-bg-base));
+  border-radius: 100px;
+  padding: 4px 10px 4px 4px;
+  width: fit-content;
+  font-size: 14px;
+  line-height: 24px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   color: var(--dsw-alias-label-primary);
-  transition: background-color 0.2s var(--ds-ease-out);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--search-sites-summary-bg-transition-duration, 0.3s);
+}
+.sources-pill:hover {
+  background-color: var(--dsw-alias-interactive-bg-hover);
+  --search-row-site-logo-color: var(--dsw-alias-interactive-bg-hover);
 }
 .search-panel {
   width: 380px;
@@ -2451,18 +2464,22 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 .settings-modal.closing { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .settings-modal.closing .settings-shell { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .action-row button, .user-actions button { position: relative; }
-.action-row button::after, .user-actions button::after {
-  content: attr(data-tip);
+/* Official .ds-tooltip.ds-tooltip--s, placement bottom, mainAxis 4, sharp arrow 6px. */
+.ds-tooltip.ds-tooltip--s {
+  --dsl-tooltip-arrow-size: 6px;
+  --dsl-tooltip-color: var(--dsw-alias-tooltip-bg);
+  --dsl-tooltip-text-color: var(--dsw-static-neutral-bluish-00);
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 6px);
+  top: calc(100% + 4px);
   transform: translateX(-50%);
   padding: 4px 8px;
   border-radius: 10px;
-  background: var(--dsw-alias-tooltip-bg);
-  color: #fff;
+  background: var(--dsl-tooltip-color);
+  color: var(--dsl-tooltip-text-color);
   font-size: 12px;
   line-height: 1.5;
+  font-weight: 400;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
@@ -2470,7 +2487,24 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   transition-delay: 0s;
   z-index: 4;
 }
-.action-row button:hover::after, .user-actions button:hover::after, .action-row button:focus-visible::after, .user-actions button:focus-visible::after {
+body[data-ds-dark-theme] .ds-tooltip.ds-tooltip--s {
+  --dsl-tooltip-text-color: var(--dsw-alias-label-primary);
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+.ds-tooltip > .ds-tooltip__arrow.ds-tooltip__arrow--sharp {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: calc(var(--dsl-tooltip-arrow-size) * 1.414);
+  height: calc(var(--dsl-tooltip-arrow-size) * 1.414);
+  background: var(--dsl-tooltip-color);
+  transform: translate(-50%, 50%) rotate(45deg);
+  z-index: 1;
+}
+.action-row button:hover > .ds-tooltip,
+.user-actions button:hover > .ds-tooltip,
+.action-row button:focus-visible > .ds-tooltip,
+.user-actions button:focus-visible > .ds-tooltip {
   opacity: 1;
   transition-delay: var(--ds-transition-duration-fast);
 }
