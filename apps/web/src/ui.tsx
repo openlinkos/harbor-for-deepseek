@@ -440,6 +440,42 @@ const useT = () => {
     translate(locale, key, vars)
 }
 
+type TurnGroup = { id: string; messageIds: string[] }
+
+const turnGroups = (path: Message[]): TurnGroup[] => {
+  const groups: TurnGroup[] = []
+  let index = 0
+  while (index < path.length) {
+    const message = path[index]
+    if (message.role === 'user') {
+      const next = path[index + 1]
+      const assistant = next && next.role === 'assistant' ? next : null
+      groups.push({ id: message.id, messageIds: assistant ? [message.id, assistant.id] : [message.id] })
+      index += assistant ? 2 : 1
+    } else {
+      groups.push({ id: message.id, messageIds: [message.id] })
+      index += 1
+    }
+  }
+  return groups
+}
+
+type ShareModeValue = {
+  on: boolean
+  groupOf: (messageId: string) => string | null
+  selected: ReadonlySet<string>
+  toggle: (groupId: string) => void
+  enter: () => void
+}
+
+const ShareMode = createContext<ShareModeValue | null>(null)
+
+const LinkMark = () => (
+  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+    <path fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M6.6 9.4 9.4 6.6M7.2 5.4l.6-.6a2.3 2.3 0 0 1 3.2 3.2l-.6.6M8.8 10.6l-.6.6a2.3 2.3 0 0 1-3.2-3.2l.6-.6" />
+  </svg>
+)
+
 const EyeIcon = ({ off }: { off?: boolean }) => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
     <path
@@ -1028,6 +1064,9 @@ const AssistantTurn = ({ message }: { message: Message }) => {
 
 const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
+  const share = useContext(ShareMode)
+  const groupId = share?.groupOf(message.id) ?? null
+  const picked = Boolean(groupId && share?.selected.has(groupId))
   const messages = useHarbor((state) => state.messages)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
@@ -1060,7 +1099,11 @@ const MessageRow = ({ message }: { message: Message }) => {
     if (next && versionCurrent) void selectSibling(versionCurrent, next)
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
+      {share?.on && groupId ? (
+        <input className="share-box" type="checkbox" checked={picked} aria-label={textOf || t('share')} onChange={() => share.toggle(groupId)} />
+      ) : null}
+      <div className={share?.on ? `share-block${picked ? ' on' : ''}` : 'share-slot'}>
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1123,10 +1166,11 @@ const MessageRow = ({ message }: { message: Message }) => {
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
           <HoverTip text={t('share')}>
-            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
+            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter()}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
         </div>
       ) : null}
+      </div>
       {feedbackOpen ? (
         <div className="modal" role="dialog" aria-label={t('feedbackTitle')}>
           <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`deepapi-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>
@@ -1162,6 +1206,65 @@ export const Shell = () => {
     () => activePath(state.messages, conversation?.activeLeafId ?? null),
     [state.messages, conversation?.activeLeafId],
   )
+  const turns = useMemo(() => turnGroups(path), [path])
+  const [shareConv, setShareConv] = useState<string | null>(null)
+  const [shareIds, setShareIds] = useState<string[] | null>(null)
+  const [sharePrimed, setSharePrimed] = useState(false)
+  const [shareSoon, setShareSoon] = useState(false)
+  const sharing = shareIds !== null
+  const exitShare = () => {
+    setShareConv(null)
+    setShareIds(null)
+    setSharePrimed(false)
+    setShareSoon(false)
+  }
+  const enterShare = (id: string | null) => {
+    if (!id) return
+    setShareSoon(false)
+    setShareConv(id)
+    if (id !== conversation?.id) {
+      setSharePrimed(false)
+      setShareIds([])
+      void state.openChat(id)
+      return
+    }
+    const last = turns.at(-1)
+    setShareIds(last ? [last.id] : [])
+    setSharePrimed(true)
+  }
+  useEffect(() => {
+    if (!shareConv || sharePrimed || conversation?.id !== shareConv) return
+    if (!turns.length) {
+      setShareIds([])
+      setSharePrimed(true)
+      return
+    }
+    const last = turns[turns.length - 1]
+    setShareIds([last.id])
+    setSharePrimed(true)
+  }, [shareConv, sharePrimed, conversation?.id, turns])
+  useEffect(() => {
+    if (!sharing) return undefined
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.isComposing) return
+      event.preventDefault()
+      exitShare()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [sharing])
+  const shareValue: ShareModeValue = {
+    on: sharing,
+    groupOf: (messageId) => turns.find((group) => group.messageIds.includes(messageId))?.id ?? null,
+    selected: new Set(shareIds ?? []),
+    toggle: (groupId) => setShareIds((current) => {
+      const ids = current ?? []
+      return ids.includes(groupId) ? ids.filter((item) => item !== groupId) : [...ids, groupId]
+    }),
+    enter: () => enterShare(conversation?.id ?? null),
+  }
+  const selectedCount = turns.filter((group) => (shareIds ?? []).includes(group.id)).length
+  const allTurns = turns.length > 0 && selectedCount === turns.length
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
@@ -1386,6 +1489,7 @@ export const Shell = () => {
 
   return (
     <SourcesPanel.Provider value={sourcesApi}>
+    <ShareMode.Provider value={shareValue}>
     <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
@@ -1447,6 +1551,7 @@ export const Shell = () => {
                   picked={picked.includes(item.id)}
                   onPick={() => setPicked((ids) => ids.includes(item.id) ? ids.filter((id) => id !== item.id) : [...ids, item.id])}
                   onMulti={() => { setSelecting(true); setPicked([]) }}
+                  onShare={() => enterShare(item.id)}
                 />
               ))}
               {label === t('groupPinned') ? <div className="group-rule" data-testid="pinned-rule" /> : null}
@@ -1618,7 +1723,7 @@ export const Shell = () => {
               <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
             </button>
             {path.length > 0 ? (
-              <button className="icon-btn" type="button" aria-label="share" onClick={() => void (navigator.share ? navigator.share({ title: conversation?.title || 'DeepAPI', text: conversation?.title || '' }) : navigator.clipboard.writeText(conversation?.title || ''))}>
+              <button className="icon-btn" type="button" aria-label="share" onClick={() => enterShare(conversation?.id ?? null)}>
                 <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
               </button>
             ) : null}
@@ -1645,12 +1750,35 @@ export const Shell = () => {
                 {path.map((message) => conversation ? <MessageRow key={message.id} message={message} /> : null)}
                 <div ref={endRef} />
               </div>
-              <div className="composer-wrap">
-                <Composer />
-                <p className="footnote ai-note">{t('aiNote')}</p>
-              </div>
+              {sharing ? null : (
+                <div className="composer-wrap">
+                  <Composer />
+                  <p className="footnote ai-note">{t('aiNote')}</p>
+                </div>
+              )}
             </div>
-            {away ? (
+            {sharing ? (
+              <div className="share-bar">
+                <label className="share-all">
+                  <input
+                    data-testid="share-all"
+                    type="checkbox"
+                    checked={allTurns}
+                    onChange={() => setShareIds(allTurns ? [] : turns.map((group) => group.id))}
+                  />
+                  <span>{t('shareSelectAll')}</span>
+                </label>
+                <span className="share-split" aria-hidden="true" />
+                <span className="share-count" data-testid="share-count">{t('shareSelected', { count: selectedCount })}</span>
+                <span className="share-gap" />
+                <DsButton data-testid="share-cancel" onClick={exitShare}>{t('cancel')}</DsButton>
+                <DsButton data-testid="share-create" variant="primary" disabled={selectedCount === 0} onClick={() => setShareSoon(true)}>
+                  <LinkMark />
+                  {t('createShareLink')}
+                </DsButton>
+              </div>
+            ) : null}
+            {away && !sharing ? (
               <button className="jump-end" type="button" aria-label={t('scrollDown')} onClick={() => { stick.current = true; setAway(false); listRef.current?.scrollTo({ left: 0, top: listRef.current.scrollHeight, behavior: 'instant' }) }}>
                 <Icon d="M6 9l6 6 6-6" />
               </button>
@@ -1688,31 +1816,31 @@ export const Shell = () => {
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
+      {shareSoon ? (
+        <div className="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="share-soon-title" data-testid="share-soon" onClick={exitShare}>
+          <div className="share-soon-card" onClick={(event) => event.stopPropagation()}>
+            <button className="share-soon-x" type="button" aria-label={t('close')} data-testid="share-soon-x" onClick={exitShare}>
+              <Icon size={16} d="M6 6l12 12M18 6 6 18" />
+            </button>
+            <h2 id="share-soon-title">{t('shareSoonTitle')}</h2>
+            <p>{t('shareSoonBody')}</p>
+            <DsButton variant="primary" size="xs" data-testid="share-soon-ok" onClick={exitShare}>{t('shareSoonOk')}</DsButton>
+          </div>
+        </div>
+      ) : null}
     </div>
+    </ShareMode.Provider>
     </SourcesPanel.Provider>
   )
 }
 
-const EMPTY_MESSAGES: Message[] = []
-
-const downloadText = (filename: string, text: string) => {
-  const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-  URL.revokeObjectURL(url)
-}
-
-const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { conversation: Conversation; active: boolean; picking?: boolean; picked?: boolean; onPick?: () => void; onMulti?: () => void }) => {
+const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onShare }: { conversation: Conversation; active: boolean; picking?: boolean; picked?: boolean; onPick?: () => void; onMulti?: () => void; onShare?: () => void }) => {
   const t = useT()
   const openChat = useHarbor((state) => state.openChat)
   const setSidebarOpen = useHarbor((state) => state.setSidebarOpen)
   const rename = useHarbor((state) => state.rename)
   const pin = useHarbor((state) => state.pin)
   const removeChat = useHarbor((state) => state.removeChat)
-  const messages = useHarbor((state) => (state.activeId === conversation.id ? state.messages : EMPTY_MESSAGES))
   const [editing, setEditing] = useState(false)
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(conversation.title)
@@ -1774,14 +1902,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         <div ref={menuRef} className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" data-testid="chat-item-menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
           <div role="menuitem" tabIndex={0} onClick={() => { setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
-          <div role="menuitem" tabIndex={0} onClick={() => {
-            setOpen(false)
-            const body = messages.map((message) => {
-              const text = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
-              return `**${message.role}**\n\n${text}`
-            }).join('\n\n')
-            downloadText(`${conversation.title || 'deepapi'}.md`, `# ${conversation.title || 'DeepAPI'}\n\n${body}\n`)
-          }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onShare?.() }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
           <div role="menuitem" tabIndex={0} className="danger" onClick={() => { setOpen(false); setConfirming(true) }}><Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" /><span>{t('delete')}</span></div>
         </div>

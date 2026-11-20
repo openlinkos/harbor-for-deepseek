@@ -57,8 +57,6 @@ const knownFailure = (width: number, title: string): string | null => {
   if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
   // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
   if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
-  // fb1132 调查，没有单独修复项。顶栏是系统分享或复制标题；操作栏和 ⋯ 菜单直接下载 Markdown。官方流程是勾选消息后创建链接。
-  if (title === 'share entries agree and open the share flow') return 'fb1132 调查: 三个分享入口都没有进入勾选消息并创建链接，顶栏不打开分享流程，另外两个入口会下载 Markdown'
   // 390 上 ⋯ 是底部 sheet，.item-menu-scrim 挡住触发器。Esc 与点遮罩在同视口已通过。不得 skip。
   if (title === 'chat ⋯ menu cancels on retoggle' && width < 768) return 'fb1132 调查: 390 上 ⋯ 底部 sheet 的遮罩挡住触发器，再点 ⋯ 点不到'
   return null
