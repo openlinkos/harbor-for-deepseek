@@ -1655,10 +1655,33 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
 .settings-line.balance-line .account-side > .hint { margin-left: 8px; }
 .settings-line.balance-line .account-side > button { margin-left: 12px; }
 @media (max-width: 767px) {
-  .settings-line.balance-line:has(button) { align-items: flex-start; }
-  .settings-line.balance-line:has(button) > span:first-child { margin-top: 7px; }
-  .settings-line.balance-line .account-side > button { order: 1; margin-left: auto; }
-  .settings-line.balance-line .account-side > .hint { order: 2; flex-basis: 100%; margin-left: 0; margin-top: 4px; }
+  .settings-line.balance-line:has(button) { align-items: center; }
+  .settings-line.balance-line:has(button) .account-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: end;
+  }
+  .settings-line.balance-line .account-side > [data-testid='balance-side'] {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+  .settings-line.balance-line .account-side > .hint {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    max-width: 100%;
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+  }
+  .settings-line.balance-line .account-side > button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    margin-left: 12px;
+  }
 }
 .settings-account, .settings-data, .settings-legal { margin-top: -10px; }
 .settings-data + .settings-data { margin-top: 0; }
