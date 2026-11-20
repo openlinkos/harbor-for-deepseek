@@ -85,6 +85,11 @@ a { color: var(--dsw-alias-brand-text); }
   flex: 1;
   color: var(--dsw-alias-label-primary);
 }
+.sidebar .brand-name {
+  cursor: pointer;
+  flex: 0 0 auto;
+  width: max-content;
+}
 .wordmark {
   display: inline-flex;
   align-items: baseline;
