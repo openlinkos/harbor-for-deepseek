@@ -276,13 +276,13 @@ export const KeyGate = () => {
   const unlock = useHarbor((state) => state.unlock)
   const setLocale = useHarbor((state) => state.setLocale)
   const locale = useHarbor((state) => state.settings.locale)
+  const prefs = useHarbor((state) => state.prefs)
+  const setPrefs = useHarbor((state) => state.setPrefs)
   const [key, setKey] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [show, setShow] = useState(false)
   const [keyOpen, setKeyOpen] = useState(false)
   const [draft, setDraft] = useState('')
-  const [think, setThink] = useState(true)
-  const [search, setSearch] = useState(true)
   const [error, setError] = useState('')
 
   const onSave = (event: FormEvent) => {
@@ -352,10 +352,10 @@ export const KeyGate = () => {
               />
               <div className="composer-tools">
                 <div className="chips">
-                  <button type="button" className={think ? 'chip on' : 'chip'} aria-pressed={think} onClick={() => setThink((value) => !value)}>
+                  <button type="button" data-testid="landing-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
                     <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
                   </button>
-                  <button type="button" className={search ? 'chip on' : 'chip'} aria-pressed={search} onClick={() => setSearch((value) => !value)}>
+                  <button type="button" data-testid="landing-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
                     <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
                   </button>
                 </div>
@@ -730,9 +730,30 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     }
   }
   flush()
+  const hasThinking = steps.some((step) => step.type === 'think')
+  const renderStep = (step: (typeof steps)[number], index: number) => step.type === 'think' ? (
+    <div key={index} className="timeline-step think-copy"><Markdown text={step.text} /></div>
+  ) : step.type === 'search' ? (
+    <p key={index} className="timeline-step found-line">
+      <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+      {t('foundPages', { count: step.items.length })}
+      <SourceMarks items={step.items} />
+    </p>
+  ) : (
+    <p key={index} className="timeline-step found-line browse-line">
+      <Icon d="M6 4h9l3 3v13H6z" />
+      {t('browsedPages', { count: step.items.length })}
+      {step.items.map((item) => (
+        <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
+          {item.title}
+          <Icon size={12} d="M7 17 17 7M9 7h8v8" />
+        </a>
+      ))}
+    </p>
+  )
   return (
     <>
-      {steps.length ? (
+      {hasThinking ? (
         <section className="thinking" data-testid="thinking">
           <button type="button" data-testid="thinking-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
             <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
@@ -741,30 +762,11 @@ const AssistantTurn = ({ message }: { message: Message }) => {
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
             <div className="thinking-body">
-              {steps.map((step, index) => step.type === 'think' ? (
-                <div key={index} className="timeline-step think-copy"><Markdown text={step.text} /></div>
-              ) : step.type === 'search' ? (
-                <p key={index} className="timeline-step found-line">
-                  <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
-                  {t('foundPages', { count: step.items.length })}
-                  <SourceMarks items={step.items} />
-                </p>
-              ) : (
-                <p key={index} className="timeline-step found-line browse-line">
-                  <Icon d="M6 4h9l3 3v13H6z" />
-                  {t('browsedPages', { count: step.items.length })}
-                  {step.items.map((item) => (
-                    <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
-                      {item.title}
-                      <Icon size={12} d="M7 17 17 7M9 7h8v8" />
-                    </a>
-                  ))}
-                </p>
-              ))}
+              {steps.map(renderStep)}
             </div>
           </div>
         </section>
-      ) : null}
+      ) : steps.map(renderStep)}
       {texts.map((block, index) => {
         const marked = markSearchCitations(block.text, block.citations, sources)
         return (
