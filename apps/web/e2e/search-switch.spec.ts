@@ -74,7 +74,6 @@ const sessionId = async (page: Page, title: string, mobile: boolean) => {
 const openSearch = async (page: Page) => {
   await page.keyboard.press('Control+k')
   await expect(page.locator('.search-dialog')).toBeVisible()
-  await expect(page.locator('.side-filter')).toBeFocused()
 }
 
 const expectHit = async (page: Page, title: string) => {

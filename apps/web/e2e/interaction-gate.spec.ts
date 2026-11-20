@@ -53,8 +53,6 @@ const current = (page: Page) => page.getByTestId('message-list')
 // fb1132-4 搜索弹窗结果列表与切换；fb1132-5 删除确认 Esc/遮罩与重命名 Esc。
 // fb1132-5 明确不改「设置点遮罩」和「重命名点外部」（待确认），这两项仍失败。
 const knownFailure = (width: number, title: string): string | null => {
-  // fb1132-4：.search-dialog 只有输入框，没有匹配会话。输入只过滤侧栏；1440 上 .search-scrim 盖住侧栏。
-  if (title === 'switch conversation via search') return 'fb1132-4: 搜索弹窗没有结果列表，1440 上侧栏还被 .search-scrim 盖住'
   // fb1132-5 待确认，不在该修复范围：.settings-modal 没有遮罩点击关闭。Esc 已能关。
   if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
   // fb1132-5：ConfirmDialog 没有 Esc，只有「取消」按钮能关。
