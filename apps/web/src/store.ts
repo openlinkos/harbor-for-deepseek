@@ -108,6 +108,14 @@ const prefsFor = (conversation: Conversation | undefined, fallback: Prefs): Pref
 const nowIso = () => new Date().toISOString()
 const nid = () => crypto.randomUUID()
 
+const blockText = (block: Message['blocks'][number]) => {
+  if (block.type === 'text') return block.text
+  if (block.type === 'thinking') return block.thinking
+  return ''
+}
+
+const messageText = (message: Message) => message.blocks.map(blockText).filter(Boolean).join('\n')
+
 const blankConversation = (prefs: Prefs): Conversation => {
   const now = nowIso()
   return {
@@ -151,6 +159,8 @@ export type HarborState = {
   setPrefs: (patch: Partial<Prefs>) => Promise<void>
   newChat: () => Promise<void>
   openChat: (id: string) => Promise<void>
+  /** Message text for every chat, used by the history search dialog. */
+  loadSearchCorpus: () => Promise<Record<string, string>>
   rename: (id: string, title: string) => Promise<void>
   pin: (id: string) => Promise<void>
   pinMany: (ids: string[]) => Promise<void>
@@ -424,6 +434,30 @@ export const useHarbor = create<HarborState>((set, get) => ({
       drafts: [],
       prefs: prefsFor(conversation, get().prefs),
     })
+  },
+
+  async loadSearchCorpus() {
+    const { conversations, serverMode, activeId, messages } = get()
+    const out: Record<string, string> = {}
+    if (activeId) out[activeId] = messages.map(messageText).join('\n')
+    if (serverMode) {
+      await Promise.all(conversations.map(async (item) => {
+        if (item.id === activeId) return
+        try {
+          const data = await api<{ messages: Message[] }>(`/api/conversations/${item.id}/messages`)
+          out[item.id] = data.messages.map(messageText).join('\n')
+        } catch {
+          out[item.id] = ''
+        }
+      }))
+      return out
+    }
+    const store = await repository()
+    await Promise.all(conversations.map(async (item) => {
+      const stored = (await store.listMessages(item.id)).map(messageText).join('\n')
+      out[item.id] = item.id === activeId && out[item.id] ? out[item.id] : stored
+    }))
+    return out
   },
 
   async rename(id, title) {
