@@ -54,6 +54,29 @@ describe('stream reducer', () => {
     })
   })
 
+  it('records the text offset a citation arrived at', () => {
+    const draft = reduceEvents([
+      { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '甲。' } },
+      {
+        type: 'content_block_delta',
+        index: 0,
+        delta: {
+          type: 'citations_delta',
+          citation: {
+            type: 'web_search_result_location',
+            url: 'https://example.com/a',
+            title: 'A',
+            cited_text: 'src',
+            encrypted_index: '',
+          },
+        },
+      },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '乙。' } },
+    ])
+    expect(draft.blocks[0]).toMatchObject({ type: 'text', text: '甲。乙。', citations: [{ at: 2, url: 'https://example.com/a' }] })
+  })
+
   it('preserves the deep-search billing split from the weather round', () => {
     expect(weatherUsage.server_tool_use.web_fetch_requests).toBe(4)
     expect(weatherUsage.server_tool_use.tool_fetch).toBe(0)

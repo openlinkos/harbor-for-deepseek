@@ -1,4 +1,4 @@
-import type { ContentBlock, TextBlock } from '@deepapi/types'
+import type { ContentBlock, TextBlock, TextCitation } from '@deepapi/types'
 
 const ONLY_PUNCT = /^[\s。．.!?！？…,，、；;：:]+$/u
 
@@ -59,4 +59,99 @@ export const presentBlocks = (blocks: ContentBlock[]): ContentBlock[] => {
     result.push(markdown === block.text ? block : { ...block, text: markdown })
   }
   return result
+}
+
+const SENTENCE_END = /[。！？.!?]/u
+
+const isSentenceEnd = (char: string) => SENTENCE_END.test(char)
+
+/** Move `at` to the end of its sentence, including the closing punctuation. */
+const sentenceEnd = (text: string, at: number): number => {
+  const cursor = Math.max(0, Math.min(at, text.length))
+  if (cursor > 0 && isSentenceEnd(text[cursor - 1] ?? '')) return cursor
+  const rest = text.slice(cursor)
+  let index = 0
+  while (index < rest.length && rest[index] !== '\n' && !isSentenceEnd(rest[index] ?? '')) index += 1
+  if (index < rest.length && isSentenceEnd(rest[index] ?? '')) return cursor + index + 1
+  if (index < rest.length && rest[index] === '\n') return cursor + index
+  return text.length
+}
+
+export type SearchCiteSource = {
+  url: string
+  title: string
+  site: string
+  snippet?: string
+  date?: string
+  icon?: string | null
+}
+
+export type SearchCiteCard = {
+  title: string
+  site: string
+  snippet: string
+  date?: string
+  icon?: string | null
+  url: string
+}
+
+const citationAt = (text: string, citation: TextCitation): number => {
+  if (typeof citation.at === 'number' && Number.isFinite(citation.at)) return sentenceEnd(text, citation.at)
+  const needle = citation.cited_text.trim()
+  if (needle) {
+    const found = text.indexOf(needle)
+    if (found >= 0) return sentenceEnd(text, found + needle.length)
+  }
+  return text.length
+}
+
+/**
+ * Search answers ship plain text. Insert 〔n〕 at the end of the sentence that
+ * was current when the citation arrived. n is that URL's 1-based index in this
+ * message's search results, the same number chat.deepseek.com prints.
+ */
+export const markSearchCitations = (
+  text: string,
+  citations: TextCitation[] | undefined,
+  sources: SearchCiteSource[],
+): { text: string; citations: TextCitation[]; sites: string[]; cards: SearchCiteCard[] } => {
+  if (!citations?.length || sources.length === 0) {
+    return { text, citations: citations ?? [], sites: [], cards: [] }
+  }
+  const aligned: TextCitation[] = []
+  const sites: string[] = []
+  const cards: SearchCiteCard[] = []
+  const inserts: { at: number; n: number }[] = []
+  for (const citation of citations) {
+    const index = sources.findIndex((item) => item.url === citation.url)
+    if (index < 0) continue
+    const source = sources[index]
+    if (!source) continue
+    const title = source.title || citation.title || citation.url
+    aligned[index] = { ...citation, title }
+    sites[index] = source.site
+    cards[index] = {
+      title,
+      site: source.site,
+      snippet: source.snippet ?? '',
+      date: source.date,
+      icon: source.icon ?? null,
+      url: source.url,
+    }
+    inserts.push({ at: citationAt(text, citation), n: index + 1 })
+  }
+  inserts.sort((a, b) => a.at - b.at || a.n - b.n)
+  const unique: { at: number; n: number }[] = []
+  for (const insert of inserts) {
+    const previous = unique.at(-1)
+    if (previous && previous.at === insert.at && previous.n === insert.n) continue
+    unique.push(insert)
+  }
+  let marked = text
+  for (let index = unique.length - 1; index >= 0; index -= 1) {
+    const insert = unique[index]
+    if (!insert) continue
+    marked = `${marked.slice(0, insert.at)}〔${insert.n}〕${marked.slice(insert.at)}`
+  }
+  return { text: marked, citations: aligned, sites, cards }
 }

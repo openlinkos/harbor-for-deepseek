@@ -1,5 +1,5 @@
 import { translate, type Locale } from '@deepapi/i18n'
-import { presentBlocks } from './blocks.js'
+import { markSearchCitations, presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@deepapi/pricing'
 import { activePath, siblingIds } from '@deepapi/types'
 import type { ContentBlock, Conversation, Message } from '@deepapi/types'
@@ -683,11 +683,14 @@ const AssistantTurn = ({ message }: { message: Message }) => {
           </div>
         </section>
       ) : null}
-      {texts.map((block, index) => (
-        <div className="prose" data-testid={index === 0 ? 'assistant-text' : undefined} key={index}>
-          <Markdown text={block.text} citations={block.citations} />
-        </div>
-      ))}
+      {texts.map((block, index) => {
+        const marked = markSearchCitations(block.text, block.citations, sources)
+        return (
+          <div className="prose" data-testid={index === 0 ? 'assistant-text' : undefined} key={index}>
+            <Markdown text={marked.text} citations={marked.citations} cards={marked.cards} />
+          </div>
+        )
+      })}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
