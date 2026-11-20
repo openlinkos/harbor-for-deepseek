@@ -58,9 +58,10 @@ export const reduceEvent = (draft: AssistantDraft, event: StreamEvent): Assistan
         blocks[event.index] = { ...thinking, signature: event.delta.signature }
       } else if (event.delta.type === 'citations_delta') {
         const text = asText(current)
+        const citation = { ...event.delta.citation, at: text.text.length }
         blocks[event.index] = {
           ...text,
-          citations: [...(text.citations ?? []), event.delta.citation],
+          citations: [...(text.citations ?? []), citation],
         }
       }
       return { ...draft, blocks }

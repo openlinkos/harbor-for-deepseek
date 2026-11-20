@@ -2,6 +2,9 @@ import { expect, test, type Page, type Route } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
+const artifacts = '/opt/cursor/artifacts'
+mkdirSync(artifacts, { recursive: true })
+
 const shots = join(process.cwd(), '../../docs/parity/ours')
 mkdirSync(shots, { recursive: true })
 
@@ -232,7 +235,160 @@ test('search citations', async ({ page }) => {
     await route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: sse(events) })
   })
   await send(page, '人口')
-  await expect(page.locator('.cite')).toContainText('1')
+  await expect(page.locator('.cite')).toHaveText(['1'])
+  await page.locator('.cite').hover()
+  await expect(page.locator('.hover-card')).toContainText('Iceland')
+  await expect(page.locator('.hover-card')).toContainText('394,000')
+})
+
+const searchResults = [
+  { type: 'web_search_result', title: '冰岛人口统计', url: 'https://example.com/pop', snippet: '约三十九万', site_name: '国家统计局' },
+  { type: 'web_search_result', title: '未引用甲', url: 'https://example.com/a', snippet: '甲', site_name: '甲站' },
+  { type: 'web_search_result', title: '未引用乙', url: 'https://example.com/b', snippet: '乙', site_name: '乙站' },
+  { type: 'web_search_result', title: '未引用丙', url: 'https://example.com/c', snippet: '丙', site_name: '丙站' },
+  { type: 'web_search_result', title: '雷克雅未克概况', url: 'https://example.com/city', snippet: '首都', site_name: '地理志' },
+]
+
+const searchCiteEvents = () => [
+  { type: 'message_start', message: { id: 'req-cite', model: 'deepseek-flash' } },
+  { type: 'content_block_start', index: 0, content_block: { type: 'server_tool_use', id: 'tool-cite', name: 'deepseek_web_search', input: { action: 'search', queries: ['冰岛人口'] }, caller: { type: 'direct' }, kind: 'search' } },
+  { type: 'content_block_stop', index: 0 },
+  { type: 'content_block_start', index: 1, content_block: { type: 'web_search_tool_result', tool_use_id: 'tool-cite', kind: 'search', content: searchResults } },
+  { type: 'content_block_stop', index: 1 },
+  { type: 'content_block_start', index: 2, content_block: { type: 'text', text: '' } },
+  { type: 'content_block_delta', index: 2, delta: { type: 'text_delta', text: '冰岛大约有三十九万人。' } },
+  { type: 'content_block_delta', index: 2, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/pop', title: '模型引用标题', cited_text: 'Population of Iceland is about 390,000 according to the source page.', encrypted_index: '' } } },
+  { type: 'content_block_delta', index: 2, delta: { type: 'text_delta', text: '首都是雷克雅未克。' } },
+  { type: 'content_block_delta', index: 2, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/city', title: '模型城市标题', cited_text: 'Reykjavik is the capital city listed on the source page.', encrypted_index: '' } } },
+  { type: 'content_block_stop', index: 2 },
+  { type: 'message_delta', delta: { stop_reason: 'end_turn', title: '冰岛' }, usage: { input_tokens: 12, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: 8, service_tier: 'standard' } },
+  { type: 'message_stop' },
+]
+
+const openSearchAnswer = async (page: Page) => {
+  await unlock(page)
+  await page.unroute('https://api.deepseek.com/**')
+  await page.route('https://api.deepseek.com/**', async (route) => {
+    if (!route.request().url().includes('/messages')) {
+      await fulfill(route)
+      return
+    }
+    await route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: sse(searchCiteEvents()) })
+  })
+  await send(page, '冰岛人口和首都')
+  return page.getByTestId('assistant-text').locator('.cite')
+}
+
+test('search cite numbers follow the result list', async ({ page }) => {
+  const cites = await openSearchAnswer(page)
+  await expect(cites).toHaveText(['1', '5'])
+  const shape = await page.getByTestId('assistant-text').evaluate((root) =>
+    [...root.querySelectorAll('.cite')].map((node) => {
+      const style = getComputedStyle(node)
+      return {
+        text: node.textContent,
+        connected: node.isConnected,
+        tl: style.borderTopLeftRadius,
+        tr: style.borderTopRightRadius,
+        br: style.borderBottomRightRadius,
+        bl: style.borderBottomLeftRadius,
+        background: style.backgroundColor,
+      }
+    }),
+  )
+  expect(shape).toHaveLength(2)
+  expect(shape[0]).toMatchObject({ text: '1', connected: true, tl: '6px', tr: '6px', br: '6px', bl: '0px' })
+  expect(shape[0]?.background).not.toBe('rgba(0, 0, 0, 0)')
+  expect(shape[1]?.text).toBe('5')
+  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-badges.png') })
+})
+
+test('search cite marks sit at the end of the cited sentence', async ({ page }) => {
+  const cites = await openSearchAnswer(page)
+  const tails = await cites.evaluateAll((nodes) => nodes.map((node) => {
+    const previous = node.parentElement?.previousSibling
+    return previous && previous.nodeType === Node.TEXT_NODE ? previous.textContent ?? '' : ''
+  }))
+  expect(tails[0]?.endsWith('三十九万人。')).toBe(true)
+  expect(tails[1]?.endsWith('雷克雅未克。')).toBe(true)
+  expect(tails[0]?.includes('雷克雅未克')).toBe(false)
+})
+
+test('search cite hover shows the result title and site', async ({ page }) => {
+  const cites = await openSearchAnswer(page)
+  await cites.nth(0).hover()
+  const first = page.getByTestId('assistant-text').locator('.hover-card').nth(0)
+  await expect(first).toBeVisible()
+  await expect(first).toContainText('冰岛人口统计')
+  await expect(first).toContainText('国家统计局')
+  await expect(first).not.toContainText('模型引用标题')
+  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-hover-1.png') })
+  await page.mouse.move(8, 8)
+  await cites.nth(1).hover()
+  const second = page.getByTestId('assistant-text').locator('.hover-card').nth(1)
+  await expect(second).toBeVisible()
+  await expect(second).toContainText('雷克雅未克概况')
+  await expect(second).toContainText('地理志')
+  await expect(second).not.toContainText('模型城市标题')
+  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-hover-5.png') })
+})
+
+test('search cite click opens the result url in a new tab', async ({ page }) => {
+  await page.context().route('https://example.com/**', async (route) => {
+    const url = route.request().url()
+    await route.fulfill({ status: 200, contentType: 'text/html', body: `<!doctype html><title>${url}</title><h1>${url}</h1>` })
+  })
+  const cites = await openSearchAnswer(page)
+  await expect(cites.nth(0)).toHaveAttribute('href', 'https://example.com/pop')
+  await expect(cites.nth(0)).toHaveAttribute('target', '_blank')
+  const [first] = await Promise.all([
+    page.context().waitForEvent('page'),
+    cites.nth(0).click(),
+  ])
+  await first.waitForLoadState('domcontentloaded')
+  await expect(first).toHaveURL('https://example.com/pop')
+  await first.screenshot({ path: join(artifacts, 'cite-click-1.png') })
+  await first.close()
+  await expect(cites.nth(1)).toHaveAttribute('href', 'https://example.com/city')
+  await expect(cites.nth(1)).toHaveAttribute('target', '_blank')
+  const [second] = await Promise.all([
+    page.context().waitForEvent('page'),
+    cites.nth(1).click(),
+  ])
+  await second.waitForLoadState('domcontentloaded')
+  await expect(second).toHaveURL('https://example.com/city')
+  await second.screenshot({ path: join(artifacts, 'cite-click-5.png') })
+})
+
+test('non-search citations keep citation-order marks', async ({ page }) => {
+  await unlock(page)
+  await page.unroute('https://api.deepseek.com/**')
+  await page.route('https://api.deepseek.com/**', async (route) => {
+    if (!route.request().url().includes('/messages')) {
+      await fulfill(route)
+      return
+    }
+    const events = [
+      { type: 'message_start', message: { id: 'req-plain', model: 'deepseek-flash' } },
+      { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '甲结论。乙结论。〔1〕〔2〕' } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/a', title: '甲来源', cited_text: '甲', encrypted_index: '' } } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'citations_delta', citation: { type: 'web_search_result_location', url: 'https://example.com/b', title: '乙来源', cited_text: '乙', encrypted_index: '' } } },
+      { type: 'message_delta', delta: { stop_reason: 'end_turn', title: '顺序' }, usage: { input_tokens: 3, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: 3, service_tier: 'standard' } },
+      { type: 'message_stop' },
+    ]
+    await route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: sse(events) })
+  })
+  await send(page, '两处引用')
+  const cites = page.getByTestId('assistant-text').locator('.cite')
+  await expect(cites).toHaveText(['1', '2'])
+  const tail = await cites.nth(0).evaluate((node) => node.parentElement?.previousSibling?.textContent ?? '')
+  expect(tail.endsWith('乙结论。')).toBe(true)
+  const between = await cites.nth(1).evaluate((node) => node.parentElement?.previousElementSibling?.className ?? '')
+  expect(between).toContain('cite-wrap')
+  await cites.nth(0).hover()
+  await expect(page.locator('.hover-card').nth(0)).toContainText('甲来源')
+  await page.locator('.turn.assistant').screenshot({ path: join(artifacts, 'cite-nonssearch.png') })
 })
 
 test('markdown surfaces', async ({ page }) => {

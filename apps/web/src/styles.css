@@ -729,6 +729,7 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
 }
 .favicons i { margin-left: -4px; }
 .favicons i:first-child { margin-left: 0; }
+.cite-wrap { display: inline; position: relative; }
 .cite {
   display: inline-flex;
   align-items: center;
@@ -748,9 +749,11 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
   user-select: none;
   cursor: pointer;
   position: relative;
+  text-decoration: none;
 }
-.cite + .cite { margin-left: 0; }
-.cite .hover-card {
+a.cite:visited, a.cite:hover { color: var(--dsw-alias-label-tertiary); text-decoration: none; }
+.cite + .cite, .cite-wrap + .cite-wrap .cite { margin-left: 0; }
+.cite-wrap .hover-card {
   display: none;
   position: absolute;
   left: 0;
@@ -764,7 +767,8 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
   z-index: 5;
   text-align: left;
 }
-.cite:hover .hover-card { display: block; }
+.cite-wrap:hover .hover-card { display: block; }
+.cite-wrap .hover-card p { margin: 4px 0 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-secondary); font-weight: 400; }
 .sources-pill {
   margin: 8px 0;
   border: 1px solid var(--dsw-alias-border-l2);

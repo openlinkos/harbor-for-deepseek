@@ -196,7 +196,7 @@ class Boundary extends Component<{ text: string; children: ReactNode }, { failed
   }
 }
 
-const citeChildren = (children: ReactNode, citations?: TextCitation[]) =>
+const citeChildren = (children: ReactNode, citations?: TextCitation[], sites?: string[]) =>
   Children.map(children, (child) => {
     if (typeof child !== 'string' || !(/〔\d+〕|\[\d+\]|\(\d+\)/.test(child))) {
       return child
@@ -207,29 +207,38 @@ const citeChildren = (children: ReactNode, citations?: TextCitation[]) =>
       if (!match || !citation) {
         return bit
       }
-      return (
-        <span className="cite" key={`${citation.url}-${index}`}>
+      const href = /^https?:\/\//i.test(citation.url) ? citation.url : undefined
+      const site = sites?.[Number(match[1]) - 1]
+      const badge = href ? (
+        <a className="cite" href={href} target="_blank" rel="noreferrer noopener">
           {match[1]}
+        </a>
+      ) : (
+        <span className="cite">{match[1]}</span>
+      )
+      return (
+        <span className="cite-wrap" key={`${citation.url}-${match[1]}-${index}`}>
+          {badge}
           <span className="hover-card">
             <strong>{citation.title || citation.url}</strong>
-            <p>{citation.cited_text}</p>
+            {site ? <p>{site}</p> : citation.cited_text ? <p>{citation.cited_text}</p> : null}
           </span>
         </span>
       )
     })
   })
 
-export const Markdown = ({ text, citations }: { text: string; citations?: TextCitation[] }) => (
+export const Markdown = ({ text, citations, sites }: { text: string; citations?: TextCitation[]; sites?: string[] }) => (
   <Boundary text={text}>
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
         p({ children }) {
-          return <p>{citeChildren(children, citations)}</p>
+          return <p>{citeChildren(children, citations, sites)}</p>
         },
         li({ children }) {
-          return <li>{citeChildren(children, citations)}</li>
+          return <li>{citeChildren(children, citations, sites)}</li>
         },
         a({ href, children }) {
           const safe = href && /^https?:\/\//i.test(href) ? href : undefined

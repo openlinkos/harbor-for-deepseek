@@ -15,6 +15,8 @@ export type TextCitation = {
   title: string | null
   cited_text: string
   encrypted_index: string
+  /** Code units into the text block when the citation arrived. Set locally; the API does not send it. */
+  at?: number
 }
 
 export type TextBlock = {
