@@ -6,8 +6,8 @@
 // Generic row invariants (lib/fb1721-rows.js) on EVERY settings tab × light/dark × 1440/1920/390 × zh/en ×
 // control states (switches flipped, safety low). No per-row whitelist: brand-exception rows (界面包、安全等级…)
 // are checked exactly like official rows.
-// Red cases on master are test.fail() via knownFailure(). IDs are fb1721-S1 … fb1721-S4.
-// A fix PR deletes only its own id. An unexpected pass fails the run. FB1721_STRICT=1 ignores knownFailure.
+// S1–S4 are fixed. Remaining fb1721 ids live in the markdown and state-style specs.
+// An unexpected pass fails the run. FB1721_STRICT=1 ignores knownFailure.
 import { expect, test } from '@playwright/test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -17,15 +17,6 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const ROWS = readFileSync(join(HERE, 'lib/fb1721-rows.js'), 'utf8')
 const OFF = JSON.parse(readFileSync(join(HERE, 'fixtures/official-fb1721.json'), 'utf8'))
 const SHOTS = process.env.SHOTS
-const STRICT = process.env.FB1721_STRICT === '1'
-// Known failure on master 6eae2b7 → the fix PR deletes this id.
-const KNOWN: Record<string, string> = {
-  'fb1721-S1': 'fb1721-S1: 界面包两个按钮竖排 80px 塞进 60px 行，跨分隔线；其余行在部分变体下也错位',
-  'fb1721-S2': 'fb1721-S2: 数据管理分区 margin-top:-10px 让相邻行重叠 10px；390 英文「Key on this device」按钮不靠右',
-  'fb1721-S3': 'fb1721-S3: 深色分隔线用了浅色 rgba(0,0,0,.1)，官方 rgba(255,255,255,.06)',
-  'fb1721-S4': 'fb1721-S4: 390 余额行换行后按钮/标签不居中',
-}
-const knownFailure = (id: string) => { if (!STRICT && KNOWN[id]) test.fail(true, KNOWN[id]) }
 const TABS = ['general', 'account', 'data', 'legal']
 const VARIANTS: { theme: 'light' | 'dark'; w: number; h: number; lang: 'zh' | 'en'; flip: boolean }[] = []
 for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900], [1920, 1072], [390, 844]]) for (const lang of ['zh', 'en'] as const) VARIANTS.push({ theme, w, h, lang, flip: false })
@@ -35,10 +26,6 @@ for (const v of VARIANTS) {
   test.describe(`fb1721 settings ${cell}`, () => {
     test.use({ viewport: { width: v.w, height: v.h }, colorScheme: v.theme, bypassCSP: true })
     for (const tab of TABS) test(`rows-${tab}`, async ({ page }) => {
-      if (tab === 'general') knownFailure('fb1721-S1')
-      else if (tab === 'data') knownFailure('fb1721-S2')
-      else if (tab === 'account' && v.theme === 'dark') knownFailure('fb1721-S3')
-      else if (tab === 'account' && v.w < 768) knownFailure('fb1721-S4')
       await boot(page, v.theme); await openSettings(page)
       if (v.lang === 'en') { await page.getByTestId('language-trigger').click(); await page.getByRole('option', { name: 'English' }).click(); await page.waitForTimeout(300) }
       if (v.flip) { for (const s of await page.locator('[data-testid=settings-dialog] .switch').all()) if (await s.isVisible()) await s.click()

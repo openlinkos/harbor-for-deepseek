@@ -449,7 +449,7 @@ test('390 balance label stays on one line', async ({ page }) => {
   expect(box!.width).toBeGreaterThan(27)
 })
 
-test('390 balance refresh stays on the value line', async ({ page }) => {
+test('390 balance label and refresh sit on the row centre', async ({ page }) => {
   await install(page)
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
@@ -460,19 +460,26 @@ test('390 balance refresh stays on the value line', async ({ page }) => {
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '账号管理' }).click()
-  const centers = await page.evaluate(() => {
-    const mid = (selector: string) => {
+  const metrics = await page.evaluate(() => {
+    const box = (selector: string) => {
       const rect = document.querySelector(selector)!.getBoundingClientRect()
-      return rect.top + rect.height / 2
+      return { top: rect.top, bottom: rect.bottom, mid: rect.top + rect.height / 2, right: rect.right }
     }
+    const row = document.querySelector('[data-testid="balance-label"]')!.closest('.settings-line')!.getBoundingClientRect()
     return {
-      value: mid('[data-testid="balance-value"]'),
-      button: mid('[data-testid="refresh-balance"]'),
-      label: mid('[data-testid="balance-label"]'),
+      rowMid: row.top + row.height / 2,
+      rowRight: row.right,
+      label: box('[data-testid="balance-label"]'),
+      value: box('[data-testid="balance-value"]'),
+      button: box('[data-testid="refresh-balance"]'),
+      hint: box('[data-testid="balance-hint"]'),
     }
   })
-  expect(Math.abs(centers.button - centers.value)).toBeLessThanOrEqual(4)
-  expect(Math.abs(centers.label - centers.value)).toBeLessThanOrEqual(4)
+  expect(Math.abs(metrics.label.mid - metrics.rowMid)).toBeLessThanOrEqual(1)
+  expect(Math.abs(metrics.button.mid - metrics.rowMid)).toBeLessThanOrEqual(1)
+  expect(Math.abs(metrics.button.right - metrics.rowRight)).toBeLessThanOrEqual(1)
+  expect(metrics.hint.top).toBeGreaterThanOrEqual(metrics.value.bottom - 1)
+  expect(metrics.button.right).toBeGreaterThan(metrics.value.right)
 })
 
 test('balance hint keeps a gap from the value', async ({ page }) => {
