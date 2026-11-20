@@ -862,6 +862,39 @@ const hostOf = (url: string) => {
   }
 }
 
+const samePage = (left: string, right: string) => {
+  try {
+    return new URL(left).href === new URL(right).href
+  } catch {
+    return left === right
+  }
+}
+
+type BrowsePage = { title: string; url: string; fetched: boolean }
+
+/** One row per URL. A fetch result replaces the hostname that open_page showed first; the page title is kept verbatim. */
+const pushBrowse = (pages: BrowsePage[], url: string, title: string, fetched: boolean) => {
+  const found = pages.find((page) => samePage(page.url, url))
+  if (!found) {
+    pages.push({ title, url, fetched })
+    return
+  }
+  if (fetched) {
+    found.title = title
+    found.fetched = true
+  }
+}
+
+const BROWSE_EXTERNAL_PATH = 'M6.54199 8.62824C6.54199 8.44193 6.54146 8.28829 6.53906 8.15851L1.11719 13.5814L0.728516 13.1927L0.339844 12.803L5.76172 7.38019C5.63201 7.3778 5.47812 7.37824 5.29199 7.37824H1.43555V6.27863H5.29199C5.65471 6.27863 5.97167 6.27814 6.22852 6.30597C6.49541 6.33493 6.76232 6.3998 7.00293 6.57452C7.13452 6.67013 7.25108 6.78571 7.34668 6.9173C7.52157 7.15808 7.5863 7.4256 7.61523 7.69269C7.64305 7.94948 7.64258 8.26562 7.64258 8.62824V12.4857H6.54199V8.62824Z'
+
+const BrowseExternalIcon = () => (
+  <span className="browse-ext" aria-hidden="true">
+    <svg width={14} height={14} viewBox="0 0 8 14" fill="none">
+      <path d={BROWSE_EXTERNAL_PATH} fill="currentColor" />
+    </svg>
+  </span>
+)
+
 const AssistantTurn = ({ message }: { message: Message }) => {
   const t = useT()
   const sourcesApi = useContext(SourcesPanel)
@@ -880,10 +913,10 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   const steps: Array<
     | { type: 'think'; text: string }
     | { type: 'search'; items: SourceItem[] }
-    | { type: 'browse'; items: { title: string; url: string }[] }
+    | { type: 'browse'; items: BrowsePage[] }
   > = []
   const texts: Extract<ContentBlock, { type: 'text' }>[] = []
-  let browse: { title: string; url: string }[] = []
+  let browse: BrowsePage[] = []
   const flush = () => {
     if (browse.length) {
       steps.push({ type: 'browse', items: browse })
@@ -908,11 +941,12 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       sources.push(...items)
       if (items.length) steps.push({ type: 'search', items })
     } else if (block.type === 'web_fetch_tool_result' && block.content.type !== 'web_fetch_tool_result_error') {
-      browse.push({ title: block.content.content?.title || hostOf(block.content.url), url: block.content.url })
+      const url = block.content.url
+      pushBrowse(browse, url, block.content.content?.title || hostOf(url), true)
     } else if (block.type === 'server_tool_use') {
       const action = block.input.action
       if ((action === 'open_page' || action === 'read_link') && 'url' in block.input && typeof block.input.url === 'string') {
-        browse.push({ title: hostOf(block.input.url), url: block.input.url })
+        pushBrowse(browse, block.input.url, hostOf(block.input.url), false)
       }
     } else if (block.type === 'text') {
       flush()
@@ -948,12 +982,12 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       <p key={index} className={`timeline-step timeline-browse found-line browse-line ${last}`}>
         <span className="timeline-line" aria-hidden="true" />
         <Glyph name="document" size={14} />
-        {t('browsedPages', { count: step.items.length })}
+        <span className="browse-count">{t('browsedPages', { count: step.items.length })}</span>
         {step.items.map((item) => (
-          <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
-            {item.title}
-            <Icon size={12} d="M7 17 17 7M9 7h8v8" />
-          </a>
+          <span key={item.url} className="browse-item">
+            <a className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
+            <BrowseExternalIcon />
+          </span>
         ))}
       </p>
     )
