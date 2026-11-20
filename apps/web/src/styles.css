@@ -923,8 +923,9 @@ button.chip { appearance: none; margin: 0; }
   box-shadow: none;
 }
 /* Group margin is official ._5f9bba8 (0 2px). firstGapPx in official-fb1554.json is 4 CSS px.
-   top -1px is CSS px from getBoundingClientRect: inline-flex plus cite top -5px measures dyTop 2, the fixture is 1. Not read off a screenshot. */
-.cite-wrap { display: inline; position: relative; margin: 0 2px; top: -1px; }
+   top 1px is CSS px, not a screenshot: Playwright CI installs fonts-wqy-zenhei, and with that face
+   inline-flex plus cite top -5px measures dyTop 0. One CSS px down lands on the fixture's 1. */
+.cite-wrap { display: inline; position: relative; margin: 0 2px; top: 1px; }
 .cite {
   display: inline-flex;
   align-items: center;
