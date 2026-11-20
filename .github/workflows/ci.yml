@@ -38,6 +38,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm scan-secrets
+      - run: pnpm check-css
       - run: pnpm build
       - run: pnpm --filter @deepapi/web exec playwright install --with-deps chromium
       - run: pnpm e2e

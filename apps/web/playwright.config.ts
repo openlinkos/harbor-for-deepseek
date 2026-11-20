@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e',
+  // fb1344-parity.spec.ts is part of this run. The proposal's playwright.fb1344.config.ts
+  // is not a second entry point, so `pnpm e2e` is the gate CI runs.
   testMatch: '*.spec.ts',
   testIgnore: ['android.spec.ts', 'server.spec.ts'],
   timeout: 60_000,
