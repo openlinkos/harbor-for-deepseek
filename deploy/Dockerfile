@@ -8,6 +8,8 @@ COPY LICENSE NOTICE ./
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
+ARG SOURCE_COMMIT=
+ENV SOURCE_COMMIT=$SOURCE_COMMIT
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @deepapi/web build && pnpm --filter @deepapi/server build
 

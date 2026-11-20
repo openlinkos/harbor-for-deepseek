@@ -1703,9 +1703,9 @@ app.get('/api/admin/settings', async (c) => {
         return c.notFound()
       }
       const stream = Readable.toWeb(createReadStream(filePath)) as ReadableStream
-      return new Response(stream, {
-        headers: { 'content-type': types[extname(filePath)] ?? 'application/octet-stream' },
-      })
+      const headers: Record<string, string> = { 'content-type': types[extname(filePath)] ?? 'application/octet-stream' }
+      if (pathname === '/version.json') headers['cache-control'] = 'no-store'
+      return new Response(stream, { headers })
     })
   }
 

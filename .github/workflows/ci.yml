@@ -5,6 +5,13 @@ on:
   pull_request:
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch origin master --depth=1
+      - run: node scripts/check-version.mjs
+
   check:
     runs-on: ubuntu-latest
     env:
@@ -51,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: DOCKER_BUILDKIT=1 docker build -f deploy/Dockerfile -t harbor:ci .
+      - run: DOCKER_BUILDKIT=1 docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" -f deploy/Dockerfile -t harbor:ci .
 
   server-e2e:
     runs-on: ubuntu-latest
@@ -87,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -f deploy/web/Dockerfile -t harbor-web:ci .
+      - run: docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" -f deploy/web/Dockerfile -t harbor-web:ci .
       - run: docker run -d --name harbor-web -p 8080:8080 harbor-web:ci
       - run: |
           for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do

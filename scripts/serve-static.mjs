@@ -33,7 +33,9 @@ createServer((request, response) => {
     response.end('not found')
     return
   }
-  response.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' })
+  const headers = { 'content-type': types[extname(file)] ?? 'application/octet-stream' }
+  if (url.pathname === '/version.json') headers['cache-control'] = 'no-store'
+  response.writeHead(200, headers)
   createReadStream(file).pipe(response)
 }).listen(port, '127.0.0.1', () => {
   console.log(`serving ${root} on ${port}`)

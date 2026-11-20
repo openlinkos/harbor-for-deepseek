@@ -7,6 +7,8 @@ COPY LICENSE NOTICE ./
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
+ARG SOURCE_COMMIT=
+ENV SOURCE_COMMIT=$SOURCE_COMMIT
 RUN pnpm install --frozen-lockfile && pnpm build
 RUN cp LICENSE NOTICE apps/web/dist/
 

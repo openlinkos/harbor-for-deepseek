@@ -53,6 +53,8 @@ jobs:
         with:
           context: .
           file: deploy/web/Dockerfile
+          build-args: |
+            SOURCE_COMMIT=${{ github.sha }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
