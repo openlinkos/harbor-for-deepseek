@@ -9,7 +9,7 @@ import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
-import { useHarbor, type HarborState } from './store.js'
+import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 
@@ -105,11 +105,9 @@ const focusComposer = () => {
   })
 }
 
-const shortcutHint = () => {
-  if (typeof navigator === 'undefined') return 'Ctrl J'
-  const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
-  const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
-  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
+const shortcutWindows = () => {
+  if (typeof navigator === 'undefined') return false
+  return navigator.userAgent.toLowerCase().includes('windows')
 }
 
 const Wordmark = () => (
@@ -396,7 +394,6 @@ const ThemeSwitch = () => {
 }
 
 const LANGUAGES = ['简体中文', 'English', '跟随系统', 'Afrikaans', 'አማርኛ', 'العربية', 'Azərbaycan', 'Беларуская', 'Български', 'বাংলা', 'Català', 'Čeština', 'Dansk']
-const VOICES = ['贝壳', '白浪', '海星', '暗潮']
 
 const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
   const [open, setOpen] = useState(false)
@@ -441,23 +438,6 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
         document.body,
       ) : null}
     </div>
-  )
-}
-
-const VoiceSelect = () => {
-  const [name, setName] = useState(() => localStorage.getItem('deepapi-voice') || '贝壳')
-  return (
-    <AnchoredMenu
-      testId="voice-select"
-      menuClass="voice-menu"
-      label={name || '贝壳'}
-      selected={name || '贝壳'}
-      options={VOICES}
-      onPick={(value) => {
-        setName(value)
-        localStorage.setItem('deepapi-voice', value)
-      }}
-    />
   )
 }
 
@@ -805,7 +785,6 @@ const MessageRow = ({ message }: { message: Message }) => {
           </button>
           <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /></button>
           <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
-          <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { const utter = new SpeechSynthesisUtterance(textOf); utter.lang = 'zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(utter) }}><FillIcon paths={[...ACTION_ICONS.speak]} /></button>
           <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
         </div>
       ) : null}
@@ -1005,7 +984,18 @@ export const Shell = () => {
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
-          <span className="brand-name">
+          <span
+            className="brand-name"
+            data-testid="brand"
+            onClick={() => {
+              state.setSidebarOpen(false)
+              void state.newChat()
+              focusComposer()
+              if (window.location.pathname !== '/' || window.location.search || window.location.hash) {
+                window.history.replaceState(null, '', '/')
+              }
+            }}
+          >
             <Mark />
             <Wordmark />
           </span>
@@ -1026,15 +1016,14 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-          <div className="new-chat" data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
+          <div className={shortcutWindows() ? 'new-chat shortcut-win' : 'new-chat'} data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
-            <kbd className="kbd">{shortcutHint()}</kbd>
           </div>
         )}
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {groups.map(([label, items], index) => (
-            <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
+            <div key={label} className={`group${index === 0 ? ' is-first' : ''}${label === t('groupPinned') ? ' pinned' : ''}`}>
               <p className="group-label">
                 {label}
                 {!selecting && index === 0 ? (
@@ -1054,6 +1043,7 @@ export const Shell = () => {
                   onMulti={() => { setSelecting(true); setPicked([]) }}
                 />
               ))}
+              {label === t('groupPinned') ? <div className="group-rule" data-testid="pinned-rule" /> : null}
             </div>
           ))}
         </div>
@@ -1360,7 +1350,6 @@ const Composer = () => {
     window.addEventListener('deepapi-prefill', onPrefill)
     return () => window.removeEventListener('deepapi-prefill', onPrefill)
   }, [])
-  const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
     const value = text
     setText('')
@@ -1418,16 +1407,16 @@ const Composer = () => {
               <span className="chip-label">{t('thinking')}</span>
             </div>
           </span>
-          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} aria-disabled={flash ? 'false' : 'true'} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
+          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
           </div>
         </div>
         <div className="tool-right">
-          <button type="button" className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')} disabled={!flash} onClick={() => fileRef.current?.click()}>
+          <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
             <Glyph name="attach" size={16} />
           </button>
-          <input ref={fileRef} data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
+          <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
@@ -1531,10 +1520,6 @@ const Settings = () => {
             />
           </div>
           <div className="settings-line">
-            <span>{t('voice')}</span>
-            <VoiceSelect />
-          </div>
-          <div className="settings-line">
             <span>{t('skin')}</span>
             <span className="account-side">
               <label className="file-button">
@@ -1555,26 +1540,6 @@ const Settings = () => {
             </span>
           </div>
           <div className="settings-line">
-            <span>{t('model')}</span>
-            <AnchoredMenu
-              testId="model-select"
-              label={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              selected={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              options={[`DeepSeek ${t('flash')}`, `DeepSeek ${t('pro')}`]}
-              onPick={(value) => void setPrefs({ model: value.endsWith(t('pro')) ? 'deepseek-v4-pro' : 'deepseek-flash' })}
-            />
-          </div>
-          <div className="settings-line">
-            <span>{t('effort')}</span>
-            <AnchoredMenu
-              testId="effort-select"
-              label={prefs.effort}
-              selected={prefs.effort}
-              options={['low', 'high', 'max']}
-              onPick={(value) => void setPrefs({ effort: value as HarborState['prefs']['effort'] })}
-            />
-          </div>
-          <div className="settings-line">
             <span>{t('safety')}</span>
             <AnchoredMenu
               testId="safety-select"
@@ -1591,7 +1556,6 @@ const Settings = () => {
               data-testid="toggle-read"
               className={prefs.readLink ? 'switch on' : 'switch'}
               aria-pressed={prefs.readLink}
-              disabled={prefs.model !== 'deepseek-flash'}
               onClick={() => void setPrefs({ readLink: !prefs.readLink })}
             >
               <span className="knob" />
