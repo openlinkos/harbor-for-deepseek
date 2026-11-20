@@ -471,9 +471,6 @@ type ShareModeValue = {
 const ShareMode = createContext<ShareModeValue | null>(null)
 
 /** No DOM node unless selecting, so article > .prose stays a direct child for the markdown gate. */
-const ShareSlot = ({ on, className, children }: { on: boolean; className?: string; children: ReactNode }) =>
-  on ? <div className={className}>{children}</div> : <>{children}</>
-
 const LinkMark = () => (
   <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
     <path fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M6.6 9.4 9.4 6.6M7.2 5.4l.6-.6a2.3 2.3 0 0 1 3.2 3.2l-.6.6M8.8 10.6l-.6.6a2.3 2.3 0 0 1-3.2-3.2l.6-.6" />
@@ -1103,11 +1100,9 @@ const MessageRow = ({ message }: { message: Message }) => {
     if (next && versionCurrent) void selectSibling(versionCurrent, next)
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
-      {share?.on && groupId ? (
-        <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" checked={picked} aria-label={textOf || t('share')} onChange={() => share.toggle(groupId)} />
-      ) : null}
-      <ShareSlot on={!!share?.on} className={share?.on ? `share-block${picked ? ' on' : ''}` : undefined}>
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
+      <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
+      {message.role === 'assistant' ? <div className="share-halo" aria-hidden="true" /> : null}
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1119,7 +1114,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           </form>
         ) : (
         <>
-          <div className="bubble">{textOf}</div>
+          <div className="bubble"><span className="share-halo" aria-hidden="true" />{textOf}</div>
           <div className="user-actions">
             <HoverTip text={t('copy')}>
               <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
@@ -1174,7 +1169,6 @@ const MessageRow = ({ message }: { message: Message }) => {
           </HoverTip>
         </div>
       ) : null}
-      </ShareSlot>
       {feedbackOpen ? (
         <div className="modal" role="dialog" aria-label={t('feedbackTitle')}>
           <form className="modal-card feedback" onSubmit={(event) => { event.preventDefault(); localStorage.setItem(`deepapi-feedback:${message.id}`, '1'); setFeedbackOpen(false) }}>

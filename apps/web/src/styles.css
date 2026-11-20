@@ -2800,34 +2800,32 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 .turn.share-on {
   position: relative;
   content-visibility: visible;
-  margin-bottom: 36px;
+  margin-bottom: 55px;
 }
 .turn.share-on > .share-box {
   position: absolute;
-  left: -26px;
-  top: -12px;
+  left: -41px;
   z-index: 2;
 }
+.turn.user.share-on > .share-box { top: -12px; }
+.turn.assistant.share-on > .share-box { top: 5px; }
 .turn.share-on .action-row,
 .turn.share-on .user-actions { display: none; }
-.turn.share-on .share-block { position: relative; }
-.turn.user.share-on .share-block {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-.share-block.on::before {
-  content: "";
+.turn.assistant.share-on { isolation: isolate; }
+.turn.assistant.share-on > :not(.share-box):not(.share-halo) { position: relative; z-index: 1; }
+.bubble { position: relative; }
+.share-halo {
+  display: none;
   position: absolute;
-  inset: -15px;
   border-radius: 18px;
   background: var(--dsw-static-neutral-bluish-60);
-  z-index: 0;
   pointer-events: none;
 }
-body[data-ds-dark-theme] .share-block.on::before { background: var(--dsw-static-neutral-bluish-850); }
-.share-block.on > * { position: relative; z-index: 1; }
+.bubble > .share-halo { inset: -15px; z-index: -1; }
+.turn.assistant > .share-halo { top: -28px; right: -15px; bottom: -15px; left: -15px; z-index: 0; }
+.turn.user.share-picked .bubble > .share-halo,
+.turn.assistant.share-picked > .share-halo { display: block; }
+body[data-ds-dark-theme] .share-halo { background: var(--dsw-static-neutral-bluish-850); }
 input.share-box.ds-checkbox,
 .share-bar input.ds-checkbox {
   --dsl-checkbox-size: 16px;
@@ -2839,13 +2837,15 @@ input.share-box.ds-checkbox,
   height: var(--dsl-checkbox-size);
   margin: 0;
   flex: none;
-  border: var(--dsl-checkbox-border-width) solid var(--dsw-alias-border-l3);
+  border: 0;
   border-radius: var(--dsl-checkbox-border-radius);
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsw-alias-border-l3);
   background: transparent;
   display: grid;
   place-content: center;
   cursor: pointer;
 }
+input.share-box[hidden] { display: none; }
 input.share-box.ds-checkbox.ds-checkbox--l,
 .share-bar input.ds-checkbox.ds-checkbox--l { --dsl-checkbox-size: 18px; }
 input.share-box.ds-checkbox::after,
@@ -2861,7 +2861,7 @@ input.share-box.ds-checkbox::after,
 input.share-box.ds-checkbox:checked,
 .share-bar input.ds-checkbox:checked {
   background: var(--dsw-alias-button-primary-fill);
-  border-color: transparent;
+  box-shadow: none;
 }
 input.share-box.ds-checkbox:checked::after,
 .share-bar input.ds-checkbox:checked::after { border-color: var(--dsl-checkbox-icon-color); }
@@ -2874,14 +2874,17 @@ input.share-box.ds-checkbox:checked::after,
   box-sizing: border-box;
   height: 65px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   border-top: 1px solid var(--dsw-alias-border-l2);
   background: var(--dsw-alias-bg-base);
 }
 .share-bar-inner {
-  width: min(752px, calc(100% - 88px));
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: calc(min(752px, calc(100% - 88px)) + 56px);
   height: 100%;
+  margin-left: calc((100% - min(752px, calc(100% - 88px))) / 2 - 41px);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -2904,12 +2907,17 @@ input.share-box.ds-checkbox:checked::after,
   flex: none;
 }
 .share-count {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 14px;
   line-height: 22px;
   color: var(--dsw-alias-label-secondary);
-  white-space: nowrap;
 }
-.share-gap { flex: 1; min-width: 8px; }
+.share-gap { flex: 1 1 auto; min-width: 0; }
+.share-bar .ds-button { flex: 0 0 auto; }
 .share-bar .ds-button__content { gap: 4px; }
 .modal.share-modal { z-index: 1400; }
 .share-soon-card {
@@ -2951,6 +2959,8 @@ input.share-box.ds-checkbox:checked::after,
   cursor: pointer;
 }
 @media (max-width: 767px) {
-  .share-bar-inner { width: calc(100% - 40px); }
-  .turn.share-on > .share-box { left: -20px; }
+  .share-bar-inner {
+    width: calc(100% - 40px + 56px);
+    margin-left: calc(20px - 41px);
+  }
 }
