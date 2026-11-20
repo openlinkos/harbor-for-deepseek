@@ -6,7 +6,7 @@
 // sha256 b32ab0665cec907d32b99fc2bd1489ac7a65f4444d289447936f00a9f36b5442.
 // Staged SSE reuses e2e/lib/fb1344-sse.js. The route mock matches fb1344 (balance, models, messages).
 // 34 cases = 4 cells × 7 + 1440 × 3 × 2. Red cases on master are test.fail() via knownFailure().
-// IDs still open: fb1554-M1, M2, T1, and M4 only for the 390 cite wrap. A fix PR deletes only its own id.
+// IDs still open: fb1554-M1, M2, and M4 only for the 390 cite wrap. T1 已随阶段标题删掉。A fix PR deletes only its own id.
 // An unexpected pass fails the run. FB1554_STRICT=1 ignores knownFailure.
 // FB1344_STRICT does not open this file: that switch is the fb1344 baseline.
 import { expect, test, type Page } from '@playwright/test'
@@ -23,13 +23,12 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // fb1554-M4 只剩 390 的 cite-inline-same-line（角标单独换行，等官方补采）。cite-style 已对齐，不再挂这个 id。
 //   1440 的 cite-inline-same-line 已经同行，不要标失败，否则意外通过会让 CI 变红。
 // fb1554-M5 已删：搜索行 favicon 重叠 4px（.thinking > button 不再漏到 button.favicons）。
-// fb1554-T1 「用时 N 秒」：正文阶段还在涨、刷新后变 1 秒、别的回答生成时旧回答也在涨：thought-seconds-*
+// fb1554-T1 「用时 N 秒」已随阶段标题落地：秒数来自思考片段，正文阶段和刷新都不再按墙钟涨。key 已删，thought-seconds-* 必须真过。
 const STRICT = process.env.FB1554_STRICT === '1'
 const KNOWN: Record<string, string> = {
   'fb1554-M1': 'fb1554-M1: 每个 text block 一个 .prose，段落和列表在引用处断开',
   'fb1554-M2': 'fb1554-M2: **「…」** 原样显示',
   'fb1554-M4': 'fb1554-M4: 390 下列表项角标被单独换到下一行，等官方补采后再决定是否不断行',
-  'fb1554-T1': 'fb1554-T1: 用时按挂载后墙钟、全局 streaming 计',
 }
 // Same shape as fb1344-parity.spec.ts. FB1344_STRICT is intentionally not read here.
 const KNOWN_PASSING_CELLS: Record<string, string[]> = {}

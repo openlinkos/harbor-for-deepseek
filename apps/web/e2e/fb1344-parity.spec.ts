@@ -16,14 +16,10 @@ const SSE = readFileSync(join(HERE, 'lib/fb1344-sse.js'), 'utf8')
 const STRICT = process.env.FB1344_STRICT === '1'
 
 // 在 master 4734e7f 上会失败的用例。修复 PR 删掉自己那几条；修好了却没删，会因为意外通过让 CI 变红。
-// fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing。phase-done 在 master 已通过，不要标失败。
+// fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing 已落地。phase-done 保持通过。
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P5 分阶段 SSE：正在思考 / 正在搜索 / 正在浏览网页
-  'phase-thinking': 'fb1344-P5: 流式中标题一直是「已思考（用时 N 秒）」，没有「正在思考」与 shimmer',
-  'phase-searching': 'fb1344-P5: 搜索进行中无「正在搜索」标题，也没有进行中的搜索行',
-  'phase-browsing': 'fb1344-P5: 浏览进行中无「正在浏览网页」',
   // fb1344-P6 另一会话生成中再发送
   'concurrent-send': 'fb1344-P6: 另一会话生成中时新会话的发送键是停止键，点击会中断第一条；没有「有消息正在生成，请稍后再试」',
 }
@@ -138,6 +134,442 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(head(page)).toHaveText(K.phaseTitles.browsing) })
     test('phase-done', async ({ page }) => { await staged(page); for (const p of [PH.thinking, PH.searching, PH.browsing, PH.answer]) await push(page, p); await page.evaluate(() => (window as any).__sse.end()); await page.waitForTimeout(500)
       await expect(head(page)).toHaveText(new RegExp(K.phaseTitles.done)); expect(await shimmer(page)).toEqual([]) })
+    test('phase-live', async ({ page }) => {
+      const lead = cell.thinkLeadFill
+      const label = cell.thinkLabelColor
+      const dot = theme === 'dark' ? 'rgb(173, 178, 184)' : 'rgb(129, 133, 140)'
+      const stopBg = theme === 'dark' ? 'rgb(86, 134, 254)' : 'rgb(57, 100, 254)'
+      const capsule = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(255, 255, 255)'
+      const capsuleBorder = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)'
+      const sweep = async () => head(page).evaluate((h) => [...h.querySelectorAll('*')].map((e) => getComputedStyle(e)).filter((s) => s.animationIterationCount === 'infinite' && s.animationName !== 'none').map((s) => ({ name: s.animationName, d: s.animationDuration, t: s.animationTimingFunction })))
+      const bar = async () => head(page).locator('.phase-shimmer-bar').evaluate((e) => getComputedStyle(e).backgroundImage)
+      await staged(page)
+      await expect(page.getByTestId('reply-dots').locator('i')).toHaveCount(3)
+      await expect(page.getByTestId('reply-dots').locator('i').first()).toHaveCSS('background-color', dot)
+      await expect(page.getByTestId('stop').locator('.send-spinner')).toBeVisible()
+      await expect(page.getByTestId('stop').locator('.stop-square')).toHaveCount(0)
+      await expect(page.getByTestId('thinking')).toHaveCount(0)
+      const spin = await page.getByTestId('stop').locator('.send-spinner').evaluate((e) => getComputedStyle(e).animationName)
+      expect(spin).toBe('send-spin')
+      await push(page, PH.thinking)
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await expect(head(page).locator('.phase-label')).toHaveCSS('color', label)
+      expect(await sweep()).toContainEqual({ name: '_5a7d2fc', d: K.shimmer.duration, t: K.shimmer.timing })
+      await expect(head(page).locator('.phase-shimmer-bar')).toHaveCSS('width', '120px')
+      expect(await bar()).toContain('109.02%')
+      expect(await bar()).toContain(theme === 'dark' ? 'rgba(21, 21, 23, 0.5)' : 'rgba(255, 255, 255, 0.7)')
+      let c = await comp(page)
+      expect(c.thinkHead.iconLead.dHash).toBe(cell.thinkLeadHash)
+      expect(c.thinkHead.iconLead.fill).toBe(lead)
+      expect(c.thinkHead.iconChevron.dir).toBe('down')
+      const stopBtn = page.getByTestId('stop')
+      await expect(stopBtn).toHaveAttribute('aria-label', '停止生成')
+      await expect(stopBtn).toHaveAttribute('data-tip', '停止生成')
+      await expect(stopBtn.locator('.stop-square')).toBeVisible()
+      await expect(stopBtn).toHaveCSS('background-color', stopBg)
+      await expect(stopBtn.locator('.stop-square rect')).toHaveCSS('fill', 'rgb(255, 255, 255)')
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      await expect(page.getByTestId('search-pending')).toHaveText('搜索')
+      expect((await sweep()).length).toBeGreaterThan(0)
+      await push(page, PH.browsing)
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await expect(page.getByTestId('search-pending')).toHaveCount(0)
+      await expect(page.locator('.timeline-search').last()).toContainText('搜索到 17 个网页')
+      await expect(page.locator('.timeline-browse').last()).toContainText('浏览 1 个页面')
+      expect(await sweep()).toContainEqual({ name: '_5a7d2fc', d: K.shimmer.duration, t: K.shimmer.timing })
+      await stopBtn.click()
+      await expect(head(page)).toHaveText('已停止')
+      expect(await sweep()).toEqual([])
+      await expect(page.getByTestId('thinking')).toContainText('用户想知道今天上海的天气')
+      c = await comp(page)
+      expect(c.thinkHead.iconLead.dHash).toBe(cell.thinkLeadHash)
+      expect(c.thinkHead.iconLead.fill).toBe(dot)
+      expect(c.thinkHead.iconChevron.dir).toBe('down')
+      const below = await page.evaluate(() => {
+        const body = document.querySelector('.thinking-body')!.getBoundingClientRect()
+        const row = document.querySelector('.action-row')!.getBoundingClientRect()
+        return row.top >= body.bottom - 1
+      })
+      expect(below).toBe(true)
+      const cont = page.getByTestId('continue')
+      await expect(cont).toHaveText('继续生成')
+      await expect(cont).toHaveCSS('background-color', capsule)
+      await expect(cont).toHaveCSS('border-top-color', capsuleBorder)
+      const edge = await page.evaluate(() => {
+        const row = document.querySelector('.action-row')!.getBoundingClientRect()
+        const button = document.querySelector('[data-testid=continue]')!.getBoundingClientRect()
+        return { gap: row.right - button.right, left: button.left - row.left }
+      })
+      expect(Math.abs(edge.gap)).toBeLessThanOrEqual(2)
+      expect(edge.left).toBeGreaterThan(40)
+    })
+    test('phase-revisit', async ({ page }) => {
+      const noDone = async () => {
+        const titles = await page.locator('[data-testid=thinking] button').allTextContents()
+        expect(titles.join('\n')).not.toContain('已思考')
+      }
+      const liveHead = async () => {
+        await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+        await expect(page.getByTestId('thinking').last()).toHaveAttribute('data-phase', 'thinking')
+        expect(await shimmer(page)).toContainEqual({ d: K.shimmer.duration, t: K.shimmer.timing })
+        const names = await head(page).evaluate((node) => [...node.querySelectorAll('*')].map((el) => getComputedStyle(el).animationName))
+        expect(names).toContain('_5a7d2fc')
+        await noDone()
+      }
+      await staged(page)
+      await noDone()
+      await push(page, [PH.thinking[0]])
+      await noDone()
+      await push(page, [PH.thinking[1]])
+      await liveHead()
+      await push(page, [PH.thinking[2]])
+      await liveHead()
+      await push(page, [{ type: 'content_block_stop', index: 0 }])
+      await liveHead()
+      await drawer(page)
+      await page.getByTestId('new-chat').click()
+      await page.waitForTimeout(200)
+      if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
+      await drawer(page)
+      await page.locator('.chat-link').first().click()
+      if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
+      await liveHead()
+      await page.waitForFunction(async (snippet) => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('deepapi')
+          request.onsuccess = () => resolve(request.result)
+          request.onerror = () => reject(request.error)
+        })
+        const rows = await new Promise<Array<{ status: string; blocks: unknown }>>((resolve) => {
+          const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+          request.onsuccess = () => resolve(request.result as Array<{ status: string; blocks: unknown }>)
+        })
+        db.close()
+        return rows.some((row) => row.status === 'streaming' && JSON.stringify(row.blocks).includes(String(snippet)))
+      }, '用户想知道今天上海的天气')
+      await page.reload()
+      // Local refresh kills the fetch. A streaming row left in IndexedDB is the stopped state.
+      await expect(head(page)).toHaveText('已停止')
+      await expect(page.getByTestId('thinking').last()).toHaveAttribute('data-phase', 'stopped')
+      expect(await shimmer(page)).toEqual([])
+      await expect(page.getByTestId('continue')).toHaveText('继续生成')
+      await expect(page.getByTestId('thinking')).toContainText('用户想知道今天上海的天气')
+      await noDone()
+    })
+    test('phase-tool-titles', async ({ page }) => {
+      const fetchResult = (id: string, index: number) => [{ type: 'content_block_start', index, content_block: { type: 'web_fetch_tool_result', tool_use_id: id, content: { type: 'web_fetch_result', url: RESULTS[0].url, content: { title: '上海' } } } }, { type: 'content_block_stop', index }]
+      await staged(page)
+      await push(page, PH.thinking)
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      await push(page, [PH.browsing[0], PH.browsing[1]])
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await push(page, [PH.browsing[2], PH.browsing[3]])
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await push(page, fetchResult('f0', 8))
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await push(page, [{ type: 'content_block_start', index: 9, content_block: { type: 'server_tool_use', id: 'g0', name: 'deepseek_web_fetch', input: { action: 'find_in_page', url: RESULTS[0].url, pattern: '气温' } } }, { type: 'content_block_stop', index: 9 }])
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await expect(head(page)).not.toHaveText('正在查找')
+      await push(page, fetchResult('g0', 10))
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+    })
+    test('phase-shimmer-sweep', async ({ page }) => {
+      const sample = () => head(page).locator('.phase-shimmer-sweep').evaluate((node) => {
+        const title = (node.parentElement ?? node).getBoundingClientRect()
+        const anim = node.getAnimations().find((item) => item instanceof CSSAnimation)
+        const points = [0, 0.45, 0.9]
+        return points.map((p) => {
+          if (anim) anim.currentTime = p * 2000
+          const sweep = node.getBoundingClientRect()
+          const bar = node.querySelector('.phase-shimmer-bar')?.getBoundingClientRect()
+          const matrix = new DOMMatrix(getComputedStyle(node).transform)
+          return {
+            p,
+            tx: matrix.m41,
+            sweep: sweep.width,
+            barLeft: bar?.left ?? 0,
+            barRight: bar?.right ?? 0,
+            titleLeft: title.left,
+            titleRight: title.right,
+          }
+        })
+      })
+      const expectSweep = (frames: Awaited<ReturnType<typeof sample>>) => {
+        expect(frames).toHaveLength(3)
+        expect(Math.abs(frames[0].sweep - 136)).toBeLessThanOrEqual(1)
+        expect(Math.abs(frames[0].tx + frames[0].sweep)).toBeLessThanOrEqual(1)
+        expect(Math.abs(frames[2].tx - frames[2].sweep)).toBeLessThanOrEqual(1)
+        expect(frames[0].barRight).toBeLessThanOrEqual(frames[0].titleLeft + 1)
+        expect(frames[2].barLeft).toBeGreaterThanOrEqual(frames[2].titleRight - 1)
+      }
+      await staged(page)
+      await push(page, PH.thinking)
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      expectSweep(await sample())
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      expectSweep(await sample())
+      await push(page, PH.browsing)
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      expectSweep(await sample())
+    })
+    test('phase-persist', async ({ page }) => {
+      await page.addInitScript(() => {
+        const orig = IDBObjectStore.prototype.put
+        const bag = { n: 0 }
+        ;(window as unknown as { __msgPuts: { n: number } }).__msgPuts = bag
+        IDBObjectStore.prototype.put = function (this: IDBObjectStore, ...args: unknown[]) {
+          if (this.name === 'messages') bag.n += 1
+          return orig.apply(this, args as never)
+        }
+      })
+      await staged(page)
+      await push(page, PH.thinking)
+      await page.waitForTimeout(250)
+      const base = await page.evaluate(() => (window as unknown as { __msgPuts: { n: number } }).__msgPuts.n)
+      const deltas = Array.from({ length: 24 }, (_, i) => ({ type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: `第${i}句。` } }))
+      await push(page, deltas)
+      await page.waitForTimeout(40)
+      const burst = await page.evaluate(() => (window as unknown as { __msgPuts: { n: number } }).__msgPuts.n) - base
+      expect(burst).toBeLessThanOrEqual(3)
+      const wroteAt = Date.now()
+      await expect.poll(async () => page.evaluate(async () => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('deepapi')
+          request.onsuccess = () => resolve(request.result)
+          request.onerror = () => reject(request.error)
+        })
+        const rows = await new Promise<unknown[]>((resolve) => {
+          const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+          request.onsuccess = () => resolve(request.result as unknown[])
+        })
+        db.close()
+        return JSON.stringify(rows).includes('第23句')
+      }), { timeout: 700 }).toBe(true)
+      expect(Date.now() - wroteAt).toBeLessThan(500)
+      const landed = await page.evaluate(async () => {
+        const start = performance.now()
+        ;(document.querySelector('[data-testid=stop]') as HTMLButtonElement).click()
+        while (performance.now() - start < 180) {
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open('deepapi')
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
+          })
+          const rows = await new Promise<Array<{ status: string }>>((resolve) => {
+            const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+            request.onsuccess = () => resolve(request.result as Array<{ status: string }>)
+          })
+          db.close()
+          if (rows.some((row) => row.status === 'aborted')) return performance.now() - start
+          await new Promise((resolve) => setTimeout(resolve, 15))
+        }
+        return -1
+      })
+      expect(landed).toBeGreaterThanOrEqual(0)
+      expect(landed).toBeLessThan(180)
+    })
+    test('phase-persist-continuous', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the continuous stream')
+      await staged(page)
+      await push(page, [PH.thinking[0], PH.thinking[1]])
+      const thinking = Array.from({ length: 20 }, (_, i) => `思${String(i).padStart(2, '0')}`)
+      const answer = Array.from({ length: 20 }, (_, i) => `文${String(i).padStart(2, '0')}`)
+      await page.evaluate(async ({ thinking: thoughts, answer: words }) => {
+        const sse = (window as unknown as { __sse: { push: (events: unknown[]) => void } }).__sse
+        for (const piece of thoughts) {
+          sse.push([{ type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        sse.push([{ type: 'content_block_stop', index: 0 }, { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } }])
+        for (const piece of words) {
+          sse.push([{ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }, { thinking, answer })
+      const kept = async (target: Page) => {
+        const text = await target.locator('.turn.assistant').innerText()
+        expect(text).toContain('思00')
+        expect(text).toContain('思19')
+        expect(text).toContain('文00')
+        const last = answer.filter((piece) => text.includes(piece)).length
+        expect(last).toBeGreaterThanOrEqual(19)
+      }
+      await page.reload()
+      await expect(page.locator('.turn.assistant')).toBeVisible()
+      await kept(page)
+      await page.close()
+      const again = await page.context().newPage()
+      await again.goto('/')
+      await expect(again.locator('.turn.assistant')).toBeVisible()
+      await kept(again)
+    })
+    test('phase-continue', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers continuation')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_start', index: 4, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 4, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
+      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
+      expect(request?.messages.at(-1)?.role).toBe('assistant')
+      expect(JSON.stringify(request?.messages.at(-1)?.content)).toContain('原文甲')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+      await expect(page.getByTestId('versions')).toHaveCount(0)
+    })
+    test('phase-persist-refresh', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers a refresh off the one-second boundary')
+      await staged(page)
+      await push(page, [PH.thinking[0], PH.thinking[1], { type: 'content_block_stop', index: 0 }, { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } }])
+      const answer = Array.from({ length: 12 }, (_, i) => `段${String(i).padStart(2, '0')}`)
+      await page.evaluate(async (words) => {
+        const sse = (window as unknown as { __sse: { push: (events: unknown[]) => void } }).__sse
+        for (const piece of words) {
+          sse.push([{ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }, answer)
+      await page.reload()
+      await expect(page.locator('.turn.assistant')).toBeVisible()
+      const body = await page.locator('.turn.assistant').innerText()
+      const kept = answer.filter((piece) => body.includes(piece)).length
+      expect(kept).toBeGreaterThanOrEqual(answer.length - 1)
+      expect(body).toContain(answer[0])
+    })
+    test('phase-continue-thinking', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the thinking retry')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await page.evaluate(() => {
+        const sse = (window as unknown as { __sse: { decide: ((body: { messages?: Array<{ role?: string; content?: unknown }> }) => number) | null } }).__sse
+        sse.decide = (body) => {
+          const last = body?.messages?.at(-1)
+          const encoded = JSON.stringify(last?.content ?? '')
+          if (last?.role === 'assistant' && encoded.includes('thinking')) return 400
+          return 200
+        }
+      })
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => {
+        const sse = (window as unknown as { __sse: { count: () => number; requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse
+        const continuations = sse.requests.filter((item) => item.messages.at(-1)?.role === 'assistant')
+        return sse.count() > 1 && continuations.some((item) => !JSON.stringify(item.messages.at(-1)?.content).includes('thinking'))
+      })
+      const requests = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests)
+      const continuations = requests.filter((item) => item.messages.at(-1)?.role === 'assistant')
+      expect(JSON.stringify(continuations[0]?.messages.at(-1)?.content)).toContain('thinking')
+      expect(continuations.length).toBeGreaterThan(1)
+      expect(JSON.stringify(continuations.at(-1)?.messages.at(-1)?.content)).not.toContain('thinking')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+    })
+    test('phase-continue-search', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers folded search continuation')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'server_tool_use', id: 's1', name: 'deepseek_web_search', input: { action: 'search', queries: ['上海天气'] } } },
+        { type: 'content_block_stop', index: 1 },
+        { type: 'content_block_start', index: 2, content_block: { type: 'web_search_tool_result', tool_use_id: 's1', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] } },
+        { type: 'content_block_stop', index: 2 },
+        { type: 'content_block_start', index: 3, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 3, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await expect(page.getByTestId('continue')).toBeVisible()
+      expect(readFileSync(join(HERE, 'explanations.json'), 'utf8')).toContain('continue-web-tools')
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
+      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
+      const last = request?.messages.at(-1)
+      expect(last?.role).toBe('assistant')
+      const encoded = JSON.stringify(last?.content)
+      expect(encoded).toContain('thinking')
+      expect(encoded).toContain('天气来源')
+      expect(encoded).not.toContain('server_tool_use')
+      expect(encoded).not.toContain('web_search_tool_result')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+    })
+    test('phase-continue-search-reject', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the regenerate fallback')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'server_tool_use', id: 's1', name: 'deepseek_web_search', input: { action: 'search', queries: ['上海天气'] } } },
+        { type: 'content_block_stop', index: 1 },
+        { type: 'content_block_start', index: 2, content_block: { type: 'web_search_tool_result', tool_use_id: 's1', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] } },
+        { type: 'content_block_stop', index: 2 },
+        { type: 'content_block_start', index: 3, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 3, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await page.evaluate(() => {
+        const sse = (window as unknown as { __sse: { decide: ((body: { messages?: Array<{ role?: string }> }) => number) | null } }).__sse
+        sse.decide = (body) => (body?.messages?.at(-1)?.role === 'assistant' ? 400 : 200)
+      })
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => {
+        const requests = (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string }> }> } }).__sse.requests
+        return requests.some((item) => item.messages.at(-1)?.role === 'assistant') && requests.some((item) => item.messages.at(-1)?.role === 'user' && requests.indexOf(item) > 0)
+      })
+      await push(page, [
+        { type: 'message_start', message: { id: 'regen', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '重新生成。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.locator('.turn.assistant')).toContainText('重新生成')
+      await expect(page.getByTestId('versions')).toBeVisible()
+    })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
       await page.getByTestId('composer').fill('[筑衡测试] 第二条'); await page.locator('[data-testid=send], [data-testid=stop]').first().click(); await page.waitForTimeout(500)
