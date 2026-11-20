@@ -3,7 +3,7 @@ import { markSearchCitations, presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@deepapi/pricing'
 import { activePath, siblingIds } from '@deepapi/types'
 import type { ContentBlock, Conversation, Message } from '@deepapi/types'
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { cloneElement, createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent as ReactFocusEvent, type FormEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
@@ -56,13 +56,63 @@ const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16', fillRule }: { paths
   </svg>
 )
 
-/** Official ds-tooltip--s under the trigger, with the sharp arrow. Shared by the answer actions and the user bubble. */
-const ActionTooltip = ({ text }: { text: string }) => (
-  <span className="ds-tooltip ds-tooltip--s" role="tooltip">
-    {text}
-    <span className="ds-tooltip__arrow ds-tooltip__arrow--sharp" aria-hidden="true" />
-  </span>
-)
+/** Official ds-tooltip--s, portaled to body so a turn's content-visibility cannot clip it. */
+const HoverTip = ({ text, children }: { text: string; children: ReactElement<React.HTMLAttributes<HTMLElement>> }) => {
+  const anchor = useRef<HTMLElement>(null)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ left: 0, top: 0 })
+  const place = () => {
+    const rect = anchor.current?.getBoundingClientRect()
+    if (!rect) return
+    setPos({ left: rect.left + rect.width / 2, top: rect.bottom + 4 })
+  }
+  useEffect(() => {
+    if (!open) return undefined
+    const follow = () => place()
+    window.addEventListener('scroll', follow, true)
+    window.addEventListener('resize', follow)
+    return () => {
+      window.removeEventListener('scroll', follow, true)
+      window.removeEventListener('resize', follow)
+    }
+  }, [open])
+  const previous = children.props
+  const child = cloneElement(children, {
+    ref: anchor,
+    onMouseEnter: (event: ReactMouseEvent<HTMLElement>) => {
+      place()
+      setOpen(true)
+      previous.onMouseEnter?.(event)
+    },
+    onMouseLeave: (event: ReactMouseEvent<HTMLElement>) => {
+      setOpen(false)
+      previous.onMouseLeave?.(event)
+    },
+    onFocus: (event: ReactFocusEvent<HTMLElement>) => {
+      if (event.currentTarget.matches(':focus-visible')) {
+        place()
+        setOpen(true)
+      }
+      previous.onFocus?.(event)
+    },
+    onBlur: (event: ReactFocusEvent<HTMLElement>) => {
+      setOpen(false)
+      previous.onBlur?.(event)
+    },
+  } as { ref: Ref<HTMLElement> } & HTMLAttributes<HTMLElement>)
+  return (
+    <>
+      {child}
+      {open ? createPortal(
+        <span className="ds-tooltip ds-tooltip--s is-open" role="tooltip" style={{ left: pos.left, top: pos.top }}>
+          {text}
+          <span className="ds-tooltip__arrow ds-tooltip__arrow--sharp" aria-hidden="true" />
+        </span>,
+        document.body,
+      ) : null}
+    </>
+  )
+}
 const UserMenuIcon = ({ name }: { name: keyof typeof USER_MENU_ICONS }) => {
   const paths = USER_MENU_ICONS[name].map((d, index) => <path key={index} d={d} fill="currentColor" />)
   if (name === 'settings') {
@@ -984,14 +1034,16 @@ const MessageRow = ({ message }: { message: Message }) => {
         <>
           <div className="bubble">{textOf}</div>
           <div className="user-actions">
-            <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
-              <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
-              <ActionTooltip text={t('copy')} />
-            </button>
-            <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
-              <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
-              <ActionTooltip text={t('edit')} />
-            </button>
+            <HoverTip text={t('copy')}>
+              <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
+                <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+              </button>
+            </HoverTip>
+            <HoverTip text={t('edit')}>
+              <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
+                <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+              </button>
+            </HoverTip>
           </div>
         </>
         )
@@ -1016,14 +1068,23 @@ const MessageRow = ({ message }: { message: Message }) => {
               <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
             </span>
           ) : null}
-          <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}<ActionTooltip text={copied ? t('copied') : t('copy')} /></button>
-          <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
-            <FillIcon paths={[...ACTION_ICONS.regen]} />
-            <ActionTooltip text={t('regenerate')} />
-          </button>
-          <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /><ActionTooltip text={t('like')} /></button>
-          <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /><ActionTooltip text={t('dislike')} /></button>
-          <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /><ActionTooltip text={t('share')} /></button>
+          <HoverTip text={copied ? t('copied') : t('copy')}>
+            <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
+          </HoverTip>
+          <HoverTip text={t('regenerate')}>
+            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+              <FillIcon paths={[...ACTION_ICONS.regen]} />
+            </button>
+          </HoverTip>
+          <HoverTip text={t('like')}>
+            <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /></button>
+          </HoverTip>
+          <HoverTip text={t('dislike')}>
+            <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
+          </HoverTip>
+          <HoverTip text={t('share')}>
+            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
+          </HoverTip>
         </div>
       ) : null}
       {feedbackOpen ? (

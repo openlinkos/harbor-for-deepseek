@@ -2464,14 +2464,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 .settings-modal.closing { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .settings-modal.closing .settings-shell { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .action-row button, .user-actions button { position: relative; }
-/* Official .ds-tooltip.ds-tooltip--s, placement bottom, mainAxis 4, sharp arrow 6px. */
+/* Official .ds-tooltip--s on document.body. left/top are the trigger's bottom center plus the 4px main axis. */
 .ds-tooltip.ds-tooltip--s {
   --dsl-tooltip-arrow-size: 6px;
   --dsl-tooltip-color: var(--dsw-alias-tooltip-bg);
   --dsl-tooltip-text-color: var(--dsw-static-neutral-bluish-00);
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 4px);
+  position: fixed;
   transform: translateX(-50%);
   padding: 4px 8px;
   border-radius: 10px;
@@ -2485,7 +2483,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   pointer-events: none;
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
-  z-index: 4;
+  z-index: 5;
+}
+.ds-tooltip.ds-tooltip--s.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: var(--ds-transition-duration-fast);
 }
 body[data-ds-dark-theme] .ds-tooltip.ds-tooltip--s {
   --dsl-tooltip-text-color: var(--dsw-alias-label-primary);
@@ -2500,13 +2503,6 @@ body[data-ds-dark-theme] .ds-tooltip.ds-tooltip--s {
   background: var(--dsl-tooltip-color);
   transform: translate(-50%, 50%) rotate(45deg);
   z-index: 1;
-}
-.action-row button:hover > .ds-tooltip,
-.user-actions button:hover > .ds-tooltip,
-.action-row button:focus-visible > .ds-tooltip,
-.user-actions button:focus-visible > .ds-tooltip {
-  opacity: 1;
-  transition-delay: var(--ds-transition-duration-fast);
 }
 .menu { transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-in-out); }
 @media (max-width: 767px) {

@@ -93,13 +93,15 @@ const pillMetrics = (page: Page) => page.getByTestId('search-results').last().ev
 
 const expectTooltip = async (button: Locator, theme: 'light' | 'dark') => {
   await button.hover()
-  const tip = button.getByRole('tooltip')
+  const page = button.page()
+  const label = (await button.getAttribute('aria-label')) || ''
+  const tip = page.getByRole('tooltip').filter({ hasText: label })
   await expect(tip).toBeVisible()
   const arrow = tip.locator('.ds-tooltip__arrow')
   await expect(arrow).toBeVisible()
-  const geometry = await button.evaluate((node) => {
+  const geometry = await button.evaluate((node, tipLabel) => {
     const buttonBox = node.getBoundingClientRect()
-    const tipNode = node.querySelector('[role=tooltip]') as HTMLElement
+    const tipNode = [...document.querySelectorAll('[role=tooltip]')].find((item) => item.textContent?.includes(tipLabel)) as HTMLElement
     const arrowNode = tipNode.querySelector('.ds-tooltip__arrow') as HTMLElement
     const tipBox = tipNode.getBoundingClientRect()
     const arrowBox = arrowNode.getBoundingClientRect()
@@ -125,7 +127,7 @@ const expectTooltip = async (button: Locator, theme: 'light' | 'dark') => {
       shadow: style.boxShadow,
       arrowBg: arrowStyle.backgroundColor,
     }
-  })
+  }, label)
   near(geometry.tipY - geometry.buttonBottom, 4, 0.5)
   expect(geometry.tipY).toBeGreaterThan(geometry.buttonBottom - 1)
   expect(geometry.arrowTop).toBeLessThan(geometry.tipY)
