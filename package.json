@@ -19,10 +19,12 @@
     "e2e": "pnpm --filter @deepapi/web e2e",
     "style:audit": "node --experimental-strip-types tools/style-audit/run.ts",
     "e2e:server": "pnpm --filter @deepapi/web exec playwright test -c playwright.server.config.ts",
-    "scan-secrets": "node scripts/scan-secrets.mjs"
+    "scan-secrets": "node scripts/scan-secrets.mjs",
+    "check-css": "node scripts/check-css.mjs apps/web/src/styles.css apps/web/src/theme.css"
   },
   "devDependencies": {
     "oxlint": "1.28.0",
+    "postcss": "8.5.33",
     "turbo": "2.6.1",
     "typescript": "5.6.3"
   },

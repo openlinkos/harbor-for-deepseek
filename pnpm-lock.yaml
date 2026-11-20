@@ -11,6 +11,9 @@ importers:
       oxlint:
         specifier: 1.28.0
         version: 1.28.0
+      postcss:
+        specifier: 8.5.33
+        version: 8.5.33
       turbo:
         specifier: 2.6.1
         version: 2.6.1
