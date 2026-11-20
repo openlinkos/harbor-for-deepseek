@@ -24,6 +24,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
       - name: Use the preinstalled Android SDK
         run: |
           sdk="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
@@ -40,6 +41,8 @@ jobs:
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs
       - run: pnpm --filter @deepapi/mobile exec cap sync android
+      - name: Resolve Android dependencies
+        run: bash scripts/android-gradle-retry.sh
       - name: Decode a keystore only when the repo secrets exist
         id: sign
         env:
