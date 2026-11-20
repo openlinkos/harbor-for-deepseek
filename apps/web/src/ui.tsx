@@ -1102,7 +1102,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
       <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
-      {message.role === 'assistant' ? <div className="share-halo" aria-hidden="true" /> : null}
+      <div className="share-halo" aria-hidden="true" />
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1114,7 +1114,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           </form>
         ) : (
         <>
-          <div className="bubble"><span className="share-halo" aria-hidden="true" />{textOf}</div>
+          <div className="bubble">{textOf}</div>
           <div className="user-actions">
             <HoverTip text={t('copy')}>
               <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>

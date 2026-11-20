@@ -306,13 +306,23 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const allBox = (await page.getByTestId('share-all').boundingBox())!
       const overlaps = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }) =>
         a.x < b.x + b.width - 0.5 && a.x + a.width > b.x + 0.5 && a.y < b.y + b.height - 0.5 && a.y + a.height > b.y + 0.5
+      const fits = (rect: { x: number; y: number; width: number; height: number }, name: string) => {
+        expect(rect.x, `${name} left`).toBeGreaterThanOrEqual(0)
+        expect(rect.x + rect.width, `${name} right`).toBeLessThanOrEqual(w)
+        expect(rect.y, `${name} top`).toBeGreaterThanOrEqual(0)
+        expect(rect.y + rect.height, `${name} bottom`).toBeLessThanOrEqual(h)
+      }
+      fits(allBox, 'select-all')
       for (const turn of [page.locator('.turn.user').first(), page.locator('.turn.assistant').first(), userTurn, answerTurn]) {
         const rect = (await turn.locator('.share-box').boundingBox())!
-        expect(Math.abs(rect.x - (text!.x - 41)), 'checkbox is 41px left of the body text').toBeLessThanOrEqual(1)
+        fits(rect, 'message checkbox')
+        if (w >= 768) expect(Math.abs(rect.x - (text!.x - 41)), 'checkbox is 41px left of the body text').toBeLessThanOrEqual(1)
         expect(Math.abs(rect.x - allBox.x), 'select-all shares the checkbox column').toBeLessThanOrEqual(1)
       }
       const userGrey = (await userTurn.locator('.share-halo').boundingBox())!
       const answerGrey = (await answerTurn.locator('.share-halo').boundingBox())!
+      expect(Math.abs(userGrey.x - answerGrey.x), 'question and answer grey left edges').toBeLessThanOrEqual(1)
+      expect(Math.abs(userGrey.x + userGrey.width - (answerGrey.x + answerGrey.width)), 'question and answer grey right edges').toBeLessThanOrEqual(1)
       const userCheck = (await userTurn.locator('.share-box').boundingBox())!
       const answerCheck = (await answerTurn.locator('.share-box').boundingBox())!
       expect(overlaps(userCheck, userGrey), 'user checkbox stays outside its grey block').toBe(false)
@@ -332,22 +342,28 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(hit, `${id} center`).toBe(id)
       }
 
-      await boxes.nth(0).evaluate((node) => (node as HTMLInputElement).click())
+      await boxes.nth(0).click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-all')).toBeChecked()
       await expect(page.locator('.share-halo:visible')).toHaveCount(4)
+      for (const index of [0, 1]) {
+        const question = (await page.locator('.turn.user').nth(index).locator('.share-halo').boundingBox())!
+        const answer = (await page.locator('.turn.assistant').nth(index).locator('.share-halo').boundingBox())!
+        expect(Math.abs(question.x - answer.x), `pair ${index} grey left`).toBeLessThanOrEqual(1)
+        expect(Math.abs(question.x + question.width - (answer.x + answer.width)), `pair ${index} grey right`).toBeLessThanOrEqual(1)
+      }
 
-      await page.getByTestId('share-all').evaluate((node) => (node as HTMLInputElement).click())
+      await page.getByTestId('share-all').click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).not.toBeChecked()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 0 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
       await expect(page.getByTestId('share-create')).toBeDisabled()
 
-      await page.getByTestId('share-all').evaluate((node) => (node as HTMLInputElement).click())
+      await page.getByTestId('share-all').click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-create')).toBeEnabled()
-      await boxes.nth(0).evaluate((node) => (node as HTMLInputElement).click())
+      await boxes.nth(0).click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
 
@@ -367,25 +383,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(idle.bg).toBe(tone.checkBg)
       const dpr = await page.evaluate(() => window.devicePixelRatio)
       const borderNode = page.locator('input.share-box:not(:checked)').first()
-      const borderBox = (await borderNode.boundingBox())!
-      const borderOnScreen = borderBox.x >= 0 && borderBox.y >= 0 && borderBox.x + borderBox.width <= w && borderBox.y + borderBox.height <= h
-      const borderShot = borderOnScreen
-        ? await borderNode.screenshot()
-        : await (async () => {
-            const probe = await borderNode.evaluateHandle((node) => {
-              const copy = node.cloneNode(true) as HTMLElement
-              copy.style.position = 'fixed'
-              copy.style.left = '8px'
-              copy.style.top = '8px'
-              copy.style.zIndex = '10000'
-              copy.style.margin = '0'
-              document.body.appendChild(copy)
-              return copy
-            })
-            const shot = await probe.asElement()!.screenshot()
-            await probe.evaluate((node) => node.remove())
-            return shot
-          })()
+      const borderShot = await borderNode.screenshot()
       const renderedBorder = renderedBorderPx(borderShot) / dpr
       expect(Math.abs(renderedBorder - 1.5), `rendered checkbox border ${renderedBorder}`).toBeLessThanOrEqual(0.4)
       const on = await cssOf(page, 'input.share-box:checked')
@@ -429,9 +427,9 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(cancelBox.radius).toBe(OFF.buttonRadius)
       expect(cancelBox.border).toBe(tone.outline)
 
-      await page.getByTestId('share-all').evaluate((node) => (node as HTMLInputElement).click())
+      await page.getByTestId('share-all').click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
-      await page.getByTestId('share-all').evaluate((node) => (node as HTMLInputElement).click())
+      await page.getByTestId('share-all').click()
       await expect(page.getByTestId('share-create')).toBeDisabled()
       const faded = await page.getByTestId('share-create').evaluate((node) => getComputedStyle(node).opacity)
       expect(faded).toBe(OFF.disabledOpacity)
