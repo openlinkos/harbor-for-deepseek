@@ -1,4 +1,4 @@
-import { buildRequest, clampExpireSeconds, createClient, purposeForFile } from '@deepapi/api-client'
+import { buildRequest, createClient, purposeForFile } from '@deepapi/api-client'
 import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
@@ -594,11 +594,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const key = get().key
-    const settings = get().settings
     if (!key) {
       return
     }
-    const seconds = clampExpireSeconds(settings.fileExpireDays)
     for (const file of files) {
       const localId = nid()
       const mapped = purposeForFile(file.name, file.type)
@@ -617,7 +615,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         ],
       })
       try {
-        const uploaded = await client.uploadFile(key, file, file.name, mapped.purpose, seconds)
+        const uploaded = await client.uploadFile(key, file, file.name, mapped.purpose)
         set({
           drafts: get().drafts.map((item) =>
             item.localId === localId

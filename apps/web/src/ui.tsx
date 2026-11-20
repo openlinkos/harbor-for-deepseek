@@ -1654,18 +1654,6 @@ const Settings = () => {
               <span className="knob" />
             </button>
           </div>
-          <div className="settings-line">
-            <span>{t('fileExpiry')}</span>
-            <input
-              className="settings-pill"
-              data-testid="file-expiry"
-              type="number"
-              min={1}
-              max={30}
-              value={settings.fileExpireDays}
-              onChange={(event) => void patchSettings({ fileExpireDays: Number(event.target.value) })}
-            />
-          </div>
         </section>
         <section className="settings-account">
           <div className="settings-line">

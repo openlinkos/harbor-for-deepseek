@@ -90,13 +90,10 @@ export const createClient = (options: ClientOptions = {}) => {
       file: Blob,
       filename: string,
       purpose: string,
-      expireSeconds: number,
       signal?: AbortSignal,
     ): Promise<UploadedFile> {
       const form = new FormData()
       form.append('purpose', purpose)
-      form.append('expires_after[anchor]', 'created_at')
-      form.append('expires_after[seconds]', String(expireSeconds))
       form.append('file', file, filename)
       const response = await request(fetchImpl, `${origin}/files`, {
         method: 'POST',

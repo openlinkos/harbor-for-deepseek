@@ -24,7 +24,7 @@ DeepAPI 是面向 [DeepSeek API](https://platform.deepseek.com/) 的开源（MIT
 ## 功能
 
 - 流式对话，模型为 `deepseek-flash` 与 `deepseek-v4-pro`，可显示思考过程。
-- Flash 上可用：联网搜索、打开网页、文件上传（官方侧默认 7 天后过期）、自动标题。
+- Flash 上可用：联网搜索、打开网页、文件上传（文件会保留）、自动标题。
 - 多个对话，重命名、删除、停止、重新生成（保留为分支）。
 - Markdown、代码高亮、KaTeX 公式、Mermaid。
 - 中文和英文界面，手机上可用，可安装为 PWA。

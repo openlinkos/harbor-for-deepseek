@@ -51,18 +51,13 @@ export type Tombstone = {
 export type Settings = {
   locale: 'zh' | 'en'
   safetyLevel: 'high' | 'low'
-  /** Whole days. The API allows 3600–2592000 seconds; the client clamps. */
-  fileExpireDays: number
   acknowledgedKeyRisk: boolean
   deviceId: string
 }
 
-export const DEFAULT_FILE_EXPIRE_DAYS = 7
-
 export const defaultSettings = (deviceId: string): Settings => ({
   locale: 'zh',
   safetyLevel: 'high',
-  fileExpireDays: DEFAULT_FILE_EXPIRE_DAYS,
   acknowledgedKeyRisk: false,
   deviceId,
 })

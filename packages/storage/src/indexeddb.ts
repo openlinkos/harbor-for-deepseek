@@ -90,9 +90,13 @@ export const openIndexedRepository = async (): Promise<Repository> => {
 
   return {
     async loadSettings() {
-      const stored = (await data.get('kv', 'settings')) as (Partial<Settings> & { documentPurpose?: unknown; deviceId?: string }) | undefined
+      const stored = (await data.get('kv', 'settings')) as
+        | (Partial<Settings> & { documentPurpose?: unknown; fileExpireDays?: unknown; deviceId?: string })
+        | undefined
       if (stored && typeof stored === 'object') {
-        const { documentPurpose: _legacyPurpose, ...rest } = stored
+        const { documentPurpose: _legacyPurpose, fileExpireDays: _legacyFileExpireDays, ...rest } = stored
+        void _legacyPurpose
+        void _legacyFileExpireDays
         return {
           ...defaultSettings(stored.deviceId || crypto.randomUUID()),
           ...rest,
