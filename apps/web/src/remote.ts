@@ -58,8 +58,9 @@ export const readRun = async (
   runId: string,
   onEvent: (event: StreamEvent) => void,
   signal: AbortSignal,
-): Promise<string> => {
+): Promise<{ status: string; thinkingSeconds?: number }> => {
   let after = 0
+  let thinkingSeconds: number | undefined
   while (!signal.aborted) {
     const response = await fetch(endpoint(`/api/runs/${runId}/events?after=${after}`), {
       credentials: bearer ? 'omit' : 'include',
@@ -84,7 +85,9 @@ export const readRun = async (
           after = Number(frame.lastEventId)
         }
         if (frame.event === 'end') {
-          ended = JSON.parse(frame.data).status ?? 'complete'
+          const data = JSON.parse(frame.data) as { status?: string; thinkingSeconds?: number }
+          ended = data.status ?? 'complete'
+          if (typeof data.thinkingSeconds === 'number') thinkingSeconds = data.thinkingSeconds
           break
         }
         try {
@@ -101,8 +104,8 @@ export const readRun = async (
       }
     }
     if (ended) {
-      return ended
+      return { status: ended, thinkingSeconds }
     }
   }
-  return 'aborted'
+  return { status: 'aborted', thinkingSeconds }
 }

@@ -1,4 +1,4 @@
-import { buildRequest, CONTENT_SECURITY_POLICY } from '@deepapi/api-client'
+import { buildRequest, CONTENT_SECURITY_POLICY, messageUsedWebTool } from '@deepapi/api-client'
 import { estimateCost } from '@deepapi/pricing'
 import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@deepapi/sse'
 import type { ContentBlock, Message, Usage } from '@deepapi/types'
@@ -35,6 +35,8 @@ export type ServerOptions = {
   allowOpenSetup?: boolean
   /** Default lifetime of a new invite, in hours. */
   inviteTtlHours?: number
+  /** Test hook: runs inside the transaction that publishes a new run, before commit. */
+  beforeRunCommit?: () => Promise<void>
   authRateLimit?: number
   chatRateLimit?: number
 }
@@ -720,6 +722,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     blocks: row.blocks_json ?? [],
     usage: row.usage_json,
     errorMessage: row.error_message,
+    thinkingSeconds: typeof row.thinking_seconds === 'number' ? row.thinking_seconds : row.thinking_seconds == null ? undefined : Number(row.thinking_seconds),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     rev: asNumber(row.rev),
@@ -1006,27 +1009,51 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     requestTitle: boolean
     locale: 'zh' | 'en'
     timeZone: string
+    priorBlocks?: ContentBlock[]
+    dropThinking?: boolean
   }) => {
     const controller = new AbortController()
     aborts.set(runId, controller)
-    const body = buildRequest({
-      ...prefs,
-      safetyLevel: 'high',
-      messages: requestMessages,
-      locale: prefs.locale,
-      timeZone: prefs.timeZone,
-    })
+    let thinkingClosed = 0
+    let thinkingOpen: number | null = null
+    let thinkingStored = 0
+    const thinkingSeconds = () => {
+      const live = thinkingOpen === null ? 0 : Date.now() - thinkingOpen
+      const total = thinkingClosed + live
+      if (total <= 0) return null
+      return Math.max(1, Math.round(total / 1000))
+    }
+    const rememberThinking = async () => {
+      const seconds = thinkingSeconds()
+      if (seconds === null || seconds === thinkingStored) return
+      thinkingStored = seconds
+      await sql`update messages set thinking_seconds = ${seconds}, updated_at = now() where id = ${messageId}`
+    }
     try {
-      const result = await upstreamCall(
-        '/anthropic/v1/messages',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
-          body: JSON.stringify(body),
-          signal: controller.signal,
-        },
-        new Set(),
-      )
+      const callUpstream = (dropThinking: boolean) =>
+        upstreamCall(
+          '/anthropic/v1/messages',
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
+            body: JSON.stringify(buildRequest({
+              ...prefs,
+              safetyLevel: 'high',
+              messages: requestMessages,
+              locale: prefs.locale,
+              timeZone: prefs.timeZone,
+              dropThinking,
+            })),
+            signal: controller.signal,
+          },
+          new Set(),
+        )
+      let result = await callUpstream(Boolean(prefs.dropThinking))
+      const hasThinking = requestMessages.some((message) => message.blocks.some((block) => block.type === 'thinking'))
+      if (result.response?.status === 400 && !prefs.dropThinking && hasThinking) {
+        await result.response.body?.cancel().catch(() => undefined)
+        result = await callUpstream(true)
+      }
       if (!result.response || !result.key) {
         await finishRun(runId, 'error', 'no usable key')
         await sql`update messages set status = 'error', error_message = 'no usable key', updated_at = now() where id = ${messageId}`
@@ -1062,6 +1089,14 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
             continue
           }
           draft = reduceEvent(draft, event)
+          if (event.type === 'content_block_start' && event.content_block.type === 'thinking' && thinkingOpen === null) {
+            thinkingOpen = Date.now()
+          }
+          if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking' && thinkingOpen !== null) {
+            thinkingClosed += Date.now() - thinkingOpen
+            thinkingOpen = null
+          }
+          await rememberThinking()
           await appendEvent(runId, event)
           if (event.type === 'message_delta' && event.delta.title) {
             const rev = await nextRev(user.id)
@@ -1077,14 +1112,17 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       }
       const refused = draft.stopReason === 'refusal'
       const status = controller.signal.aborted ? 'aborted' : refused ? 'refused' : draft.stopped ? 'complete' : 'error'
-      const blocks = refused ? [] : draft.blocks.filter(Boolean)
+      const prior = prefs.priorBlocks ?? []
+      const blocks = refused ? [] : [...prior, ...draft.blocks.filter(Boolean)]
       const messageRev = await nextRev(user.id)
+      const seconds = thinkingSeconds()
       await sql`
         update messages set
           status = ${status},
           blocks_json = ${sql.json(blocks as postgres.JSONValue)},
           usage_json = ${draft.usage ? sql.json(draft.usage as unknown as postgres.JSONValue) : null},
           error_message = ${status === 'error' ? 'interrupted' : null},
+          thinking_seconds = ${seconds},
           rev = ${messageRev},
           updated_at = now()
         where id = ${messageId}
@@ -1149,7 +1187,8 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     }
     const body = await readBody<Record<string, unknown>>(c)
     const now = new Date().toISOString()
-    const regenerate = typeof body.parentId === 'string' && !body.text
+    const continueId = typeof body.continueMessageId === 'string' ? body.continueMessageId : ''
+    const regenerate = !continueId && typeof body.parentId === 'string' && !body.text
     let parentId = regenerate ? String(body.parentId) : (conversation.active_leaf_id as string | null)
     let userMessageId = regenerate ? String(body.parentId) : crypto.randomUUID()
     if (!regenerate) {
@@ -1183,12 +1222,22 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       `
       parentId = userMessageId
     }
-    const assistantId = crypto.randomUUID()
-    const assistantRev = await nextRev(user.id)
-    await sql`
-      insert into messages (id, user_id, conversation_id, parent_id, role, status, blocks_json, created_at, updated_at, rev)
-      values (${assistantId}, ${user.id}, ${conversationId}, ${parentId}, 'assistant', 'streaming', '[]'::jsonb, ${now}, ${now}, ${assistantRev})
-    `
+    let assistantId = continueId || crypto.randomUUID()
+    let priorBlocks: ContentBlock[] = []
+    if (continueId) {
+      const existingRows = await sql<Record<string, unknown>[]>`
+        select * from messages where id = ${continueId} and user_id = ${user.id} and conversation_id = ${conversationId} and deleted_at is null
+      `
+      const existing = existingRows[0] ? (mapMessage(existingRows[0]) as Message) : null
+      if (!existing || existing.role !== 'assistant') {
+        return c.json({ error: { message: 'not found' } }, 404)
+      }
+      if (messageUsedWebTool(existing)) {
+        return c.json({ error: { message: 'web tools cannot be continued' } }, 400)
+      }
+      priorBlocks = existing.blocks.filter(Boolean)
+      userMessageId = existing.parentId ?? userMessageId
+    }
     const leafRev = await nextRev(user.id)
     const model = body.model === 'deepseek-v4-pro' ? 'deepseek-v4-pro' : 'deepseek-flash'
     const effort = body.effort === 'low' || body.effort === 'max' ? body.effort : 'high'
@@ -1210,7 +1259,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     const history = historyRows.map((row) => mapMessage(row) as Message)
     const byId = new Map(history.map((message) => [message.id, message]))
     const path: Message[] = []
-    let cursor = byId.get(userMessageId)
+    let cursor = byId.get(continueId || userMessageId)
     const seen = new Set<string>()
     while (cursor && !seen.has(cursor.id)) {
       seen.add(cursor.id)
@@ -1219,10 +1268,22 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     }
     path.reverse()
     const runId = crypto.randomUUID()
-    await sql`
-      insert into chat_runs (id, user_id, conversation_id, message_id, status)
-      values (${runId}, ${user.id}, ${conversationId}, ${assistantId}, 'streaming')
-    `
+    const assistantRev = await nextRev(user.id)
+    await sql.begin(async (tx) => {
+      await tx`
+        insert into chat_runs (id, user_id, conversation_id, message_id, status)
+        values (${runId}, ${user.id}, ${conversationId}, ${assistantId}, 'streaming')
+      `
+      if (continueId) {
+        await tx`update messages set status = 'streaming', updated_at = now() where id = ${assistantId}`
+      } else {
+        await tx`
+          insert into messages (id, user_id, conversation_id, parent_id, role, status, blocks_json, created_at, updated_at, rev)
+          values (${assistantId}, ${user.id}, ${conversationId}, ${parentId}, 'assistant', 'streaming', '[]'::jsonb, ${now}, ${now}, ${assistantRev})
+        `
+      }
+      await options.beforeRunCommit?.()
+    })
     const locale = body.locale === 'zh' ? 'zh' : 'en'
     const timeZone = typeof body.timeZone === 'string' ? body.timeZone : 'Asia/Shanghai'
     void executeRun(runId, user, conversationId, assistantId, path, {
@@ -1234,6 +1295,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       readLink: body.readLink === true,
       effort,
       requestTitle: conversation.title_source !== 'user',
+      priorBlocks,
     })
     return c.json({ runId, userMessageId, assistantMessageId: assistantId })
   })
@@ -1288,7 +1350,10 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
             }
             const current = await sql<{ status: string }[]>`select status from chat_runs where id = ${runId}`
             if (current[0]?.status !== 'streaming') {
-              send(`event: end\ndata: ${JSON.stringify({ status: current[0]?.status ?? 'error' })}\n\n`)
+              const thought = await sql<{ thinking_seconds: number | null }[]>`
+                select thinking_seconds from messages where id = (select message_id from chat_runs where id = ${runId})
+              `
+              send(`event: end\ndata: ${JSON.stringify({ status: current[0]?.status ?? 'error', thinkingSeconds: thought[0]?.thinking_seconds ?? undefined })}\n\n`)
               close()
               return
             }

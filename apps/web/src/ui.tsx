@@ -1160,7 +1160,7 @@ const MessageRow = ({ message }: { message: Message }) => {
             <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
           {message.status === 'aborted' ? (
-            <button type="button" className="continue-gen" data-testid="continue" onClick={() => void regenerate(message.id)}>{t('continueGenerating')}</button>
+            <button type="button" className="continue-gen" data-testid="continue" onClick={() => void useHarbor.getState().continueReply(message.id)}>{t('continueGenerating')}</button>
           ) : null}
         </div>
       ) : null}

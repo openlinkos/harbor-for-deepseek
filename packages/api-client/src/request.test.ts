@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildRequest } from './request.js'
+import { buildRequest, messageUsedWebTool, toApiMessages } from './request.js'
 
 const user = (id: string, text: string) => ({
   id,
@@ -47,5 +47,33 @@ describe('harborSystemPrompt', () => {
       now,
     })
     expect(chinese.system).toBeUndefined()
+  })
+})
+
+describe('continuation', () => {
+  const assistant = {
+    ...user('a', ''),
+    role: 'assistant' as const,
+    parentId: 'u',
+    status: 'aborted' as const,
+    blocks: [
+      { type: 'thinking' as const, thinking: '先想', signature: 'sig' },
+      { type: 'text' as const, text: '原文甲' },
+    ],
+  }
+  it('ends the request with the partial assistant message and can omit thinking', () => {
+    const kept = toApiMessages([user('u', '写一首诗'), assistant])
+    expect(kept.at(-1)?.role).toBe('assistant')
+    expect(JSON.stringify(kept.at(-1))).toContain('原文甲')
+    expect(JSON.stringify(kept.at(-1))).toContain('先想')
+    const dropped = toApiMessages([user('u', '写一首诗'), assistant], { dropThinking: true })
+    expect(JSON.stringify(dropped.at(-1))).toContain('原文甲')
+    expect(JSON.stringify(dropped.at(-1))).not.toContain('先想')
+  })
+  it('treats web search and page reads as not continuable', () => {
+    expect(messageUsedWebTool(assistant)).toBe(false)
+    expect(messageUsedWebTool({
+      blocks: [{ type: 'server_tool_use', id: 's', name: 'deepseek_web_search', input: { action: 'search', queries: ['q'] } }],
+    })).toBe(true)
   })
 })

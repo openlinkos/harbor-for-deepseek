@@ -32,6 +32,8 @@ export type TurnOptions = {
   locale?: 'zh' | 'en'
   timeZone?: string
   now?: Date
+  /** Continuation retry: the partial assistant thinking block made upstream return 400. */
+  dropThinking?: boolean
 }
 
 const replayAssistant = (message: Message): ApiContentBlock[] => {
@@ -80,8 +82,17 @@ const replayUser = (message: Message): ApiMessage | null => {
   return content.length ? { role: 'user', content } : null
 }
 
+/** A partial reply that called web search or read-url cannot be continued (the API returns 400). */
+export const messageUsedWebTool = (message: Pick<Message, 'blocks'>): boolean =>
+  message.blocks.some(
+    (block) =>
+      block.type === 'server_tool_use' ||
+      block.type === 'web_search_tool_result' ||
+      block.type === 'web_fetch_tool_result',
+  )
+
 /** Full blocks are stored locally and sent back, including signatures. Refusals and errors stay out. */
-export const toApiMessages = (messages: Message[]): ApiMessage[] => {
+export const toApiMessages = (messages: Message[], options?: { dropThinking?: boolean }): ApiMessage[] => {
   const api: ApiMessage[] = []
   for (const message of messages) {
     if (message.deletedAt || message.status === 'refused' || message.status === 'error') {
@@ -97,7 +108,7 @@ export const toApiMessages = (messages: Message[]): ApiMessage[] => {
       }
       continue
     }
-    const content = replayAssistant(message)
+    const content = replayAssistant(message).filter((block) => !(options?.dropThinking && block.type === 'thinking'))
     if (content.length) {
       api.push({ role: 'assistant', content })
     }
@@ -120,7 +131,7 @@ export const buildRequest = (options: TurnOptions): CreateMessageBody => {
     model: options.model,
     stream: true,
     ...(system ? { system } : {}),
-    messages: toApiMessages(options.messages),
+    messages: toApiMessages(options.messages, { dropThinking: options.dropThinking }),
     thinking: { type: options.thinking ? 'enabled' : 'disabled' },
     ...(tools.length ? { tools } : {}),
     safety_check: { level: options.safetyLevel },

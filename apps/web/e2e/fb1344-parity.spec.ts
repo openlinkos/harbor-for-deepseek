@@ -276,10 +276,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(head(page)).toHaveText(K.phaseTitles.thinking)
     })
     test('phase-shimmer-sweep', async ({ page }) => {
-      await staged(page)
-      await push(page, PH.thinking)
-      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
-      const frames = await head(page).locator('.phase-shimmer-sweep').evaluate((node) => {
+      const sample = () => head(page).locator('.phase-shimmer-sweep').evaluate((node) => {
         const title = (node.parentElement ?? node).getBoundingClientRect()
         const anim = node.getAnimations().find((item) => item instanceof CSSAnimation)
         const points = [0, 0.45, 0.9]
@@ -299,12 +296,24 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
           }
         })
       })
-      expect(frames).toHaveLength(3)
-      expect(Math.abs(frames[0].sweep - 136)).toBeLessThanOrEqual(1)
-      expect(Math.abs(frames[0].tx + 136)).toBeLessThanOrEqual(1)
-      expect(Math.abs(frames[2].tx - 136)).toBeLessThanOrEqual(1)
-      expect(frames[0].barRight).toBeLessThanOrEqual(frames[0].titleLeft + 1)
-      expect(frames[2].barLeft).toBeGreaterThanOrEqual(frames[2].titleRight - 1)
+      const expectSweep = (frames: Awaited<ReturnType<typeof sample>>) => {
+        expect(frames).toHaveLength(3)
+        expect(Math.abs(frames[0].sweep - 136)).toBeLessThanOrEqual(1)
+        expect(Math.abs(frames[0].tx + frames[0].sweep)).toBeLessThanOrEqual(1)
+        expect(Math.abs(frames[2].tx - frames[2].sweep)).toBeLessThanOrEqual(1)
+        expect(frames[0].barRight).toBeLessThanOrEqual(frames[0].titleLeft + 1)
+        expect(frames[2].barLeft).toBeGreaterThanOrEqual(frames[2].titleRight - 1)
+      }
+      await staged(page)
+      await push(page, PH.thinking)
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      expectSweep(await sample())
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      expectSweep(await sample())
+      await push(page, PH.browsing)
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      expectSweep(await sample())
     })
     test('phase-persist', async ({ page }) => {
       await page.addInitScript(() => {
@@ -361,6 +370,69 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       })
       expect(landed).toBeGreaterThanOrEqual(0)
       expect(landed).toBeLessThan(180)
+    })
+    test('phase-persist-continuous', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the continuous stream')
+      await staged(page)
+      await push(page, [PH.thinking[0], PH.thinking[1]])
+      const thinking = Array.from({ length: 20 }, (_, i) => `思${String(i).padStart(2, '0')}`)
+      const answer = Array.from({ length: 20 }, (_, i) => `文${String(i).padStart(2, '0')}`)
+      await page.evaluate(async ({ thinking: thoughts, answer: words }) => {
+        const sse = (window as unknown as { __sse: { push: (events: unknown[]) => void } }).__sse
+        for (const piece of thoughts) {
+          sse.push([{ type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        sse.push([{ type: 'content_block_stop', index: 0 }, { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } }])
+        for (const piece of words) {
+          sse.push([{ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }, { thinking, answer })
+      const kept = async (target: Page) => {
+        const text = await target.locator('.turn.assistant').innerText()
+        expect(text).toContain('思00')
+        expect(text).toContain('思19')
+        expect(text).toContain('文00')
+        const last = answer.filter((piece) => text.includes(piece)).length
+        expect(last).toBeGreaterThanOrEqual(19)
+      }
+      await page.reload()
+      await expect(page.locator('.turn.assistant')).toBeVisible()
+      await kept(page)
+      await page.close()
+      const again = await page.context().newPage()
+      await again.goto('/')
+      await expect(again.locator('.turn.assistant')).toBeVisible()
+      await kept(again)
+    })
+    test('phase-continue', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers continuation')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_start', index: 4, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 4, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
+      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
+      expect(request?.messages.at(-1)?.role).toBe('assistant')
+      expect(JSON.stringify(request?.messages.at(-1)?.content)).toContain('原文甲')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+      await expect(page.getByTestId('versions')).toHaveCount(0)
     })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')

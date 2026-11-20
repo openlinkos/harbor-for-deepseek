@@ -5,6 +5,7 @@ export {
   API_ORIGIN,
   buildRequest,
   FILES_BETA,
+  messageUsedWebTool,
   HARBOR_SYSTEM_PROMPT,
   harborSystemPrompt,
   purposeForFile,

@@ -199,9 +199,14 @@ WHERE expires_at IS NULL;
 CREATE INDEX IF NOT EXISTS invite_codes_expires_at ON invite_codes (expires_at);
 `
 
+const THINKING_SECONDS = `
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS thinking_seconds integer;
+`
+
 export const MIGRATIONS: ReadonlyArray<{ id: string; sql: string }> = [
   { id: '001_init', sql: INIT },
   { id: '002_invite_expiry', sql: INVITE_EXPIRY },
+  { id: '003_thinking_seconds', sql: THINKING_SECONDS },
 ]
 
 const LOCK_KEY = 764521

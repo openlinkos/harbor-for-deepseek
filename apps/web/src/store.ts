@@ -1,4 +1,4 @@
-import { buildRequest, createClient, purposeForFile } from '@deepapi/api-client'
+import { ApiClientError, buildRequest, createClient, messageUsedWebTool, purposeForFile } from '@deepapi/api-client'
 import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
@@ -30,6 +30,44 @@ let abort: AbortController | null = null
 let serverAbort: AbortController | null = null
 let serverRunId: string | null = null
 let persistTimer = 0
+let persistDue = 0
+let persistFlush: (() => void) | null = null
+const PERSIST_WAIT = 200
+const PERSIST_MAX = 1000
+
+const flushPersist = () => {
+  window.clearTimeout(persistTimer)
+  persistTimer = 0
+  persistDue = 0
+  persistFlush?.()
+}
+
+/** Trailing 200ms, but never wait more than 1000ms while events keep arriving. */
+const schedulePersist = (flush: () => void) => {
+  persistFlush = flush
+  const now = Date.now()
+  if (!persistDue) persistDue = now + PERSIST_MAX
+  const wait = Math.max(0, Math.min(PERSIST_WAIT, persistDue - now))
+  window.clearTimeout(persistTimer)
+  persistTimer = 0
+  if (wait === 0) {
+    persistDue = 0
+    flush()
+    return
+  }
+  persistTimer = window.setTimeout(() => {
+    persistTimer = 0
+    persistDue = 0
+    flush()
+  }, wait)
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', flushPersist)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPersist()
+  })
+}
 /** In-flight assistant. openChat and a refresh must not replace it with a finished title. */
 let liveTurn: { conversationId: string; message: Message } | null = null
 
@@ -204,6 +242,7 @@ export type HarborState = {
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
   regenerate: (assistantId: string) => Promise<void>
+  continueReply: (assistantId: string) => Promise<void>
   editUser: (messageId: string, text: string) => Promise<void>
   stop: () => void
   refreshBalance: () => Promise<void>
@@ -628,6 +667,21 @@ export const useHarbor = create<HarborState>((set, get) => ({
     await runTurn('', assistant.parentId)
   },
 
+  async continueReply(assistantId) {
+    const assistant = get().messages.find((item) => item.id === assistantId)
+    if (!assistant || assistant.role !== 'assistant' || get().streaming) return
+    if (messageUsedWebTool(assistant)) {
+      await get().regenerate(assistantId)
+      return
+    }
+    if (get().serverMode) {
+      await runServerTurn('', null, assistantId)
+      return
+    }
+    if (!get().key) return
+    await runContinuation(assistantId)
+  },
+
   async editUser(messageId, text) {
     const message = get().messages.find((item) => item.id === messageId)
     const trimmed = text.trim()
@@ -950,6 +1004,105 @@ const applyImport = async (
   useHarbor.setState({ notice: `${plan.added}:${plan.skipped}`, booted: true })
 }
 
+const runContinuation = async (assistantId: string) => {
+  const state = useHarbor.getState()
+  const key = state.key
+  const current = state.messages.find((item) => item.id === assistantId)
+  if (!key || !current) return
+  const store = await repository()
+  const prior = current.blocks.filter(Boolean)
+  const assistant: Message = { ...current, status: 'streaming', errorMessage: null, updatedAt: nowIso() }
+  const history = activePath(state.messages, assistantId).map((item) =>
+    item.id === assistantId ? { ...item, status: 'aborted' as const } : item,
+  )
+  useHarbor.setState({
+    messages: state.messages.map((item) => (item.id === assistantId ? assistant : item)),
+    streaming: true,
+  })
+  const conversation = state.conversations.find((item) => item.id === assistant.conversationId)
+  const attempt = async (dropThinking: boolean) => {
+    const body = buildRequest({
+      model: DEFAULT_CHAT_MODEL,
+      thinking: conversation?.thinking ?? true,
+      search: conversation?.search ?? false,
+      readLink: conversation?.readLink ?? false,
+      effort: DEFAULT_EFFORT,
+      safetyLevel: state.settings.safetyLevel,
+      requestTitle: false,
+      messages: history,
+      locale: state.settings.locale,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      dropThinking,
+    })
+    abort = new AbortController()
+    let draft = createDraft()
+    const publish = () => {
+      const next: Message = {
+        ...assistant,
+        status: 'streaming',
+        blocks: [...prior, ...draft.blocks.filter(Boolean)],
+        usage: draft.usage,
+        updatedAt: nowIso(),
+      }
+      Object.assign(assistant, next)
+      rememberLive(assistant)
+      useHarbor.setState({
+        messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
+      })
+      schedulePersist(() => {
+        void store.saveMessage(structuredClone(assistant))
+      })
+    }
+    for await (const event of client.streamMessage(key, body, abort.signal)) {
+      draft = reduceEvent(draft, event)
+      publish()
+    }
+    const done: Message = {
+      ...assistant,
+      status: draft.stopReason === 'refusal' ? 'refused' : 'complete',
+      blocks: draft.stopReason === 'refusal' ? [] : [...prior, ...draft.blocks.filter(Boolean)],
+      usage: draft.usage,
+      errorMessage: null,
+      updatedAt: nowIso(),
+    }
+    Object.assign(assistant, done)
+    useHarbor.setState({
+      messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
+    })
+  }
+  try {
+    try {
+      await attempt(false)
+    } catch (error) {
+      const thinking = prior.some((block) => block.type === 'thinking')
+      if (thinking && error instanceof ApiClientError && error.status === 400 && !abort?.signal.aborted) {
+        await attempt(true)
+      } else {
+        throw error
+      }
+    }
+  } catch (error) {
+    const aborted = abort?.signal.aborted
+    Object.assign(assistant, {
+      status: aborted ? 'aborted' : 'error',
+      errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
+      updatedAt: nowIso(),
+    })
+    useHarbor.setState({
+      messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
+    })
+  } finally {
+    window.clearTimeout(persistTimer)
+    persistTimer = 0
+    persistDue = 0
+    persistFlush = null
+    await store.saveMessage({ ...assistant })
+    clearLive(assistant.id)
+    abort = null
+    useHarbor.setState({ streaming: false })
+  }
+}
+
 const runTurn = async (text: string, regenerateParent?: string | null, branchFrom?: string | null) => {
   const state = useHarbor.getState()
   const key = state.key
@@ -1082,8 +1235,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         usage: draft.usage,
         thinkingSeconds: clock.seconds(),
       })
-      window.clearTimeout(persistTimer)
-      persistTimer = window.setTimeout(persist, 200)
+      schedulePersist(persist)
     }
     if (draft.stopReason === 'refusal') {
       publish({ status: 'refused', blocks: [], usage: draft.usage, errorMessage: null, thinkingSeconds: clock.seconds() })
@@ -1101,6 +1253,9 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     })
   } finally {
     window.clearTimeout(persistTimer)
+    persistTimer = 0
+    persistDue = 0
+    persistFlush = null
     await store.saveMessage({ ...assistant })
     clearLive(assistant.id)
     abort = null
@@ -1174,10 +1329,13 @@ const followServerRun = async (runId: string, assistantId: string) => {
   serverAbort = new AbortController()
   useHarbor.setState({ streaming: true })
   let draft = createDraft()
-  const clock = createThinkingClock()
+  const storedSeconds = () => useHarbor.getState().messages.find((item) => item.id === assistantId)?.thinkingSeconds
   const publish = (patch: Partial<Message>) => {
+    const known = storedSeconds()
+    const next = patch.thinkingSeconds
+    const thinkingSeconds = known && (next === undefined || next < known) ? known : next ?? known
     useHarbor.setState({
-      messages: useHarbor.getState().messages.map((item) => (item.id === assistantId ? { ...item, ...patch } : item)),
+      messages: useHarbor.getState().messages.map((item) => (item.id === assistantId ? { ...item, ...patch, thinkingSeconds } : item)),
     })
     const current = useHarbor.getState().messages.find((item) => item.id === assistantId)
     if (current) rememberLive(current)
@@ -1187,7 +1345,6 @@ const followServerRun = async (runId: string, assistantId: string) => {
       runId,
       (event) => {
         draft = reduceEvent(draft, event)
-        clock.onEvent(event, draft.blocks)
         if (event.type === 'message_delta' && event.delta.title) {
           const title = event.delta.title
           const conversationId = useHarbor.getState().messages.find((item) => item.id === assistantId)?.conversationId
@@ -1201,18 +1358,17 @@ const followServerRun = async (runId: string, assistantId: string) => {
           status: 'streaming',
           blocks: draft.blocks.filter(Boolean),
           usage: draft.usage,
-          thinkingSeconds: clock.seconds(),
         })
       },
       serverAbort.signal,
     )
-    const aborted = serverAbort.signal.aborted || ended === 'aborted'
-    const status = draft.stopReason === 'refusal' ? 'refused' : aborted ? 'aborted' : ended === 'error' ? 'error' : 'complete'
+    const aborted = serverAbort.signal.aborted || ended.status === 'aborted'
+    const status = draft.stopReason === 'refusal' ? 'refused' : aborted ? 'aborted' : ended.status === 'error' ? 'error' : 'complete'
     publish({
       status,
       blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
       usage: draft.usage,
-      thinkingSeconds: clock.seconds(),
+      thinkingSeconds: ended.thinkingSeconds ?? storedSeconds(),
       errorMessage: status === 'error' ? 'interrupted' : null,
     })
   } catch (error) {
@@ -1221,7 +1377,7 @@ const followServerRun = async (runId: string, assistantId: string) => {
       status: aborted ? 'aborted' : 'error',
       errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
       blocks: draft.blocks.filter(Boolean),
-      thinkingSeconds: clock.seconds(),
+      thinkingSeconds: storedSeconds(),
     })
   } finally {
     if (serverRunId === runId) {
@@ -1233,11 +1389,13 @@ const followServerRun = async (runId: string, assistantId: string) => {
   }
 }
 
-const runServerTurn = async (text: string, regenerateParent: string | null) => {
+const runServerTurn = async (text: string, regenerateParent: string | null, continueMessageId?: string | null) => {
   const state = useHarbor.getState()
   if (state.streaming) {
     return
   }
+  const continued = continueMessageId ? state.messages.find((item) => item.id === continueMessageId) : undefined
+  const priorBlocks = continued?.blocks.filter(Boolean) ?? []
   let conversationId = state.activeId
   if (!conversationId || regenerateParent === null && !state.conversations.some((item) => item.id === conversationId)) {
     conversationId = nid()
@@ -1255,6 +1413,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
       body: JSON.stringify({
         text,
         parentId: regenerateParent,
+        continueMessageId: continueMessageId || undefined,
         files: files.map((file) => ({
           fileId: file.fileId,
           filename: file.filename,
@@ -1271,7 +1430,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
   )
   serverRunId = started.runId
   const now = nowIso()
-  const userMessage: Message | null = regenerateParent
+  const userMessage: Message | null = regenerateParent || continueMessageId
     ? null
     : {
         id: started.userMessageId,
@@ -1287,20 +1446,22 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
         rev: 1,
         deletedAt: null,
       }
-  const assistant: Message = {
-    id: started.assistantMessageId,
-    conversationId,
-    parentId: regenerateParent ?? started.userMessageId,
-    role: 'assistant',
-    status: 'streaming',
-    blocks: [],
-    usage: null,
-    errorMessage: null,
-    createdAt: now,
-    updatedAt: now,
-    rev: 1,
-    deletedAt: null,
-  }
+  const assistant: Message = continued
+    ? { ...continued, status: 'streaming', errorMessage: null, updatedAt: now }
+    : {
+        id: started.assistantMessageId,
+        conversationId,
+        parentId: regenerateParent ?? started.userMessageId,
+        role: 'assistant',
+        status: 'streaming',
+        blocks: [],
+        usage: null,
+        errorMessage: null,
+        createdAt: now,
+        updatedAt: now,
+        rev: 1,
+        deletedAt: null,
+      }
   const conversations = state.conversations.some((item) => item.id === conversationId)
     ? state.conversations.map((item) =>
         item.id === conversationId ? { ...item, activeLeafId: assistant.id, updatedAt: now } : item,
@@ -1324,13 +1485,16 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
   useHarbor.setState({
     conversations,
     activeId: conversationId,
-    messages: [...state.messages.filter((item) => item.conversationId === conversationId), ...(userMessage ? [userMessage] : []), assistant],
+    messages: continued
+      ? state.messages.map((item) => (item.id === continued.id ? assistant : item))
+      : [...state.messages.filter((item) => item.conversationId === conversationId), ...(userMessage ? [userMessage] : []), assistant],
   })
   serverAbort = new AbortController()
   let draft = createDraft()
   const clock = createThinkingClock()
+  const streamedBlocks = () => (continued ? [...priorBlocks, ...draft.blocks.filter(Boolean)] : draft.blocks.filter(Boolean))
   try {
-    await readRun(
+    const outcome = await readRun(
       started.runId,
       (event) => {
         draft = reduceEvent(draft, event)
@@ -1347,7 +1511,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
         useHarbor.setState({
           messages: useHarbor.getState().messages.map((item) =>
             item.id === assistant.id
-              ? { ...item, blocks: draft.blocks.filter(Boolean), usage: draft.usage, thinkingSeconds: clock.seconds() }
+              ? { ...item, blocks: streamedBlocks(), usage: draft.usage, thinkingSeconds: Math.max(clock.seconds(), item.thinkingSeconds ?? 0) || clock.seconds() }
               : item,
           ),
         })
@@ -1357,15 +1521,16 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
       serverAbort.signal,
     )
     const status = draft.stopReason === 'refusal' ? 'refused' : serverAbort.signal.aborted ? 'aborted' : 'complete'
+    const seconds = Math.max(clock.seconds(), outcome.thinkingSeconds ?? 0)
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) =>
         item.id === assistant.id
           ? {
               ...item,
               status,
-              blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
+              blocks: status === 'refused' ? [] : streamedBlocks(),
               usage: draft.usage,
-              thinkingSeconds: clock.seconds(),
+              thinkingSeconds: seconds || item.thinkingSeconds,
             }
           : item,
       ),
@@ -1379,8 +1544,8 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
               ...item,
               status: aborted ? 'aborted' : 'error',
               errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
-              blocks: draft.blocks.filter(Boolean),
-              thinkingSeconds: clock.seconds(),
+              blocks: streamedBlocks(),
+              thinkingSeconds: Math.max(clock.seconds(), item.thinkingSeconds ?? 0) || item.thinkingSeconds,
             }
           : item,
       ),
