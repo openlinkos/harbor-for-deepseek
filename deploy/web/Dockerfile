@@ -7,9 +7,12 @@ COPY LICENSE NOTICE ./
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
+RUN pnpm install --frozen-lockfile
 ARG SOURCE_COMMIT=
 ENV SOURCE_COMMIT=$SOURCE_COMMIT
-RUN pnpm install --frozen-lockfile && pnpm build
+ARG DEEPAPI_VERSION=
+ENV DEEPAPI_VERSION=$DEEPAPI_VERSION
+RUN pnpm --filter @deepapi/web build
 RUN cp LICENSE NOTICE apps/web/dist/
 
 FROM nginxinc/nginx-unprivileged:1.27-alpine

@@ -33,6 +33,8 @@ jobs:
           --health-retries 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.4
@@ -58,7 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: DOCKER_BUILDKIT=1 docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" -f deploy/Dockerfile -t harbor:ci .
+        with:
+          fetch-depth: 0
+      - run: DOCKER_BUILDKIT=1 docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" --build-arg DEEPAPI_VERSION="$(node scripts/release-meta.mjs)" -f deploy/Dockerfile -t harbor:ci .
 
   server-e2e:
     runs-on: ubuntu-latest
@@ -70,6 +74,12 @@ jobs:
       COMPOSE_PROJECT_NAME: harbor
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Version for the image
+        run: |
+          echo "DEEPAPI_VERSION=$(node scripts/release-meta.mjs)" >> "$GITHUB_ENV"
+          echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Start Compose
         run: docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build --wait
       - name: Create an admin, invite a user, chat, and sync
@@ -94,7 +104,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" -f deploy/web/Dockerfile -t harbor-web:ci .
+        with:
+          fetch-depth: 0
+      - run: docker build --build-arg SOURCE_COMMIT="$(git rev-parse HEAD)" --build-arg DEEPAPI_VERSION="$(node scripts/release-meta.mjs)" -f deploy/web/Dockerfile -t harbor-web:ci .
       - run: docker run -d --name harbor-web -p 8080:8080 harbor-web:ci
       - run: |
           for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
@@ -111,6 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.4
@@ -156,6 +170,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.4

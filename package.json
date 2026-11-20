@@ -1,7 +1,7 @@
 {
   "name": "deepapi",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "DeepAPI — a chat client for the DeepSeek API. The key and messages stay on the device.",
   "license": "MIT",
   "type": "module",

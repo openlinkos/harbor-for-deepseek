@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["DEEPAPI_VERSION", "SOURCE_COMMIT", "DEEPAPI_COMMIT", "GITHUB_SHA"],
   "tasks": {
     "build": {
       "outputs": ["dist/**"]

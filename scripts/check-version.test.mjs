@@ -1,61 +1,109 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
-import { changelogHasVersion, evaluate, isExempt, isShipped, parseSemver, versionGreater } from './check-version.mjs'
+import { evaluate, isChangeNote, isShipped } from './check-version.mjs'
+import { productVersion } from './release-meta.mjs'
 
-test('semver compare only counts a real increase', () => {
-  assert.deepEqual(parseSemver('0.1.1'), [0, 1, 1])
-  assert.equal(parseSemver('0.1'), null)
-  assert.equal(parseSemver('0.1.1-beta'), null)
-  assert.equal(versionGreater('0.1.1', '0.1.0'), true)
-  assert.equal(versionGreater('0.2.0', '0.1.9'), true)
-  assert.equal(versionGreater('1.0.0', '0.9.9'), true)
-  assert.equal(versionGreater('0.1.0', '0.1.0'), false)
-  assert.equal(versionGreater('0.0.1', '0.1.0'), false)
-})
-
-test('changelog heading must be the exact version', () => {
-  const body = '## Unreleased\n\n## 0.1.1 — 2026-11-20\n\nnote\n\n## 0.1.10 — 2026-11-01\n'
-  assert.equal(changelogHasVersion(body, '0.1.1'), true)
-  assert.equal(changelogHasVersion(body, '0.1.10'), true)
-  assert.equal(changelogHasVersion(body, '0.1.2'), false)
-  assert.equal(changelogHasVersion('## [0.2.0]\n', '0.2.0'), true)
-})
-
-test('tests and docs under apps or packages are exempt', () => {
+test('shipped paths and change notes', () => {
   assert.equal(isShipped('apps/web/src/ui.tsx'), true)
-  assert.equal(isShipped('packages/i18n/src/index.ts'), true)
-  assert.equal(isShipped('apps/web/src/styles.css'), true)
-  assert.equal(isShipped('apps/web/public/sw.js'), true)
-  assert.equal(isExempt('apps/web/e2e/product-version.spec.ts'), true)
   assert.equal(isShipped('apps/web/e2e/product-version.spec.ts'), false)
   assert.equal(isShipped('apps/web/src/csp.test.ts'), false)
-  assert.equal(isShipped('packages/types/src/index.test.ts'), false)
-  assert.equal(isShipped('apps/web/README.md'), false)
-  assert.equal(isShipped('apps/web/playwright.config.ts'), false)
-  assert.equal(isShipped('scripts/check-version.mjs'), false)
-  assert.equal(isShipped('CHANGELOG.md'), false)
-  assert.equal(isShipped('deploy/web/nginx/nginx.conf'), false)
+  assert.equal(isShipped('scripts/release-meta.mjs'), false)
+  assert.equal(isChangeNote('changes/product-version.md'), true)
+  assert.equal(isChangeNote('changes/Product.md'), false)
+  assert.equal(isChangeNote('docs/product-version.md'), false)
 })
 
-test('shipped edits fail until the version rises and the changelog names it', () => {
+test('a shipped edit needs a new Chinese fragment', () => {
   const files = ['apps/web/src/ui.tsx', 'apps/web/e2e/product-version.spec.ts']
-  const same = evaluate({ files, headVersion: '0.1.0', baseVersion: '0.1.0', changelog: '## 0.1.0\n' })
-  assert.equal(same.ok, false)
-  const downgrade = evaluate({ files, headVersion: '0.0.1', baseVersion: '0.1.0', changelog: '## 0.0.1\n' })
-  assert.equal(downgrade.ok, false)
-  const missingLog = evaluate({ files, headVersion: '0.1.1', baseVersion: '0.1.0', changelog: '## 0.1.0\n' })
-  assert.equal(missingLog.ok, false)
-  const ok = evaluate({ files, headVersion: '0.1.1', baseVersion: '0.1.0', changelog: '## 0.1.1 — 2026-11-20\n' })
+  const missing = evaluate({ files, notes: [], bodies: {} })
+  assert.equal(missing.ok, false)
+  const empty = evaluate({ files, notes: ['changes/product-version.md'], bodies: { 'changes/product-version.md': '   \n' } })
+  assert.equal(empty.ok, false)
+  const english = evaluate({ files, notes: ['changes/product-version.md'], bodies: { 'changes/product-version.md': 'Show the version.\n' } })
+  assert.equal(english.ok, false)
+  const ok = evaluate({
+    files,
+    notes: ['changes/product-version.md'],
+    bodies: { 'changes/product-version.md': '设置页显示当前版本。\n' },
+  })
   assert.equal(ok.ok, true)
-  assert.match(ok.message, /0\.1\.0 → 0\.1\.1/)
 })
 
-test('pure tests or docs do not require a bump', () => {
+test('pure tests do not require a fragment', () => {
   const onlyTests = evaluate({
-    files: ['apps/web/e2e/product-version.spec.ts', 'apps/server/src/server.test.ts', 'CONTRIBUTING.md'],
-    headVersion: '0.1.0',
-    baseVersion: '0.1.0',
-    changelog: '',
+    files: ['apps/web/e2e/product-version.spec.ts', 'CONTRIBUTING.md'],
+    notes: [],
+    bodies: {},
   })
   assert.equal(onlyTests.ok, true)
+})
+
+const git = (dir, args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' })
+
+const initRepo = () => {
+  const dir = mkdtempSync(join(tmpdir(), 'deepapi-ver-'))
+  git(dir, ['init', '-b', 'master'])
+  git(dir, ['config', 'user.email', 'version@example.com'])
+  git(dir, ['config', 'user.name', 'version'])
+  writeFileSync(join(dir, 'package.json'), '{"version":"0.1.0"}\n')
+  git(dir, ['add', 'package.json'])
+  git(dir, ['commit', '-m', 'base'])
+  return dir
+}
+
+test('two consecutive commits compute different versions', () => {
+  const dir = initRepo()
+  try {
+    const first = productVersion(dir, {})
+    writeFileSync(join(dir, 'note.txt'), 'one\n')
+    git(dir, ['add', 'note.txt'])
+    git(dir, ['commit', '-m', 'second'])
+    const second = productVersion(dir, {})
+    assert.equal(first, '0.1.0')
+    assert.equal(second, '0.1.1')
+    assert.notEqual(first, second)
+    writeFileSync(join(dir, 'note.txt'), 'two\n')
+    git(dir, ['add', 'note.txt'])
+    git(dir, ['commit', '-m', 'third'])
+    assert.equal(productVersion(dir, {}), '0.1.2')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('a merge counts once on the first parent', () => {
+  const dir = initRepo()
+  try {
+    git(dir, ['checkout', '-b', 'side'])
+    writeFileSync(join(dir, 'side.txt'), 'side\n')
+    git(dir, ['add', 'side.txt'])
+    git(dir, ['commit', '-m', 'side'])
+    git(dir, ['checkout', 'master'])
+    git(dir, ['merge', '--no-ff', '-m', 'merge side', 'side'])
+    assert.equal(productVersion(dir, {}), '0.1.1')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('a shallow clone fails instead of reporting patch 0', () => {
+  const dir = initRepo()
+  const shallow = mkdtempSync(join(tmpdir(), 'deepapi-shallow-'))
+  try {
+    writeFileSync(join(dir, 'note.txt'), 'one\n')
+    git(dir, ['add', 'note.txt'])
+    git(dir, ['commit', '-m', 'second'])
+    git(shallow, ['clone', '--depth', '1', `file://${dir}`, '.'])
+    assert.throws(() => productVersion(shallow, {}), /浅克隆|DEEPAPI_VERSION/)
+    assert.equal(productVersion(shallow, { DEEPAPI_VERSION: '0.1.4' }), '0.1.4')
+    assert.throws(() => productVersion(shallow, { DEEPAPI_VERSION: '0' }), /DEEPAPI_VERSION/)
+    assert.throws(() => productVersion(shallow, { DEEPAPI_VERSION: '0.2.1' }), /0\.1\.Z/)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+    rmSync(shallow, { recursive: true, force: true })
+  }
 })
