@@ -1754,7 +1754,7 @@ body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67
 .settings-line .pill-gap { width: 10px; flex: none; }
 .settings-line .pill-menu button svg { position: absolute; right: 14px; top: 11px; width: 14px; height: 14px; margin: 0; }
 .settings-line + .settings-line,
-.settings-data + .settings-data > .settings-line:first-child { box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0 0 inset; }
+.settings-data + .settings-data > .settings-line:first-child { box-shadow: var(--dsw-alias-border-l2-darkmode-thin) 0 1px 0 0 inset; }
 .settings-line strong { font-weight: 560; }
 .settings-line .hint { margin: 2px 0 0; max-width: 360px; }
 .settings-line.stack { height: auto; min-height: 86px; align-items: center; }

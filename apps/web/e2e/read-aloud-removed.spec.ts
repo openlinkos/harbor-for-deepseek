@@ -143,7 +143,10 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
         expect(row.paddingTop).toBe('12px')
         expect(row.paddingBottom).toBe('12px')
         expect(row.borderTopWidth).toBe('0px')
-        expect(row.boxShadow).toBe(index === 0 ? 'none' : 'rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset')
+        const divider = theme === '深色'
+          ? 'rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset'
+          : 'rgba(0, 0, 0, 0.1) 0px 1px 0px 0px inset'
+        expect(row.boxShadow).toBe(index === 0 ? 'none' : divider)
       }
       await expect(page.getByTestId('file-expiry')).toHaveCount(0)
       await page.locator('.settings-main').evaluate((node) => { node.scrollTop = 0 })
