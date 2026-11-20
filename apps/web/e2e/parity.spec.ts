@@ -572,10 +572,15 @@ test('welcome back', async ({ page }) => {
   await send(page, '回来')
   await page.getByTestId('new-chat').click()
   await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
-  await expect(page.locator('.kbd')).toContainText('Ctrl J')
-  await expect(page.locator('.kbd')).toHaveCSS('opacity', '0')
+  const shortcut = await page.locator('.new-chat').evaluate((node) => {
+    const style = getComputedStyle(node, '::after')
+    const windows = navigator.userAgent.toLowerCase().includes('windows')
+    return { content: style.content, opacity: style.opacity, windows }
+  })
+  expect(shortcut.content).toBe(shortcut.windows ? '"Ctrl + J"' : '"⌘ J"')
+  expect(shortcut.opacity).toBe('0')
   await page.getByTestId('new-chat').hover()
-  await expect(page.locator('.kbd')).toHaveCSS('opacity', '1')
+  await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('1')
   await expect(page.locator('.new-chat')).toHaveCSS('justify-content', 'center')
   const on = page.getByTestId('toggle-thinking')
   await expect(on).toHaveCSS('background-color', 'rgb(237, 243, 254)')
