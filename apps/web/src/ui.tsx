@@ -1002,7 +1002,18 @@ export const Shell = () => {
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
-          <span className="brand-name">
+          <span
+            className="brand-name"
+            data-testid="brand"
+            onClick={() => {
+              state.setSidebarOpen(false)
+              void state.newChat()
+              focusComposer()
+              if (window.location.pathname !== '/' || window.location.search || window.location.hash) {
+                window.history.replaceState(null, '', '/')
+              }
+            }}
+          >
             <Mark />
             <Wordmark />
           </span>
