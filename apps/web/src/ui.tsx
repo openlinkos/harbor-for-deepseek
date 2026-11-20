@@ -12,6 +12,7 @@ import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
+import { USER_MENU_ICONS } from './user-menu-icons.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -53,6 +54,26 @@ const FillIcon = ({ paths, size = 16, viewBox = '0 0 16 16' }: { paths: readonly
     {paths.map((d) => <path key={d.slice(0, 24)} d={d} fill="currentColor" />)}
   </svg>
 )
+const UserMenuIcon = ({ name }: { name: keyof typeof USER_MENU_ICONS }) => {
+  const paths = USER_MENU_ICONS[name].map((d, index) => <path key={index} d={d} fill="currentColor" />)
+  if (name === 'settings') {
+    return (
+      <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <g clipPath="url(#user-menu-settings-clip)">{paths}</g>
+        <defs>
+          <clipPath id="user-menu-settings-clip">
+            <rect width="16" height="16" />
+          </clipPath>
+        </defs>
+      </svg>
+    )
+  }
+  return (
+    <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      {paths}
+    </svg>
+  )
+}
 const Glyph = ({ name, size = 16 }: { name: GlyphName; size?: number }) => {
   const glyph = GLYPHS[name]
   return <FillIcon paths={glyph.paths} viewBox={glyph.vb} size={size} />
@@ -977,6 +998,7 @@ export const Shell = () => {
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
   const [userMenu, setUserMenu] = useState(false)
+  const userBarRef = useRef<HTMLDivElement>(null)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
   const [selecting, setSelecting] = useState(false)
   const [picked, setPicked] = useState<string[]>([])
@@ -1006,6 +1028,16 @@ export const Shell = () => {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [state])
+  useEffect(() => {
+    if (!userMenu) return undefined
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target
+      if (target instanceof Node && userBarRef.current?.contains(target)) return
+      setUserMenu(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown, true)
+    return () => document.removeEventListener('pointerdown', onPointerDown, true)
+  }, [userMenu])
   const groups = useMemo(() => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
@@ -1125,25 +1157,43 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-        <a className="user-bar" href="#account" onClick={(event) => event.preventDefault()}>
+        <div
+          className="user-bar"
+          data-testid="user-menu"
+          tabIndex={0}
+          aria-haspopup="menu"
+          aria-expanded={userMenu}
+          ref={userBarRef}
+          onClick={(event) => {
+            const target = event.target
+            if (target instanceof Element && target.closest('.user-menu')) return
+            setUserMenu((value) => !value)
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
+            setUserMenu(true)
+          }}
+          onBlur={() => setUserMenu(false)}
+        >
           <span className="avatar" aria-hidden="true">
             {initial || 'D'}
           </span>
           <span className="user-copy">
             <span className="user-label">{who}</span>
           </span>
-          <button className="icon-btn" type="button" data-testid="user-menu" aria-label={t('menu')} onClick={() => setUserMenu((value) => !value)}>
+          <span className="user-more" aria-hidden="true">
             <FillIcon paths={MORE_DOTS} />
-          </button>
+          </span>
           {userMenu ? (
-            <div className="menu user-menu">
-              <div role="menuitem" tabIndex={0} onClick={() => window.open('https://github.com/openlinkos/deepapi/releases', '_blank', 'noopener')}>{t('downloadMobile')}</div>
-              <div role="menuitem" tabIndex={0} data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}>{t('systemSettings')}</div>
-              <div role="menuitem" tabIndex={0} onClick={() => window.open('https://github.com/openlinkos/deepapi/issues', '_blank', 'noopener')}>{t('helpFeedback')}</div>
-              <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}><Glyph name="close" size={16} />{t('logout')}</div>
+            <div className="menu user-menu" role="menu" onMouseDown={(event) => event.preventDefault()}>
+              <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); window.open('https://github.com/openlinkos/deepapi/releases', '_blank', 'noopener') }}><UserMenuIcon name="download" />{t('downloadMobile')}</div>
+              <div role="menuitem" tabIndex={0} data-testid="settings-open" onClick={() => { setUserMenu(false); state.setSettingsOpen(true) }}><UserMenuIcon name="settings" />{t('systemSettings')}</div>
+              <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); window.open('https://github.com/openlinkos/deepapi/issues', '_blank', 'noopener') }}><UserMenuIcon name="help" />{t('helpFeedback')}</div>
+              <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}><UserMenuIcon name="logout" />{t('logout')}</div>
             </div>
           ) : null}
-        </a>
+        </div>
         )}
       </aside>
       {collapsed ? (
