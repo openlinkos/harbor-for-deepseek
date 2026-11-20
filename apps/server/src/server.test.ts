@@ -46,6 +46,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
   const seen: string[] = []
   let fileBody = ''
   let releaseHold: (() => void) | null = null
+  let releaseRun: (() => void) | null = null
   let holdRun: Promise<void> | null = null
 
   beforeAll(async () => {
@@ -178,6 +179,9 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     fileBody = ''
     releaseHold?.()
     releaseHold = null
+    releaseRun?.()
+    releaseRun = null
+    holdRun = null
     await harbor.sql`
       truncate table
         run_events, chat_runs, usage_events, usage_daily, alerts, balance_snapshots,
@@ -435,28 +439,35 @@ describe.skipIf(!postgresReady)('harbor server', () => {
       headers,
       body: JSON.stringify({ id: 'race-chat' }),
     })
-    let release: () => void = () => undefined
     holdRun = new Promise<void>((resolve) => {
-      release = resolve
+      releaseRun = resolve
     })
-    const pending = harbor.app.request('/api/conversations/race-chat/runs', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ text: 'race' }),
-    })
-    await new Promise((resolve) => setTimeout(resolve, 80))
-    const during = await harbor.app.request('/api/conversations/race-chat/messages', { headers: authed(session, created.csrf) })
-    const mid = (await during.json()) as { liveRun: { id: string } | null; messages: Array<{ status: string }> }
-    expect(mid.messages.some((item) => item.status === 'streaming' && !mid.liveRun)).toBe(false)
-    release()
-    holdRun = null
-    const started = (await (await pending).json()) as { runId: string }
-    const after = await harbor.app.request('/api/conversations/race-chat/messages', { headers: authed(session, created.csrf) })
-    const open = (await after.json()) as { liveRun: { id: string } | null; messages: Array<{ status: string }> }
-    expect(open.liveRun?.id).toBe(started.runId)
-    expect(open.messages.some((item) => item.status === 'streaming')).toBe(true)
-    releaseHold?.()
-    releaseHold = null
+    try {
+      const pending = harbor.app.request('/api/conversations/race-chat/runs', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ text: 'race' }),
+      })
+      await new Promise((resolve) => setTimeout(resolve, 80))
+      const during = await harbor.app.request('/api/conversations/race-chat/messages', { headers: authed(session, created.csrf) })
+      const mid = (await during.json()) as { liveRun: { id: string } | null; messages: Array<{ status: string }> }
+      expect(mid.messages.some((item) => item.status === 'streaming' && !mid.liveRun)).toBe(false)
+      releaseRun?.()
+      releaseRun = null
+      holdRun = null
+      const started = (await (await pending).json()) as { runId: string }
+      for (let i = 0; i < 50 && !releaseHold; i += 1) await new Promise((resolve) => setTimeout(resolve, 20))
+      const after = await harbor.app.request('/api/conversations/race-chat/messages', { headers: authed(session, created.csrf) })
+      const open = (await after.json()) as { liveRun: { id: string } | null; messages: Array<{ status: string }> }
+      expect(open.liveRun?.id).toBe(started.runId)
+      expect(open.messages.some((item) => item.status === 'streaming')).toBe(true)
+    } finally {
+      releaseRun?.()
+      releaseRun = null
+      holdRun = null
+      releaseHold?.()
+      releaseHold = null
+    }
   })
 
   it('stores thinking duration on the server and keeps it across reads', async () => {
@@ -497,6 +508,13 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     expect(a?.thinkingSeconds).toBeLessThanOrEqual(4)
     expect(b?.thinkingSeconds).toBe(a?.thinkingSeconds)
     expect(end).toContain(String(a?.thinkingSeconds))
+    await harbor.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'other-chat' }),
+    })
+    const switched = await harbor.app.request('/api/conversations/think-chat/messages', { headers: authed(session, created.csrf) })
+    expect((await read(switched))?.thinkingSeconds).toBe(a?.thinkingSeconds)
   })
 
   it('does not write to a closed run stream after the ping interval', async () => {

@@ -212,25 +212,25 @@ export const MIGRATIONS: ReadonlyArray<{ id: string; sql: string }> = [
 const LOCK_KEY = 764521
 
 export const applyMigrations = async (sql: Sql): Promise<void> => {
-  await sql`select pg_advisory_lock(${LOCK_KEY})`
-  try {
-    await sql.unsafe(`
+  // Session advisory locks follow the connection. postgres.js round-robins idle
+  // connections, so lock and unlock could land on different sessions and the
+  // next startup would wait forever. A transaction lock stays on one connection
+  // and releases when the transaction ends.
+  await sql.begin(async (tx) => {
+    await tx`select pg_advisory_xact_lock(${LOCK_KEY})`
+    await tx.unsafe(`
       create table if not exists schema_migrations (
         id text primary key,
         applied_at timestamptz not null default now()
       )
     `)
     for (const migration of MIGRATIONS) {
-      const done = await sql<{ id: string }[]>`select id from schema_migrations where id = ${migration.id}`
+      const done = await tx<{ id: string }[]>`select id from schema_migrations where id = ${migration.id}`
       if (done.length > 0) {
         continue
       }
-      await sql.begin(async (tx) => {
-        await tx.unsafe(migration.sql)
-        await tx`insert into schema_migrations (id) values (${migration.id})`
-      })
+      await tx.unsafe(migration.sql)
+      await tx`insert into schema_migrations (id) values (${migration.id})`
     }
-  } finally {
-    await sql`select pg_advisory_unlock(${LOCK_KEY})`
-  }
+  })
 }

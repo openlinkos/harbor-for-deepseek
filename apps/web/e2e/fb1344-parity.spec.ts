@@ -434,6 +434,103 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(page.locator('.turn.assistant')).toContainText('续写乙')
       await expect(page.getByTestId('versions')).toHaveCount(0)
     })
+    test('phase-server-seconds', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers server-mode seconds')
+      const now = '2026-11-20T00:00:00.000Z'
+      const chat = (id: string, title: string, leaf: string, updatedAt: string) => ({
+        id, title, titleSource: 'user', model: 'deepseek-flash', thinking: true, search: false, readLink: false,
+        effort: 'high', pinned: false, archived: false, activeLeafId: leaf, createdAt: now, updatedAt, rev: 1, deletedAt: null,
+      })
+      const message = (id: string, conversationId: string, parentId: string | null, role: string, status: string, blocks: unknown[], thinkingSeconds?: number) => ({
+        id, conversationId, parentId, role, status, blocks, usage: null, errorMessage: null, thinkingSeconds,
+        createdAt: now, updatedAt: now, rev: 1, deletedAt: null,
+      })
+      const think = (text: string) => ({ type: 'thinking', thinking: text, signature: '' })
+      const text = (value: string) => ({ type: 'text', text: value })
+      const chats = [
+        chat('chat-a', '四秒题', 'a-assistant', '2026-11-20T03:00:00.000Z'),
+        chat('chat-b', '九秒题', 'b-assistant', '2026-11-20T02:00:00.000Z'),
+        chat('chat-c', '重连题', 'c-assistant', '2026-11-20T01:00:00.000Z'),
+      ]
+      const byChat: Record<string, { messages: unknown[]; liveRun: { id: string; messageId: string } | null }> = {
+        'chat-a': {
+          liveRun: null,
+          messages: [
+            message('a-user', 'chat-a', null, 'user', 'complete', [text('问')]),
+            message('a-assistant', 'chat-a', 'a-user', 'assistant', 'complete', [think('想了四秒'), text('答四')], 4),
+          ],
+        },
+        'chat-b': {
+          liveRun: null,
+          messages: [
+            message('b-user', 'chat-b', null, 'user', 'complete', [text('问')]),
+            message('b-assistant', 'chat-b', 'b-user', 'assistant', 'complete', [think('想了九秒'), text('答九')], 9),
+          ],
+        },
+        'chat-c': {
+          liveRun: { id: 'run-c', messageId: 'c-assistant' },
+          messages: [
+            message('c-user', 'chat-c', null, 'user', 'complete', [text('问')]),
+            message('c-assistant', 'chat-c', 'c-user', 'assistant', 'streaming', [think('想过了')], 4),
+          ],
+        },
+      }
+      const replay = [
+        { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '想过了' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '答完了' } },
+        { type: 'content_block_stop', index: 1 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 2 } },
+        { type: 'message_stop' },
+      ]
+      const sseBody = `${replay.map((event, index) => `id: ${index + 1}\nevent: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`).join('')}id: ${replay.length + 1}\nevent: end\ndata: ${JSON.stringify({ status: 'complete', thinkingSeconds: 4 })}\n\n`
+      await page.route(/127\.0\.0\.1:4173\/(?:\?.*)?$/, async (route) => {
+        const response = await route.fetch()
+        const html = (await response.text()).replace(/<head[^>]*>/, (tag) => `${tag}<meta name="deepapi-server" content="">`)
+        await route.fulfill({ status: response.status(), headers: response.headers(), body: html })
+      })
+      await page.route('**/api/**', async (route) => {
+        const url = route.request().url()
+        if (url.includes('/api/config')) return route.fulfill({ json: { setup_required: false, bootstrap: 'open' } })
+        if (url.includes('/api/me')) {
+          return route.fulfill({ json: { user: { id: 'u', username: 'ada', role: 'member' }, csrf: 'csrf', quota: { tokenUsed: 0, tokenQuota: 100, searchUsed: 0, searchQuota: 10, pageUsed: 0, pageQuota: 10 } } })
+        }
+        if (url.includes('/api/sync')) return route.fulfill({ json: { cursor: 3, conversations: chats, messages: [], tombstones: [] } })
+        const chatId = url.match(/conversations\/([^/]+)\/messages/)?.[1]
+        if (chatId && byChat[chatId]) return route.fulfill({ json: byChat[chatId] })
+        if (url.includes('/api/runs/run-c/events')) return route.fulfill({ status: 200, contentType: 'text/event-stream', body: sseBody })
+        return route.fulfill({ json: {} })
+      })
+      const title = page.locator('[data-testid=thinking-toggle]').first()
+      await page.goto('/')
+      await expect(title).toHaveText(/已思考（用时 4 秒）/)
+      await page.getByRole('button', { name: '九秒题' }).click()
+      await expect(title).toHaveText(/已思考（用时 9 秒）/)
+      await page.getByRole('button', { name: '四秒题' }).click()
+      await expect(title).toHaveText(/已思考（用时 4 秒）/)
+      await page.reload()
+      await expect(title).toHaveText(/已思考（用时 4 秒）/)
+      await page.evaluate(() => {
+        const seen: string[] = []
+        ;(window as unknown as { __titles: string[] }).__titles = seen
+        const read = () => {
+          const text = document.querySelector('[data-testid=thinking] > button')?.textContent?.replace(/\s+/g, '') ?? ''
+          if (text && seen.at(-1) !== text) seen.push(text)
+        }
+        new MutationObserver(read).observe(document.body, { subtree: true, childList: true, characterData: true })
+        read()
+      })
+      await page.getByRole('button', { name: '重连题' }).click()
+      await expect(page.locator('.turn.assistant')).toContainText('答完了')
+      await expect(title).toHaveText(/已思考（用时 4 秒）/)
+      const seen = await page.evaluate(() => (window as unknown as { __titles: string[] }).__titles)
+      const done = seen.filter((item) => item.includes('已思考'))
+      expect(done.length).toBeGreaterThan(0)
+      expect(done.every((item) => item.includes('用时4秒'))).toBe(true)
+      expect(seen.some((item) => item.includes('用时1秒'))).toBe(false)
+    })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
       await page.getByTestId('composer').fill('[筑衡测试] 第二条'); await page.locator('[data-testid=send], [data-testid=stop]').first().click(); await page.waitForTimeout(500)
