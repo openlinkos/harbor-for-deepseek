@@ -1,0 +1,552 @@
+{
+ "settingsRow": {
+  "paddingY": 12,
+  "minHeight": 60,
+  "controlHeight": 36,
+  "divider": {
+   "light": "rgba(0, 0, 0, 0.1)",
+   "dark": "rgba(255, 255, 255, 0.06)"
+  }
+ },
+ "state": {
+  "brand": {
+   "light": "rgb(57, 100, 254)",
+   "dark": "rgb(86, 134, 254)"
+  },
+  "tertiary": {
+   "light": "rgb(129, 133, 140)",
+   "dark": "rgb(173, 178, 184)"
+  },
+  "dimmed": {
+   "light": "rgb(225, 229, 238)",
+   "dark": "rgb(67, 69, 74)"
+  },
+  "secondary": {
+   "light": "rgb(97, 102, 107)",
+   "dark": "rgb(207, 211, 214)"
+  },
+  "dot": {
+   "size": "5px",
+   "animationDuration": "1.5s",
+   "animationTimingFunction": "linear",
+   "inactiveAnimation": "none"
+  },
+  "line": {
+   "width": "1px",
+   "top": "31px",
+   "left": "7.5px",
+   "changingColor": false
+  },
+  "titleHoverTransition": "0.2s",
+  "titleShimmerDuration": "2s",
+  "toolMaskDuration": "1.5s",
+  "KNOWN": "Official dot blue→grey confirmed in bundle. Vertical line is dimmed in all states (no WIP selector in frozen CSS), NOT blue→grey. Need official capture to reconcile user's reference. Error/stop tool exact DOM selector/status need official capture.",
+  "reference": {
+   "light": {
+    "dotWip": {
+     "bg": "rgb(57, 100, 254)",
+     "color": "rgb(57, 100, 254)",
+     "anim": "1.5s linear infinite",
+     "w": "5px",
+     "h": "5px",
+     "border": "rgb(57, 100, 254)",
+     "transition": "0s"
+    },
+    "dotDone": {
+     "bg": "rgb(129, 133, 140)",
+     "color": "rgb(57, 100, 254)",
+     "anim": "none",
+     "w": "5px",
+     "h": "5px",
+     "border": "rgb(57, 100, 254)",
+     "transition": "0s"
+    },
+    "line": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "none",
+     "w": "0px",
+     "h": "86px",
+     "border": "rgb(225, 229, 238)",
+     "transition": "0s"
+    },
+    "titleIcon": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(57, 100, 254)",
+     "anim": "none",
+     "w": "3.625px",
+     "h": "0px",
+     "border": "rgb(57, 100, 254)",
+     "transition": "0s"
+    },
+    "titleIconStopped": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(129, 133, 140)",
+     "anim": "none",
+     "w": "3.625px",
+     "h": "0px",
+     "border": "rgb(129, 133, 140)",
+     "transition": "0s"
+    },
+    "titleText": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(97, 102, 107)",
+     "anim": "none",
+     "w": "768px",
+     "h": "28px",
+     "border": "rgb(97, 102, 107)",
+     "transition": "0.2s"
+    },
+    "shimmer": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "2s ease-out infinite",
+     "w": "0px",
+     "h": "0px",
+     "border": "rgb(128, 0, 128)",
+     "transition": "0s"
+    },
+    "toolSweep": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+     "w": "7.40625px",
+     "h": "19px",
+     "border": "rgb(128, 0, 128)",
+     "transition": "0s"
+    }
+   },
+   "dark": {
+    "dotWip": {
+     "bg": "rgb(86, 134, 254)",
+     "color": "rgb(86, 134, 254)",
+     "anim": "1.5s linear infinite",
+     "w": "5px",
+     "h": "5px",
+     "border": "rgb(86, 134, 254)",
+     "transition": "0s"
+    },
+    "dotDone": {
+     "bg": "rgb(173, 178, 184)",
+     "color": "rgb(86, 134, 254)",
+     "anim": "none",
+     "w": "5px",
+     "h": "5px",
+     "border": "rgb(86, 134, 254)",
+     "transition": "0s"
+    },
+    "line": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "none",
+     "w": "0px",
+     "h": "86px",
+     "border": "rgb(67, 69, 74)",
+     "transition": "0s"
+    },
+    "titleIcon": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(86, 134, 254)",
+     "anim": "none",
+     "w": "3.625px",
+     "h": "0px",
+     "border": "rgb(86, 134, 254)",
+     "transition": "0s"
+    },
+    "titleIconStopped": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(173, 178, 184)",
+     "anim": "none",
+     "w": "3.625px",
+     "h": "0px",
+     "border": "rgb(173, 178, 184)",
+     "transition": "0s"
+    },
+    "titleText": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(207, 211, 214)",
+     "anim": "none",
+     "w": "768px",
+     "h": "28px",
+     "border": "rgb(207, 211, 214)",
+     "transition": "0.2s"
+    },
+    "shimmer": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "2s ease-out infinite",
+     "w": "0px",
+     "h": "0px",
+     "border": "rgb(128, 0, 128)",
+     "transition": "0s"
+    },
+    "toolSweep": {
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(128, 0, 128)",
+     "anim": "1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+     "w": "7.40625px",
+     "h": "19px",
+     "border": "rgb(128, 0, 128)",
+     "transition": "0s"
+    }
+   }
+  }
+ },
+ "markdown": {
+  "body": {
+   "fontSize": "16px",
+   "lineHeight": "28px",
+   "listMarginY": "16px",
+   "listPaddingLeft": "18px",
+   "liGap": "6px",
+   "paragraphMarginY": "16px"
+  },
+  "think": {
+   "fontSize": "14px",
+   "lineHeight": "24px",
+   "listMarginY": "12px",
+   "listPaddingLeft": "18px",
+   "liGap": "2px",
+   "paragraphMarginY": "12px",
+   "nestedListMarginTop": "2px",
+   "liParagraphMarginY": "2px",
+   "paragraphThenListMarginTop": "4px"
+  },
+  "math": {
+   "displayTextAlign": "center",
+   "displayPadding": "4px",
+   "displayOverflowX": "auto",
+   "katexFont": "1.21em/1.2 KaTeX_Main, Times New Roman, serif",
+   "throwOnError": true,
+   "strict": false,
+   "displayMode": "!isInline",
+   "delimiters": [
+    "$...$",
+    "$$...$$",
+    "\\(...\\)",
+    "\\[...\\]"
+   ]
+  },
+  "reference": {
+   "light|1440": {
+    "body": {
+     "gaps": {
+      "p>p": 16,
+      "p>ul": 16,
+      "ul>p": 16,
+      "p>ol": 16,
+      "ol>p": 16
+     },
+     "nested": [
+      8
+     ],
+     "liGaps": [
+      6
+     ],
+     "indent": 18,
+     "liFont": [
+      "16px",
+      "28px"
+     ],
+     "pFont": [
+      "16px",
+      "28px"
+     ],
+     "liColor": "rgb(15, 17, 21)",
+     "marker": "rgb(97, 102, 107)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    },
+    "think": {
+     "gaps": {
+      "p>p": 12,
+      "p>ul": 12,
+      "ul>p": 12,
+      "p>ol": 4,
+      "ol>p": 12
+     },
+     "nested": [
+      6
+     ],
+     "liGaps": [
+      2
+     ],
+     "indent": 18,
+     "liFont": [
+      "14px",
+      "24px"
+     ],
+     "pFont": [
+      "14px",
+      "24px"
+     ],
+     "liColor": "rgb(97, 102, 107)",
+     "marker": "rgb(97, 102, 107)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    }
+   },
+   "light|390": {
+    "body": {
+     "gaps": {
+      "p>p": 16,
+      "p>ul": 16,
+      "ul>p": 16,
+      "p>ol": 16,
+      "ol>p": 16
+     },
+     "nested": [
+      8
+     ],
+     "liGaps": [
+      6
+     ],
+     "indent": 18,
+     "liFont": [
+      "16px",
+      "28px"
+     ],
+     "pFont": [
+      "16px",
+      "28px"
+     ],
+     "liColor": "rgb(15, 17, 21)",
+     "marker": "rgb(97, 102, 107)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    },
+    "think": {
+     "gaps": {
+      "p>p": 12,
+      "p>ul": 12,
+      "ul>p": 12,
+      "p>ol": 4,
+      "ol>p": 12
+     },
+     "nested": [
+      6
+     ],
+     "liGaps": [
+      2
+     ],
+     "indent": 18,
+     "liFont": [
+      "14px",
+      "24px"
+     ],
+     "pFont": [
+      "14px",
+      "24px"
+     ],
+     "liColor": "rgb(97, 102, 107)",
+     "marker": "rgb(97, 102, 107)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    }
+   },
+   "dark|1440": {
+    "body": {
+     "gaps": {
+      "p>p": 16,
+      "p>ul": 16,
+      "ul>p": 16,
+      "p>ol": 16,
+      "ol>p": 16
+     },
+     "nested": [
+      8
+     ],
+     "liGaps": [
+      6
+     ],
+     "indent": 18,
+     "liFont": [
+      "16px",
+      "28px"
+     ],
+     "pFont": [
+      "16px",
+      "28px"
+     ],
+     "liColor": "rgb(249, 250, 251)",
+     "marker": "rgb(207, 211, 214)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    },
+    "think": {
+     "gaps": {
+      "p>p": 12,
+      "p>ul": 12,
+      "ul>p": 12,
+      "p>ol": 4,
+      "ol>p": 12
+     },
+     "nested": [
+      6
+     ],
+     "liGaps": [
+      2
+     ],
+     "indent": 18,
+     "liFont": [
+      "14px",
+      "24px"
+     ],
+     "pFont": [
+      "14px",
+      "24px"
+     ],
+     "liColor": "rgb(207, 211, 214)",
+     "marker": "rgb(207, 211, 214)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    }
+   },
+   "dark|390": {
+    "body": {
+     "gaps": {
+      "p>p": 16,
+      "p>ul": 16,
+      "ul>p": 16,
+      "p>ol": 16,
+      "ol>p": 16
+     },
+     "nested": [
+      8
+     ],
+     "liGaps": [
+      6
+     ],
+     "indent": 18,
+     "liFont": [
+      "16px",
+      "28px"
+     ],
+     "pFont": [
+      "16px",
+      "28px"
+     ],
+     "liColor": "rgb(249, 250, 251)",
+     "marker": "rgb(207, 211, 214)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    },
+    "think": {
+     "gaps": {
+      "p>p": 12,
+      "p>ul": 12,
+      "ul>p": 12,
+      "p>ol": 4,
+      "ol>p": 12
+     },
+     "nested": [
+      6
+     ],
+     "liGaps": [
+      2
+     ],
+     "indent": 18,
+     "liFont": [
+      "14px",
+      "24px"
+     ],
+     "pFont": [
+      "14px",
+      "24px"
+     ],
+     "liColor": "rgb(207, 211, 214)",
+     "marker": "rgb(207, 211, 214)",
+     "math": {
+      "inline": 5,
+      "display": 4,
+      "katexFontRatio": [
+       1.21
+      ]
+     }
+    }
+   }
+  },
+  "referenceHow": "runs/fb1721/offline/reference.mjs: official parser (frozen bundle modules 45368/6755/29824/63317/64085, offline) → official DOM shape (frozen dom-answer.html) → frozen main.dc093a796f.css + katex.effce08cb3.css; KaTeX 0.16.22 from our node_modules (official katex chunk 52059 not frozen). li::marker line-height 28px makes the first li line 28px tall, hence think nested=6.",
+  "parser": {
+   "LISTS": {
+    "counts": {
+     "root": 1,
+     "paragraph": 9,
+     "text": 9,
+     "list": 3,
+     "listItem": 5
+    },
+    "math": [],
+    "inlineMath": [],
+    "text": "先分析题意。 | 需要考虑： | 质数定义 | 检验范围 | 只需到 10 | 步骤： | 列出 2 到 100 | 筛去倍数 | 结论段落。"
+   },
+   "MATH": {
+    "counts": {
+     "root": 1,
+     "paragraph": 7,
+     "text": 11,
+     "inlineMath": 5,
+     "math": 4,
+     "list": 1,
+     "listItem": 2
+    },
+    "math": [
+     "11^2=121>100",
+     "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+     "x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a} ",
+     "\\boxed{\n\\begin{aligned}\n&2,\\ 3,\\ 5,\\ 7,\\ 11,\\ 13,\\ 17,\\ 19,\\ 23,\\ 29,\\\\\n&31,\\ 37,\\ 41,\\ 43,\\ 47,\\ 53,\\ 59,\\ 61,\\ 67,\\ 71,\\\\\n&73,\\ 79,\\ 83,\\ 89,\\ 97\n\\end{aligned}\n}"
+    ],
+    "inlineMath": [
+     "n \\leq 100",
+     "\\sqrt{100}=10",
+     "a^2+b^2=c^2",
+     "2",
+     "25"
+    ],
+    "text": "我们要找出所有满足  |  的质数。 | 只需检验到  | ，因为 | 行内美元  | ，块美元： | 最终答案： | 价格 $5 和 $10 不是公式。 | 偶数质数只有  | 共有  |  个"
+   }
+  }
+ },
+ "source": "frozen official-source/main.dc093a796f.css + katex.effce08cb3.css; official-bundle/default-vendors.a63ee0213e.js module 6755 (micromark math) and main.5a15ff2247.js; style-official settings samples; official DOM dom-answer.html. Parser counts: offline Chromium load of frozen vendors+main, all network aborted. List and display-math geometry: official DOM shape + frozen CSS (reference.mjs). State colours: frozen CSS tokens + official DOM class toggle probe (_0652043, dea47b2e).",
+ "settingsOfficialInvariants": {
+  "rows": 54,
+  "rightAligned": 54,
+  "violations": 0,
+  "how": "same __rows invariants as the spec, run on the frozen official settings DOM; 0 violations."
+ }
+}
