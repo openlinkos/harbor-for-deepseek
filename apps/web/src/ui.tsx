@@ -226,10 +226,82 @@ type SourcesApi = {
 }
 const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined })
 
+const MODAL_FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/** Official ds-modal defaults: mask click and Escape close, focus stays inside, then returns to the trigger. */
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
+  const panel = useRef<HTMLDivElement>(null)
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
+  const previousFocus = useRef<HTMLElement | null>(null)
+  const capturedFocus = useRef(false)
+  if (!capturedFocus.current && typeof document !== 'undefined') {
+    capturedFocus.current = true
+    const active = document.activeElement
+    previousFocus.current = active instanceof HTMLElement ? active : null
+  }
+  useLayoutEffect(() => {
+    const root = panel.current
+    if (!root) return
+    const focusables = () => [...root.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE)].filter((node) => node.tabIndex >= 0 && !node.hasAttribute('disabled'))
+    const nodes = focusables()
+    nodes[0]?.focus()
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        onCancelRef.current()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const list = focusables()
+      if (!list.length) {
+        event.preventDefault()
+        return
+      }
+      const first = list[0]
+      const last = list[list.length - 1]
+      const current = document.activeElement
+      const inside = current instanceof Node && root.contains(current)
+      if (event.shiftKey) {
+        if (!inside || current === first) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || current === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    const onFocusIn = (event: FocusEvent) => {
+      if (!root.isConnected) return
+      const target = event.target
+      if (target instanceof Node && root.contains(target)) return
+      const list = focusables()
+      ;(list[0] ?? root).focus()
+    }
+    root.addEventListener('keydown', onKey)
+    document.addEventListener('focusin', onFocusIn)
+    return () => {
+      document.removeEventListener('focusin', onFocusIn)
+      root.removeEventListener('keydown', onKey)
+      const back = previousFocus.current
+      if (back?.isConnected) back.focus()
+    }
+  }, [])
   return createPortal(
-    <div className="modal confirm-modal" role="dialog" aria-modal="true" aria-label={label} data-testid="confirm-dialog">
+    <div
+      ref={panel}
+      className="modal confirm-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      data-testid="confirm-dialog"
+      onClick={(event) => {
+        event.stopPropagation()
+        if (event.target === event.currentTarget) onCancel()
+      }}
+    >
       <div className="confirm-card">
         <h2>{label}</h2>
         <div className="edit-actions">
@@ -1374,8 +1446,17 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         </span>
       ) : null}
       {editing ? (
-        <form onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}>
-          <input aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
+        <form
+          onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Escape' || event.nativeEvent.isComposing) return
+            event.preventDefault()
+            event.stopPropagation()
+            setTitle(conversation.title)
+            setEditing(false)
+          }}
+        >
+          <input autoFocus aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
         </form>
       ) : (
         <button type="button">{conversation.title || t('newChat')}</button>
@@ -1390,7 +1471,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
         <div ref={menuRef} className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" data-testid="chat-item-menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
-          <div role="menuitem" tabIndex={0} onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => {
             setOpen(false)
