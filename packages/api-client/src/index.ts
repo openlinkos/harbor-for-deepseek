@@ -4,6 +4,7 @@ export type { ClientOptions, FetchLike, HarborClient } from './client.js'
 export {
   API_ORIGIN,
   buildRequest,
+  continuationBlocks,
   FILES_BETA,
   messageUsedWebTool,
   HARBOR_SYSTEM_PROMPT,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildRequest, messageUsedWebTool, toApiMessages } from './request.js'
+import { buildRequest, continuationBlocks, messageUsedWebTool, toApiMessages } from './request.js'
 
 const user = (id: string, text: string) => ({
   id,
@@ -70,7 +70,19 @@ describe('continuation', () => {
     expect(JSON.stringify(dropped.at(-1))).toContain('原文甲')
     expect(JSON.stringify(dropped.at(-1))).not.toContain('先想')
   })
-  it('treats web search and page reads as not continuable', () => {
+  it('folds search results into text and drops web tool blocks', () => {
+    const folded = continuationBlocks([
+      { type: 'thinking', thinking: '先想', signature: 'sig' },
+      { type: 'server_tool_use', id: 's', name: 'deepseek_web_search', input: { action: 'search', queries: ['q'] } },
+      { type: 'web_search_tool_result', tool_use_id: 's', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] },
+      { type: 'text', text: '原文甲' },
+    ])
+    expect(folded.some((block) => block.type === 'server_tool_use' || block.type === 'web_search_tool_result')).toBe(false)
+    expect(JSON.stringify(folded)).toContain('天气来源')
+    expect(JSON.stringify(folded)).toContain('先想')
+    expect(JSON.stringify(folded)).toContain('原文甲')
+  })
+  it('detects web search and page reads on the stored reply', () => {
     expect(messageUsedWebTool(assistant)).toBe(false)
     expect(messageUsedWebTool({
       blocks: [{ type: 'server_tool_use', id: 's', name: 'deepseek_web_search', input: { action: 'search', queries: ['q'] } }],

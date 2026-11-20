@@ -1,7 +1,7 @@
 import { translate, type Locale } from '@deepapi/i18n'
 import { markSearchCitations, presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@deepapi/pricing'
-import { activePath, siblingIds } from '@deepapi/types'
+import { activePath, childIds, siblingIds } from '@deepapi/types'
 import type { ContentBlock, Conversation, Message } from '@deepapi/types'
 import { cloneElement, createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent as ReactFocusEvent, type FormEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
@@ -1159,7 +1159,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('share')}>
             <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
-          {message.status === 'aborted' ? (
+          {message.status === 'aborted' && !streaming && childIds(messages, message.id).length === 0 ? (
             <button type="button" className="continue-gen" data-testid="continue" onClick={() => void useHarbor.getState().continueReply(message.id)}>{t('continueGenerating')}</button>
           ) : null}
         </div>

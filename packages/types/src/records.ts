@@ -42,6 +42,8 @@ export type Message = SyncFields & {
    * The API total when the stream reports one; otherwise the summed thinking-fragment time.
    */
   thinkingSeconds?: number
+  /** Server clock when the first thinking block opened. Reconnect uses this instead of a partial duration. */
+  thinkingStartedAt?: string
   createdAt: string
 }
 

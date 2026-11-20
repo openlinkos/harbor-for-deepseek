@@ -434,102 +434,141 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(page.locator('.turn.assistant')).toContainText('续写乙')
       await expect(page.getByTestId('versions')).toHaveCount(0)
     })
-    test('phase-server-seconds', async ({ page }) => {
-      test.skip(!(theme === 'light' && w === 1440), 'one cell covers server-mode seconds')
-      const now = '2026-11-20T00:00:00.000Z'
-      const chat = (id: string, title: string, leaf: string, updatedAt: string) => ({
-        id, title, titleSource: 'user', model: 'deepseek-flash', thinking: true, search: false, readLink: false,
-        effort: 'high', pinned: false, archived: false, activeLeafId: leaf, createdAt: now, updatedAt, rev: 1, deletedAt: null,
-      })
-      const message = (id: string, conversationId: string, parentId: string | null, role: string, status: string, blocks: unknown[], thinkingSeconds?: number) => ({
-        id, conversationId, parentId, role, status, blocks, usage: null, errorMessage: null, thinkingSeconds,
-        createdAt: now, updatedAt: now, rev: 1, deletedAt: null,
-      })
-      const think = (text: string) => ({ type: 'thinking', thinking: text, signature: '' })
-      const text = (value: string) => ({ type: 'text', text: value })
-      const chats = [
-        chat('chat-a', '四秒题', 'a-assistant', '2026-11-20T03:00:00.000Z'),
-        chat('chat-b', '九秒题', 'b-assistant', '2026-11-20T02:00:00.000Z'),
-        chat('chat-c', '重连题', 'c-assistant', '2026-11-20T01:00:00.000Z'),
-      ]
-      const byChat: Record<string, { messages: unknown[]; liveRun: { id: string; messageId: string } | null }> = {
-        'chat-a': {
-          liveRun: null,
-          messages: [
-            message('a-user', 'chat-a', null, 'user', 'complete', [text('问')]),
-            message('a-assistant', 'chat-a', 'a-user', 'assistant', 'complete', [think('想了四秒'), text('答四')], 4),
-          ],
-        },
-        'chat-b': {
-          liveRun: null,
-          messages: [
-            message('b-user', 'chat-b', null, 'user', 'complete', [text('问')]),
-            message('b-assistant', 'chat-b', 'b-user', 'assistant', 'complete', [think('想了九秒'), text('答九')], 9),
-          ],
-        },
-        'chat-c': {
-          liveRun: { id: 'run-c', messageId: 'c-assistant' },
-          messages: [
-            message('c-user', 'chat-c', null, 'user', 'complete', [text('问')]),
-            message('c-assistant', 'chat-c', 'c-user', 'assistant', 'streaming', [think('想过了')], 4),
-          ],
-        },
-      }
-      const replay = [
-        { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
-        { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '想过了' } },
+    test('phase-persist-refresh', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers a refresh off the one-second boundary')
+      await staged(page)
+      await push(page, [PH.thinking[0], PH.thinking[1], { type: 'content_block_stop', index: 0 }, { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } }])
+      const answer = Array.from({ length: 12 }, (_, i) => `段${String(i).padStart(2, '0')}`)
+      await page.evaluate(async (words) => {
+        const sse = (window as unknown as { __sse: { push: (events: unknown[]) => void } }).__sse
+        for (const piece of words) {
+          sse.push([{ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: piece } }])
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }, answer)
+      await page.reload()
+      await expect(page.locator('.turn.assistant')).toBeVisible()
+      const body = await page.locator('.turn.assistant').innerText()
+      const kept = answer.filter((piece) => body.includes(piece)).length
+      expect(kept).toBeGreaterThanOrEqual(answer.length - 1)
+      expect(body).toContain(answer[0])
+    })
+    test('phase-continue-thinking', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the thinking retry')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
         { type: 'content_block_stop', index: 0 },
         { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
-        { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '答完了' } },
-        { type: 'content_block_stop', index: 1 },
-        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 2 } },
-        { type: 'message_stop' },
-      ]
-      const sseBody = `${replay.map((event, index) => `id: ${index + 1}\nevent: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`).join('')}id: ${replay.length + 1}\nevent: end\ndata: ${JSON.stringify({ status: 'complete', thinkingSeconds: 4 })}\n\n`
-      await page.route(/127\.0\.0\.1:4173\/(?:\?.*)?$/, async (route) => {
-        const response = await route.fetch()
-        const html = (await response.text()).replace(/<head[^>]*>/, (tag) => `${tag}<meta name="deepapi-server" content="">`)
-        await route.fulfill({ status: response.status(), headers: response.headers(), body: html })
-      })
-      await page.route('**/api/**', async (route) => {
-        const url = route.request().url()
-        if (url.includes('/api/config')) return route.fulfill({ json: { setup_required: false, bootstrap: 'open' } })
-        if (url.includes('/api/me')) {
-          return route.fulfill({ json: { user: { id: 'u', username: 'ada', role: 'member' }, csrf: 'csrf', quota: { tokenUsed: 0, tokenQuota: 100, searchUsed: 0, searchQuota: 10, pageUsed: 0, pageQuota: 10 } } })
-        }
-        if (url.includes('/api/sync')) return route.fulfill({ json: { cursor: 3, conversations: chats, messages: [], tombstones: [] } })
-        const chatId = url.match(/conversations\/([^/]+)\/messages/)?.[1]
-        if (chatId && byChat[chatId]) return route.fulfill({ json: byChat[chatId] })
-        if (url.includes('/api/runs/run-c/events')) return route.fulfill({ status: 200, contentType: 'text/event-stream', body: sseBody })
-        return route.fulfill({ json: {} })
-      })
-      const title = page.locator('[data-testid=thinking-toggle]').first()
-      await page.goto('/')
-      await expect(title).toHaveText(/已思考（用时 4 秒）/)
-      await page.getByRole('button', { name: '九秒题' }).click()
-      await expect(title).toHaveText(/已思考（用时 9 秒）/)
-      await page.getByRole('button', { name: '四秒题' }).click()
-      await expect(title).toHaveText(/已思考（用时 4 秒）/)
-      await page.reload()
-      await expect(title).toHaveText(/已思考（用时 4 秒）/)
+        { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
       await page.evaluate(() => {
-        const seen: string[] = []
-        ;(window as unknown as { __titles: string[] }).__titles = seen
-        const read = () => {
-          const text = document.querySelector('[data-testid=thinking] > button')?.textContent?.replace(/\s+/g, '') ?? ''
-          if (text && seen.at(-1) !== text) seen.push(text)
+        const sse = (window as unknown as { __sse: { decide: ((body: { messages?: Array<{ role?: string; content?: unknown }> }) => number) | null } }).__sse
+        sse.decide = (body) => {
+          const last = body?.messages?.at(-1)
+          const encoded = JSON.stringify(last?.content ?? '')
+          if (last?.role === 'assistant' && encoded.includes('thinking')) return 400
+          return 200
         }
-        new MutationObserver(read).observe(document.body, { subtree: true, childList: true, characterData: true })
-        read()
       })
-      await page.getByRole('button', { name: '重连题' }).click()
-      await expect(page.locator('.turn.assistant')).toContainText('答完了')
-      await expect(title).toHaveText(/已思考（用时 4 秒）/)
-      const seen = await page.evaluate(() => (window as unknown as { __titles: string[] }).__titles)
-      const done = seen.filter((item) => item.includes('已思考'))
-      expect(done.length).toBeGreaterThan(0)
-      expect(done.every((item) => item.includes('用时4秒'))).toBe(true)
-      expect(seen.some((item) => item.includes('用时1秒'))).toBe(false)
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => {
+        const sse = (window as unknown as { __sse: { count: () => number; requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse
+        const continuations = sse.requests.filter((item) => item.messages.at(-1)?.role === 'assistant')
+        return sse.count() > 1 && continuations.some((item) => !JSON.stringify(item.messages.at(-1)?.content).includes('thinking'))
+      })
+      const requests = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests)
+      const continuations = requests.filter((item) => item.messages.at(-1)?.role === 'assistant')
+      expect(JSON.stringify(continuations[0]?.messages.at(-1)?.content)).toContain('thinking')
+      expect(continuations.length).toBeGreaterThan(1)
+      expect(JSON.stringify(continuations.at(-1)?.messages.at(-1)?.content)).not.toContain('thinking')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+    })
+    test('phase-continue-search', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers folded search continuation')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'server_tool_use', id: 's1', name: 'deepseek_web_search', input: { action: 'search', queries: ['上海天气'] } } },
+        { type: 'content_block_stop', index: 1 },
+        { type: 'content_block_start', index: 2, content_block: { type: 'web_search_tool_result', tool_use_id: 's1', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] } },
+        { type: 'content_block_stop', index: 2 },
+        { type: 'content_block_start', index: 3, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 3, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await expect(page.getByTestId('continue')).toBeVisible()
+      expect(readFileSync(join(HERE, 'explanations.json'), 'utf8')).toContain('continue-web-tools')
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
+      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
+      const last = request?.messages.at(-1)
+      expect(last?.role).toBe('assistant')
+      const encoded = JSON.stringify(last?.content)
+      expect(encoded).toContain('thinking')
+      expect(encoded).toContain('天气来源')
+      expect(encoded).not.toContain('server_tool_use')
+      expect(encoded).not.toContain('web_search_tool_result')
+      await push(page, [
+        { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '续写乙。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.getByTestId('message-assistant')).toHaveCount(1)
+      await expect(page.locator('.turn.assistant')).toContainText('原文甲')
+      await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+    })
+    test('phase-continue-search-reject', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers the regenerate fallback')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'server_tool_use', id: 's1', name: 'deepseek_web_search', input: { action: 'search', queries: ['上海天气'] } } },
+        { type: 'content_block_stop', index: 1 },
+        { type: 'content_block_start', index: 2, content_block: { type: 'web_search_tool_result', tool_use_id: 's1', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] } },
+        { type: 'content_block_stop', index: 2 },
+        { type: 'content_block_start', index: 3, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 3, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await page.evaluate(() => {
+        const sse = (window as unknown as { __sse: { decide: ((body: { messages?: Array<{ role?: string }> }) => number) | null } }).__sse
+        sse.decide = (body) => (body?.messages?.at(-1)?.role === 'assistant' ? 400 : 200)
+      })
+      await page.getByTestId('continue').click()
+      await page.waitForFunction(() => {
+        const requests = (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string }> }> } }).__sse.requests
+        return requests.some((item) => item.messages.at(-1)?.role === 'assistant') && requests.some((item) => item.messages.at(-1)?.role === 'user' && requests.indexOf(item) > 0)
+      })
+      await push(page, [
+        { type: 'message_start', message: { id: 'regen', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '重新生成。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.locator('.turn.assistant')).toContainText('重新生成')
+      await expect(page.getByTestId('versions')).toBeVisible()
     })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')

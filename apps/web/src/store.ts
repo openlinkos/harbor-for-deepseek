@@ -1,4 +1,4 @@
-import { ApiClientError, buildRequest, createClient, messageUsedWebTool, purposeForFile } from '@deepapi/api-client'
+import { ApiClientError, buildRequest, continuationBlocks, createClient, messageUsedWebTool, purposeForFile } from '@deepapi/api-client'
 import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
@@ -32,8 +32,64 @@ let serverRunId: string | null = null
 let persistTimer = 0
 let persistDue = 0
 let persistFlush: (() => void) | null = null
+let persistMessage: Message | null = null
 const PERSIST_WAIT = 200
 const PERSIST_MAX = 1000
+const LIVE_SNAP = 'deepapi-live-snap'
+
+const notePersist = (message: Message) => {
+  persistMessage = message
+}
+
+/** IndexedDB commits after the page is gone. pagehide writes this snapshot synchronously. */
+const writeLiveSnap = () => {
+  if (!persistMessage) return
+  try {
+    sessionStorage.setItem(LIVE_SNAP, JSON.stringify(persistMessage))
+  } catch {
+    // A full sessionStorage must not block the unload flush.
+  }
+}
+
+const readLiveSnap = (): Message | null => {
+  try {
+    const raw = sessionStorage.getItem(LIVE_SNAP)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Message
+    if (!parsed || parsed.role !== 'assistant' || typeof parsed.id !== 'string') return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+const clearLiveSnap = () => {
+  try {
+    sessionStorage.removeItem(LIVE_SNAP)
+  } catch {
+    // Ignore a storage that is already gone.
+  }
+}
+
+const bodySize = (message: Message) =>
+  message.blocks.reduce((sum, block) => sum + (block.type === 'text' ? block.text.length : block.type === 'thinking' ? block.thinking.length : 0), 0)
+
+const mergeLiveSnap = async (store: Repository, rows: Message[]): Promise<Message[]> => {
+  const snap = readLiveSnap()
+  if (!snap) return rows
+  const next = rows.slice()
+  const index = next.findIndex((item) => item.id === snap.id)
+  if (index < 0) {
+    next.push(snap)
+    await store.saveMessage(snap)
+  } else if (bodySize(snap) > bodySize(next[index])) {
+    const merged = { ...next[index], blocks: snap.blocks, thinkingSeconds: snap.thinkingSeconds ?? next[index].thinkingSeconds, status: next[index].status === 'complete' ? next[index].status : snap.status }
+    next[index] = merged
+    await store.saveMessage(merged)
+  }
+  clearLiveSnap()
+  return next
+}
 
 const flushPersist = () => {
   window.clearTimeout(persistTimer)
@@ -63,7 +119,10 @@ const schedulePersist = (flush: () => void) => {
 }
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('pagehide', flushPersist)
+  window.addEventListener('pagehide', () => {
+    writeLiveSnap()
+    flushPersist()
+  })
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flushPersist()
   })
@@ -360,7 +419,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         usages.push(row.usage)
       }
       if (conversation.id === activeId) {
-        messages = withLive(activeId, await stopOrphanStreams(store, rows))
+        messages = withLive(activeId, await stopOrphanStreams(store, await mergeLiveSnap(store, rows)))
       }
     }
     let key: string | null = previousKey
@@ -670,16 +729,17 @@ export const useHarbor = create<HarborState>((set, get) => ({
   async continueReply(assistantId) {
     const assistant = get().messages.find((item) => item.id === assistantId)
     if (!assistant || assistant.role !== 'assistant' || get().streaming) return
-    if (messageUsedWebTool(assistant)) {
-      await get().regenerate(assistantId)
-      return
-    }
+    const usedWeb = messageUsedWebTool(assistant)
     if (get().serverMode) {
       await runServerTurn('', null, assistantId)
+      const after = get().messages.find((item) => item.id === assistantId)
+      if (usedWeb && after?.errorMessage === 'upstream 400') await get().regenerate(assistantId)
       return
     }
     if (!get().key) return
     await runContinuation(assistantId)
+    const after = get().messages.find((item) => item.id === assistantId)
+    if (usedWeb && after?.errorMessage === 'upstream 400') await get().regenerate(assistantId)
   },
 
   async editUser(messageId, text) {
@@ -1010,10 +1070,10 @@ const runContinuation = async (assistantId: string) => {
   const current = state.messages.find((item) => item.id === assistantId)
   if (!key || !current) return
   const store = await repository()
-  const prior = current.blocks.filter(Boolean)
-  const assistant: Message = { ...current, status: 'streaming', errorMessage: null, updatedAt: nowIso() }
+  const prior = continuationBlocks(current.blocks.filter(Boolean))
+  const assistant: Message = { ...current, status: 'streaming', errorMessage: null, blocks: prior, updatedAt: nowIso() }
   const history = activePath(state.messages, assistantId).map((item) =>
-    item.id === assistantId ? { ...item, status: 'aborted' as const } : item,
+    item.id === assistantId ? { ...item, status: 'aborted' as const, blocks: prior } : item,
   )
   useHarbor.setState({
     messages: state.messages.map((item) => (item.id === assistantId ? assistant : item)),
@@ -1046,6 +1106,7 @@ const runContinuation = async (assistantId: string) => {
       }
       Object.assign(assistant, next)
       rememberLive(assistant)
+      notePersist(assistant)
       useHarbor.setState({
         messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
       })
@@ -1085,7 +1146,7 @@ const runContinuation = async (assistantId: string) => {
     const aborted = abort?.signal.aborted
     Object.assign(assistant, {
       status: aborted ? 'aborted' : 'error',
-      errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
+      errorMessage: aborted ? null : error instanceof ApiClientError && error.status === 400 ? 'upstream 400' : error instanceof Error ? error.message : 'error',
       updatedAt: nowIso(),
     })
     useHarbor.setState({
@@ -1097,6 +1158,8 @@ const runContinuation = async (assistantId: string) => {
     persistDue = 0
     persistFlush = null
     await store.saveMessage({ ...assistant })
+    clearLiveSnap()
+    persistMessage = null
     clearLive(assistant.id)
     abort = null
     useHarbor.setState({ streaming: false })
@@ -1210,6 +1273,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     const next = { ...assistant, ...patch, updatedAt: nowIso() }
     Object.assign(assistant, next)
     rememberLive(assistant)
+    notePersist(assistant)
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
     })
@@ -1257,6 +1321,8 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     persistDue = 0
     persistFlush = null
     await store.saveMessage({ ...assistant })
+    clearLiveSnap()
+    persistMessage = null
     clearLive(assistant.id)
     abort = null
     const usages = []
@@ -1281,7 +1347,7 @@ const reloadLocal = async (set: Setter) => {
   const store = await repository()
   const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const activeId = conversations[0]?.id ?? null
-  const messages = activeId ? withLive(activeId, await stopOrphanStreams(store, await store.listMessages(activeId))) : []
+  const messages = activeId ? withLive(activeId, await stopOrphanStreams(store, await mergeLiveSnap(store, await store.listMessages(activeId)))) : []
   set({ conversations, activeId, messages, serverMode: false })
 }
 
@@ -1329,7 +1395,15 @@ const followServerRun = async (runId: string, assistantId: string) => {
   serverAbort = new AbortController()
   useHarbor.setState({ streaming: true })
   let draft = createDraft()
+  let thinkingOpen = false
   const storedSeconds = () => useHarbor.getState().messages.find((item) => item.id === assistantId)?.thinkingSeconds
+  const anchoredSeconds = () => {
+    const started = useHarbor.getState().messages.find((item) => item.id === assistantId)?.thinkingStartedAt
+    if (!started || thinkingOpen) return undefined
+    const elapsed = Date.now() - Date.parse(started)
+    if (!Number.isFinite(elapsed) || elapsed < 0) return undefined
+    return Math.max(1, Math.round(elapsed / 1000))
+  }
   const publish = (patch: Partial<Message>) => {
     const known = storedSeconds()
     const next = patch.thinkingSeconds
@@ -1345,6 +1419,8 @@ const followServerRun = async (runId: string, assistantId: string) => {
       runId,
       (event) => {
         draft = reduceEvent(draft, event)
+        if (event.type === 'content_block_start' && event.content_block.type === 'thinking') thinkingOpen = true
+        if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking') thinkingOpen = false
         if (event.type === 'message_delta' && event.delta.title) {
           const title = event.delta.title
           const conversationId = useHarbor.getState().messages.find((item) => item.id === assistantId)?.conversationId
@@ -1358,6 +1434,7 @@ const followServerRun = async (runId: string, assistantId: string) => {
           status: 'streaming',
           blocks: draft.blocks.filter(Boolean),
           usage: draft.usage,
+          thinkingSeconds: anchoredSeconds(),
         })
       },
       serverAbort.signal,
@@ -1368,7 +1445,7 @@ const followServerRun = async (runId: string, assistantId: string) => {
       status,
       blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
       usage: draft.usage,
-      thinkingSeconds: ended.thinkingSeconds ?? storedSeconds(),
+      thinkingSeconds: Math.max(ended.thinkingSeconds ?? 0, storedSeconds() ?? 0, anchoredSeconds() ?? 0) || storedSeconds(),
       errorMessage: status === 'error' ? 'interrupted' : null,
     })
   } catch (error) {
@@ -1511,7 +1588,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null, cont
         useHarbor.setState({
           messages: useHarbor.getState().messages.map((item) =>
             item.id === assistant.id
-              ? { ...item, blocks: streamedBlocks(), usage: draft.usage, thinkingSeconds: Math.max(clock.seconds(), item.thinkingSeconds ?? 0) || clock.seconds() }
+              ? { ...item, blocks: streamedBlocks(), usage: draft.usage, thinkingSeconds: continued?.thinkingSeconds ?? (Math.max(clock.seconds(), item.thinkingSeconds ?? 0) || clock.seconds()) }
               : item,
           ),
         })
@@ -1520,8 +1597,9 @@ const runServerTurn = async (text: string, regenerateParent: string | null, cont
       },
       serverAbort.signal,
     )
-    const status = draft.stopReason === 'refusal' ? 'refused' : serverAbort.signal.aborted ? 'aborted' : 'complete'
-    const seconds = Math.max(clock.seconds(), outcome.thinkingSeconds ?? 0)
+    const failed = outcome.status === 'error'
+    const status = draft.stopReason === 'refusal' ? 'refused' : serverAbort.signal.aborted ? 'aborted' : failed ? 'error' : 'complete'
+    const seconds = continued?.thinkingSeconds ?? (Math.max(clock.seconds(), outcome.thinkingSeconds ?? 0) || undefined)
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) =>
         item.id === assistant.id
@@ -1530,7 +1608,8 @@ const runServerTurn = async (text: string, regenerateParent: string | null, cont
               status,
               blocks: status === 'refused' ? [] : streamedBlocks(),
               usage: draft.usage,
-              thinkingSeconds: seconds || item.thinkingSeconds,
+              errorMessage: failed ? 'upstream 400' : null,
+              thinkingSeconds: seconds,
             }
           : item,
       ),

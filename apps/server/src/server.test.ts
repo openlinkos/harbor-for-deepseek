@@ -96,6 +96,73 @@ describe.skipIf(!postgresReady)('harbor server', () => {
             releaseHold = resolve
           })
         }
+        let upstreamBody: { messages?: Array<{ role?: string }> } = {}
+        try {
+          upstreamBody = JSON.parse(raw) as { messages?: Array<{ role?: string }> }
+        } catch {
+          upstreamBody = {}
+        }
+        if (upstreamBody.messages?.at(-1)?.role === 'assistant') {
+          response.writeHead(200, { 'content-type': 'text/event-stream' })
+          response.end([
+            'event: content_block_start',
+            'data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}',
+            '',
+            'event: content_block_delta',
+            'data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"续写乙"}}',
+            '',
+            'event: content_block_stop',
+            'data: {"type":"content_block_stop","index":0}',
+            '',
+            'event: message_delta',
+            'data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"input_tokens":1,"output_tokens":2}}',
+            '',
+            'event: message_stop',
+            'data: {"type":"message_stop"}',
+            '',
+            '',
+          ].join('\n'))
+          return
+        }
+        if (key.includes('think-open')) {
+          response.writeHead(200, { 'content-type': 'text/event-stream' })
+          const frame = (event: string, data: unknown) => {
+            response.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+          }
+          frame('message_start', { type: 'message_start', message: { id: 'open', model: 'deepseek-flash', usage: { input_tokens: 1, output_tokens: 0 } } })
+          frame('content_block_start', { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } })
+          frame('content_block_delta', { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '还在想' } })
+          await new Promise<void>((resolve) => {
+            releaseHold = resolve
+          })
+          frame('content_block_stop', { type: 'content_block_stop', index: 0 })
+          frame('content_block_start', { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } })
+          frame('content_block_delta', { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '想完了' } })
+          frame('content_block_stop', { type: 'content_block_stop', index: 1 })
+          frame('message_delta', { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 2 } })
+          frame('message_stop', { type: 'message_stop' })
+          response.end()
+          return
+        }
+        if (key.includes('partial-stream')) {
+          response.writeHead(200, { 'content-type': 'text/event-stream' })
+          const frame = (event: string, data: unknown) => {
+            response.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+          }
+          frame('message_start', { type: 'message_start', message: { id: 'part', model: 'deepseek-flash', usage: { input_tokens: 1, output_tokens: 0 } } })
+          frame('content_block_start', { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } })
+          frame('content_block_delta', { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '先想' } })
+          await new Promise((resolve) => setTimeout(resolve, 1200))
+          frame('content_block_stop', { type: 'content_block_stop', index: 0 })
+          frame('content_block_start', { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } })
+          frame('content_block_delta', { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '原文甲' } })
+          frame('content_block_stop', { type: 'content_block_stop', index: 1 })
+          await new Promise<void>((resolve) => {
+            releaseHold = resolve
+          })
+          response.end()
+          return
+        }
         if (key.includes('think-pause')) {
           response.writeHead(200, { 'content-type': 'text/event-stream' })
           const frame = (event: string, data: unknown) => {
@@ -517,6 +584,113 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     expect((await read(switched))?.thinkingSeconds).toBe(a?.thinkingSeconds)
   })
 
+  it('does not publish a partial thinking duration while thinking is still open', async () => {
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    const headers = { 'content-type': 'application/json', ...authed(session, created.csrf, true) }
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ secret: 'think-open-key', accountGroup: 'open' }),
+    })
+    await harbor.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'open-chat' }),
+    })
+    const startedAt = Date.now()
+    const run = await harbor.app.request('/api/conversations/open-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text: '慢思考', thinking: true }),
+    })
+    expect(run.status).toBe(200)
+    await new Promise((resolve) => setTimeout(resolve, 1600))
+    const midResponse = await harbor.app.request('/api/conversations/open-chat/messages', { headers: authed(session, created.csrf) })
+    const mid = (await midResponse.json()) as { messages: Array<{ status: string; thinkingSeconds?: number; thinkingStartedAt?: string }> }
+    const streaming = mid.messages.find((item) => item.status === 'streaming')
+    expect(streaming?.thinkingStartedAt).toBeTruthy()
+    expect(streaming?.thinkingSeconds).toBeUndefined()
+    const openFor = Date.now() - startedAt
+    releaseHold?.()
+    releaseHold = null
+    const events = await harbor.app.request(`/api/runs/${((await run.json()) as { runId: string }).runId}/events`, { headers: authed(session, created.csrf) })
+    const stream = await events.text()
+    expect(stream).toContain('想完了')
+    const doneResponse = await harbor.app.request('/api/conversations/open-chat/messages', { headers: authed(session, created.csrf) })
+    const done = (await doneResponse.json()) as { messages: Array<{ thinkingSeconds?: number }> }
+    const seconds = done.messages.find((item) => item.thinkingSeconds)?.thinkingSeconds
+    const elapsed = Math.round(openFor / 1000)
+    expect(seconds).toBeGreaterThanOrEqual(Math.max(1, elapsed - 1))
+    expect(seconds).toBeLessThanOrEqual(elapsed + 1)
+    const again = await harbor.app.request('/api/conversations/open-chat/messages', { headers: authed(session, created.csrf) })
+    const stable = (await again.json()) as { messages: Array<{ thinkingSeconds?: number }> }
+    expect(stable.messages.find((item) => item.thinkingSeconds)?.thinkingSeconds).toBe(seconds)
+    expect(stream.slice(stream.lastIndexOf('event: end'))).toContain(String(seconds))
+  })
+
+  it('keeps the stopped text on the same message when a reply continues', async () => {
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    const headers = { 'content-type': 'application/json', ...authed(session, created.csrf, true) }
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ secret: 'partial-stream-key', accountGroup: 'partial' }),
+    })
+    await harbor.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'partial-chat' }),
+    })
+    const run = await harbor.app.request('/api/conversations/partial-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text: '分段', thinking: true }),
+    })
+    const started = (await run.json()) as { runId: string; assistantMessageId: string }
+    await new Promise((resolve) => setTimeout(resolve, 2200))
+    const abort = await harbor.app.request(`/api/runs/${started.runId}/abort`, { method: 'POST', headers })
+    expect(abort.status).toBe(200)
+    releaseHold?.()
+    releaseHold = null
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    const stoppedResponse = await harbor.app.request('/api/conversations/partial-chat/messages', { headers: authed(session, created.csrf) })
+    const stopped = (await stoppedResponse.json()) as { messages: Array<{ id: string; role: string; status: string; blocks: Array<{ type: string; text?: string }>; thinkingSeconds?: number }> }
+    const assistant = stopped.messages.find((item) => item.role === 'assistant')
+    expect(assistant?.status).toBe('aborted')
+    expect(JSON.stringify(assistant?.blocks)).toContain('原文甲')
+    expect(stopped.messages.filter((item) => item.role === 'user')).toHaveLength(1)
+    const seconds = assistant?.thinkingSeconds
+    expect(seconds).toBeGreaterThanOrEqual(1)
+    const continued = await harbor.app.request('/api/conversations/partial-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ continueMessageId: started.assistantMessageId, thinking: true }),
+    })
+    expect(continued.status).toBe(200)
+    const continuedBody = (await continued.json()) as { runId: string }
+    const events = await harbor.app.request(`/api/runs/${continuedBody.runId}/events`, { headers: authed(session, created.csrf) })
+    expect(await events.text()).toContain('续写乙')
+    const afterResponse = await harbor.app.request('/api/conversations/partial-chat/messages', { headers: authed(session, created.csrf) })
+    const after = (await afterResponse.json()) as { messages: Array<{ id: string; role: string; status: string; blocks: unknown; thinkingSeconds?: number }> }
+    expect(after.messages.filter((item) => item.role === 'user')).toHaveLength(1)
+    expect(after.messages.filter((item) => item.role === 'assistant')).toHaveLength(1)
+    expect(JSON.stringify(after.messages.find((item) => item.role === 'assistant')?.blocks)).toContain('原文甲')
+    expect(JSON.stringify(after.messages.find((item) => item.role === 'assistant')?.blocks)).toContain('续写乙')
+    expect(after.messages.find((item) => item.role === 'assistant')?.thinkingSeconds).toBe(seconds)
+  })
+
   it('does not write to a closed run stream after the ping interval', async () => {
     const errors: string[] = []
     const onError = (error: Error) => {
@@ -764,7 +938,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
 
   it('applies migrations once and serves health checks', async () => {
     const before = await harbor.sql<{ id: string }[]>`select id from schema_migrations order by id`
-    expect(before.map((row) => row.id)).toEqual(['001_init', '002_invite_expiry', '003_thinking_seconds'])
+    expect(before.map((row) => row.id)).toEqual(['001_init', '002_invite_expiry', '003_thinking_seconds', '004_thinking_started'])
     await applyMigrations(harbor.sql)
     const after = await harbor.sql<{ id: string }[]>`select id from schema_migrations order by id`
     expect(after.map((row) => row.id)).toEqual(before.map((row) => row.id))

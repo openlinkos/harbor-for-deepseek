@@ -82,7 +82,37 @@ const replayUser = (message: Message): ApiMessage | null => {
   return content.length ? { role: 'user', content } : null
 }
 
-/** A partial reply that called web search or read-url cannot be continued (the API returns 400). */
+/**
+ * Search and page-read blocks cannot be sent back on a continuation (the API returns 400).
+ * Fold the readable result into plain text and drop the tool blocks. The caller still tries
+ * one continuation; a 400 falls back to regenerating.
+ */
+export const continuationBlocks = (blocks: Message['blocks']): Message['blocks'] => {
+  const folded: string[] = []
+  const kept: Message['blocks'] = []
+  for (const block of blocks) {
+    if (block.type === 'web_search_tool_result') {
+      const lines = block.content.flatMap((item) =>
+        item.type === 'web_search_result' ? [`${item.title} ${item.url}${item.snippet ? ` ${item.snippet}` : ''}`] : [],
+      )
+      if (lines.length) folded.push(lines.join('\n'))
+      continue
+    }
+    if (block.type === 'web_fetch_tool_result') {
+      if (block.content.type === 'web_fetch_result') {
+        const title = block.content.content?.title || block.content.url
+        folded.push(`${title} ${block.content.url}`)
+      }
+      continue
+    }
+    if (block.type === 'server_tool_use') continue
+    kept.push(block)
+  }
+  if (folded.length) kept.push({ type: 'text', text: folded.join('\n') })
+  return kept
+}
+
+/** True when the stored reply still contains web search or read-url blocks. */
 export const messageUsedWebTool = (message: Pick<Message, 'blocks'>): boolean =>
   message.blocks.some(
     (block) =>

@@ -1,4 +1,4 @@
-import { buildRequest, CONTENT_SECURITY_POLICY, messageUsedWebTool } from '@deepapi/api-client'
+import { buildRequest, CONTENT_SECURITY_POLICY, continuationBlocks } from '@deepapi/api-client'
 import { estimateCost } from '@deepapi/pricing'
 import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@deepapi/sse'
 import type { ContentBlock, Message, Usage } from '@deepapi/types'
@@ -723,6 +723,11 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     usage: row.usage_json,
     errorMessage: row.error_message,
     thinkingSeconds: typeof row.thinking_seconds === 'number' ? row.thinking_seconds : row.thinking_seconds == null ? undefined : Number(row.thinking_seconds),
+    thinkingStartedAt: row.thinking_started_at instanceof Date
+      ? row.thinking_started_at.toISOString()
+      : typeof row.thinking_started_at === 'string'
+        ? row.thinking_started_at
+        : undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     rev: asNumber(row.rev),
@@ -1011,23 +1016,49 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     timeZone: string
     priorBlocks?: ContentBlock[]
     dropThinking?: boolean
+    /** A continuation keeps the duration recorded when thinking first closed. */
+    preserveThinkingSeconds?: boolean
   }) => {
     const controller = new AbortController()
     aborts.set(runId, controller)
     let thinkingClosed = 0
     let thinkingOpen: number | null = null
-    let thinkingStored = 0
-    const thinkingSeconds = () => {
-      const live = thinkingOpen === null ? 0 : Date.now() - thinkingOpen
-      const total = thinkingClosed + live
-      if (total <= 0) return null
-      return Math.max(1, Math.round(total / 1000))
-    }
-    const rememberThinking = async () => {
-      const seconds = thinkingSeconds()
-      if (seconds === null || seconds === thinkingStored) return
-      thinkingStored = seconds
-      await sql`update messages set thinking_seconds = ${seconds}, updated_at = now() where id = ${messageId}`
+    let draft = createDraft()
+    const closedThinkingSeconds = () => (thinkingOpen === null && thinkingClosed > 0 ? Math.max(1, Math.round(thinkingClosed / 1000)) : null)
+    const outboundMessages = requestMessages.map((message) =>
+      message.id === messageId
+        ? { ...message, status: 'aborted' as const, blocks: continuationBlocks(message.blocks) }
+        : message,
+    )
+    const persistDraft = async (status: 'complete' | 'aborted' | 'refused' | 'error', errorMessage: string | null) => {
+      const prior = prefs.priorBlocks ?? []
+      const blocks = status === 'refused' ? [] : [...prior, ...draft.blocks.filter(Boolean)]
+      const messageRev = await nextRev(user.id)
+      const seconds = closedThinkingSeconds()
+      if (prefs.preserveThinkingSeconds) {
+        await sql`
+          update messages set
+            status = ${status},
+            blocks_json = ${sql.json(blocks as postgres.JSONValue)},
+            usage_json = ${draft.usage ? sql.json(draft.usage as unknown as postgres.JSONValue) : null},
+            error_message = ${errorMessage},
+            rev = ${messageRev},
+            updated_at = now()
+          where id = ${messageId}
+        `
+        return
+      }
+      await sql`
+        update messages set
+          status = ${status},
+          blocks_json = ${sql.json(blocks as postgres.JSONValue)},
+          usage_json = ${draft.usage ? sql.json(draft.usage as unknown as postgres.JSONValue) : null},
+          error_message = ${errorMessage},
+          thinking_seconds = ${seconds},
+          rev = ${messageRev},
+          updated_at = now()
+        where id = ${messageId}
+      `
     }
     try {
       const callUpstream = (dropThinking: boolean) =>
@@ -1039,7 +1070,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
             body: JSON.stringify(buildRequest({
               ...prefs,
               safetyLevel: 'high',
-              messages: requestMessages,
+              messages: outboundMessages,
               locale: prefs.locale,
               timeZone: prefs.timeZone,
               dropThinking,
@@ -1049,7 +1080,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
           new Set(),
         )
       let result = await callUpstream(Boolean(prefs.dropThinking))
-      const hasThinking = requestMessages.some((message) => message.blocks.some((block) => block.type === 'thinking'))
+      const hasThinking = outboundMessages.some((message) => message.blocks.some((block) => block.type === 'thinking'))
       if (result.response?.status === 400 && !prefs.dropThinking && hasThinking) {
         await result.response.body?.cancel().catch(() => undefined)
         result = await callUpstream(true)
@@ -1070,7 +1101,6 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       const decoder = new ServerSentEventDecoder()
       const textDecoder = new TextDecoder()
       const reader = result.response.body.getReader()
-      let draft = createDraft()
       while (!controller.signal.aborted) {
         const { done, value } = await reader.read()
         const frames = decoder.push(textDecoder.decode(value ?? new Uint8Array(), { stream: !done }))
@@ -1091,12 +1121,18 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
           draft = reduceEvent(draft, event)
           if (event.type === 'content_block_start' && event.content_block.type === 'thinking' && thinkingOpen === null) {
             thinkingOpen = Date.now()
+            if (!prefs.preserveThinkingSeconds) {
+              await sql`update messages set thinking_started_at = coalesce(thinking_started_at, now()) where id = ${messageId}`
+            }
           }
           if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking' && thinkingOpen !== null) {
             thinkingClosed += Date.now() - thinkingOpen
             thinkingOpen = null
+            const seconds = closedThinkingSeconds()
+            if (!prefs.preserveThinkingSeconds && seconds !== null) {
+              await sql`update messages set thinking_seconds = ${seconds}, updated_at = now() where id = ${messageId}`
+            }
           }
-          await rememberThinking()
           await appendEvent(runId, event)
           if (event.type === 'message_delta' && event.delta.title) {
             const rev = await nextRev(user.id)
@@ -1112,21 +1148,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       }
       const refused = draft.stopReason === 'refusal'
       const status = controller.signal.aborted ? 'aborted' : refused ? 'refused' : draft.stopped ? 'complete' : 'error'
-      const prior = prefs.priorBlocks ?? []
-      const blocks = refused ? [] : [...prior, ...draft.blocks.filter(Boolean)]
-      const messageRev = await nextRev(user.id)
-      const seconds = thinkingSeconds()
-      await sql`
-        update messages set
-          status = ${status},
-          blocks_json = ${sql.json(blocks as postgres.JSONValue)},
-          usage_json = ${draft.usage ? sql.json(draft.usage as unknown as postgres.JSONValue) : null},
-          error_message = ${status === 'error' ? 'interrupted' : null},
-          thinking_seconds = ${seconds},
-          rev = ${messageRev},
-          updated_at = now()
-        where id = ${messageId}
-      `
+      await persistDraft(status, status === 'error' ? 'interrupted' : null)
       if (draft.usage) {
         await recordUsage({
           userId: user.id,
@@ -1141,6 +1163,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       await finishRun(runId, status === 'complete' || status === 'refused' || status === 'aborted' ? status : 'error', null)
     } catch (error) {
       if (controller.signal.aborted) {
+        await persistDraft('aborted', null)
         await finishRun(runId, 'aborted', null)
         return
       }
@@ -1191,7 +1214,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     const regenerate = !continueId && typeof body.parentId === 'string' && !body.text
     let parentId = regenerate ? String(body.parentId) : (conversation.active_leaf_id as string | null)
     let userMessageId = regenerate ? String(body.parentId) : crypto.randomUUID()
-    if (!regenerate) {
+    if (!regenerate && !continueId) {
       const rev = await nextRev(user.id)
       const blocks: ContentBlock[] = []
       if (typeof body.text === 'string' && body.text.trim()) {
@@ -1232,10 +1255,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       if (!existing || existing.role !== 'assistant') {
         return c.json({ error: { message: 'not found' } }, 404)
       }
-      if (messageUsedWebTool(existing)) {
-        return c.json({ error: { message: 'web tools cannot be continued' } }, 400)
-      }
-      priorBlocks = existing.blocks.filter(Boolean)
+      priorBlocks = continuationBlocks(existing.blocks).filter(Boolean)
       userMessageId = existing.parentId ?? userMessageId
     }
     const leafRev = await nextRev(user.id)
@@ -1296,6 +1316,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       effort,
       requestTitle: conversation.title_source !== 'user',
       priorBlocks,
+      preserveThinkingSeconds: Boolean(continueId),
     })
     return c.json({ runId, userMessageId, assistantMessageId: assistantId })
   })
@@ -1415,9 +1436,13 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (rows.length === 0) {
       return c.json({ error: { message: 'not found' } }, 404)
     }
-    aborts.get(runId)?.abort()
+    const controller = aborts.get(runId)
+    if (controller) {
+      controller.abort()
+      return c.json({ ok: true })
+    }
     await finishRun(runId, 'aborted', null)
-    await sql`update messages set status = 'aborted', updated_at = now() where id = ${rows[0]?.message_id}`
+    await sql`update messages set status = 'aborted', updated_at = now() where id = ${rows[0]?.message_id} and status = 'streaming'`
     return c.json({ ok: true })
   })
 
