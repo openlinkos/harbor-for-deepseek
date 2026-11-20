@@ -160,3 +160,90 @@ test('delete confirm', async ({ page }) => {
   await page.getByTestId('confirm-delete').click()
   await expect(page.getByTestId('sidebar')).not.toContainText('对照')
 })
+
+const openRowMenu = async (page: Page, width: number) => {
+  if (width < 768) {
+    const sidebar = page.locator('.sidebar')
+    if (!(await sidebar.isVisible())) {
+      await page.getByTestId('menu').click()
+      await expect(sidebar).toBeVisible()
+    }
+  }
+  const row = page.locator('.chat-link').first()
+  if (width >= 768) await row.hover()
+  await row.locator('.more').click()
+}
+
+const chatStillNamed = async (page: Page, title: string, absent: string) => {
+  await page.waitForTimeout(400)
+  const sidebar = page.getByTestId('sidebar')
+  await expect(sidebar).toContainText(title)
+  await expect(sidebar).not.toContainText(absent)
+}
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+] as const) {
+  test(`delete confirm and rename dismiss at ${viewport.width}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await unlock(page)
+    await page.getByTestId('composer').fill('待留')
+    await page.getByTestId('send').click()
+    await expect(page.getByTestId('sidebar')).toContainText('对照')
+    const mutations: string[] = []
+    const onRequest = (request: { method: () => string; url: () => string }) => {
+      const method = request.method()
+      if (method === 'DELETE' || method === 'PATCH' || method === 'PUT') mutations.push(`${method} ${request.url()}`)
+    }
+    page.on('request', onRequest)
+
+    await openRowMenu(page, viewport.width)
+    await page.getByRole('menuitem', { name: '删除' }).click()
+    const dialog = page.getByTestId('confirm-dialog')
+    await expect(dialog).toBeVisible()
+    await expect(page.getByRole('button', { name: '取消' })).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('confirm-delete')).toBeFocused()
+    await page.keyboard.press('Shift+Tab')
+    await expect(page.getByRole('button', { name: '取消' })).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+    await chatStillNamed(page, '对照', '不该保存的名字')
+
+    await openRowMenu(page, viewport.width)
+    await page.getByRole('menuitem', { name: '删除' }).click()
+    await expect(dialog).toBeVisible()
+    await dialog.click({ position: { x: 12, y: 12 } })
+    await expect(dialog).toBeHidden()
+    await chatStillNamed(page, '对照', '不该保存的名字')
+
+    await openRowMenu(page, viewport.width)
+    await page.getByRole('menuitem', { name: '删除' }).click()
+    await expect(dialog).toBeVisible()
+    await page.getByRole('button', { name: '取消' }).click()
+    await expect(dialog).toBeHidden()
+    await chatStillNamed(page, '对照', '不该保存的名字')
+
+    await openRowMenu(page, viewport.width)
+    await page.getByRole('menuitem', { name: '重命名' }).click()
+    const title = page.getByLabel('对话标题')
+    await expect(title).toBeFocused()
+    await title.fill('不该保存的名字')
+    await page.locator('.group-label').first().click()
+    await expect(title).toBeVisible()
+    await expect(title).toHaveValue('不该保存的名字')
+    await title.press('Escape')
+    await expect(title).toBeHidden()
+    await chatStillNamed(page, '对照', '不该保存的名字')
+    expect(mutations).toEqual([])
+
+    await openRowMenu(page, viewport.width)
+    await page.getByRole('menuitem', { name: '重命名' }).click()
+    await page.getByLabel('对话标题').fill('已改名')
+    await page.getByLabel('对话标题').press('Enter')
+    await expect(page.getByTestId('sidebar')).toContainText('已改名')
+    await expect(page.getByTestId('sidebar')).not.toContainText('对照')
+    page.off('request', onRequest)
+  })
+}

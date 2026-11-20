@@ -57,12 +57,6 @@ const knownFailure = (width: number, title: string): string | null => {
   if (title === 'switch conversation via search') return 'fb1132-4: 搜索弹窗没有结果列表，1440 上侧栏还被 .search-scrim 盖住'
   // fb1132-5 待确认，不在该修复范围：.settings-modal 没有遮罩点击关闭。Esc 已能关。
   if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
-  // fb1132-5：ConfirmDialog 没有 Esc，只有「取消」按钮能关。
-  if (title === 'delete confirm cancels on esc') return 'fb1132-5: ConfirmDialog 没有 Esc 监听'
-  // fb1132-5：ConfirmDialog 没有遮罩点击关闭。
-  if (title === 'delete confirm cancels on outside') return 'fb1132-5: ConfirmDialog 没有遮罩点击关闭'
-  // fb1132-5：重命名 form 没有 Esc，不能退出编辑、也不能恢复原标题。
-  if (title === 'rename edit cancels on esc') return 'fb1132-5: 重命名 form 没有处理 Esc'
   // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
   if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
   // fb1132 调查，没有单独修复项。顶栏是系统分享或复制标题；操作栏和 ⋯ 菜单直接下载 Markdown。官方流程是勾选消息后创建链接。
