@@ -20,7 +20,6 @@ const SHOTS = process.env.SHOTS
 const STRICT = process.env.FB1721_STRICT === '1'
 // Known failure on master 6eae2b7 → the fix PR deletes this id.
 const KNOWN: Record<string, string> = {
-  'fb1721-S2': 'fb1721-S2: 数据管理分区 margin-top:-10px 让相邻行重叠 10px；390 英文「Key on this device」按钮不靠右',
   'fb1721-S3': 'fb1721-S3: 深色分隔线用了浅色 rgba(0,0,0,.1)，官方 rgba(255,255,255,.06)',
   'fb1721-S4': 'fb1721-S4: 390 余额行换行后按钮/标签不居中',
 }
@@ -34,8 +33,7 @@ for (const v of VARIANTS) {
   test.describe(`fb1721 settings ${cell}`, () => {
     test.use({ viewport: { width: v.w, height: v.h }, colorScheme: v.theme, bypassCSP: true })
     for (const tab of TABS) test(`rows-${tab}`, async ({ page }) => {
-      if (tab === 'data') knownFailure('fb1721-S2')
-      else if (tab === 'account' && v.theme === 'dark') knownFailure('fb1721-S3')
+      if (tab === 'account' && v.theme === 'dark') knownFailure('fb1721-S3')
       else if (tab === 'account' && v.w < 768) knownFailure('fb1721-S4')
       await boot(page, v.theme); await openSettings(page)
       if (v.lang === 'en') { await page.getByTestId('language-trigger').click(); await page.getByRole('option', { name: 'English' }).click(); await page.waitForTimeout(300) }

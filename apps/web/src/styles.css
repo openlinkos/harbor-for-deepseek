@@ -1645,6 +1645,10 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
 }
 .settings-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: auto; min-height: 60px; padding: 12px 0; border: 0; font-size: 14px; font-weight: 400; line-height: 22px; box-shadow: none; }
 .settings-line > span:first-child { flex-shrink: 0; white-space: nowrap; }
+@media (max-width: 767px) {
+  .settings-line > span:first-child { flex: 1 1 auto; min-width: 0; white-space: normal; }
+  .settings-line.balance-line > span:first-child { flex: 0 0 auto; white-space: nowrap; }
+}
 .settings-line.balance-line { height: auto; align-items: center; }
 .settings-line.balance-line > span:first-child { height: 22px; line-height: 22px; }
 .settings-line.balance-line .account-side { column-gap: 0; row-gap: 0; }
@@ -1657,6 +1661,7 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
   .settings-line.balance-line .account-side > .hint { order: 2; flex-basis: 100%; margin-left: 0; margin-top: 4px; }
 }
 .settings-account, .settings-data, .settings-legal { margin-top: -10px; }
+.settings-data + .settings-data { margin-top: 0; }
 .legal-copy { max-width: 640px; }
 .legal-copy h3 { margin: 16px 0 8px; font-size: 16px; }
 .legal-copy p { margin: 0 0 12px; line-height: 24px; color: var(--dsw-alias-label-secondary); }
@@ -1748,7 +1753,8 @@ body[data-ds-dark-theme] .settings-line .pill-menu > div,
 body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67, 69, 74); }
 .settings-line .pill-gap { width: 10px; flex: none; }
 .settings-line .pill-menu button svg { position: absolute; right: 14px; top: 11px; width: 14px; height: 14px; margin: 0; }
-.settings-line + .settings-line { box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0 0 inset; }
+.settings-line + .settings-line,
+.settings-data + .settings-data > .settings-line:first-child { box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0 0 inset; }
 .settings-line strong { font-weight: 560; }
 .settings-line .hint { margin: 2px 0 0; max-width: 360px; }
 .settings-line.stack { height: auto; min-height: 86px; align-items: center; }
