@@ -17,7 +17,6 @@ const STRICT = process.env.FB1344_STRICT === '1'
 
 // 在 master 4734e7f 上会失败的用例。修复 PR 删掉自己那几条；修好了却没删，会因为意外通过让 CI 变红。
 // fb1344-P2 回答底部：pill-geometry、pill-bg-dark、action-color-dark、share-tooltip。
-// fb1344-P3 设置行内按钮（含 label/file-input）：settings-buttons、centring-scan（导入 label |dx|>1）。
 // fb1344-P5 流式阶段标题和 shimmer：phase-thinking、phase-searching、phase-browsing。phase-done 在 master 已通过，不要标失败。
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
@@ -27,9 +26,6 @@ const KNOWN: Record<string, string> = {
   'pill-bg-dark': 'fb1344-P2: 深色来源胶囊底色 rgb(44,44,46)，官方 rgb(21,21,23)',
   'action-color-dark': 'fb1344-P2: 深色操作栏图标色 rgb(129,133,140)，官方 rgb(173,178,184)',
   'share-tooltip': 'fb1344-P2: 操作栏 tooltip 在按钮上方且无箭头，官方 placement bottom',
-  // fb1344-P3 设置行内按钮，label/file-input 也算按钮；居中误差 >1px
-  'settings-buttons': 'fb1344-P3: 设置行内按钮：导入是 label 72×40 文字偏 9px；全部按钮 padding 12px（官方 14px），深色边框 .16（官方 .12）',
-  'centring-scan': 'fb1344-P3: 全站居中扫描：导入 label |dx|>1。用户行不在这次扫描里，归 fb1344-P4 的 user-row-centre',
   // fb1344-P5 分阶段 SSE：正在思考 / 正在搜索 / 正在浏览网页
   'phase-thinking': 'fb1344-P5: 流式中标题一直是「已思考（用时 N 秒）」，没有「正在思考」与 shimmer',
   'phase-searching': 'fb1344-P5: 搜索进行中无「正在搜索」标题，也没有进行中的搜索行',
@@ -114,7 +110,11 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         for (const b of bs) { const e: string[] = []
           if (Math.abs(b.box.h - K.settingsButton.h) > 0.5) e.push(`h=${b.box.h}`); if (b.box.w < K.settingsButton.minW - 0.5) e.push(`w=${b.box.w}`)
           if (b.cs['padding-left'] !== K.settingsButton.padX || b.cs['padding-right'] !== K.settingsButton.padX) e.push(`pad=${b.cs['padding-left']}`)
-          if (![K.settingsButton.border[theme], 'rgb(236, 19, 19)'].includes(b.border.color)) e.push(`border=${b.border.color}`)
+          // Danger border is not in fixtures/official-fb1344.json. Frozen main.dc093a796f.css is a single line (line 1):
+          // .ds-button.ds-button--outlined.ds-button--error { --dsl-button-border-color: var(--dsw-alias-state-error-primary) }
+          // light: --dsw-alias-state-error-primary: var(--dsw-static-red-600); --dsw-static-red-600:#ec1313 → rgb(236, 19, 19)
+          // dark body[data-ds-dark-theme]: --dsw-alias-state-error-primary: var(--dsw-static-red-400); --dsw-static-red-400:#f25a5a → rgb(242, 90, 90)
+          if (![K.settingsButton.border[theme], theme === 'dark' ? 'rgb(242, 90, 90)' : 'rgb(236, 19, 19)'].includes(b.border.color)) e.push(`border=${b.border.color}`)
           if (!b.textOff || Math.abs(b.textOff.dx) > 1 || Math.abs(b.textOff.dy) > 1) e.push(`textOff=${JSON.stringify(b.textOff)}`)
           if (Math.abs(b.right - right) > 1) e.push(`right=${b.right}≠${right}`)
           if (e.length) bad.push(`${tab ?? '通用设置'}/${b.row}/${b.text}: ${e.join(' ')}`) }

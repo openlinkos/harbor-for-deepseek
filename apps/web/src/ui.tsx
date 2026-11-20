@@ -13,6 +13,7 @@ import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { USER_MENU_ICONS } from './user-menu-icons.js'
+import { DsButton, DsFileButton } from './ds-button.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -360,8 +361,8 @@ const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel
       <div className="confirm-card">
         <h2>{label}</h2>
         <div className="edit-actions">
-          <button type="button" onClick={onCancel}>{t('cancel')}</button>
-          <button type="button" className="danger outline" data-testid="confirm-delete" onClick={onConfirm}>{t('delete')}</button>
+          <DsButton type="button" onClick={onCancel}>{t('cancel')}</DsButton>
+          <DsButton type="button" variant="danger" data-testid="confirm-delete" onClick={onConfirm}>{t('delete')}</DsButton>
         </div>
       </div>
     </div>,
@@ -1934,22 +1935,17 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('skin')}</span>
-            <span className="account-side">
-              <label className="file-button">
+            <span className="account-side ds-button-stack">
+              <DsButton type="button" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</DsButton>
+              <DsFileButton
+                testId="skin-file"
+                accept="application/json,.json"
+                onFile={(file) => {
+                  void file.text().then((raw) => saveSkin(parseSkin(raw))).catch(() => undefined)
+                }}
+              >
                 {t('skinImport')}
-                <input
-                  data-testid="skin-file"
-                  type="file"
-                  accept="application/json,.json"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0]
-                    event.target.value = ''
-                    if (!file) return
-                    void file.text().then((raw) => saveSkin(parseSkin(raw))).catch(() => undefined)
-                  }}
-                />
-              </label>
-              <button type="button" className="account-quiet" data-testid="skin-reset" onClick={() => saveSkin(null)}>{t('skinReset')}</button>
+              </DsFileButton>
             </span>
           </div>
           <div className="settings-line">
@@ -1979,7 +1975,7 @@ const Settings = () => {
         <section className="settings-account">
           <div className="settings-line">
             <span>API Key</span>
-            <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
+            <DsButton type="button" onClick={() => void clearKey()}>{t('clearKey')}</DsButton>
           </div>
           <div className="settings-line balance-line">
             <span data-testid="balance-label">{t('balance')}</span>
@@ -1996,7 +1992,7 @@ const Settings = () => {
                 </span>
               ) : null}
               {serverMode ? null : (
-                <button type="button" className="account-quiet" data-testid="refresh-balance" onClick={() => void refreshBalance()}>{t('refresh')}</button>
+                <DsButton type="button" data-testid="refresh-balance" onClick={() => void refreshBalance()}>{t('refresh')}</DsButton>
               )}
             </span>
           </div>
@@ -2021,13 +2017,13 @@ const Settings = () => {
             <span>{t('nickname')}</span>
             <input className="account-value" data-testid="nickname" value={nickname} placeholder={t('nickname')} maxLength={32} onChange={(event) => setNickname(event.target.value)} />
             <input className="account-value short" data-testid="avatar-initial" value={initial} placeholder={t('avatarMark')} maxLength={2} onChange={(event) => setInitial(event.target.value)} />
-            <button type="button" className="account-quiet" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</button>
+            <DsButton type="button" onClick={() => saveProfile({ nickname, initial })}>{t('save')}</DsButton>
           </div>
         </section>
         <section className="settings-data">
           <div className="settings-line">
             <span>{t('sharedLinks')}</span>
-            <button type="button" className="account-quiet" onClick={() => setSharedNote(true)}>{t('manage')}</button>
+            <DsButton type="button" onClick={() => setSharedNote(true)}>{t('manage')}</DsButton>
           </div>
           {sharedNote ? <p className="hint">{t('noShared')}</p> : null}
           <div className="settings-line stack">
@@ -2035,11 +2031,11 @@ const Settings = () => {
               <span>{t('exportAll')}</span>
               <p className="hint">{t('exportAllBody')}</p>
             </div>
-            <button type="button" className="account-quiet" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</button>
+            <DsButton type="button" data-testid="export-all" onClick={() => { setExporting(true); void exportJson().finally(() => setExporting(false)) }}>{exporting ? <span className="spinner" aria-hidden="true" /> : t('export')}</DsButton>
           </div>
           <div className="settings-line">
             <span>{t('deleteAll')}</span>
-            <button type="button" className="account-danger" onClick={() => setConfirmAll(true)}>{t('delete')}</button>
+            <DsButton type="button" variant="danger" onClick={() => setConfirmAll(true)}>{t('delete')}</DsButton>
             {confirmAll ? (
               <ConfirmDialog
                 label={t('deleteConfirm')}
@@ -2078,11 +2074,11 @@ const Settings = () => {
           <p className="hint">{serverMode ? t('serverImportNote') : t('importMergeNote')}</p>
           <div className="settings-line">
             <span>{t('exportJson')}</span>
-            <button type="button" className="account-quiet" data-testid="export-json" onClick={() => void exportJson()}>{t('export')}</button>
+            <DsButton type="button" data-testid="export-json" onClick={() => void exportJson()}>{t('export')}</DsButton>
           </div>
           <div className="settings-line">
             <span>{t('exportZip')}</span>
-            <button type="button" className="account-quiet" data-testid="export-zip" onClick={() => void exportZip()}>{t('export')}</button>
+            <DsButton type="button" data-testid="export-zip" onClick={() => void exportZip()}>{t('export')}</DsButton>
           </div>
           <div className="settings-line">
             <span>{t('importAsCopy')}</span>
@@ -2092,35 +2088,23 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('importJson')}</span>
-            <label className="file-button">
+            <DsFileButton
+              testId="import-json"
+              accept="application/json,.json"
+              onFile={(file) => { void importJson(file, asCopy) }}
+            >
               {t('importAct')}
-              <input
-                data-testid="import-json"
-                type="file"
-                accept="application/json,.json"
-                onChange={(event) => {
-                  const file = event.target.files?.[0]
-                  event.target.value = ''
-                  if (file) void importJson(file, asCopy)
-                }}
-              />
-            </label>
+            </DsFileButton>
           </div>
           <div className="settings-line">
             <span>{t('importZip')}</span>
-            <label className="file-button">
+            <DsFileButton
+              testId="import-zip"
+              accept=".zip,application/zip"
+              onFile={(file) => { void importZip(file, asCopy) }}
+            >
               {t('importAct')}
-              <input
-                data-testid="import-zip"
-                type="file"
-                accept=".zip,application/zip"
-                onChange={(event) => {
-                  const file = event.target.files?.[0]
-                  event.target.value = ''
-                  if (file) void importZip(file, asCopy)
-                }}
-              />
-            </label>
+            </DsFileButton>
           </div>
         </section>
         {serverMode ? null : (
@@ -2135,11 +2119,11 @@ const Settings = () => {
           </div>
           <div className="settings-line">
             <span>{t('replaceKey')}</span>
-            <button type="button" className="account-quiet" data-testid="replace-save" onClick={() => void saveKey(nextKey, passphrase, true)}>{t('save')}</button>
+            <DsButton type="button" data-testid="replace-save" onClick={() => void saveKey(nextKey, passphrase, true)}>{t('save')}</DsButton>
           </div>
           <div className="settings-line">
             <span>{t('deviceKey')}</span>
-            <button type="button" className="account-quiet" onClick={() => void clearKey()}>{t('clearKey')}</button>
+            <DsButton type="button" onClick={() => void clearKey()}>{t('clearKey')}</DsButton>
           </div>
         </section>
         )}
@@ -2188,7 +2172,7 @@ const Settings = () => {
               </div>
               <div className="settings-line">
                 <span>{inviteCode.trim() ? t('registerTitle') : t('loginTitle')}</span>
-                <button type="submit" className="account-quiet" data-testid="remote-login">{inviteCode.trim() ? t('registerSubmit') : t('connectServer')}</button>
+                <DsButton type="submit" variant="primary" data-testid="remote-login">{inviteCode.trim() ? t('registerSubmit') : t('connectServer')}</DsButton>
               </div>
               {remoteError ? <p className="error">{remoteError}</p> : null}
             </form>
@@ -2196,15 +2180,15 @@ const Settings = () => {
           {serverUser ? (
             <>
               {serverBase ? <p className="hint" data-testid="connected-server">{t('connectedServer')}: {serverBase}</p> : null}
-            <div className="settings-line"><span>{t('syncNow')}</span><button type="button" className="account-quiet" data-testid="server-sync" onClick={() => void syncServer()}>{t('syncAct')}</button></div>
-            <div className="settings-line"><span>{t('copyLocal')}</span><button type="button" className="account-quiet" data-testid="copy-local" onClick={() => void copyLocalToServer()}>{t('copyAct')}</button></div>
-            <div className="settings-line"><span>{serverMode ? t('useLocal') : t('useServer')}</span><button type="button" className="account-quiet" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>{t('switchAct')}</button></div>
-            <div className="settings-line"><span>{t('logout')}</span><button type="button" className="account-quiet" onClick={() => void logoutServer()}>{t('logoutAct')}</button></div>
+            <div className="settings-line"><span>{t('syncNow')}</span><DsButton type="button" data-testid="server-sync" onClick={() => void syncServer()}>{t('syncAct')}</DsButton></div>
+            <div className="settings-line"><span>{t('copyLocal')}</span><DsButton type="button" data-testid="copy-local" onClick={() => void copyLocalToServer()}>{t('copyAct')}</DsButton></div>
+            <div className="settings-line"><span>{serverMode ? t('useLocal') : t('useServer')}</span><DsButton type="button" onClick={() => void (serverMode ? enterLocalMode() : enterServerMode())}>{t('switchAct')}</DsButton></div>
+            <div className="settings-line"><span>{t('logout')}</span><DsButton type="button" onClick={() => void logoutServer()}>{t('logoutAct')}</DsButton></div>
             </>
           ) : hosted ? (
-            <button type="button" data-testid="open-login" onClick={openLogin}>
+            <DsButton type="button" variant="primary" data-testid="open-login" onClick={openLogin}>
               {t('loginTitle')}
-            </button>
+            </DsButton>
           ) : null}
         </section>
         <section className="settings-legal">
