@@ -728,6 +728,8 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
 .usage, .hint { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .found-line { color: var(--dsw-alias-label-secondary); font-size: 14px; margin-bottom: 8px; }
 .favicons { display: inline-flex; align-items: center; margin-left: 6px; user-select: none; }
+button.favicons { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; vertical-align: middle; }
+button.chip { appearance: none; margin: 0; }
 .favicon, .favicons i {
   position: relative;
   width: 16px;

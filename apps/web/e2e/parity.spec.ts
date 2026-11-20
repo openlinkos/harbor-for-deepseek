@@ -709,7 +709,7 @@ test('thinking motion', async ({ page }) => {
   await expect(collapse).toHaveClass(/open/)
   await expect(collapse).toHaveCSS('transition-duration', /0\.2s/)
   await expect(page.getByTestId('thinking')).toContainText('reasoning')
-  await page.getByTestId('thinking').getByRole('button').click()
+  await page.getByTestId('thinking-toggle').click()
   await expect(collapse).not.toHaveClass(/open/)
 })
 
@@ -797,7 +797,7 @@ test('official states', async ({ page }) => {
   await expect(page.locator('.katex')).toBeVisible()
   await page.getByTestId('message-user').last().hover()
   await page.screenshot({ path: join(dir, 'answer-rich-thinking-expanded-user-bubble.png') })
-  await page.getByTestId('thinking').getByRole('button').click()
+  await page.getByTestId('thinking-toggle').click()
   await page.screenshot({ path: join(dir, 'answer-rich-thinking-collapsed.png') })
   await page.screenshot({ path: join(dir, 'answer-rich-table-math-code.png') })
   await page.locator('.code-card').filter({ hasText: 'const n' }).getByRole('button').first().hover()

@@ -110,6 +110,50 @@ const shortcutWindows = () => {
   return navigator.userAgent.toLowerCase().includes('windows')
 }
 
+type PopupNode = { readonly current: HTMLElement | null }
+
+/** Close a popover on an outside press, Escape, or focus leaving the trigger and popup. */
+const usePopoverDismiss = (open: boolean, onClose: () => void, anchor: PopupNode, popup: PopupNode) => {
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  useEffect(() => {
+    if (!open) return undefined
+    const contains = (node: EventTarget | null) =>
+      node instanceof Node && Boolean(anchor.current?.contains(node) || popup.current?.contains(node))
+    const onMouseDown = (event: MouseEvent) => {
+      if (contains(event.target)) return
+      onCloseRef.current()
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      event.stopPropagation()
+      onCloseRef.current()
+    }
+    let timer = 0
+    const onFocusOut = (event: FocusEvent) => {
+      if (!contains(event.target)) return
+      const next = event.relatedTarget
+      if (next instanceof Node && contains(next)) return
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        const active = document.activeElement
+        if (active instanceof Node && contains(active)) return
+        onCloseRef.current()
+      }, 0)
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    document.addEventListener('keydown', onKeyDown, true)
+    document.addEventListener('focusout', onFocusOut)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('mousedown', onMouseDown)
+      document.removeEventListener('keydown', onKeyDown, true)
+      document.removeEventListener('focusout', onFocusOut)
+    }
+  }, [open, anchor, popup])
+}
+
 const Wordmark = () => (
   <span className="wordmark">
     <span className="wordmark-name">DeepAPI</span>
@@ -154,7 +198,12 @@ const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
 }
 
 type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string; icon?: string | null }
-const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
+type SourcesApi = {
+  open: boolean
+  show: (items: SourceItem[]) => void
+  toggle: (items: SourceItem[]) => void
+}
+const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined })
 
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
@@ -282,12 +331,12 @@ export const KeyGate = () => {
               />
               <div className="composer-tools">
                 <div className="chips">
-                  <div className={think ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => setThink((value) => !value)}>
+                  <button type="button" className={think ? 'chip on' : 'chip'} aria-pressed={think} onClick={() => setThink((value) => !value)}>
                     <Icon d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2" /> {t('thinking')}
-                  </div>
-                  <div className={search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => setSearch((value) => !value)}>
+                  </button>
+                  <button type="button" className={search ? 'chip on' : 'chip'} aria-pressed={search} onClick={() => setSearch((value) => !value)}>
                     <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /> {t('search')}
-                  </div>
+                  </button>
                 </div>
                 <button className={`send ${draft.trim() ? 'ready' : ''}`} data-testid="landing-send" type="submit" aria-label={t('send')}>
                   <Icon d="M12 19V5M6 11l6-6 6 6" />
@@ -395,12 +444,13 @@ const ThemeSwitch = () => {
 
 const LANGUAGES = ['简体中文', 'English', '跟随系统', 'Afrikaans', 'አማርኛ', 'العربية', 'Azərbaycan', 'Беларуская', 'Български', 'বাংলা', 'Català', 'Čeština', 'Dansk']
 
-const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
+const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0, dismiss = false }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number; dismiss?: boolean }) => {
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [box, setBox] = useState({ top: 0, right: 0, maxHeight: 320 })
   const show = () => setOpen((value) => !value)
+  usePopoverDismiss(dismiss && open, () => setOpen(false), trigger, menuRef)
   useLayoutEffect(() => {
     if (!open) return
     const rect = trigger.current?.getBoundingClientRect()
@@ -424,7 +474,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
     <div className="pill-menu">
       <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
-        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, maxWidth: 'calc(100vw - 16px)', overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
+        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" data-testid={testId ? `${testId}-menu` : undefined} style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, maxWidth: 'calc(100vw - 16px)', overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
@@ -510,9 +560,27 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
   return null
 }
 
+const SourceMarks = ({ items }: { items: SourceItem[] }) => {
+  const t = useT()
+  const sources = useContext(SourcesPanel)
+  if (!items.length) return null
+  return (
+    <button
+      type="button"
+      className="favicons"
+      data-testid="source-favicons"
+      aria-expanded={sources.open}
+      aria-label={t('foundPages', { count: items.length })}
+      onClick={() => sources.toggle(items)}
+    >
+      {items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}
+    </button>
+  )
+}
+
 const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_search_tool_result' }> }) => {
   const t = useT()
-  const openPanel = useContext(SourcesPanel)
+  const sources = useContext(SourcesPanel)
   const results = block.content.filter((item) => item.type === 'web_search_result')
   if (!results.length) {
     return null
@@ -525,21 +593,14 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
     icon: result.site_icon,
   }))
-  const marks = (
-    <span className="favicons">
-      {results.slice(0, SOURCE_MARKS).map((result) => (
-        <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
-      ))}
-    </span>
-  )
   return (
     <div className="search-block">
       <p className="found-line">
         <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
         {t('foundPages', { count: results.length })}
-        {marks}
+        <SourceMarks items={items} />
       </p>
-      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
+      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sources.show(items)}>
         <span className="favicons">
           {results.slice(0, SOURCE_MARKS).map((result) => (
             <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
@@ -590,7 +651,7 @@ const hostOf = (url: string) => {
 
 const AssistantTurn = ({ message }: { message: Message }) => {
   const t = useT()
-  const openPanel = useContext(SourcesPanel)
+  const sourcesApi = useContext(SourcesPanel)
   const streaming = useHarbor((state) => state.streaming)
   const started = useRef(Date.now())
   const [open, setOpen] = useState(true)
@@ -652,7 +713,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     <>
       {steps.length ? (
         <section className="thinking" data-testid="thinking">
-          <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+          <button type="button" data-testid="thinking-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
             <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
             {t('thoughtFor', { seconds })}
             <span className={`chev ${open ? 'open' : ''}`}><Icon d="M9 6l6 6-6 6" /></span>
@@ -665,7 +726,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
                 <p key={index} className="timeline-step found-line">
                   <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
                   {t('foundPages', { count: step.items.length })}
-                  <span className="favicons">{step.items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
+                  <SourceMarks items={step.items} />
                 </p>
               ) : (
                 <p key={index} className="timeline-step found-line browse-line">
@@ -692,7 +753,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         )
       })}
       {sources.length ? (
-        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
+        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sourcesApi.show(sources)}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
           {t('pagesPill', { count: sources.length })}
         </button>
@@ -977,9 +1038,14 @@ export const Shell = () => {
   const who = serverName || profile.nickname || t('product')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
+  const sourcesApi = useMemo<SourcesApi>(() => ({
+    open: panel !== null,
+    show: (items) => setPanel(items),
+    toggle: (items) => setPanel((current) => (current ? null : items)),
+  }), [panel])
 
   return (
-    <SourcesPanel.Provider value={setPanel}>
+    <SourcesPanel.Provider value={sourcesApi}>
     <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
@@ -1227,6 +1293,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
   const [title, setTitle] = useState(conversation.title)
   const [menuBox, setMenuBox] = useState({ top: 0, left: 0 })
   const [confirming, setConfirming] = useState(false)
+  const moreRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  usePopoverDismiss(open, () => setOpen(false), moreRef, menuRef)
   return (
     <a
       className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`}
@@ -1259,7 +1328,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       ) : (
         <button type="button">{conversation.title || t('newChat')}</button>
       )}
-      {picking ? null : <button className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
+      {picking ? null : <button ref={moreRef} className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
         setMenuBox({ top: rect.bottom + 4, left: rect.left - 5 })
         setOpen((value) => !value)
@@ -1268,7 +1337,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti }: { 
       {open ? createPortal(
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
-        <div className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
+        <div ref={menuRef} className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" data-testid="chat-item-menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
           <div role="menuitem" tabIndex={0} onClick={() => { setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => {
@@ -1424,15 +1493,15 @@ const Composer = () => {
       <div className="composer-tools">
         <div className="chips" ref={chips}>
           <span className="chip-wrap">
-            <div data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+            <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
               <Glyph name="thinking" size={14} />
               <span className="chip-label">{t('thinking')}</span>
-            </div>
+            </button>
           </span>
-          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ search: !prefs.search })}>
+          <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
-          </div>
+          </button>
         </div>
         <div className="tool-right">
           <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
@@ -1528,6 +1597,7 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('language')}</span>
             <AnchoredMenu
+              dismiss
               testId="language-trigger"
               menuClass="lang-menu"
               label={settings.locale === 'en' ? 'English' : '简体中文'}
@@ -1564,6 +1634,7 @@ const Settings = () => {
           <div className="settings-line">
             <span>{t('safety')}</span>
             <AnchoredMenu
+              dismiss
               testId="safety-select"
               label={settings.safetyLevel === 'low' ? t('safetyLow') : t('safetyHigh')}
               selected={settings.safetyLevel === 'low' ? t('safetyLow') : t('safetyHigh')}
