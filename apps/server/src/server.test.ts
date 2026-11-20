@@ -45,6 +45,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
   let upstream: string
   const seen: string[] = []
   let fileBody = ''
+  let releaseHold: (() => void) | null = null
 
   beforeAll(async () => {
     mock = createServer(async (request, response) => {
@@ -87,6 +88,11 @@ describe.skipIf(!postgresReady)('harbor server', () => {
         }
         if (key.includes('slow-stream')) {
           await new Promise((resolve) => setTimeout(resolve, 90))
+        }
+        if (key.includes('hold-stream')) {
+          await new Promise<void>((resolve) => {
+            releaseHold = resolve
+          })
         }
         if (key.includes('fail-chat')) {
           response.writeHead(401, { 'content-type': 'application/json' })
@@ -150,6 +156,8 @@ describe.skipIf(!postgresReady)('harbor server', () => {
   beforeEach(async () => {
     seen.length = 0
     fileBody = ''
+    releaseHold?.()
+    releaseHold = null
     await harbor.sql`
       truncate table
         run_events, chat_runs, usage_events, usage_daily, alerts, balance_snapshots,
@@ -295,6 +303,46 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     const tail = await replay.text()
     expect(tail).toContain('message_stop')
     expect(tail.startsWith('id: 1\n')).toBe(false)
+  })
+
+  it('reports a live run while the upstream stream is still open', async () => {
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    const headers = { 'content-type': 'application/json', ...authed(session, created.csrf, true) }
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ secret: 'hold-stream-key', accountGroup: 'hold' }),
+    })
+    await harbor.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'live-chat' }),
+    })
+    const run = await harbor.app.request('/api/conversations/live-chat/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text: 'hello' }),
+    })
+    const started = (await run.json()) as { runId: string; assistantMessageId: string }
+    const during = await harbor.app.request('/api/conversations/live-chat/messages', { headers: authed(session, created.csrf) })
+    const open = (await during.json()) as { liveRun: { id: string; messageId: string } | null; messages: Array<{ id: string; status: string }> }
+    expect(open.liveRun).toEqual({ id: started.runId, messageId: started.assistantMessageId })
+    expect(open.messages.find((item) => item.id === started.assistantMessageId)?.status).toBe('streaming')
+    for (let i = 0; i < 50 && !releaseHold; i += 1) await new Promise((resolve) => setTimeout(resolve, 20))
+    releaseHold?.()
+    releaseHold = null
+    const events = await harbor.app.request(`/api/runs/${started.runId}/events`, { headers: authed(session, created.csrf) })
+    expect(await events.text()).toContain('"status":"complete"')
+    const after = await harbor.app.request('/api/conversations/live-chat/messages', { headers: authed(session, created.csrf) })
+    const done = (await after.json()) as { liveRun: { id: string } | null; messages: Array<{ status: string }> }
+    expect(done.liveRun).toBeNull()
+    expect(done.messages.some((item) => item.status === 'streaming')).toBe(false)
   })
 
   it('does not write to a closed run stream after the ping interval', async () => {

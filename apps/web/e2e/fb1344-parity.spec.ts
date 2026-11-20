@@ -249,7 +249,118 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         return rows.some((row) => row.status === 'streaming' && JSON.stringify(row.blocks).includes(String(snippet)))
       }, '用户想知道今天上海的天气')
       await page.reload()
-      await liveHead()
+      // Local refresh kills the fetch. A streaming row left in IndexedDB is the stopped state.
+      await expect(head(page)).toHaveText('已停止')
+      await expect(page.getByTestId('thinking').last()).toHaveAttribute('data-phase', 'stopped')
+      expect(await shimmer(page)).toEqual([])
+      await expect(page.getByTestId('continue')).toHaveText('继续生成')
+      await expect(page.getByTestId('thinking')).toContainText('用户想知道今天上海的天气')
+      await noDone()
+    })
+    test('phase-tool-titles', async ({ page }) => {
+      const fetchResult = (id: string, index: number) => [{ type: 'content_block_start', index, content_block: { type: 'web_fetch_tool_result', tool_use_id: id, content: { type: 'web_fetch_result', url: RESULTS[0].url, content: { title: '上海' } } } }, { type: 'content_block_stop', index }]
+      await staged(page)
+      await push(page, PH.thinking)
+      await push(page, PH.searching)
+      await expect(head(page)).toHaveText(K.phaseTitles.searching)
+      await push(page, [PH.browsing[0], PH.browsing[1]])
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await push(page, [PH.browsing[2], PH.browsing[3]])
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await push(page, fetchResult('f0', 8))
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      await push(page, [{ type: 'content_block_start', index: 9, content_block: { type: 'server_tool_use', id: 'g0', name: 'deepseek_web_fetch', input: { action: 'find_in_page', url: RESULTS[0].url, pattern: '气温' } } }, { type: 'content_block_stop', index: 9 }])
+      await expect(head(page)).toHaveText(K.phaseTitles.browsing)
+      await expect(head(page)).not.toHaveText('正在查找')
+      await push(page, fetchResult('g0', 10))
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+    })
+    test('phase-shimmer-sweep', async ({ page }) => {
+      await staged(page)
+      await push(page, PH.thinking)
+      await expect(head(page)).toHaveText(K.phaseTitles.thinking)
+      const frames = await head(page).locator('.phase-shimmer-sweep').evaluate((node) => {
+        const title = (node.parentElement ?? node).getBoundingClientRect()
+        const anim = node.getAnimations().find((item) => item instanceof CSSAnimation)
+        const points = [0, 0.45, 0.9]
+        return points.map((p) => {
+          if (anim) anim.currentTime = p * 2000
+          const sweep = node.getBoundingClientRect()
+          const bar = node.querySelector('.phase-shimmer-bar')?.getBoundingClientRect()
+          const matrix = new DOMMatrix(getComputedStyle(node).transform)
+          return {
+            p,
+            tx: matrix.m41,
+            sweep: sweep.width,
+            barLeft: bar?.left ?? 0,
+            barRight: bar?.right ?? 0,
+            titleLeft: title.left,
+            titleRight: title.right,
+          }
+        })
+      })
+      expect(frames).toHaveLength(3)
+      expect(Math.abs(frames[0].sweep - 136)).toBeLessThanOrEqual(1)
+      expect(Math.abs(frames[0].tx + 136)).toBeLessThanOrEqual(1)
+      expect(Math.abs(frames[2].tx - 136)).toBeLessThanOrEqual(1)
+      expect(frames[0].barRight).toBeLessThanOrEqual(frames[0].titleLeft + 1)
+      expect(frames[2].barLeft).toBeGreaterThanOrEqual(frames[2].titleRight - 1)
+    })
+    test('phase-persist', async ({ page }) => {
+      await page.addInitScript(() => {
+        const orig = IDBObjectStore.prototype.put
+        const bag = { n: 0 }
+        ;(window as unknown as { __msgPuts: { n: number } }).__msgPuts = bag
+        IDBObjectStore.prototype.put = function (this: IDBObjectStore, ...args: unknown[]) {
+          if (this.name === 'messages') bag.n += 1
+          return orig.apply(this, args as never)
+        }
+      })
+      await staged(page)
+      await push(page, PH.thinking)
+      await page.waitForTimeout(250)
+      const base = await page.evaluate(() => (window as unknown as { __msgPuts: { n: number } }).__msgPuts.n)
+      const deltas = Array.from({ length: 24 }, (_, i) => ({ type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: `第${i}句。` } }))
+      await push(page, deltas)
+      await page.waitForTimeout(40)
+      const burst = await page.evaluate(() => (window as unknown as { __msgPuts: { n: number } }).__msgPuts.n) - base
+      expect(burst).toBeLessThanOrEqual(3)
+      const wroteAt = Date.now()
+      await expect.poll(async () => page.evaluate(async () => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('deepapi')
+          request.onsuccess = () => resolve(request.result)
+          request.onerror = () => reject(request.error)
+        })
+        const rows = await new Promise<unknown[]>((resolve) => {
+          const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+          request.onsuccess = () => resolve(request.result as unknown[])
+        })
+        db.close()
+        return JSON.stringify(rows).includes('第23句')
+      }), { timeout: 700 }).toBe(true)
+      expect(Date.now() - wroteAt).toBeLessThan(500)
+      const landed = await page.evaluate(async () => {
+        const start = performance.now()
+        ;(document.querySelector('[data-testid=stop]') as HTMLButtonElement).click()
+        while (performance.now() - start < 180) {
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open('deepapi')
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
+          })
+          const rows = await new Promise<Array<{ status: string }>>((resolve) => {
+            const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+            request.onsuccess = () => resolve(request.result as Array<{ status: string }>)
+          })
+          db.close()
+          if (rows.some((row) => row.status === 'aborted')) return performance.now() - start
+          await new Promise((resolve) => setTimeout(resolve, 15))
+        }
+        return -1
+      })
+      expect(landed).toBeGreaterThanOrEqual(0)
+      expect(landed).toBeLessThan(180)
     })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')

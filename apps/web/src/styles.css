@@ -724,39 +724,41 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
 .thinking .chev { display: inline-flex; }
 .phase-label { color: var(--dsw-alias-label-secondary); }
+/* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
+  height: 100%;
   display: inline-block;
   position: relative;
   overflow: hidden;
 }
 .phase-shimmer-sweep {
+  width: fit-content;
+  pointer-events: none;
+  --shimmer-direction: 1;
+  height: 100%;
+  animation: _5a7d2fc 2s ease-out infinite;
+  display: flex;
   position: absolute;
   top: 0;
   left: 0;
+}
+[dir='rtl'] .phase-shimmer-sweep { --shimmer-direction: -1; left: auto; right: 0; }
+.phase-shimmer-bar {
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.7) 54.51%, rgba(255, 255, 255, 0) 109.02%);
+  flex-shrink: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  animation: _5a7d2fc 2s ease-out infinite;
+  display: inline-block;
 }
-.phase-shimmer-bar {
-  display: block;
-  width: 120px;
-  height: 100%;
-  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.7) 54.51%, rgba(255, 255, 255, 0) 109.02%);
-}
+[dir='rtl'] .phase-shimmer-bar { transform: scaleX(-1); }
+.phase-shimmer-ghost { opacity: 0; flex-shrink: 0; }
 body[data-ds-dark-theme] .phase-shimmer-bar {
   background-image: linear-gradient(90deg, rgba(21, 21, 23, 0) 0%, rgba(21, 21, 23, 0.5) 54.51%, rgba(21, 21, 23, 0) 109.02%);
 }
 @keyframes _5a7d2fc {
-  0% { transform: translateX(-100%); }
-  90%, 100% { transform: translateX(100%); }
+  0% { transform: translateX(calc(var(--shimmer-direction) * -100%)); }
+  90%, 100% { transform: translateX(calc(var(--shimmer-direction) * 100%)); }
 }
-@keyframes _5a7d2fc-rtl {
-  0% { transform: translateX(100%); }
-  90%, 100% { transform: translateX(-100%); }
-}
-[dir='rtl'] .phase-shimmer-sweep { animation-name: _5a7d2fc-rtl; }
-[dir='rtl'] .phase-shimmer-bar { transform: scaleX(-1); }
 .reply-dots { display: flex; align-items: center; gap: 6px; height: 24px; margin: 2px 0 8px; }
 .reply-dots i {
   width: 6px;
@@ -2606,7 +2608,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   pointer-events: none;
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
-  z-index: 5;
+  z-index: 20;
 }
 .ds-tooltip.ds-tooltip--s.is-open {
   opacity: 1;

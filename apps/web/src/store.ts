@@ -51,6 +51,21 @@ const withLive = (conversationId: string | null, messages: Message[]): Message[]
   return [...messages, next]
 }
 
+/** A local refresh has no fetch left. Persisted "streaming" rows are the stopped state. */
+const stopOrphanStreams = async (store: Repository, rows: Message[]): Promise<Message[]> => {
+  const next: Message[] = []
+  for (const row of rows) {
+    if (row.role === 'assistant' && row.status === 'streaming' && liveTurn?.message.id !== row.id) {
+      const stopped: Message = { ...row, status: 'aborted', updatedAt: nowIso() }
+      await store.saveMessage(stopped)
+      next.push(stopped)
+    } else {
+      next.push(row)
+    }
+  }
+  return next
+}
+
 export type ServerQuota = {
   tokenUsed: number
   tokenQuota: number
@@ -306,7 +321,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         usages.push(row.usage)
       }
       if (conversation.id === activeId) {
-        messages = withLive(activeId, rows)
+        messages = withLive(activeId, await stopOrphanStreams(store, rows))
       }
     }
     let key: string | null = previousKey
@@ -434,7 +449,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async openChat(id) {
     if (get().serverMode) {
-      const data = await api<{ messages: Message[] }>(`/api/conversations/${id}/messages`)
+      const data = await api<{ messages: Message[]; liveRun?: { id: string; messageId: string } | null }>(`/api/conversations/${id}/messages`)
       const conversation = get().conversations.find((item) => item.id === id)
       set({
         activeId: id,
@@ -443,10 +458,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
         drafts: [],
         prefs: prefsFor(conversation, get().prefs),
       })
+      if (data.liveRun && serverRunId !== data.liveRun.id) void followServerRun(data.liveRun.id, data.liveRun.messageId)
       return
     }
     const store = await repository()
-    const messages = withLive(id, await store.listMessages(id))
+    const messages = withLive(id, await stopOrphanStreams(store, await store.listMessages(id)))
     const conversation = get().conversations.find((item) => item.id === id)
     set({
       activeId: id,
@@ -1037,16 +1053,16 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   abort = new AbortController()
   let draft = createDraft()
   const clock = createThinkingClock()
-  let persistChain = Promise.resolve()
   const publish = (patch: Partial<Message>) => {
     const next = { ...assistant, ...patch, updatedAt: nowIso() }
     Object.assign(assistant, next)
     rememberLive(assistant)
-    const snapshot = structuredClone(assistant)
-    persistChain = persistChain.then(() => store.saveMessage(snapshot)).catch(() => undefined)
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) => (item.id === assistant.id ? { ...assistant } : item)),
     })
+  }
+  const persist = () => {
+    void store.saveMessage(structuredClone(assistant))
   }
   try {
     for await (const event of client.streamMessage(key, body, abort.signal)) {
@@ -1066,6 +1082,8 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         usage: draft.usage,
         thinkingSeconds: clock.seconds(),
       })
+      window.clearTimeout(persistTimer)
+      persistTimer = window.setTimeout(persist, 200)
     }
     if (draft.stopReason === 'refusal') {
       publish({ status: 'refused', blocks: [], usage: draft.usage, errorMessage: null, thinkingSeconds: clock.seconds() })
@@ -1083,7 +1101,6 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     })
   } finally {
     window.clearTimeout(persistTimer)
-    await persistChain
     await store.saveMessage({ ...assistant })
     clearLive(assistant.id)
     abort = null
@@ -1109,7 +1126,7 @@ const reloadLocal = async (set: Setter) => {
   const store = await repository()
   const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const activeId = conversations[0]?.id ?? null
-  const messages = activeId ? withLive(activeId, await store.listMessages(activeId)) : []
+  const messages = activeId ? withLive(activeId, await stopOrphanStreams(store, await store.listMessages(activeId))) : []
   set({ conversations, activeId, messages, serverMode: false })
 }
 
@@ -1122,9 +1139,12 @@ const loadServerChats = async (set: Setter) => {
   const conversations = [...sync.conversations].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const previous = useHarbor.getState().activeId
   const activeId = conversations.some((item) => item.id === previous) ? previous : (conversations[0]?.id ?? null)
-  const messages = activeId ? (await api<{ messages: Message[] }>(`/api/conversations/${activeId}/messages`)).messages : []
+  const loaded = activeId
+    ? await api<{ messages: Message[]; liveRun?: { id: string; messageId: string } | null }>(`/api/conversations/${activeId}/messages`)
+    : { messages: [] as Message[], liveRun: null }
   const usages = sync.messages.map((message) => message.usage)
-  set({ conversations, activeId, messages, totals: sumUsage(usages), serverMode: true })
+  set({ conversations, activeId, messages: loaded.messages, totals: sumUsage(usages), serverMode: true })
+  if (loaded.liveRun && serverRunId !== loaded.liveRun.id) void followServerRun(loaded.liveRun.id, loaded.liveRun.messageId)
 }
 
 const probeHost = async (set: Setter, get: () => HarborState) => {
@@ -1146,6 +1166,71 @@ const probeHost = async (set: Setter, get: () => HarborState) => {
     set({ serverUser: null, serverMode: false })
   }
   void get
+}
+
+const followServerRun = async (runId: string, assistantId: string) => {
+  if (serverRunId === runId && serverAbort) return
+  serverRunId = runId
+  serverAbort = new AbortController()
+  useHarbor.setState({ streaming: true })
+  let draft = createDraft()
+  const clock = createThinkingClock()
+  const publish = (patch: Partial<Message>) => {
+    useHarbor.setState({
+      messages: useHarbor.getState().messages.map((item) => (item.id === assistantId ? { ...item, ...patch } : item)),
+    })
+    const current = useHarbor.getState().messages.find((item) => item.id === assistantId)
+    if (current) rememberLive(current)
+  }
+  try {
+    const ended = await readRun(
+      runId,
+      (event) => {
+        draft = reduceEvent(draft, event)
+        clock.onEvent(event, draft.blocks)
+        if (event.type === 'message_delta' && event.delta.title) {
+          const title = event.delta.title
+          const conversationId = useHarbor.getState().messages.find((item) => item.id === assistantId)?.conversationId
+          useHarbor.setState({
+            conversations: useHarbor.getState().conversations.map((item) =>
+              item.id === conversationId && item.titleSource !== 'user' ? { ...item, title, titleSource: 'auto' } : item,
+            ),
+          })
+        }
+        publish({
+          status: 'streaming',
+          blocks: draft.blocks.filter(Boolean),
+          usage: draft.usage,
+          thinkingSeconds: clock.seconds(),
+        })
+      },
+      serverAbort.signal,
+    )
+    const aborted = serverAbort.signal.aborted || ended === 'aborted'
+    const status = draft.stopReason === 'refusal' ? 'refused' : aborted ? 'aborted' : ended === 'error' ? 'error' : 'complete'
+    publish({
+      status,
+      blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
+      usage: draft.usage,
+      thinkingSeconds: clock.seconds(),
+      errorMessage: status === 'error' ? 'interrupted' : null,
+    })
+  } catch (error) {
+    const aborted = serverAbort?.signal.aborted
+    publish({
+      status: aborted ? 'aborted' : 'error',
+      errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
+      blocks: draft.blocks.filter(Boolean),
+      thinkingSeconds: clock.seconds(),
+    })
+  } finally {
+    if (serverRunId === runId) {
+      serverAbort = null
+      serverRunId = null
+    }
+    clearLive(assistantId)
+    useHarbor.setState({ streaming: false })
+  }
 }
 
 const runServerTurn = async (text: string, regenerateParent: string | null) => {
@@ -1286,13 +1371,14 @@ const runServerTurn = async (text: string, regenerateParent: string | null) => {
       ),
     })
   } catch (error) {
+    const aborted = serverAbort?.signal.aborted
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) =>
         item.id === assistant.id
           ? {
               ...item,
-              status: 'error',
-              errorMessage: error instanceof Error ? error.message : 'error',
+              status: aborted ? 'aborted' : 'error',
+              errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
               blocks: draft.blocks.filter(Boolean),
               thinkingSeconds: clock.seconds(),
             }

@@ -826,23 +826,33 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
   )
 }
 
-const PhaseTitle = ({ text, live }: { text: string; live: boolean }) =>
-  live ? (
+const PhaseTitle = ({ text, live }: { text: string; live: boolean }) => {
+  const ghost = useRef<HTMLSpanElement>(null)
+  const ghostRoot = useRef<ShadowRoot | null>(null)
+  useLayoutEffect(() => {
+    const host = ghost.current
+    if (!host) return
+    // Closed shadow keeps the sizing copy out of the button's text (Playwright toHaveText
+    // pierces open shadow). Layout still matches the official opacity-0 copy.
+    if (!ghostRoot.current || ghostRoot.current.host !== host) ghostRoot.current = host.attachShadow({ mode: 'closed' })
+    ghostRoot.current.textContent = text
+  }, [text])
+  if (!live) return <span className="phase-label">{text}</span>
+  return (
     <span className="phase-label phase-shimmer">
       {text}
       <span className="phase-shimmer-sweep" aria-hidden="true">
-        <span className="phase-shimmer-bar" />
+        <span className="phase-shimmer-bar" style={{ width: 120 }} />
+        <span className="phase-shimmer-ghost" ref={ghost} />
       </span>
     </span>
-  ) : (
-    <span className="phase-label">{text}</span>
   )
+}
 
 const phaseLabel = (phase: ThinkPhase, seconds: number, t: ReturnType<typeof useT>) => {
   if (phase === 'stopped') return t('stopped')
   if (phase === 'searching') return t('phaseSearching')
   if (phase === 'browsing') return t('phaseBrowsing')
-  if (phase === 'finding') return t('phaseFinding')
   if (phase === 'thinking' || phase === 'pending') return t('phaseThinking')
   return t('thoughtFor', { seconds })
 }

@@ -2,7 +2,11 @@
 // content-visibility: auto 会裁掉非最后一条回合里溢出的绝对定位层。
 // getBoundingClientRect 看不出来，所以用 elementFromPoint 和页面截图的墨迹。
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { inflateSync } from 'node:zlib'
+const SSE = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'lib/fb1344-sse.js'), 'utf8')
 
 const sse = (events: unknown[]) => events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')
 const reply = (text: string) => sse([
@@ -249,6 +253,35 @@ for (const theme of ['light', 'dark'] as const) {
         await page.keyboard.press('Escape')
         await page.getByTestId('settings-close').click()
         await expect(page.getByTestId('settings-dialog')).toBeHidden()
+      })
+
+      test('stop button tooltip is painted', async ({ page }) => {
+        await page.addInitScript(SSE)
+        await page.addInitScript((value) => localStorage.setItem('deepapi-theme', value), theme)
+        await page.route('https://api.deepseek.com/**', async (route) => {
+          const url = route.request().url()
+          if (url.endsWith('/user/balance')) return route.fulfill({ json: { is_available: true, balance_infos: [{ currency: 'CNY', total_balance: '1', granted_balance: '0', topped_up_balance: '1' }] } })
+          if (url.endsWith('/models')) return route.fulfill({ json: { data: [{ id: 'deepseek-flash' }] } })
+          if (!url.includes('/messages')) return route.fulfill({ status: 404, json: {} })
+          return route.fulfill({ status: 200, contentType: 'text/event-stream', body: '' })
+        })
+        await page.goto('/')
+        await page.getByTestId('landing-send').click()
+        await page.getByTestId('key-input').fill('demo-local-key')
+        await page.getByTestId('key-save').click()
+        await expect(page.getByTestId('composer')).toBeVisible()
+        await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
+        await page.getByTestId('composer').fill('停一下')
+        await page.getByTestId('send').click()
+        await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 0)
+        await page.evaluate((events) => (window as unknown as { __sse: { push: (e: unknown[]) => void } }).__sse.push(events), [
+          { type: 'message_start', message: { id: 'r', model: 'deepseek-flash' } },
+          { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
+          { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '先想一句。' } },
+        ])
+        const stop = page.getByTestId('stop')
+        await expect(stop).toHaveAttribute('data-tip', '停止生成')
+        await hoverTip(page, stop, '停止生成', '停止生成 tooltip')
       })
     })
   }

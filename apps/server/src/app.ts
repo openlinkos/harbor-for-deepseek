@@ -140,6 +140,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       log('info', 'created admin from environment', { username: admin.username })
     }
   }
+  await sql`update messages set status = 'aborted', updated_at = now() where status = 'streaming'`
   await sql`update chat_runs set status = 'aborted', finished_at = now(), error = 'restarted' where status = 'streaming'`
   const buckets = new Map<string, number[]>()
   const hitLimit = (bucket: string, max: number, windowMs: number): boolean => {
@@ -918,12 +919,29 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (user instanceof Response) {
       return user
     }
-    const rows = await sql`
+    const id = c.req.param('id')
+    const rows = await sql<Record<string, unknown>[]>`
       select * from messages
-      where conversation_id = ${c.req.param('id')} and user_id = ${user.id} and deleted_at is null
+      where conversation_id = ${id} and user_id = ${user.id} and deleted_at is null
       order by created_at asc
     `
-    return c.json({ messages: rows.map((row) => mapMessage(row)) })
+    const live = await sql<{ id: string; message_id: string }[]>`
+      select id, message_id from chat_runs
+      where conversation_id = ${id} and user_id = ${user.id} and status = 'streaming'
+      order by started_at desc
+      limit 1
+    `
+    const liveId = live[0]?.message_id ?? null
+    for (const row of rows) {
+      if (row.status === 'streaming' && row.id !== liveId) {
+        await sql`update messages set status = 'aborted', updated_at = now() where id = ${String(row.id)}`
+        row.status = 'aborted'
+      }
+    }
+    return c.json({
+      messages: rows.map((row) => mapMessage(row)),
+      liveRun: live[0] ? { id: live[0].id, messageId: live[0].message_id } : null,
+    })
   })
 
   const appendEvent = async (runId: string, payload: unknown) => {
