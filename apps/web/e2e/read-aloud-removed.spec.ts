@@ -67,6 +67,9 @@ const closeSettings = async (page: Page) => {
 
 const generalRows = async (page: Page) => page.locator('.settings-general .settings-line').evaluateAll((nodes) => nodes.map((node) => {
   const style = getComputedStyle(node)
+  const rowBox = node.getBoundingClientRect()
+  const buttons = [...node.querySelectorAll('button')].map((button) => button.getBoundingClientRect()).filter((box) => box.height > 0)
+  const content = buttons.length ? Math.max(...buttons.map((box) => box.bottom)) - Math.min(...buttons.map((box) => box.top)) : 0
   return {
     label: node.querySelector('span')?.textContent ?? '',
     height: style.height,
@@ -74,6 +77,8 @@ const generalRows = async (page: Page) => page.locator('.settings-general .setti
     paddingBottom: style.paddingBottom,
     borderTopWidth: style.borderTopWidth,
     boxShadow: style.boxShadow,
+    buttonsInside: buttons.every((box) => box.top >= rowBox.top - 0.5 && box.bottom <= rowBox.bottom + 0.5),
+    contentHeight: content + 24,
   }
 }))
 
@@ -130,7 +135,11 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
       expect(labels).not.toContain('模型')
       expect(labels).not.toContain('思考强度')
       for (const [index, row] of rows.entries()) {
-        expect(row.height).toBe('60px')
+        if (row.label === '界面包') {
+          expect(row.buttonsInside, row.label).toBe(true)
+          expect(Math.abs(Number.parseFloat(row.height) - row.contentHeight), row.label).toBeLessThanOrEqual(1)
+          expect(Number.parseFloat(row.height), row.label).toBeGreaterThan(60)
+        } else expect(row.height).toBe('60px')
         expect(row.paddingTop).toBe('12px')
         expect(row.paddingBottom).toBe('12px')
         expect(row.borderTopWidth).toBe('0px')

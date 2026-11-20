@@ -98,7 +98,8 @@ const assertOfficialRows = async (page: Page) => {
       }
     })
     expect(box.display, label).toBe('flex')
-    expect(box.height, label).toBe('60px')
+    if (label === '界面包') expect(Number.parseFloat(box.height), label).toBeGreaterThan(60)
+    else expect(box.height, label).toBe('60px')
     expect(box.fontSize, label).toBe('14px')
     expect(box.fontWeight, label).toBe('400')
     expect(box.lineHeight, label).toBe('22px')
