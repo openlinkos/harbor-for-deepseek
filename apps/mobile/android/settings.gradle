@@ -1,3 +1,49 @@
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+
+// Gradle fails the build when a repository returns HTTP 429 and does not try
+// repositories listed after it. Keep google() first, then this public Maven
+// Central mirror, and only then repo.maven.apache.org. Capacitor modules declare
+// their own google()/mavenCentral() blocks; this hook inserts the mirror in
+// front of Maven Central for every buildscript and project repository handler.
+def mavenCentralMirrorUrl = 'https://maven-central.storage-download.googleapis.com/maven2/'
+def mavenCentralUrl = 'https://repo.maven.apache.org/maven2/'
+
+def preferMavenCentralMirror = { repos ->
+    def reordering = false
+    repos.whenObjectAdded { repo ->
+        if (reordering || !(repo instanceof MavenArtifactRepository)) {
+            return
+        }
+        def url = repo.url?.toString() ?: ''
+        def canonicalCentral = url.startsWith('https://repo.maven.apache.org/maven2') || url.startsWith('https://repo1.maven.org/maven2')
+        if (!canonicalCentral) {
+            return
+        }
+        def mirrorAlready = repos.any { existing ->
+            existing instanceof MavenArtifactRepository && existing.url?.toString()?.startsWith(mavenCentralMirrorUrl)
+        }
+        if (mirrorAlready) {
+            return
+        }
+        reordering = true
+        repos.remove(repo)
+        repos.maven { MavenArtifactRepository created ->
+            created.name = 'MavenCentralMirror'
+            created.setUrl(mavenCentralMirrorUrl)
+        }
+        repos.maven { MavenArtifactRepository created ->
+            created.name = 'MavenCentral'
+            created.setUrl(mavenCentralUrl)
+        }
+        reordering = false
+    }
+}
+
+gradle.allprojects { project ->
+    preferMavenCentralMirror(project.buildscript.repositories)
+    preferMavenCentralMirror(project.repositories)
+}
+
 include ':app'
 include ':capacitor-cordova-android-plugins'
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')

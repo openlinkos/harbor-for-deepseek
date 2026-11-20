@@ -110,10 +110,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - name: Assert Gradle cache and dependency retries stay enabled
+        run: node scripts/assert-android-ci.mjs
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
       - name: Use the preinstalled Android SDK
         run: |
           sdk="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
@@ -130,6 +133,8 @@ jobs:
       - run: pnpm build
       - run: node scripts/prepare-mobile.mjs --lan
       - run: pnpm --filter @deepapi/mobile exec cap sync android
+      - name: Resolve Android dependencies
+        run: bash scripts/android-gradle-retry.sh
       - name: Assemble a debug APK
         working-directory: apps/mobile/android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
