@@ -120,16 +120,17 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
       await page.getByRole('button', { name: theme }).click()
       await expect(page.getByRole('button', { name: theme })).toHaveClass(/on/)
       const rows = await generalRows(page)
-      expect(rows.map((row) => row.label)).toEqual([
+      const labels = rows.map((row) => row.label)
+      expect(labels).toEqual([
         '语言',
         '界面包',
-        '模型',
-        '思考强度',
         '安全审核',
         '打开网页',
         '上传文件过期（天）',
         'PDF / Office 解析',
       ])
+      expect(labels).not.toContain('模型')
+      expect(labels).not.toContain('思考强度')
       for (const [index, row] of rows.entries()) {
         expect(row.height).toBe('60px')
         expect(row.paddingTop).toBe('12px')

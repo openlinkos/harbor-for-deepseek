@@ -9,7 +9,7 @@ import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
-import { useHarbor, type HarborState } from './store.js'
+import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 
@@ -105,11 +105,9 @@ const focusComposer = () => {
   })
 }
 
-const shortcutHint = () => {
-  if (typeof navigator === 'undefined') return 'Ctrl J'
-  const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
-  const platform = `${nav.userAgentData?.platform || ''} ${nav.platform || ''} ${nav.userAgent || ''}`
-  return /mac|iphone|ipad|ipod/i.test(platform) ? '⌘ J' : 'Ctrl J'
+const shortcutWindows = () => {
+  if (typeof navigator === 'undefined') return false
+  return navigator.userAgent.toLowerCase().includes('windows')
 }
 
 const Wordmark = () => (
@@ -118,11 +116,44 @@ const Wordmark = () => (
   </span>
 )
 
-const Favicon = ({ label }: { label: string }) => (
-  <i className="favicon" aria-hidden="true">{(label.trim().slice(0, 1) || '?').toUpperCase()}</i>
-)
+/** Official chat shows the first four site logos on a source strip. */
+const SOURCE_MARKS = 4
 
-type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string }
+const siteIconSrc = (icon?: string | null) => (typeof icon === 'string' ? icon.trim() : '')
+
+const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
+  const src = siteIconSrc(icon)
+  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
+  const [failed, setFailed] = useState(false)
+  const [ready, setReady] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
+  useEffect(() => {
+    setFailed(false)
+    setReady(false)
+  }, [src])
+  useEffect(() => {
+    const img = imgRef.current
+    if (!img || !src || failed) return
+    if (img.complete && img.naturalWidth > 0) setReady(true)
+  }, [src, failed])
+  if (!src || failed) {
+    return <i className="favicon" aria-hidden="true">{letter}</i>
+  }
+  return (
+    <i className="favicon" aria-hidden="true">
+      <img
+        ref={imgRef}
+        src={src}
+        alt=""
+        className={ready ? 'on' : ''}
+        onLoad={() => setReady(true)}
+        onError={() => setFailed(true)}
+      />
+    </i>
+  )
+}
+
+type SourceItem = { url: string; title: string; snippet: string; site: string; date?: string; icon?: string | null }
 const SourcesPanel = createContext<(items: SourceItem[]) => void>(() => undefined)
 
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
@@ -492,11 +523,12 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
     snippet: result.snippet ?? '',
     site: result.site_name || result.url,
     date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
+    icon: result.site_icon,
   }))
   const marks = (
     <span className="favicons">
-      {results.slice(0, 3).map((result) => (
-        <Favicon key={result.url} label={result.site_name || result.title} />
+      {results.slice(0, SOURCE_MARKS).map((result) => (
+        <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
       ))}
     </span>
   )
@@ -509,8 +541,8 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
       </p>
       <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(items)}>
         <span className="favicons">
-          {results.slice(0, 3).map((result) => (
-            <Favicon key={result.url} label={result.site_name || result.title} />
+          {results.slice(0, SOURCE_MARKS).map((result) => (
+            <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
           ))}
         </span>
         {t('pagesPill', { count: results.length })}
@@ -597,6 +629,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         snippet: result.snippet ?? '',
         site: result.site_name || result.url,
         date: result.page_age ? result.page_age.slice(0, 10).replace(/-/g, '/') : undefined,
+        icon: result.site_icon,
       }))
       sources.push(...items)
       if (items.length) steps.push({ type: 'search', items })
@@ -632,7 +665,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
                 <p key={index} className="timeline-step found-line">
                   <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
                   {t('foundPages', { count: step.items.length })}
-                  <span className="favicons">{step.items.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+                  <span className="favicons">{step.items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
                 </p>
               ) : (
                 <p key={index} className="timeline-step found-line browse-line">
@@ -657,7 +690,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       ))}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => openPanel(sources)}>
-          <span className="favicons">{sources.slice(0, 3).map((item) => <Favicon key={item.url} label={item.site} />)}</span>
+          <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
           {t('pagesPill', { count: sources.length })}
         </button>
       ) : null}
@@ -948,7 +981,18 @@ export const Shell = () => {
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">
-          <span className="brand-name">
+          <span
+            className="brand-name"
+            data-testid="brand"
+            onClick={() => {
+              state.setSidebarOpen(false)
+              void state.newChat()
+              focusComposer()
+              if (window.location.pathname !== '/' || window.location.search || window.location.hash) {
+                window.history.replaceState(null, '', '/')
+              }
+            }}
+          >
             <Mark />
             <Wordmark />
           </span>
@@ -969,15 +1013,14 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
-          <div className="new-chat" data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
+          <div className={shortcutWindows() ? 'new-chat shortcut-win' : 'new-chat'} data-testid="new-chat" role="presentation" tabIndex={0} onClick={() => { state.setSidebarOpen(false); void state.newChat(); focusComposer() }} onKeyDown={(event) => { if (event.key === 'Enter') { state.setSidebarOpen(false); void state.newChat(); focusComposer() } }}>
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
-            <kbd className="kbd">{shortcutHint()}</kbd>
           </div>
         )}
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {groups.map(([label, items], index) => (
-            <div key={label} className={label === t('groupPinned') ? 'group pinned' : 'group'}>
+            <div key={label} className={`group${index === 0 ? ' is-first' : ''}${label === t('groupPinned') ? ' pinned' : ''}`}>
               <p className="group-label">
                 {label}
                 {!selecting && index === 0 ? (
@@ -997,6 +1040,7 @@ export const Shell = () => {
                   onMulti={() => { setSelecting(true); setPicked([]) }}
                 />
               ))}
+              {label === t('groupPinned') ? <div className="group-rule" data-testid="pinned-rule" /> : null}
             </div>
           ))}
         </div>
@@ -1133,7 +1177,7 @@ export const Shell = () => {
               <li key={item.url}>
                 <a className="source-card" href={item.url} target="_blank" rel="noreferrer noopener">
                   <span className="source-meta">
-                    <Favicon label={item.site} />
+                    <Favicon label={item.site} icon={item.icon} />
                     <span className="source-site">{item.site}</span>
                     {item.date ? <span>{item.date}</span> : null}
                     <span className="source-index">{index + 1}</span>
@@ -1303,7 +1347,6 @@ const Composer = () => {
     window.addEventListener('deepapi-prefill', onPrefill)
     return () => window.removeEventListener('deepapi-prefill', onPrefill)
   }, [])
-  const flash = prefs.model === 'deepseek-flash'
   const submit = () => {
     const value = text
     setText('')
@@ -1361,16 +1404,16 @@ const Composer = () => {
               <span className="chip-label">{t('thinking')}</span>
             </div>
           </span>
-          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} aria-disabled={flash ? 'false' : 'true'} onClick={() => { if (flash) void setPrefs({ search: !prefs.search }) }}>
+          <div data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} role="presentation" tabIndex={0} onClick={() => void setPrefs({ search: !prefs.search })}>
             <Glyph name="search" size={14} />
             <span className="chip-label">{t('search')}</span>
           </div>
         </div>
         <div className="tool-right">
-          <button type="button" className={`icon-btn ${flash ? '' : 'off'}`} aria-label={t('attach')} disabled={!flash} onClick={() => fileRef.current?.click()}>
+          <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
             <Glyph name="attach" size={16} />
           </button>
-          <input ref={fileRef} data-testid="file-input" type="file" hidden disabled={!flash} onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
+          <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             <button className="send stop" data-testid="stop" type="button" onClick={stop}><Icon size={18} stroke={2.4} d="M8 8h8v8H8z" /></button>
           ) : (
@@ -1494,26 +1537,6 @@ const Settings = () => {
             </span>
           </div>
           <div className="settings-line">
-            <span>{t('model')}</span>
-            <AnchoredMenu
-              testId="model-select"
-              label={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              selected={prefs.model === 'deepseek-v4-pro' ? `DeepSeek ${t('pro')}` : `DeepSeek ${t('flash')}`}
-              options={[`DeepSeek ${t('flash')}`, `DeepSeek ${t('pro')}`]}
-              onPick={(value) => void setPrefs({ model: value.endsWith(t('pro')) ? 'deepseek-v4-pro' : 'deepseek-flash' })}
-            />
-          </div>
-          <div className="settings-line">
-            <span>{t('effort')}</span>
-            <AnchoredMenu
-              testId="effort-select"
-              label={prefs.effort}
-              selected={prefs.effort}
-              options={['low', 'high', 'max']}
-              onPick={(value) => void setPrefs({ effort: value as HarborState['prefs']['effort'] })}
-            />
-          </div>
-          <div className="settings-line">
             <span>{t('safety')}</span>
             <AnchoredMenu
               testId="safety-select"
@@ -1530,7 +1553,6 @@ const Settings = () => {
               data-testid="toggle-read"
               className={prefs.readLink ? 'switch on' : 'switch'}
               aria-pressed={prefs.readLink}
-              disabled={prefs.model !== 'deepseek-flash'}
               onClick={() => void setPrefs({ readLink: !prefs.readLink })}
             >
               <span className="knob" />
