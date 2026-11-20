@@ -1381,7 +1381,7 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 .drafts li { font-size: 13px; background: var(--dsw-alias-bg-skeleton); border-radius: 10px; padding: 4px 8px; }
 
 .scrim { display: none; }
-.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 8; padding: 20px; }
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 10; padding: 20px; }
 .modal-card, .gate-card, .admin-card, .key-card {
   width: min(720px, 100%);
   max-height: min(88vh, 900px);
@@ -2608,7 +2608,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   pointer-events: none;
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
-  z-index: 20;
+  z-index: 9;
 }
 .ds-tooltip.ds-tooltip--s.is-open {
   opacity: 1;
