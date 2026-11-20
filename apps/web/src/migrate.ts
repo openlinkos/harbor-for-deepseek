@@ -8,7 +8,6 @@ type KeyStore = {
 const EXACT: Array<[string, string]> = [
   ['harbor-ui', 'deepapi-ui'],
   ['harbor-theme', 'deepapi-theme'],
-  ['harbor-voice', 'deepapi-voice'],
   ['harbor-improve', 'deepapi-improve'],
   ['harbor-profile', 'deepapi-profile'],
 ]

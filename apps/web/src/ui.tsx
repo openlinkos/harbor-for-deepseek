@@ -363,7 +363,6 @@ const ThemeSwitch = () => {
 }
 
 const LANGUAGES = ['简体中文', 'English', '跟随系统', 'Afrikaans', 'አማርኛ', 'العربية', 'Azərbaycan', 'Беларуская', 'Български', 'বাংলা', 'Català', 'Čeština', 'Dansk']
-const VOICES = ['贝壳', '白浪', '海星', '暗潮']
 
 const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, menuClass, shiftRight = 0 }: { label: string; options: string[]; selected: string; onPick: (value: string) => void; testId?: string; dividerAfter?: number; menuClass?: string; shiftRight?: number }) => {
   const [open, setOpen] = useState(false)
@@ -408,23 +407,6 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
         document.body,
       ) : null}
     </div>
-  )
-}
-
-const VoiceSelect = () => {
-  const [name, setName] = useState(() => localStorage.getItem('deepapi-voice') || '贝壳')
-  return (
-    <AnchoredMenu
-      testId="voice-select"
-      menuClass="voice-menu"
-      label={name || '贝壳'}
-      selected={name || '贝壳'}
-      options={VOICES}
-      onPick={(value) => {
-        setName(value)
-        localStorage.setItem('deepapi-voice', value)
-      }}
-    />
   )
 }
 
@@ -767,7 +749,6 @@ const MessageRow = ({ message }: { message: Message }) => {
           </button>
           <button type="button" data-tip={t('like')} className={vote === 'up' ? 'on' : ''} aria-label={t('like')} aria-pressed={vote === 'up'} onClick={() => choose('up')}><FillIcon paths={[...ACTION_ICONS.like]} /></button>
           <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
-          <button type="button" data-tip={t('speak')} aria-label={t('speak')} onClick={() => { const utter = new SpeechSynthesisUtterance(textOf); utter.lang = 'zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(utter) }}><FillIcon paths={[...ACTION_ICONS.speak]} /></button>
           <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
         </div>
       ) : null}
@@ -1491,10 +1472,6 @@ const Settings = () => {
                 else if (value === '简体中文' || value === '跟随系统') void setLocale('zh')
               }}
             />
-          </div>
-          <div className="settings-line">
-            <span>{t('voice')}</span>
-            <VoiceSelect />
           </div>
           <div className="settings-line">
             <span>{t('skin')}</span>

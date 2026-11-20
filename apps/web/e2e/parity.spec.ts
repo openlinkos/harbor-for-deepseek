@@ -199,7 +199,7 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await row.getByRole('button', { name: '不喜欢', exact: true }).click()
   await expect(row.getByRole('button', { name: '不喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(row.getByRole('button', { name: '朗读' })).toBeVisible()
+  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
@@ -454,7 +454,7 @@ test('sidebar motion', async ({ page }) => {
 test('action row', async ({ page }) => {
   await unlock(page)
   await send(page, '动作')
-  await expect(page.locator('.action-row button')).toHaveCount(6)
+  await expect(page.locator('.action-row button')).toHaveCount(5)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
   await page.screenshot({ path: join(shots, 'actions-light.png') })
   await page.getByTestId('user-menu').click()
@@ -491,8 +491,6 @@ test('official states', async ({ page }) => {
   await page.getByTestId('language-trigger').click()
   await page.screenshot({ path: join(dir, 'settings-general-language-dropdown.png') })
   await page.getByTestId('language-trigger').click()
-  await page.getByTestId('voice-select').click()
-  await page.screenshot({ path: join(dir, 'settings-general-voice-dropdown.png') })
   await page.getByRole('button', { name: '账号管理' }).click()
   await expect(page.getByTestId('nickname')).toBeVisible()
   await page.screenshot({ path: join(dir, 'settings-account.png') })
