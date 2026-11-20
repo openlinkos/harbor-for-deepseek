@@ -569,7 +569,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     if (get().serverMode) {
       for (const file of files) {
         const localId = nid()
-        const mapped = purposeForFile(file.name, file.type, get().settings.documentPurpose)
+        const mapped = purposeForFile(file.name, file.type)
         set({
           drafts: [...get().drafts, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true }],
         })
@@ -601,7 +601,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     const seconds = clampExpireSeconds(settings.fileExpireDays)
     for (const file of files) {
       const localId = nid()
-      const mapped = purposeForFile(file.name, file.type, settings.documentPurpose)
+      const mapped = purposeForFile(file.name, file.type)
       set({
         drafts: [
           ...get().drafts,

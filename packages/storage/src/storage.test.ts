@@ -129,6 +129,29 @@ describe('indexeddb repository', () => {
     expect(await repo.readSecret()).toEqual({ v: 1, enc: false, value: 'demo-local-key' })
   })
 
+  it('drops a legacy documentPurpose without touching file expiry', async () => {
+    const repo = await openIndexedRepository()
+    const current = await repo.loadSettings()
+    const db = await openDB('deepapi', 2)
+    await db.put('kv', { ...current, documentPurpose: 'text_recognition', fileExpireDays: 11 }, 'settings')
+    db.close()
+    const loaded = await (await openIndexedRepository()).loadSettings()
+    expect(loaded.fileExpireDays).toBe(11)
+    expect(loaded.deviceId).toBe(current.deviceId)
+    expect('documentPurpose' in loaded).toBe(false)
+    await (await openIndexedRepository()).saveSettings(loaded)
+    const raw = await (await openDB('deepapi', 2)).get('kv', 'settings') as { documentPurpose?: unknown; fileExpireDays?: number }
+    expect(raw.documentPurpose).toBeUndefined()
+    expect(raw.fileExpireDays).toBe(11)
+    const nested = await openDB('deepapi', 2)
+    await nested.put('kv', { ...current, documentPurpose: { mode: 'text_recognition' }, fileExpireDays: 3 }, 'settings')
+    nested.close()
+    const odd = await (await openIndexedRepository()).loadSettings()
+    expect(odd.fileExpireDays).toBe(3)
+    expect(odd.deviceId).toBe(current.deviceId)
+    expect('documentPurpose' in odd).toBe(false)
+  })
+
   it('keeps the key out of the conversation database and deletes by tombstone', async () => {
     const repo = await openIndexedRepository()
     const settings = await repo.loadSettings()
