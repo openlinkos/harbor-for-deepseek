@@ -3,7 +3,7 @@ import { markSearchCitations, presentBlocks } from './blocks.js'
 import { estimateCost, formatCny } from '@deepapi/pricing'
 import { activePath, siblingIds } from '@deepapi/types'
 import type { ContentBlock, Conversation, Message } from '@deepapi/types'
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
@@ -125,6 +125,55 @@ const focusComposer = () => {
     box.setSelectionRange(end, end)
   })
 }
+
+const snippetAround = (text: string, query: string) => {
+  const flat = text.replace(/\s+/g, ' ').trim()
+  const needle = query.trim().toLowerCase()
+  const at = flat.toLowerCase().indexOf(needle)
+  if (!needle || at < 0) return null
+  const start = Math.max(0, at - 24)
+  const end = Math.min(flat.length, at + needle.length + 48)
+  return `${start > 0 ? '…' : ''}${flat.slice(start, end)}${end < flat.length ? '…' : ''}`
+}
+
+const MarkedText = ({ text, query, mark }: { text: string; query: string; mark: string }) => {
+  const needle = query.trim()
+  if (!needle) return <>{text}</>
+  const hay = text.toLowerCase()
+  const pin = needle.toLowerCase()
+  const nodes: ReactNode[] = []
+  let cursor = 0
+  let guard = 0
+  while (cursor < text.length && guard < 40) {
+    const at = hay.indexOf(pin, cursor)
+    if (at < 0) {
+      nodes.push(text.slice(cursor))
+      break
+    }
+    if (at > cursor) nodes.push(text.slice(cursor, at))
+    nodes.push(<span className={mark} key={`${at}-${guard}`}>{text.slice(at, at + needle.length)}</span>)
+    cursor = at + needle.length
+    guard += 1
+  }
+  if (cursor < text.length && nodes.length && guard >= 40) nodes.push(text.slice(cursor))
+  return <>{nodes}</>
+}
+
+const formatSearchTime = (iso: string, yesterday: string, locale: Locale) => {
+  const when = new Date(iso)
+  if (Number.isNaN(when.getTime())) return ''
+  const now = new Date()
+  const dayStart = (value: Date) => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime()
+  const days = Math.round((dayStart(now) - dayStart(when)) / 86_400_000)
+  if (days === 0) return `${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`
+  if (days === 1) return yesterday
+  const month = when.getMonth() + 1
+  const date = when.getDate()
+  if (when.getFullYear() === now.getFullYear()) return locale === 'zh' ? `${month}月${date}日` : `${month}/${date}`
+  return locale === 'zh' ? `${when.getFullYear()}年${month}月${date}日` : `${month}/${date}/${when.getFullYear()}`
+}
+
+const SEARCH_HIT_ICON = 'M10 2C5.58162 2 2.00003 5.58162 2 10C2 11.2255 2.27557 12.3887 2.76953 13.4287L3.07422 14.0674L4.35059 13.4609L4.04785 12.8223L3.90332 12.4971C3.58796 11.7279 3.41406 10.8848 3.41406 10C3.41409 6.36278 6.36277 3.41407 10 3.41406C13.6372 3.41406 16.5859 6.36278 16.5859 10C16.5859 13.6372 13.6372 16.5859 10 16.5859C9.25515 16.5859 8.70984 16.5329 8.22656 16.3994C7.75059 16.2679 7.29925 16.0478 6.75879 15.6709C5.96644 15.1182 4.82978 14.9233 3.89355 15.5146L3.86426 15.5342L3.24121 15.9727L3.70996 17.3721L4.65918 16.7041C5.00017 16.4952 5.50572 16.5226 5.94824 16.8311C6.58879 17.2779 7.18624 17.5792 7.85059 17.7627C8.50781 17.9442 9.19541 18 10 18C14.4184 18 18 14.4184 18 10C18 5.58162 14.4184 2 10 2ZM6.25 10.5566V11.9707H10.1367V10.5566H6.25ZM6.25 9.23438H13.7852V7.82031H6.25V9.23438Z'
 
 const shortcutWindows = () => {
   if (typeof navigator === 'undefined') return false
@@ -999,6 +1048,56 @@ export const Shell = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
+  const [corpus, setCorpus] = useState<Record<string, string>>({})
+  const [activeHit, setActiveHit] = useState(-1)
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const query = filter.trim()
+  const hits = useMemo(() => {
+    if (!query) return []
+    const needle = query.toLowerCase()
+    const includes = (value: string) => value.toLowerCase().includes(needle)
+    const rows = state.conversations.flatMap((chat) => {
+      if (chat.deletedAt) return []
+      const title = chat.title || t('newChat')
+      const snippet = snippetAround(corpus[chat.id] || '', query)
+      if (!includes(title) && !snippet) return []
+      return [{ id: chat.id, title, updatedAt: chat.updatedAt, snippet }]
+    })
+    rows.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    return rows
+  }, [query, state.conversations, corpus, t])
+  const hitKey = hits.map((hit) => hit.id).join('\n')
+  const [trackedHits, setTrackedHits] = useState('')
+  if (hitKey !== trackedHits) {
+    setTrackedHits(hitKey)
+    setActiveHit(hits.length ? 0 : -1)
+  }
+  useEffect(() => {
+    if (!filtering) return undefined
+    let live = true
+    void useHarbor.getState().loadSearchCorpus().then((next) => {
+      if (live) setCorpus(next)
+    })
+    return () => {
+      live = false
+    }
+  }, [filtering, state.conversations, state.messages])
+  useEffect(() => {
+    const list = resultsRef.current
+    if (!list || activeHit < 0) return
+    const item = list.querySelector<HTMLElement>(`#conversation-search-result-${activeHit}`)
+    if (!item) return
+    const delta = item.getBoundingClientRect().top - list.getBoundingClientRect().top
+    if (delta < 0) list.scrollTop += delta
+    else if (delta + item.offsetHeight > list.clientHeight) list.scrollTop += delta + item.offsetHeight - list.clientHeight
+  }, [activeHit, hitKey])
+  const openSearched = (id: string) => {
+    window.history.pushState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
+    setFiltering(false)
+    setFilter('')
+    void state.openChat(id)
+    focusComposer()
+  }
   const [userMenu, setUserMenu] = useState(false)
   const userBarRef = useRef<HTMLDivElement>(null)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
@@ -1021,6 +1120,7 @@ export const Shell = () => {
         setPanel(null)
         setUserMenu(false)
         setFiltering(false)
+        setFilter('')
         if (state.settingsOpen) {
           state.setSettingsOpen(false)
         }
@@ -1216,13 +1316,80 @@ export const Shell = () => {
       ) : null}
       {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }} /> : null}
       {filtering ? (
-        <form className="search-dialog" role="search" onSubmit={(event) => event.preventDefault()}>
+        <form className={query ? 'search-dialog has-query' : 'search-dialog'} role="search" onSubmit={(event) => event.preventDefault()}>
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
-          <input className="side-filter" autoFocus placeholder={t('searchChats')} value={filter} aria-label={t('search')} onChange={(event) => setFilter(event.target.value)} />
+          <input
+            className="side-filter"
+            autoFocus
+            placeholder={t('searchChats')}
+            value={filter}
+            aria-label={t('search')}
+            aria-controls={query ? 'conversation-search-results' : undefined}
+            aria-activedescendant={query && activeHit >= 0 ? `conversation-search-result-${activeHit}` : undefined}
+            onChange={(event) => setFilter(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing || !query) return
+              if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault()
+                if (!hits.length) return
+                const step = event.key === 'ArrowDown' ? 1 : -1
+                setActiveHit((index) => {
+                  const start = index < 0 ? 0 : index
+                  return (start + step + hits.length) % hits.length
+                })
+                return
+              }
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                const hit = hits[activeHit]
+                if (hit) openSearched(hit.id)
+              }
+            }}
+          />
           <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
+          {query ? (
+            <div className={hits.length ? 'search-results' : 'search-results is-empty'} id="conversation-search-results" role="listbox" aria-label={t('searchPanel')} ref={resultsRef}>
+              {hits.length ? (
+                <div className="search-results-items">
+                  {hits.map((hit, index) => (
+                    <div
+                      key={hit.id}
+                      id={`conversation-search-result-${index}`}
+                      role="option"
+                      tabIndex={-1}
+                      aria-selected={index === activeHit}
+                      aria-posinset={index + 1}
+                      aria-setsize={hits.length}
+                      data-conversation-search-result-index={index}
+                      className={index === activeHit ? 'search-hit active' : 'search-hit'}
+                      onMouseMove={() => { if (index !== activeHit) setActiveHit(index) }}
+                      onClick={() => openSearched(hit.id)}
+                    >
+                      <span className="search-hit-avatar" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <path d={SEARCH_HIT_ICON} fill="#81858C" />
+                        </svg>
+                      </span>
+                      <span className="search-hit-main">
+                        <span className="search-hit-line">
+                          <span className="search-hit-title"><MarkedText text={hit.title} query={query} mark="search-hit-mark" /></span>
+                          <span className="search-hit-time">{formatSearchTime(hit.updatedAt, t('groupYesterday'), state.settings.locale)}</span>
+                        </span>
+                        {hit.snippet ? (
+                          <span className="search-hit-snippet"><MarkedText text={hit.snippet} query={query} mark="search-hit-snip" /></span>
+                        ) : null}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="search-results-empty">{t('searchNoResult')}</div>
+              )}
+            </div>
+          ) : null}
         </form>
       ) : null}
       <section className="stage">
