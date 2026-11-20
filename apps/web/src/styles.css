@@ -705,7 +705,7 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .turn.assistant { text-align: left; }
 .turn header { display: flex; justify-content: flex-end; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); }
-.thinking button {
+.thinking > button {
   background: none;
   border: 0;
   color: var(--dsw-alias-label-secondary);
@@ -720,7 +720,7 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
   font-size: 16px;
   line-height: 28px;
 }
-.thinking button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
+.thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking .chev { display: inline-flex; }
 .thinking .chev svg { width: 14px; height: 14px; }
 .thinking-collapse {
@@ -734,7 +734,7 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
   opacity: 1;
   transition: grid-template-rows 0.2s var(--ds-ease-out), opacity 0.2s var(--ds-ease-in-out);
 }
-.thinking button[aria-expanded="false"] + .thinking-collapse { display: none; }
+.thinking > button[aria-expanded="false"] + .thinking-collapse { display: none; }
 .thinking-body {
   margin: 0;
   min-height: 0;
@@ -922,7 +922,9 @@ button.chip { appearance: none; margin: 0; }
   height: 18px;
   box-shadow: none;
 }
-.cite-wrap { display: inline; position: relative; }
+/* Group margin is official ._5f9bba8 (0 2px): first badge sits 4px after the previous glyph.
+   top -1px: inline-flex baseline plus cite top -5px lands 2px under the glyph; official is 1px. */
+.cite-wrap { display: inline; position: relative; margin: 0 2px; top: -1px; }
 .cite {
   display: inline-flex;
   align-items: center;
@@ -940,7 +942,7 @@ button.chip { appearance: none; margin: 0; }
   font-variant: tabular-nums;
   white-space: nowrap;
   color: var(--dsw-alias-label-tertiary);
-  vertical-align: super;
+  vertical-align: baseline;
   user-select: none;
   cursor: pointer;
   position: relative;
@@ -2321,7 +2323,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .code-head button { width: auto; min-height: 28px; height: 28px; font-size: 13px; padding: 0 10px; }
   .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
   .user-actions button { border: 0; background: transparent; color: rgb(129, 133, 140); display: grid; place-items: center; }
-  .thinking button {
+  .thinking > button {
     position: sticky;
     top: 0;
     z-index: 2;
