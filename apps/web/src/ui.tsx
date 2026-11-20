@@ -780,9 +780,9 @@ const Thinking = ({ text }: { text: string }) => {
   return (
     <section className="thinking" data-testid="thinking">
       <button type="button" onClick={() => setOpen((value) => !value)}>
-        <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+        <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
         {t('thoughtFor', { seconds })}
-        <Icon d="M9 6l6 6-6 6" />
+        <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
       </button>
       {open ? <div className="thinking-body think-copy"><Markdown text={text} /></div> : null}
     </section>
@@ -873,7 +873,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       return (
         <p key={index} className={`timeline-step timeline-search found-line ${last}`}>
           <span className="timeline-line" aria-hidden="true" />
-          <Icon size={14} d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
+          <Glyph name="search" size={14} />
           {t('foundPages', { count: step.items.length })}
           <SourceMarks items={step.items} />
         </p>
@@ -882,7 +882,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     return (
       <p key={index} className={`timeline-step timeline-browse found-line browse-line ${last}`}>
         <span className="timeline-line" aria-hidden="true" />
-        <Icon size={14} d="M6 4h9l3 3v13H6z" />
+        <Glyph name="document" size={14} />
         {t('browsedPages', { count: step.items.length })}
         {step.items.map((item) => (
           <a key={item.url} className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">
@@ -898,9 +898,9 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       {hasThinking ? (
         <section className="thinking" data-testid="thinking">
           <button type="button" data-testid="thinking-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-            <Icon d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+            <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
             {t('thoughtFor', { seconds })}
-            <span className={`chev ${open ? 'open' : ''}`}><Icon d="M9 6l6 6-6 6" /></span>
+            <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
             <div className="thinking-body">

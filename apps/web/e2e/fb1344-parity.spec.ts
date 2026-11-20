@@ -16,7 +16,6 @@ const SSE = readFileSync(join(HERE, 'lib/fb1344-sse.js'), 'utf8')
 const STRICT = process.env.FB1344_STRICT === '1'
 
 // 在 master 4734e7f 上会失败的用例。修复 PR 删掉自己那几条；修好了却没删，会因为意外通过让 CI 变红。
-// fb1344-P1 思考/搜索/浏览标题：think-lead-icon、think-chevron、think-label-color、search-icon-size、browse-icon。
 // fb1344-P2 回答底部：pill-geometry、pill-bg-dark、action-color-dark、share-tooltip。
 // fb1344-P3 设置行内按钮（含 label/file-input）：settings-buttons、centring-scan（导入 label |dx|>1）。
 // fb1344-P4 侧栏用户行：user-row-centre。同一个 PR 还要删 scripts/check-css.mjs 里的 fb1344-P4（styles.css:587-591）。
@@ -24,12 +23,6 @@ const STRICT = process.env.FB1344_STRICT === '1'
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P1 思考/搜索/浏览标题
-  'think-lead-icon': 'fb1344-P1: 思考标题前置图标是自绘描边方框，官方是蓝色填充原子图标',
-  'think-chevron': 'fb1344-P1: 展开态箭头指向左（官方 ⌄ 字形再 rotate(90deg)），官方向下、14px',
-  'think-label-color': 'fb1344-P1: 标题与箭头颜色：1440 用 tertiary rgb(139,144,150)，深色 390 写死浅色值 rgb(97,102,107)；官方 secondary（浅 97,102,107 / 深 207,211,214）',
-  'search-icon-size': 'fb1344-P1: 搜索行放大镜 16px，官方 14px',
-  'browse-icon': 'fb1344-P1: 浏览行图标与尺寸不同，官方 14px 文档图标',
   // fb1344-P2 回答底部（胶囊几何、深色底色、深色操作栏、hover tooltip）
   'pill-geometry': 'fb1344-P2: 来源胶囊高 32.1 / 左内边距 6，官方 34 / 4',
   'pill-bg-dark': 'fb1344-P2: 深色来源胶囊底色 rgb(44,44,46)，官方 rgb(21,21,23)',
@@ -48,7 +41,7 @@ const KNOWN: Record<string, string> = {
   'concurrent-send': 'fb1344-P6: 另一会话生成中时新会话的发送键是停止键，点击会中断第一条；没有「有消息正在生成，请稍后再试」',
 }
 // Cells where master already matches (an expected failure that passes would fail the run).
-const KNOWN_PASSING_CELLS: Record<string, string[]> = { 'think-label-color': ['light 390'] }
+const KNOWN_PASSING_CELLS: Record<string, string[]> = {}
 const knownFailure = (id: string) => {
   if (STRICT || !KNOWN[id]) return
   const cell = test.info().titlePath.find((t) => t.startsWith('fb1344 '))?.slice(7) ?? ''
