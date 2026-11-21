@@ -783,6 +783,7 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .prose th { color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-table-head); background: var(--dsw-alias-bg-skeleton); }
 .prose blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); }
 .prose .md-img { max-width: 100%; border-radius: 12px; }
+.ds-markdown-math.katex-display { text-align: center; max-width: 100%; padding: 4px; display: block; overflow-x: auto; overflow-y: hidden; }
 .diagram-card { border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; margin: 12px 0; overflow: hidden; background: var(--dsw-alias-bg-layer-2); }
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; }
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }
