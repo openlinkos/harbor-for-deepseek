@@ -11,6 +11,7 @@ import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
+import { FileCard } from './file-card.js'
 import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
@@ -803,12 +804,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     )
   }
   if (block.type === 'file_ref') {
-    return (
-      <span className="file-chip">
-        {block.filename}
-        <small>{Math.ceil(block.bytes / 1024)} KB</small>
-      </span>
-    )
+    return <FileCard name={block.filename} bytes={block.bytes} status="done" />
   }
   return null
 }
@@ -1116,6 +1112,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   const versionCurrent = siblings.length > 1 ? message.id : parent?.id ?? ''
   const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
+  const fileBlocks = message.blocks.flatMap((block) => (block.type === 'file_ref' ? [block] : []))
   const errorKey = replyErrorKey(message.errorMessage)
   const [copied, setCopied] = useState(false)
   const voteKey = `deepapi-vote:${message.id}`
@@ -1140,6 +1137,13 @@ const MessageRow = ({ message }: { message: Message }) => {
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
       <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
       <div className="share-halo" aria-hidden="true" />
+      {message.role === 'user' && fileBlocks.length ? (
+        <div className="message-files" data-testid="message-files">
+          {fileBlocks.map((block, blockIndex) => (
+            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
+          ))}
+        </div>
+      ) : null}
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1181,9 +1185,7 @@ const MessageRow = ({ message }: { message: Message }) => {
       {message.role === 'assistant' && message.status === 'streaming' && phaseOf(message) === 'pending' ? (
         <div className="reply-dots" data-testid="reply-dots" aria-hidden="true"><i /><i /><i /></div>
       ) : null}
-      {message.role === 'assistant' ? <AssistantTurn message={message} /> : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
-            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
-          ))}
+      {message.role === 'assistant' ? <AssistantTurn message={message} /> : null}
       {message.status === 'error' ? (
         <p className="form-error">
           {errorKey ? t(errorKey) : message.errorMessage || t('error')}
@@ -2093,17 +2095,18 @@ const Composer = () => {
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
       {drafts.length ? (
-        <ul className="drafts">
+        <div className="drafts" data-testid="draft-files">
           {drafts.map((file) => (
-            <li key={file.localId}>
-              <span>{file.busy ? t('uploading') : file.filename}</span>
-              {file.error ? <small>{file.error}</small> : null}
-              <button type="button" onClick={() => removeDraft(file.localId)}>
-                {t('remove')}
-              </button>
-            </li>
+            <FileCard
+              key={file.localId}
+              name={file.filename}
+              bytes={file.bytes}
+              status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
+              error={file.error}
+              onRemove={() => removeDraft(file.localId)}
+            />
           ))}
-        </ul>
+        </div>
       ) : null}
       <textarea
         ref={box}
