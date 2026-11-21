@@ -1,4 +1,4 @@
-import { buildRequest, CONTENT_SECURITY_POLICY, continuationBlocks } from '@deepapi/api-client'
+import { buildRequest, CONTENT_SECURITY_POLICY, continuationBlocks, messageUsedWebTool } from '@deepapi/api-client'
 import { estimateCost } from '@deepapi/pricing'
 import { createDraft, readStreamEvent, reduceEvent, ServerSentEventDecoder } from '@deepapi/sse'
 import type { ContentBlock, Message, Usage } from '@deepapi/types'
@@ -879,7 +879,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     await sql`
       update conversations set
         title = coalesce(${title}, title),
-        title_source = case when ${title} is null then title_source else 'user' end,
+        title_source = case when ${title}::text is null then title_source else 'user' end,
         pinned = coalesce(${typeof body.pinned === 'boolean' ? body.pinned : null}, pinned),
         archived = coalesce(${typeof body.archived === 'boolean' ? body.archived : null}, archived),
         model = coalesce(${typeof body.model === 'string' ? body.model : null}, model),
@@ -1025,6 +1025,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     let thinkingOpen: number | null = null
     let draft = createDraft()
     const closedThinkingSeconds = () => (thinkingOpen === null && thinkingClosed > 0 ? Math.max(1, Math.round(thinkingClosed / 1000)) : null)
+    const dropWebSearch = requestMessages.some((message) => message.id === messageId && messageUsedWebTool(message))
     const outboundMessages = requestMessages.map((message) =>
       message.id === messageId
         ? { ...message, status: 'aborted' as const, blocks: continuationBlocks(message.blocks) }
@@ -1074,6 +1075,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
               locale: prefs.locale,
               timeZone: prefs.timeZone,
               dropThinking,
+              dropWebSearch,
             })),
             signal: controller.signal,
           },
@@ -1095,7 +1097,11 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
         const status = result.response.status
         await result.response.body?.cancel().catch(() => undefined)
         await finishRun(runId, 'error', `upstream ${status}`)
-        await sql`update messages set status = 'error', error_message = ${`upstream ${status}`}, updated_at = now() where id = ${messageId}`
+        if (prefs.preserveThinkingSeconds) {
+          await sql`update messages set status = 'aborted', error_message = null, updated_at = now() where id = ${messageId}`
+        } else {
+          await sql`update messages set status = 'error', error_message = ${`upstream ${status}`}, updated_at = now() where id = ${messageId}`
+        }
         return
       }
       const decoder = new ServerSentEventDecoder()
@@ -1125,15 +1131,17 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
               await sql`update messages set thinking_started_at = coalesce(thinking_started_at, now()) where id = ${messageId}`
             }
           }
+          let outgoing = event
           if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking' && thinkingOpen !== null) {
             thinkingClosed += Date.now() - thinkingOpen
             thinkingOpen = null
             const seconds = closedThinkingSeconds()
             if (!prefs.preserveThinkingSeconds && seconds !== null) {
               await sql`update messages set thinking_seconds = ${seconds}, updated_at = now() where id = ${messageId}`
+              outgoing = { ...event, elapsed_secs: seconds }
             }
           }
-          await appendEvent(runId, event)
+          await appendEvent(runId, outgoing)
           if (event.type === 'message_delta' && event.delta.title) {
             const rev = await nextRev(user.id)
             await sql`
@@ -1255,7 +1263,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       if (!existing || existing.role !== 'assistant') {
         return c.json({ error: { message: 'not found' } }, 404)
       }
-      priorBlocks = continuationBlocks(existing.blocks).filter(Boolean)
+      priorBlocks = existing.blocks.filter(Boolean)
       userMessageId = existing.parentId ?? userMessageId
     }
     const leafRev = await nextRev(user.id)

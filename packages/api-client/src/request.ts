@@ -34,6 +34,8 @@ export type TurnOptions = {
   now?: Date
   /** Continuation retry: the partial assistant thinking block made upstream return 400. */
   dropThinking?: boolean
+  /** Folded continuation: do not offer web search again on this request. */
+  dropWebSearch?: boolean
 }
 
 const replayAssistant = (message: Message): ApiContentBlock[] => {
@@ -84,8 +86,8 @@ const replayUser = (message: Message): ApiMessage | null => {
 
 /**
  * Search and page-read blocks cannot be sent back on a continuation (the API returns 400).
- * Fold the readable result into plain text and drop the tool blocks. The caller still tries
- * one continuation; a 400 falls back to regenerating.
+ * Fold the readable result into plain text for the upstream request only. Stored blocks stay
+ * as they were. A 400 still falls back to regenerating.
  */
 export const continuationBlocks = (blocks: Message['blocks']): Message['blocks'] => {
   const folded: string[] = []
@@ -149,7 +151,7 @@ export const toApiMessages = (messages: Message[], options?: { dropThinking?: bo
 export const buildRequest = (options: TurnOptions): CreateMessageBody => {
   const tools: ApiTool[] = []
   if (modelSupportsServerTools(options.model)) {
-    if (options.search) {
+    if (options.search && !options.dropWebSearch) {
       tools.push({ type: 'deepseek_web_search', name: 'deepseek_web_search' })
     }
     if (options.readLink) {

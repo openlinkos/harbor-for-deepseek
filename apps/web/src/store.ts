@@ -729,17 +729,30 @@ export const useHarbor = create<HarborState>((set, get) => ({
   async continueReply(assistantId) {
     const assistant = get().messages.find((item) => item.id === assistantId)
     if (!assistant || assistant.role !== 'assistant' || get().streaming) return
+    const snapshot = {
+      blocks: structuredClone(assistant.blocks),
+      thinkingSeconds: assistant.thinkingSeconds,
+    }
     const usedWeb = messageUsedWebTool(assistant)
     if (get().serverMode) {
       await runServerTurn('', null, assistantId)
-      const after = get().messages.find((item) => item.id === assistantId)
-      if (usedWeb && after?.errorMessage === 'upstream 400') await get().regenerate(assistantId)
-      return
+    } else {
+      if (!get().key) return
+      await runContinuation(assistantId)
     }
-    if (!get().key) return
-    await runContinuation(assistantId)
     const after = get().messages.find((item) => item.id === assistantId)
-    if (usedWeb && after?.errorMessage === 'upstream 400') await get().regenerate(assistantId)
+    if (!(usedWeb && after?.errorMessage === 'upstream 400')) return
+    const restored: Message = {
+      ...after,
+      status: 'aborted',
+      blocks: snapshot.blocks,
+      thinkingSeconds: snapshot.thinkingSeconds ?? after.thinkingSeconds,
+      errorMessage: null,
+      updatedAt: nowIso(),
+    }
+    if (!get().serverMode) await (await repository()).saveMessage(restored)
+    set({ messages: get().messages.map((item) => (item.id === assistantId ? restored : item)) })
+    await get().regenerate(assistantId)
   },
 
   async editUser(messageId, text) {
@@ -1070,10 +1083,12 @@ const runContinuation = async (assistantId: string) => {
   const current = state.messages.find((item) => item.id === assistantId)
   if (!key || !current) return
   const store = await repository()
-  const prior = continuationBlocks(current.blocks.filter(Boolean))
-  const assistant: Message = { ...current, status: 'streaming', errorMessage: null, blocks: prior, updatedAt: nowIso() }
+  const original = current.blocks.filter(Boolean)
+  const folded = continuationBlocks(original)
+  const usedWeb = messageUsedWebTool(current)
+  const assistant: Message = { ...current, status: 'streaming', errorMessage: null, blocks: original, updatedAt: nowIso() }
   const history = activePath(state.messages, assistantId).map((item) =>
-    item.id === assistantId ? { ...item, status: 'aborted' as const, blocks: prior } : item,
+    item.id === assistantId ? { ...item, status: 'aborted' as const, blocks: folded } : item,
   )
   useHarbor.setState({
     messages: state.messages.map((item) => (item.id === assistantId ? assistant : item)),
@@ -1085,6 +1100,7 @@ const runContinuation = async (assistantId: string) => {
       model: DEFAULT_CHAT_MODEL,
       thinking: conversation?.thinking ?? true,
       search: conversation?.search ?? false,
+      dropWebSearch: usedWeb,
       readLink: conversation?.readLink ?? false,
       effort: DEFAULT_EFFORT,
       safetyLevel: state.settings.safetyLevel,
@@ -1100,7 +1116,7 @@ const runContinuation = async (assistantId: string) => {
       const next: Message = {
         ...assistant,
         status: 'streaming',
-        blocks: [...prior, ...draft.blocks.filter(Boolean)],
+        blocks: [...original, ...draft.blocks.filter(Boolean)],
         usage: draft.usage,
         updatedAt: nowIso(),
       }
@@ -1121,7 +1137,7 @@ const runContinuation = async (assistantId: string) => {
     const done: Message = {
       ...assistant,
       status: draft.stopReason === 'refusal' ? 'refused' : 'complete',
-      blocks: draft.stopReason === 'refusal' ? [] : [...prior, ...draft.blocks.filter(Boolean)],
+      blocks: draft.stopReason === 'refusal' ? [] : [...original, ...draft.blocks.filter(Boolean)],
       usage: draft.usage,
       errorMessage: null,
       updatedAt: nowIso(),
@@ -1135,7 +1151,7 @@ const runContinuation = async (assistantId: string) => {
     try {
       await attempt(false)
     } catch (error) {
-      const thinking = prior.some((block) => block.type === 'thinking')
+      const thinking = original.some((block) => block.type === 'thinking')
       if (thinking && error instanceof ApiClientError && error.status === 400 && !abort?.signal.aborted) {
         await attempt(true)
       } else {
@@ -1395,19 +1411,15 @@ const followServerRun = async (runId: string, assistantId: string) => {
   serverAbort = new AbortController()
   useHarbor.setState({ streaming: true })
   let draft = createDraft()
-  let thinkingOpen = false
   const storedSeconds = () => useHarbor.getState().messages.find((item) => item.id === assistantId)?.thinkingSeconds
-  const anchoredSeconds = () => {
-    const started = useHarbor.getState().messages.find((item) => item.id === assistantId)?.thinkingStartedAt
-    if (!started || thinkingOpen) return undefined
-    const elapsed = Date.now() - Date.parse(started)
-    if (!Number.isFinite(elapsed) || elapsed < 0) return undefined
-    return Math.max(1, Math.round(elapsed / 1000))
+  // Freeze once thinking ends. Later body events must not recompute now-minus-start.
+  let frozen = storedSeconds()
+  const remember = (value: number | undefined) => {
+    if (frozen !== undefined) return
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) frozen = Math.max(1, Math.round(value))
   }
   const publish = (patch: Partial<Message>) => {
-    const known = storedSeconds()
-    const next = patch.thinkingSeconds
-    const thinkingSeconds = known && (next === undefined || next < known) ? known : next ?? known
+    const thinkingSeconds = frozen ?? patch.thinkingSeconds ?? storedSeconds()
     useHarbor.setState({
       messages: useHarbor.getState().messages.map((item) => (item.id === assistantId ? { ...item, ...patch, thinkingSeconds } : item)),
     })
@@ -1419,8 +1431,7 @@ const followServerRun = async (runId: string, assistantId: string) => {
       runId,
       (event) => {
         draft = reduceEvent(draft, event)
-        if (event.type === 'content_block_start' && event.content_block.type === 'thinking') thinkingOpen = true
-        if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking') thinkingOpen = false
+        if (event.type === 'content_block_stop' && draft.blocks[event.index]?.type === 'thinking') remember(event.elapsed_secs)
         if (event.type === 'message_delta' && event.delta.title) {
           const title = event.delta.title
           const conversationId = useHarbor.getState().messages.find((item) => item.id === assistantId)?.conversationId
@@ -1434,18 +1445,19 @@ const followServerRun = async (runId: string, assistantId: string) => {
           status: 'streaming',
           blocks: draft.blocks.filter(Boolean),
           usage: draft.usage,
-          thinkingSeconds: anchoredSeconds(),
+          thinkingSeconds: frozen,
         })
       },
       serverAbort.signal,
     )
     const aborted = serverAbort.signal.aborted || ended.status === 'aborted'
     const status = draft.stopReason === 'refusal' ? 'refused' : aborted ? 'aborted' : ended.status === 'error' ? 'error' : 'complete'
+    remember(ended.thinkingSeconds)
     publish({
       status,
       blocks: status === 'refused' ? [] : draft.blocks.filter(Boolean),
       usage: draft.usage,
-      thinkingSeconds: Math.max(ended.thinkingSeconds ?? 0, storedSeconds() ?? 0, anchoredSeconds() ?? 0) || storedSeconds(),
+      thinkingSeconds: frozen,
       errorMessage: status === 'error' ? 'interrupted' : null,
     })
   } catch (error) {

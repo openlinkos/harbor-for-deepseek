@@ -1,5 +1,6 @@
 import { translate, type Locale } from '@deepapi/i18n'
-import { markSearchCitations, presentBlocks } from './blocks.js'
+import { presentBlocks } from './blocks.js'
+import { composeCitationMarkdown, joinAnswerText } from './citations.js'
 import { estimateCost, formatCny } from '@deepapi/pricing'
 import { activePath, childIds, siblingIds } from '@deepapi/types'
 import type { ContentBlock, Conversation, Message } from '@deepapi/types'
@@ -723,7 +724,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
   }
   if (block.type === 'text') {
     const marked = block.citations?.length
-      ? `${block.text.trimEnd()}${block.citations.map((_, index) => `〔${index + 1}〕`).join('')}`
+      ? `${block.text.trimEnd()}${block.citations.map((_, index) => `[citation:${index + 1}]`).join('')}`
       : block.text
     return (
       <div className="prose" data-testid={testId}>
@@ -927,7 +928,6 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     | { type: 'searching' }
     | { type: 'browse'; items: BrowsePage[] }
   > = []
-  const texts: Extract<ContentBlock, { type: 'text' }>[] = []
   let browse: BrowsePage[] = []
   const flush = () => {
     if (browse.length) {
@@ -937,7 +937,8 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   }
   const sources: SourceItem[] = []
   let pendingSearch = false
-  for (const block of presentBlocks(message.blocks)) {
+  const presented = presentBlocks(message.blocks)
+  for (const block of presented) {
     if (block.type === 'thinking') {
       flush()
       if (block.thinking.trim()) steps.push({ type: 'think', text: block.thinking })
@@ -965,13 +966,15 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       }
     } else if (block.type === 'text') {
       flush()
-      texts.push(block)
     } else {
       flush()
     }
   }
   flush()
   if (pendingSearch && message.status === 'streaming') steps.push({ type: 'searching' })
+  const joined = joinAnswerText(presented)
+  const answerStreaming = message.status === 'streaming'
+  const article = composeCitationMarkdown(joined.text, joined.citations, sources, answerStreaming)
   const phase = phaseOf(message)
   const hasThink = steps.some((step) => step.type === 'think')
   const showHead =
@@ -1039,14 +1042,11 @@ const AssistantTurn = ({ message }: { message: Message }) => {
           </div>
         </section>
       ) : steps.map(renderStep)}
-      {texts.map((block, index) => {
-        const marked = markSearchCitations(block.text, block.citations, sources)
-        return (
-          <div className="prose" data-testid={index === 0 ? 'assistant-text' : undefined} key={index}>
-            <Markdown text={marked.text} citations={marked.citations} cards={marked.cards} />
-          </div>
-        )
-      })}
+      {article.text.trim() ? (
+        <div className="prose" data-testid="assistant-text">
+          <Markdown text={article.text} citations={article.citations} cards={article.cards} streaming={answerStreaming} />
+        </div>
+      ) : null}
       {sources.length ? (
         <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sourcesApi.show(sources)}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
@@ -1064,6 +1064,9 @@ const MessageRow = ({ message }: { message: Message }) => {
   const regenerate = useHarbor((state) => state.regenerate)
   const editUser = useHarbor((state) => state.editUser)
   const streaming = useHarbor((state) => state.streaming)
+  const generatingHere = useHarbor((state) =>
+    state.messages.some((item) => item.conversationId === message.conversationId && item.status === 'streaming'),
+  )
   const siblings = siblingIds(messages, message.id)
   const parent = messages.find((item) => item.id === message.parentId && item.role === 'user')
   const userSiblings = parent ? siblingIds(messages, parent.id) : []
@@ -1159,7 +1162,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('share')}>
             <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => downloadText('deepapi-answer.md', `${textOf}\n`)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
-          {message.status === 'aborted' && !streaming && childIds(messages, message.id).length === 0 ? (
+          {message.status === 'aborted' && !generatingHere && childIds(messages, message.id).length === 0 ? (
             <button type="button" className="continue-gen" data-testid="continue" onClick={() => void useHarbor.getState().continueReply(message.id)}>{t('continueGenerating')}</button>
           ) : null}
         </div>

@@ -64,6 +64,19 @@ const chip = async (page: Page, id: string, on: boolean) => { const c = (await p
 const ask = async (page: Page) => { await chip(page, 'toggle-thinking', true); await chip(page, 'toggle-search', true); await page.getByTestId('composer').fill('[筑衡测试] 上海天气'); await page.getByTestId('send').click(); await page.getByTestId('assistant-text').last().waitFor(); await page.waitForTimeout(300) }
 const comp = async (page: Page) => { await page.evaluate(LIB); return page.evaluate(() => (window as any).__comp('ours')) }
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768
+const idbMessages = (page: Page) => page.evaluate(async () => {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('deepapi')
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error)
+  })
+  const rows = await new Promise<Array<{ role: string; status: string; blocks: Array<{ type: string; text?: string }> }>>((resolve) => {
+    const request = db.transaction('messages', 'readonly').objectStore('messages').getAll()
+    request.onsuccess = () => resolve(request.result as Array<{ role: string; status: string; blocks: Array<{ type: string; text?: string }> }>)
+  })
+  db.close()
+  return rows
+})
 const drawer = async (page: Page) => { if (isMobile(page) && !(await page.locator('.nav-open').count())) { await page.getByTestId('menu').click(); await page.waitForTimeout(400) } }
 const settings = async (page: Page, tab?: string) => { await drawer(page); await page.getByTestId('user-menu').click(); await page.getByTestId('settings-open').click(); await page.getByRole('button', { name: '通用设置' }).waitFor(); if (tab) await page.getByRole('button', { name: tab }).click(); await page.waitForTimeout(200) }
 
@@ -510,19 +523,22 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         { type: 'content_block_delta', index: 3, delta: { type: 'text_delta', text: '原文甲。' } },
       ])
       await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await expect(page.getByTestId('search-results')).toBeVisible()
+      await expect(page.locator('.found-line')).toContainText('搜索到 1 个网页')
       await page.getByTestId('stop').click()
       await expect(page.getByTestId('continue')).toBeVisible()
-      expect(readFileSync(join(HERE, 'explanations.json'), 'utf8')).toContain('continue-web-tools')
       await page.getByTestId('continue').click()
       await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
-      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
+      const request = await page.evaluate(() => (window as unknown as { __sse: { requests: Array<{ tools?: Array<{ type?: string; name?: string }>; messages: Array<{ role: string; content: unknown }> }> } }).__sse.requests.at(-1))
       const last = request?.messages.at(-1)
       expect(last?.role).toBe('assistant')
       const encoded = JSON.stringify(last?.content)
       expect(encoded).toContain('thinking')
       expect(encoded).toContain('天气来源')
+      expect(encoded).toContain('https://weather.example/a')
       expect(encoded).not.toContain('server_tool_use')
       expect(encoded).not.toContain('web_search_tool_result')
+      expect(JSON.stringify(request?.tools ?? [])).not.toContain('deepseek_web_search')
       await push(page, [
         { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
         { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
@@ -534,6 +550,17 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await expect(page.getByTestId('message-assistant')).toHaveCount(1)
       await expect(page.locator('.turn.assistant')).toContainText('原文甲')
       await expect(page.locator('.turn.assistant')).toContainText('续写乙')
+      await expect(page.getByTestId('search-results')).toBeVisible()
+      await expect(page.locator('.found-line')).toContainText('搜索到 1 个网页')
+      await expect(page.locator('.prose')).not.toContainText('https://weather.example/a')
+      await expect(page.locator('.prose')).not.toContainText('天气来源')
+      await expect.poll(async () => {
+        const rows = await idbMessages(page)
+        const assistant = rows.find((row) => row.role === 'assistant')
+        const types = assistant?.blocks.map((block) => block.type) ?? []
+        const text = assistant?.blocks.filter((block) => block.type === 'text').map((block) => block.text ?? '').join('\n') ?? ''
+        return `${types.slice(0, 4).join(',')}|${text.includes('原文甲')}|${text.includes('续写乙')}|${text.includes('https://weather.example/a')}|${text.includes('天气来源')}`
+      }).toBe('thinking,server_tool_use,web_search_tool_result,text|true|true|false|false')
     })
     test('phase-continue-search-reject', async ({ page }) => {
       test.skip(!(theme === 'light' && w === 1440), 'one cell covers the regenerate fallback')
@@ -568,7 +595,108 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         { type: 'message_stop' },
       ])
       await expect(page.locator('.turn.assistant')).toContainText('重新生成')
-      await expect(page.getByTestId('versions')).toBeVisible()
+      await expect(page.getByTestId('versions')).toContainText('2 / 2')
+      const originalStopped = async (target: Page) => {
+        await target.getByRole('button', { name: '‹' }).click()
+        await expect(target.getByTestId('versions')).toContainText('1 / 2')
+        await expect(target.locator('.turn.assistant').last()).toContainText('已停止')
+        await expect(target.getByTestId('continue')).toBeVisible()
+        await expect(target.getByTestId('search-results')).toBeVisible()
+        await expect(target.locator('.found-line')).toContainText('搜索到 1 个网页')
+        await expect(target.getByTestId('retry')).toHaveCount(0)
+        await expect(target.locator('.prose')).toContainText('原文甲')
+        await expect(target.locator('.prose')).not.toContainText('https://weather.example/a')
+        await expect(target.locator('.prose')).not.toContainText('重新生成')
+        const rows = await idbMessages(target)
+        const assistant = rows.find((row) => row.role === 'assistant' && row.status === 'aborted')
+        expect(assistant?.blocks.some((block) => block.type === 'server_tool_use')).toBe(true)
+        expect(assistant?.blocks.some((block) => block.type === 'web_search_tool_result')).toBe(true)
+        const text = assistant?.blocks.filter((block) => block.type === 'text').map((block) => block.text ?? '').join('\n') ?? ''
+        expect(text).toContain('原文甲')
+        expect(text).not.toContain('https://weather.example/a')
+        expect(text).not.toContain('天气来源')
+      }
+      await originalStopped(page)
+      await page.getByTestId('versions').locator('button').nth(1).click()
+      await expect(page.getByTestId('versions')).toContainText('2 / 2')
+      await page.reload()
+      await expect(page.getByTestId('versions')).toContainText('2 / 2')
+      await originalStopped(page)
+    })
+    test('phase-continue-hidden', async ({ page }) => {
+      test.skip(!(theme === 'light' && w === 1440), 'one cell covers when continue stays hidden')
+      await staged(page)
+      await push(page, [
+        ...PH.thinking,
+        { type: 'message_delta', delta: { title: '会话甲' } },
+      ])
+      await expect(page.locator('.chat-link', { hasText: '会话甲' })).toBeVisible()
+      await expect(page.getByTestId('stop')).toBeVisible()
+      await expect(page.getByTestId('continue')).toHaveCount(0)
+      await push(page, [
+        { type: 'content_block_stop', index: 0 },
+        { type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: '原文甲。' } },
+      ])
+      await expect(page.getByTestId('assistant-text')).toContainText('原文甲')
+      await page.getByTestId('stop').click()
+      await expect(page.getByTestId('continue')).toHaveCount(1)
+      await page.getByTestId('new-chat').click()
+      await page.getByTestId('composer').fill('完成的')
+      await page.getByTestId('send').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 1)
+      await push(page, [
+        { type: 'message_start', message: { id: 'done', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '完成了。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null, title: '会话乙' }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.locator('.turn.assistant')).toContainText('完成了')
+      await expect(page.getByTestId('stop')).toHaveCount(0)
+      await expect(page.getByTestId('continue')).toHaveCount(0)
+      await page.getByTestId('new-chat').click()
+      await page.getByTestId('composer').fill('先停再追问')
+      await page.getByTestId('send').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { requests: Array<{ messages?: Array<{ content?: unknown }> }> } }).__sse.requests.some((item) => JSON.stringify(item).includes('先停再追问')))
+      await push(page, [
+        { type: 'message_start', message: { id: 'child-stop', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '半句。' } },
+        { type: 'message_delta', delta: { title: '会话丙' } },
+      ])
+      await expect(page.locator('.turn.assistant')).toContainText('半句')
+      await page.getByTestId('stop').click()
+      await expect(page.getByTestId('continue')).toHaveCount(1)
+      await page.getByTestId('composer').fill('追问')
+      await page.getByTestId('send').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { requests: Array<{ messages?: Array<{ content?: unknown }> }> } }).__sse.requests.some((item) => JSON.stringify(item).includes('追问')))
+      await push(page, [
+        { type: 'message_start', message: { id: 'child-done', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '后文。' } },
+        { type: 'content_block_stop', index: 0 },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { input_tokens: 1, output_tokens: 1 } },
+        { type: 'message_stop' },
+      ])
+      await expect(page.locator('.turn.assistant').last()).toContainText('后文')
+      await expect(page.getByTestId('continue')).toHaveCount(0)
+      await page.getByTestId('new-chat').click()
+      await page.getByTestId('composer').fill('另一路还在生成')
+      await page.getByTestId('send').click()
+      await page.waitForFunction(() => (window as unknown as { __sse: { requests: Array<{ messages?: Array<{ content?: unknown }> }> } }).__sse.requests.some((item) => JSON.stringify(item).includes('另一路还在生成')))
+      await push(page, [
+        { type: 'message_start', message: { id: 'other', model: 'deepseek-flash' } },
+        { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '', signature: '' } },
+        { type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: '还在想' } },
+        { type: 'message_delta', delta: { title: '会话丁' } },
+      ])
+      await expect(page.getByTestId('stop')).toBeVisible()
+      await expect(page.locator('.chat-link', { hasText: '会话丁' })).toBeVisible()
+      await page.locator('.chat-link', { hasText: '会话甲' }).click()
+      await expect(page.locator('.turn.assistant').last()).toContainText('原文甲')
+      await expect(page.getByTestId('continue')).toBeVisible()
     })
     test('concurrent-send', async ({ page }) => { knownFailure('concurrent-send'); await staged(page); await push(page, PH.thinking); await page.waitForTimeout(300)
       await drawer(page); await page.getByTestId('new-chat').click(); await page.waitForTimeout(300); if (isMobile(page) && (await page.locator('.nav-open').count())) await page.keyboard.press('Escape')
