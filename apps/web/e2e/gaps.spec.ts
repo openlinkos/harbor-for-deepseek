@@ -81,7 +81,7 @@ test('mobile drawer', async ({ page }) => {
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await expect(page.locator('.settings-shell')).toHaveCSS('border-top-left-radius', '24px')
-  await expect(page.locator('.settings-shell')).toHaveCSS('border-bottom-left-radius', '0px')
+  await expect(page.locator('.settings-shell')).toHaveCSS('border-bottom-left-radius', '24px')
 })
 
 test('offline banner', async ({ page }) => {
