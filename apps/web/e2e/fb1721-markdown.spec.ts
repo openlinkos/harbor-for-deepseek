@@ -6,8 +6,7 @@
 // Corpus: e2e/fixtures/fb1721-math-corpus.ts. The same text is sent as answer body and as thinking.
 // Every case runs in BOTH containers: answer body (.prose / .ds-markdown) and thinking
 // (.think-copy / .ds-think-content .ds-markdown), × light/dark × 1440/390.
-// IDs: fb1721-M math delimiters, fb1721-L thinking-block lists, fb1721-N main-answer nested lists.
-// A fix PR deletes only its own id. FB1721_STRICT=1 ignores knownFailure.
+// fb1721-M (math delimiters) is asserted directly. List spacing covers fb1721-L and fb1721-N.
 import { expect, test, type Page } from '@playwright/test'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -20,11 +19,6 @@ const OFF_ALL = JSON.parse(readFileSync(join(HERE, 'fixtures/official-fb1721.jso
 const OFF = OFF_ALL.markdown
 const PARSER = OFF.parser.MATH.counts
 const SHOTS = process.env.SHOTS
-const STRICT = process.env.FB1721_STRICT === '1'
-const KNOWN: Record<string, string> = {
-  'fb1721-M': 'fb1721-M: 只认 $ / $$；\\( \\) 与 \\[ \\] 原样显示（反斜杠被 CommonMark 转义吃掉）；「$5 和 $10」被误当成公式',
-}
-const knownFailure = (id: string) => { if (!STRICT && KNOWN[id]) test.fail(true, KNOWN[id]) }
 const reply = (where: 'body' | 'think', text: string) => (_req: unknown) => {
   const ev: unknown[] = [{ type: 'message_start', message: { id: 'm', model: 'deepseek-flash' } }]
   let i = 0
@@ -51,7 +45,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
   const cell = `${theme} ${w} ${where}`
   test.describe(`fb1721 md ${cell}`, () => {
     test.use({ viewport: { width: w, height: h }, colorScheme: theme as 'light' | 'dark', bypassCSP: true })
-    test('math-delimiters', async ({ page }) => { knownFailure('fb1721-M'); const c = await run(page, theme, where, MATH)
+    test('math-delimiters', async ({ page }) => { const c = await run(page, theme, where, MATH)
       if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await c.screenshot({ path: join(SHOTS, `math-${cell.replace(/ /g, '-')}.png`) }) }
       const m = await c.evaluate((e) => (window as any).__mdm(e))
       const leaked = MATH_EXPECT.literalForbidden.filter((s) => m.plain.includes(s))
@@ -60,7 +54,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       expect.soft(m.errors, 'katex-error').toBe(0)
       expect.soft(m.inline, 'inline formulas').toBe(PARSER.inlineMath)
       expect(m.display, 'display formulas').toBe(PARSER.math) })
-    test('math-display-style', async ({ page }) => { knownFailure('fb1721-M'); const c = await run(page, theme, where, MATH)
+    test('math-display-style', async ({ page }) => { const c = await run(page, theme, where, MATH)
       const m = await c.evaluate((e) => (window as any).__mdm(e))
       expect(m.display).toBe(PARSER.math)
       for (const d of m.display_) { expect.soft(d.textAlign).toBe(OFF.math.displayTextAlign); expect.soft(d.padding).toBe(OFF.math.displayPadding); expect.soft(d.overflowX).toBe(OFF.math.displayOverflowX)
