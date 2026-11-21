@@ -819,11 +819,19 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     const requests = continuationBodies()
     expect(requests.length).toBeGreaterThan(0)
     expect(JSON.stringify(requests[0]?.tools ?? [])).not.toContain('deepseek_web_search')
-    const sent = JSON.stringify(requests[0]?.messages?.at(-1)?.content)
+    const sentContent = requests[0]?.messages?.at(-1)?.content
+    const sent = JSON.stringify(sentContent)
     expect(sent).not.toContain('server_tool_use')
     expect(sent).not.toContain('web_search_tool_result')
     expect(sent).toContain('天气来源')
     expect(sent).toContain('https://weather.example/a')
+    expect(Array.isArray(sentContent)).toBe(true)
+    const sentBlocks = sentContent as Array<{ type?: string; text?: string }>
+    expect(sentBlocks.at(-1)).toEqual({ type: 'text', text: '原文甲' })
+    const partialAt = sentBlocks.findIndex((block) => block.type === 'text' && block.text === '原文甲')
+    expect(partialAt).toBe(sentBlocks.length - 1)
+    expect(sentBlocks.slice(0, partialAt).some((block) => block.type === 'text' && (block.text ?? '').includes('https://weather.example/a'))).toBe(true)
+    expect(sentBlocks.slice(partialAt + 1).some((block) => block.type === 'text' && (block.text ?? '').includes('https://weather.example/a'))).toBe(false)
     const afterResponse = await harbor.app.request('/api/conversations/fold-chat/messages', { headers: authed(session, created.csrf) })
     const after = (await afterResponse.json()) as { messages: Array<{ role: string; status: string; blocks: Array<{ type: string; text?: string }> }> }
     expect(after.messages.filter((item) => item.role === 'assistant')).toHaveLength(1)

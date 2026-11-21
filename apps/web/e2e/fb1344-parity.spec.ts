@@ -539,6 +539,14 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       expect(encoded).not.toContain('server_tool_use')
       expect(encoded).not.toContain('web_search_tool_result')
       expect(JSON.stringify(request?.tools ?? [])).not.toContain('deepseek_web_search')
+      const blocks = last?.content
+      expect(Array.isArray(blocks)).toBe(true)
+      const content = blocks as Array<{ type?: string; text?: string }>
+      expect(content.at(-1)).toEqual({ type: 'text', text: '原文甲。' })
+      const partialAt = content.findIndex((block) => block.type === 'text' && block.text === '原文甲。')
+      expect(partialAt).toBe(content.length - 1)
+      expect(content.slice(0, partialAt).some((block) => block.type === 'text' && (block.text ?? '').includes('https://weather.example/a'))).toBe(true)
+      expect(content.slice(partialAt + 1).some((block) => block.type === 'text' && (block.text ?? '').includes('https://weather.example/a'))).toBe(false)
       await push(page, [
         { type: 'message_start', message: { id: 'c', model: 'deepseek-flash' } },
         { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },

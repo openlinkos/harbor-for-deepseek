@@ -1,3 +1,4 @@
+import { appendFileSync } from 'node:fs'
 import { createServer as createHttp, type IncomingMessage, type ServerResponse } from 'node:http'
 import { serve } from '@hono/node-server'
 import { createServer } from '../src/app.ts'
@@ -59,6 +60,9 @@ const upstream = createHttp(async (request, response) => {
   const body = await readBody(request)
   const encoded = JSON.stringify(body)
   const last = body.messages?.at(-1)
+  if (process.env.CONTINUATION_CAPTURE && last?.role === 'assistant') {
+    appendFileSync(process.env.CONTINUATION_CAPTURE, `${JSON.stringify(body)}\n`)
+  }
   if (encoded.includes('仍要400') && last?.role === 'assistant') {
     response.writeHead(400, { 'content-type': 'application/json' })
     response.end(JSON.stringify({ error: { message: 'rejected' } }))

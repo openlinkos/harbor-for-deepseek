@@ -82,6 +82,30 @@ describe('continuation', () => {
     expect(JSON.stringify(folded)).toContain('先想')
     expect(JSON.stringify(folded)).toContain('原文甲')
   })
+  it('places folded search text before the partial answer', () => {
+    const partial = { type: 'text' as const, text: 'partial' }
+    const folded = continuationBlocks([
+      { type: 'thinking', thinking: '先搜', signature: 'sig-1' },
+      { type: 'server_tool_use', id: 's', name: 'deepseek_web_search', input: { action: 'search', queries: ['q'] } },
+      { type: 'web_search_tool_result', tool_use_id: 's', content: [{ type: 'web_search_result', title: '天气来源', url: 'https://weather.example/a', snippet: '晴' }] },
+      { type: 'thinking', thinking: '再写', signature: 'sig-2' },
+      partial,
+    ])
+    expect(folded.at(-1)).toEqual(partial)
+    const answerAt = folded.findIndex((block) => block.type === 'text' && block.text === 'partial')
+    const sourceAt = folded.findIndex((block) => block.type === 'text' && block.text.includes('https://weather.example/a'))
+    expect(answerAt).toBe(folded.length - 1)
+    expect(sourceAt).toBeGreaterThan(0)
+    expect(sourceAt).toBeLessThan(answerAt)
+    expect(folded.slice(answerAt + 1).some((block) => block.type === 'text' && block.text.includes('https://weather.example/a'))).toBe(false)
+    const sent = toApiMessages([user('u', '天气'), { ...assistant, blocks: folded }])
+    const content = sent.at(-1)?.content
+    expect(Array.isArray(content)).toBe(true)
+    if (!Array.isArray(content)) return
+    expect(content.at(-1)).toEqual({ type: 'text', text: 'partial' })
+    expect(content.slice(0, -1).some((block) => block.type === 'text' && block.text.includes('https://weather.example/a'))).toBe(true)
+    expect(content.slice(-1).some((block) => block.type === 'text' && block.text.includes('https://weather.example/a'))).toBe(false)
+  })
   it('drops the web search tool from a folded continuation request', () => {
     const searched = {
       ...assistant,

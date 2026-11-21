@@ -87,17 +87,24 @@ const replayUser = (message: Message): ApiMessage | null => {
 /**
  * Search and page-read blocks cannot be sent back on a continuation (the API returns 400).
  * Fold the readable result into plain text for the upstream request only. Stored blocks stay
- * as they were. A 400 still falls back to regenerating.
+ * as they were. The folded text replaces the first removed tool block, and always sits before
+ * the first answer text, so the prefill still ends on the partial answer. A 400 still falls
+ * back to regenerating.
  */
 export const continuationBlocks = (blocks: Message['blocks']): Message['blocks'] => {
   const folded: string[] = []
   const kept: Message['blocks'] = []
+  let insertAt: number | null = null
+  const markRemoval = () => {
+    if (insertAt === null) insertAt = kept.length
+  }
   for (const block of blocks) {
     if (block.type === 'web_search_tool_result') {
       const lines = block.content.flatMap((item) =>
         item.type === 'web_search_result' ? [`${item.title} ${item.url}${item.snippet ? ` ${item.snippet}` : ''}`] : [],
       )
       if (lines.length) folded.push(lines.join('\n'))
+      markRemoval()
       continue
     }
     if (block.type === 'web_fetch_tool_result') {
@@ -105,12 +112,21 @@ export const continuationBlocks = (blocks: Message['blocks']): Message['blocks']
         const title = block.content.content?.title || block.content.url
         folded.push(`${title} ${block.content.url}`)
       }
+      markRemoval()
       continue
     }
-    if (block.type === 'server_tool_use') continue
+    if (block.type === 'server_tool_use') {
+      markRemoval()
+      continue
+    }
     kept.push(block)
   }
-  if (folded.length) kept.push({ type: 'text', text: folded.join('\n') })
+  if (!folded.length) return kept
+  const note: Message['blocks'][number] = { type: 'text', text: folded.join('\n') }
+  const firstAnswer = kept.findIndex((block) => block.type === 'text')
+  let at = insertAt ?? kept.length
+  if (firstAnswer !== -1 && at > firstAnswer) at = firstAnswer
+  kept.splice(at, 0, note)
   return kept
 }
 

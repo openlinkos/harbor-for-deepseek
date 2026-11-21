@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { once } from 'node:events'
-import { rm } from 'node:fs/promises'
+import { readFile, rm } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, test, type Page } from '@playwright/test'
@@ -8,6 +8,7 @@ import { expect, test, type Page } from '@playwright/test'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '../../..')
 const BUNDLE = join(ROOT, 'apps/server/e2e/.live-harbor.mjs')
+const CONTINUATION_CAPTURE = '/tmp/harbor-54d1-continuations.ndjson'
 
 const titleOf = (page: Page) => page.locator('[data-testid=thinking-toggle]').first()
 const secondsOf = async (page: Page) => {
@@ -23,6 +24,7 @@ test.describe('server live clock', () => {
 
   test.beforeAll(async () => {
     await rm(BUNDLE, { force: true })
+    await rm(CONTINUATION_CAPTURE, { force: true })
     const build = spawn('pnpm', ['--filter', '@deepapi/server', 'exec', 'esbuild', 'e2e/live-harbor.ts', '--bundle', '--platform=node', '--format=esm', `--outfile=${BUNDLE}`], {
       cwd: ROOT,
       stdio: 'inherit',
@@ -31,7 +33,7 @@ test.describe('server live clock', () => {
     if (built[0] !== 0) throw new Error('live harbor bundle failed')
     child = spawn(process.execPath, [BUNDLE], {
       cwd: join(ROOT, 'apps/server'),
-      env: { ...process.env, STATIC_DIR: join(ROOT, 'apps/web/dist') },
+      env: { ...process.env, STATIC_DIR: join(ROOT, 'apps/web/dist'), CONTINUATION_CAPTURE },
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     const ready = new Promise<number>((resolve, reject) => {
@@ -58,6 +60,7 @@ test.describe('server live clock', () => {
   test.afterAll(async () => {
     child?.kill('SIGTERM')
     await rm(BUNDLE, { force: true })
+    await rm(CONTINUATION_CAPTURE, { force: true })
   })
 
   const boot = async (page: Page) => {
@@ -111,6 +114,18 @@ test.describe('server live clock', () => {
     await expect(page.locator('.turn.user')).toHaveCount(1)
     if (before !== null) expect(await secondsOf(page)).toBe(before)
   })
+
+  const continuationBodies = async () => {
+    const raw = await readFile(CONTINUATION_CAPTURE, 'utf8').catch(() => '')
+    return raw.split('\n').flatMap((line) => {
+      if (!line) return []
+      try {
+        return [JSON.parse(line) as { messages?: Array<{ role?: string; content?: unknown }> }]
+      } catch {
+        return []
+      }
+    })
+  }
 
   const storedAssistant = async (page: Page, needle: string) =>
     page.evaluate(async (needle) => {
@@ -192,6 +207,16 @@ test.describe('server live clock', () => {
     await expect(page.getByTestId('continue')).toBeVisible()
     await page.getByTestId('continue').click()
     await expect(reply).toContainText('续写乙')
+    await expect.poll(async () => {
+      const hit = (await continuationBodies()).find((body) => JSON.stringify(body).includes('搜索续写') && JSON.stringify(body).includes('https://weather.example/a'))
+      const content = hit?.messages?.at(-1)?.content
+      if (!Array.isArray(content)) return 'missing'
+      const blocks = content as Array<{ type?: string; text?: string }>
+      const last = blocks.at(-1)
+      const partialAt = blocks.findIndex((block) => block.type === 'text' && block.text === '原文甲')
+      const leaked = blocks.slice(partialAt + 1).some((block) => block.type === 'text' && (block.text ?? '').includes('https://weather.example/a'))
+      return `${last?.type ?? ''}:${last?.type === 'text' ? last.text : ''}|at:${partialAt}|end:${blocks.length - 1}|leaked:${leaked}`
+    }).toBe('text:原文甲|at:2|end:2|leaked:false')
     await expect(page.getByTestId('message-assistant')).toHaveCount(1)
     await expect(reply.getByTestId('search-results')).toBeVisible()
     await expect(reply.locator('.found-line')).toContainText('搜索到 1 个网页')
