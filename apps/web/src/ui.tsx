@@ -1091,6 +1091,22 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   )
 }
 
+const BranchSwitcher = ({ ids, current, disabled, onStep }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void }) => {
+  if (ids.length <= 1) return null
+  const index = Math.max(0, ids.indexOf(current))
+  return (
+    <span className="branch" data-testid="versions">
+      <button type="button" className="branch-prev" aria-label="‹" disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
+        <Glyph name="chevronRight" size={14} />
+      </button>
+      <span className="branch-count">{index + 1} / {ids.length}</span>
+      <button type="button" aria-label="›" disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
+        <Glyph name="chevronRight" size={14} />
+      </button>
+    </span>
+  )
+}
+
 const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
@@ -1106,11 +1122,6 @@ const MessageRow = ({ message }: { message: Message }) => {
     state.messages.some((item) => item.conversationId === message.conversationId && item.status === 'streaming'),
   )
   const siblings = siblingIds(messages, message.id)
-  const parent = messages.find((item) => item.id === message.parentId && item.role === 'user')
-  const userSiblings = parent ? siblingIds(messages, parent.id) : []
-  const versionIds = siblings.length > 1 ? siblings : userSiblings.length > 1 ? userSiblings : []
-  const versionCurrent = siblings.length > 1 ? message.id : parent?.id ?? ''
-  const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const fileBlocks = message.blocks.flatMap((block) => (block.type === 'file_ref' ? [block] : []))
   const errorKey = replyErrorKey(message.errorMessage)
@@ -1130,8 +1141,9 @@ const MessageRow = ({ message }: { message: Message }) => {
     else localStorage.removeItem(voteKey)
   }
   const stepVersion = (dir: -1 | 1) => {
-    const next = versionIds[versionIndex + dir]
-    if (next && versionCurrent) void selectSibling(versionCurrent, next)
+    const index = siblings.indexOf(message.id)
+    const next = siblings[index + dir]
+    if (next) void selectSibling(message.id, next)
   }
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
@@ -1177,6 +1189,7 @@ const MessageRow = ({ message }: { message: Message }) => {
                 <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
               </button>
             </HoverTip>
+            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
           </div>
         </>
         )
@@ -1195,13 +1208,7 @@ const MessageRow = ({ message }: { message: Message }) => {
       {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
-          {versionIds.length > 1 ? (
-            <span className="branch" data-testid="versions">
-              <button type="button" aria-label="‹" disabled={versionIndex <= 0} onClick={() => stepVersion(-1)}>‹</button>
-              <span>{versionIndex + 1} / {versionIds.length}</span>
-              <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
-            </span>
-          ) : null}
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
           <HoverTip text={copied ? t('copied') : t('copy')}>
             <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           </HoverTip>

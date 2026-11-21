@@ -186,8 +186,13 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
 .edit-card { width: min(100%, 640px); margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 16px; padding: 10px 12px; background: var(--dsw-specific-bubble); }
 .edit-card textarea { width: 100%; min-height: 72px; border: 0; background: transparent; resize: vertical; }
 .edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.action-row .branch { margin-right: 6px; font-size: 13px; color: var(--dsw-alias-label-secondary); }
-.action-row .branch button { width: auto; height: 28px; padding: 0 4px; }
+.branch { display: inline-flex; align-items: center; gap: 2px; height: 28px; flex: none; }
+.branch-count { color: var(--dsw-alias-label-tertiary); font-size: 15px; line-height: 18px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; user-select: none; }
+.branch-prev svg { transform: rotate(180deg); }
+.action-row .branch button, .user-actions .branch button { width: 28px; height: 28px; padding: 0; color: var(--dsw-alias-label-tertiary); }
+.action-row .branch button:disabled, .user-actions .branch button:disabled { cursor: not-allowed; color: var(--dsw-alias-label-caption); }
+.action-row .branch button:hover:not(:disabled), .user-actions .branch button:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+.action-row .branch button:hover:disabled, .user-actions .branch button:hover:disabled { background: transparent; }
 .feedback-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .diagram-tools { position: relative; }
 .diagram-menu { position: absolute; right: 0; top: 32px; min-width: 140px; }
