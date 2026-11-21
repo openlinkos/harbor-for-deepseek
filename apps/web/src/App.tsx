@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { AdminScreen, ServerLogin, SetupWizard } from './hosted.js'
 import { useHarbor } from './store.js'
-import { KeyGate, Shell } from './ui.js'
+import { BootSkeleton, KeyGate, Shell } from './ui.js'
 
 export const App = () => {
   const booted = useHarbor((state) => state.booted)
@@ -20,7 +20,7 @@ export const App = () => {
     }
   }, [boot])
   if (!booted) {
-    return <main className="gate" />
+    return <BootSkeleton />
   }
   if (setupRequired) {
     return <SetupWizard />

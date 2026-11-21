@@ -1669,6 +1669,15 @@ body[data-ds-dark-theme] .lang button.on { background: #3a3b40; color: #fff; }
   background: transparent;
 }
 .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--dsw-alias-bg-base); }
+.boot-skeleton { min-height: 100vh; }
+.boot-bars { display: flex; flex-direction: column; gap: 12px; padding: 8px 16px; }
+.boot-bars i, .boot-title-bar { display: block; background: var(--dsw-alias-bg-skeleton); }
+.boot-bars i { height: 14px; border-radius: 7px; }
+.boot-bars i:nth-child(1) { width: 38%; }
+.boot-bars i:nth-child(2) { width: 78%; }
+.boot-bars i:nth-child(3) { width: 54%; }
+.boot-title-bar { width: 148px; height: 18px; margin: 16px 0 0 18px; border-radius: 8px; }
+.boot-skeleton .user-bar { margin-top: auto; cursor: default; }
 label { display: grid; gap: 6px; margin: 10px 0; font-size: 14px; }
 label.check { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px; }
 input[type="checkbox"] {

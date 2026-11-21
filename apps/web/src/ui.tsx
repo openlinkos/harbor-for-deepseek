@@ -1252,6 +1252,34 @@ const MessageRow = ({ message }: { message: Message }) => {
   )
 }
 
+export const BootSkeleton = () => {
+  const t = useT()
+  return (
+    <div className="shell boot-skeleton" data-testid="boot-skeleton">
+      <aside className="sidebar">
+        <div className="sider-top">
+          <span className="brand-name"><Mark /><Wordmark /></span>
+          <span className="sider-icons" aria-hidden="true">
+            <span className="icon-btn"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
+            <span className="icon-btn"><Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" /></span>
+          </span>
+        </div>
+        <div className="new-chat" role="presentation">
+          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
+        </div>
+        <div className="boot-bars" aria-hidden="true"><i /><i /><i /></div>
+        <div className="user-bar">
+          <span className="avatar" />
+          <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+        </div>
+      </aside>
+      <section className="stage">
+        <div className="boot-title-bar" />
+      </section>
+    </div>
+  )
+}
+
 export const Shell = () => {
   const t = useT()
   useEffect(() => {

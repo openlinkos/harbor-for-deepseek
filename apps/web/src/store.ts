@@ -416,6 +416,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
   serverBase: '',
 
   async boot() {
+    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('deepapi-boot-hold') === '1') {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('deepapi-boot-release', () => resolve(), { once: true })
+      })
+    }
     const previousKey = get().key
     const store = await repository()
     const settings = await store.loadSettings()
