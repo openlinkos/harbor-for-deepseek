@@ -37,6 +37,26 @@ describe('stream reducer', () => {
     expect(draft.stopped).toBe(true)
   })
 
+  it('keeps a positive thinking duration the API reports', () => {
+    const events = parseSse(
+      [
+        'event: content_block_start',
+        'data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":"","elapsed_secs":3}}',
+        '',
+        'event: content_block_stop',
+        'data: {"type":"content_block_stop","index":0,"elapsed_secs":3}',
+        '',
+        'event: message_delta',
+        'data: {"type":"message_delta","delta":{"stop_reason":"end_turn","thinking_elapsed_secs":3},"usage":{"input_tokens":1,"output_tokens":1}}',
+        '',
+        '',
+      ].join('\n'),
+    )
+    expect(events[0]).toMatchObject({ type: 'content_block_start', content_block: { elapsed_secs: 3 } })
+    expect(events[1]).toMatchObject({ type: 'content_block_stop', elapsed_secs: 3 })
+    expect(events[2]).toMatchObject({ type: 'message_delta', delta: { thinking_elapsed_secs: 3 } })
+  })
+
   it('round-trips a search stream through SSE text, including a keep-alive', () => {
     const payload = `: keep-alive\n\n${eventsToSse(searchEvents())}`
     const events = parseSse(payload)

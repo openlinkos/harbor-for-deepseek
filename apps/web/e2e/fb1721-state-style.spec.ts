@@ -12,7 +12,7 @@
 //                                         stop / error / interrupted) → label-tertiary
 //   vertical line       ._9ecc93a        border-left 1px label-dimmed in every state (no state selector exists)
 //   no transition on dot/icon colour (transition-duration 0s): the switch is a single frame.
-// IDs: fb1721-D1 WIP dot, fb1721-D2 stop/error title icon (#54 already turns D2 green).
+// IDs: fb1721-D1 WIP dot stays known. fb1721-D2 stop/error title icon is green on this PR, so its key is gone.
 // A fix PR deletes only its own id. FB1721_STRICT=1 ignores knownFailure.
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
@@ -25,7 +25,6 @@ const OFF = JSON.parse(readFileSync(join(HERE, 'fixtures/official-fb1721.json'),
 const STRICT = process.env.FB1721_STRICT === '1'
 const KNOWN: Record<string, string> = {
   'fb1721-D1': 'fb1721-D1: 思考点永远灰色、无脉动；进行中应为品牌蓝 + 1.5s 脉动，结束后灰',
-  'fb1721-D2': 'fb1721-D2: 停止/出错后标题图标仍为蓝色，官方变 label-tertiary',
 }
 const knownFailure = (id: string) => { if (!STRICT && KNOWN[id]) test.fail(true, KNOWN[id]) }
 const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="#888"/></svg>')

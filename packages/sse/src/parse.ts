@@ -74,10 +74,16 @@ export const readStreamEvent = (value: unknown): StreamEvent | null => {
       if (!isRecord(value.content_block) || typeof value.content_block.type !== 'string') {
         return null
       }
+      const raw = value.content_block
+      const content_block = { ...raw } as ContentBlock
+      if (content_block.type === 'thinking') {
+        const elapsed = raw.elapsed_secs
+        if (typeof elapsed === 'number' && Number.isFinite(elapsed) && elapsed > 0) content_block.elapsed_secs = elapsed
+      }
       return {
         type: 'content_block_start',
         index: num(value.index),
-        content_block: value.content_block as ContentBlock,
+        content_block,
       }
     }
     case 'content_block_delta': {
@@ -135,16 +141,24 @@ export const readStreamEvent = (value: unknown): StreamEvent | null => {
       }
       return null
     }
-    case 'content_block_stop':
-      return { type: 'content_block_stop', index: num(value.index) }
+    case 'content_block_stop': {
+      const elapsed = value.elapsed_secs
+      return {
+        type: 'content_block_stop',
+        index: num(value.index),
+        ...(typeof elapsed === 'number' && Number.isFinite(elapsed) && elapsed > 0 ? { elapsed_secs: elapsed } : {}),
+      }
+    }
     case 'message_delta': {
       const delta = isRecord(value.delta) ? value.delta : {}
+      const reported = typeof delta.thinking_elapsed_secs === 'number' ? delta.thinking_elapsed_secs : delta.elapsed_secs
       return {
         type: 'message_delta',
         delta: {
           stop_reason: typeof delta.stop_reason === 'string' ? delta.stop_reason : null,
           stop_sequence: typeof delta.stop_sequence === 'string' ? delta.stop_sequence : null,
           ...(typeof delta.title === 'string' ? { title: delta.title } : {}),
+          ...(typeof reported === 'number' && Number.isFinite(reported) && reported > 0 ? { thinking_elapsed_secs: reported } : {}),
         },
         usage: readUsage(value.usage),
       }

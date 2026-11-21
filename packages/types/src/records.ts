@@ -37,6 +37,13 @@ export type Message = SyncFields & {
   /** Final usage from message_delta only. Never message_start. */
   usage: Usage | null
   errorMessage: string | null
+  /**
+   * Rounded thinking seconds for 「用时 N 秒」.
+   * The API total when the stream reports one; otherwise the summed thinking-fragment time.
+   */
+  thinkingSeconds?: number
+  /** Server clock when the first thinking block opened. Reconnect uses this instead of a partial duration. */
+  thinkingStartedAt?: string
   createdAt: string
 }
 
