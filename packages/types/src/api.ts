@@ -35,6 +35,8 @@ export type ThinkingBlock = {
   type: 'thinking'
   thinking: string
   signature: string
+  /** Seconds this fragment took, when the API sends `elapsed_secs`. Absent on the public stream today. */
+  elapsed_secs?: number
 }
 
 export type ServerToolKind =
@@ -175,13 +177,15 @@ export type StreamEvent =
         | { type: 'citations_delta'; citation: TextCitation }
         | { type: 'input_json_delta'; partial_json: string }
     }
-  | { type: 'content_block_stop'; index: number }
+  | { type: 'content_block_stop'; index: number; elapsed_secs?: number }
   | {
       type: 'message_delta'
       delta: {
         stop_reason?: StopReason | null
         stop_sequence?: string | null
         title?: string
+        /** Total thinking seconds, when the API sends it on message_delta. */
+        thinking_elapsed_secs?: number
       }
       usage?: Usage
     }

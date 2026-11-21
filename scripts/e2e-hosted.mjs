@@ -75,7 +75,7 @@ const child = spawn(process.execPath, [join(root, 'apps/server/dist/server.js')]
   stdio: 'inherit',
   env: {
     ...process.env,
-    PORT: '8080',
+    PORT: process.env.PW_SERVER_PORT || '8080',
     STATIC_DIR: join(root, 'apps/web/dist'),
     DATA_DIR: join(root, '.tmp-e2e'),
     E2E_RESET: '1',

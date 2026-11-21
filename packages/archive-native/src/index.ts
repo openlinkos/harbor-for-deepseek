@@ -51,6 +51,9 @@ const messageFields = (value: Record<string, unknown>, conversationId: string): 
   blocks: Array.isArray(value.blocks) ? (value.blocks as ContentBlock[]) : [],
   usage: isRecord(value.usage) ? (value.usage as Message['usage']) : null,
   errorMessage: typeof value.errorMessage === 'string' ? value.errorMessage : null,
+  ...(typeof value.thinkingSeconds === 'number' && Number.isFinite(value.thinkingSeconds)
+    ? { thinkingSeconds: Math.max(1, Math.round(value.thinkingSeconds)) }
+    : {}),
   createdAt: stringField(value.createdAt, 'message.createdAt'),
   updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : stringField(value.createdAt, 'createdAt'),
   rev: typeof value.rev === 'number' ? value.rev : 1,
