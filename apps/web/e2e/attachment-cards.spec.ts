@@ -1,11 +1,9 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-const samples = '/workspace/deepapi-verify/official-captures/chatdemo-gaps/files'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 const sse = (text: string) => {
   const events = [
@@ -89,6 +87,9 @@ test.use({ viewport: { width: 1920, height: 1072 } })
 
 test('attachment cards show uploading then the official size, and the sent message reuses the card', async ({ page }) => {
   await unlock(page)
+  const samples = mkdtempSync(join(tmpdir(), 'attach-'))
+  writeFileSync(join(samples, 'zhuheng-test.pdf'), Buffer.alloc(1383))
+  writeFileSync(join(samples, 'zhuheng-test.txt'), Buffer.alloc(65))
   armUpload()
   await page.getByTestId('file-input').setInputFiles(join(samples, 'zhuheng-test.pdf'))
   const uploading = page.getByTestId('file-card-meta').filter({ hasText: '上传中...' })
@@ -101,7 +102,7 @@ test('attachment cards show uploading then the official size, and the sent messa
   await page.getByTestId('file-input').setInputFiles(join(samples, 'zhuheng-test.txt'))
   await expect(page.getByTestId('file-card-meta').filter({ hasText: '上传中...' })).toBeVisible()
   await expect(page.getByTestId('file-card-meta').first()).toHaveText('PDF 1.35KB')
-  await page.screenshot({ path: join(shots, 'attachments-uploading-txt.png') })
+  await saveShot(page, 'attachments-uploading-txt.png')
   releaseUpload()
   await expect(page.getByTestId('file-card-meta').nth(1)).toHaveText('TXT 65B')
   await expect(page.getByTestId('file-card').first()).toHaveCSS('width', '240px')
@@ -122,7 +123,7 @@ test('attachment cards show uploading then the official size, and the sent messa
   await expect(remove).toHaveCSS('opacity', '1')
   await page.mouse.move(8, 8)
   await expect(remove).toHaveCSS('opacity', '0')
-  await page.screenshot({ path: join(shots, 'attachments-01-composer-txt-uploading.png') })
+  await saveShot(page, 'attachments-01-composer-txt-uploading.png')
 
   armStream()
   await page.getByTestId('send').click()
@@ -132,10 +133,10 @@ test('attachment cards show uploading then the official size, and the sent messa
   await expect(sent.getByRole('button', { name: '移除' })).toHaveCount(0)
   await expect(page.getByTestId('reply-dots')).toBeVisible()
   await expect(page.locator('.drafts')).toHaveCount(0)
-  await page.screenshot({ path: join(shots, 'attachments-02-composer-cards-before-send.png') })
+  await saveShot(page, 'attachments-02-composer-cards-before-send.png')
   releaseStream()
   await expect(page.getByTestId('assistant-text')).toContainText('这两个附件是一组测试文件。')
   await expect(sent).toContainText('zhuheng-test.pdf')
-  await page.screenshot({ path: join(shots, 'attachments-03-sent-user-message-cards-waiting-dots.png') })
-  await page.screenshot({ path: join(shots, 'attachments-04-answer-summary.png') })
+  await saveShot(page, 'attachments-03-sent-user-message-cards-waiting-dots.png')
+  await saveShot(page, 'attachments-04-answer-summary.png')
 })

@@ -1,9 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 test('reload shows the shell skeleton before the app attaches', async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('deepapi-boot-hold', '1'))
@@ -18,7 +14,7 @@ test('reload shows the shell skeleton before the app attaches', async ({ page })
   const box = await bar.boundingBox()
   expect(box && box.width).toBeGreaterThan(40)
   expect(box && box.height).toBeGreaterThan(8)
-  await page.screenshot({ path: join(shots, 'refresh-mid-02-right-after-reload-skeleton-loading.png') })
+  await saveShot(page, 'refresh-mid-02-right-after-reload-skeleton-loading.png')
   await page.evaluate(() => window.dispatchEvent(new Event('deepapi-boot-release')))
   await expect(page.getByTestId('landing-send')).toBeVisible()
   await expect(skeleton).toHaveCount(0)

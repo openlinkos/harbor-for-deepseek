@@ -1,9 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 const fulfill = async (route: Route) => {
   const url = route.request().url()
@@ -50,13 +46,13 @@ test('mobile settings is a centred card with space around it', async ({ page }) 
   expect(box && view && box.y).toBeGreaterThan(8)
   expect(box && view && box.x + box.width).toBeLessThan(view.width - 8)
   expect(box && view && box.y + box.height).toBeLessThan(view.height - 8)
-  await page.screenshot({ path: join(shots, 'mobile-390-04-settings.png') })
+  await saveShot(page, 'mobile-390-04-settings.png')
 })
 
 test('dark home, answer, and settings stay on the dark surfaces', async ({ page }) => {
   await boot(page, 'dark', 1440, 900)
   await expect(page.locator('body')).toHaveAttribute('data-ds-dark-theme', '')
-  await page.screenshot({ path: join(shots, 'dark-01-home-dark.png') })
+  await saveShot(page, 'dark-01-home-dark.png')
   await page.route('https://api.deepseek.com/**', async (route) => {
     const url = route.request().url()
     if (!url.includes('/messages')) {
@@ -81,16 +77,16 @@ test('dark home, answer, and settings stay on the dark surfaces', async ({ page 
   await page.getByTestId('composer').fill('写一句')
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('夜色很安静')
-  await page.screenshot({ path: join(shots, 'dark-02-chat-with-answer-dark.png') })
+  await saveShot(page, 'dark-02-chat-with-answer-dark.png')
   await openSettings(page, false)
   const shell = page.locator('.settings-shell')
   await expect(shell).toBeVisible()
   await expect(shell).toHaveCSS('border-radius', '24px')
-  await page.screenshot({ path: join(shots, 'dark-03-settings-dialog-dark.png') })
+  await saveShot(page, 'dark-03-settings-dialog-dark.png')
   await page.setViewportSize({ width: 390, height: 844 })
   const box = await shell.boundingBox()
   expect(box && box.y).toBeGreaterThan(8)
   expect(box && box.y + box.height).toBeLessThan(836)
   await expect(shell).toHaveCSS('border-bottom-left-radius', '24px')
-  await page.screenshot({ path: join(shots, 'mobile-390-dark-03-settings.png') })
+  await saveShot(page, 'mobile-390-dark-03-settings.png')
 })

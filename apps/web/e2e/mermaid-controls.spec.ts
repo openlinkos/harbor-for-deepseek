@@ -1,9 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 const chart = ['```mermaid', 'graph LR', '  A-->B', '```'].join('\n')
 const wide = ['```mermaid', 'graph LR', '  A-->B-->C-->D-->E-->F-->G-->H-->I-->J', '```'].join('\n')
@@ -66,13 +62,13 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download does not open 
   await ask(page)
   const card = page.getByTestId('mermaid-card')
   await expect(card.getByRole('tab', { name: '图表' })).toHaveAttribute('aria-selected', 'true')
-  await page.screenshot({ path: join(shots, 'mermaid-01-default-diagram-view-toggle-Diagram-Code.png') })
+  await saveShot(page, 'mermaid-01-default-diagram-view-toggle-Diagram-Code.png')
   await card.getByRole('button', { name: '放大' }).hover()
   await expect(page.getByRole('tooltip')).toHaveText('放大')
-  await page.screenshot({ path: join(shots, 'mermaid-04-diagram-zoom-in-tooltip.png') })
+  await saveShot(page, 'mermaid-04-diagram-zoom-in-tooltip.png')
   await card.getByRole('button', { name: '放大' }).click()
   await expect(card.locator('.mermaid')).toHaveCSS('transform', /matrix|scale/)
-  await page.screenshot({ path: join(shots, 'mermaid-05-diagram-zoomed-in.png') })
+  await saveShot(page, 'mermaid-05-diagram-zoomed-in.png')
   const downloadPromise = page.waitForEvent('download')
   await card.getByRole('button', { name: '下载' }).click()
   await expect(card.locator('.diagram-menu')).toHaveCount(0)
@@ -86,7 +82,7 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download does not open 
   const view = page.viewportSize()
   expect(shell && view && shell.y).toBeGreaterThan(8)
   expect(shell && view && shell.y + shell.height).toBeLessThan(view.height - 8)
-  await page.screenshot({ path: join(shots, 'mermaid-03-diagram-fullscreen-modal.png') })
+  await saveShot(page, 'mermaid-03-diagram-fullscreen-modal.png')
   await modal.getByRole('button', { name: '关闭' }).click()
   await expect(modal).toHaveCount(0)
   await card.getByRole('tab', { name: '代码' }).click()
@@ -94,7 +90,7 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download does not open 
   await expect(card.getByRole('button', { name: '下载' })).toBeVisible()
   await expect(card.getByRole('button', { name: '全屏' })).toBeVisible()
   await expect(card.locator('.diagram-source')).toContainText('graph LR')
-  await page.screenshot({ path: join(shots, 'mermaid-02-code-view-Copy-Download-Fullscreen.png') })
+  await saveShot(page, 'mermaid-02-code-view-Copy-Download-Fullscreen.png')
 })
 
 const channel = (paint: string) => paint.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? []
@@ -170,5 +166,5 @@ test('a wide diagram stays inside the card at 390px', async ({ page }) => {
   expect(cardBox && svgBox && svgBox.x + svgBox.width).toBeLessThanOrEqual((cardBox?.x ?? 0) + (cardBox?.width ?? 0) + 1)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
   expect(overflow).toBe(false)
-  await page.screenshot({ path: join(shots, 'mermaid-mobile-390-08-no-overflow.png') })
+  await saveShot(page, 'mermaid-mobile-390-08-no-overflow.png')
 })

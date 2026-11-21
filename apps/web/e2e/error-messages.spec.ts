@@ -1,9 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 const sse = (text: string) => {
   const events = [
@@ -85,14 +81,14 @@ test('network failure before the stream shows the official hint and retry', asyn
   if (button && bubble) {
     expect(Math.round(bubble.x - (button.x + button.width))).toBe(13)
   }
-  await page.screenshot({ path: join(shots, 'error-stream-interrupt-01-offline-t0-check-network-and-retry.png') })
+  await saveShot(page, 'error-stream-interrupt-01-offline-t0-check-network-and-retry.png')
   await retry.hover()
   await expect(retry).toHaveCSS('background-color', 'rgb(247, 173, 49)')
   mode = 'ok'
   await retry.click()
   await expect(page.getByTestId('assistant-text')).toContainText('已重新发出')
   await expect(page.getByTestId('user-hint')).toHaveCount(0)
-  await page.screenshot({ path: join(shots, 'error-stream-interrupt-04-after-retry-click-streaming.png') })
+  await saveShot(page, 'error-stream-interrupt-04-after-retry-click-streaming.png')
 })
 
 test('HTTP 503, 402, and 401 keep the assistant error row and use bundle text', async ({ page }) => {

@@ -1,9 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const shots = '/workspace/deepapi-dev/tasks/M-shots'
-mkdirSync(shots, { recursive: true })
+import { saveShot } from './lib/parity-shots'
 
 const sse = (text: string) => {
   const events = [
@@ -82,7 +78,7 @@ test('regenerating shows dots, then ‹ 2 / 2 › with disabled and hover colors
   await expect(page.getByTestId('reply-dots')).toBeVisible()
   await expect(page.getByTestId('versions')).toHaveCount(0)
   await expect(page.getByTestId('assistant-text')).toHaveCount(0)
-  await page.screenshot({ path: join(shots, 'versions-01-regenerating-placeholder-dots.png') })
+  await saveShot(page, 'versions-01-regenerating-placeholder-dots.png')
   release()
   const versions = page.getByTestId('versions')
   await expect(versions).toContainText('2 / 2')
@@ -103,10 +99,10 @@ test('regenerating shows dots, then ‹ 2 / 2 › with disabled and hover colors
   await expect(count).toHaveCSS('color', 'rgb(129, 133, 140)')
   await expect(next).toHaveCSS('color', 'rgb(173, 178, 184)')
   await expect(prev).toHaveCSS('color', 'rgb(129, 133, 140)')
-  await page.screenshot({ path: join(shots, 'versions-02-switcher-2of2.png') })
+  await saveShot(page, 'versions-02-switcher-2of2.png')
   await prev.hover()
   await expect(prev).toHaveCSS('background-color', 'rgba(38, 49, 72, 0.06)')
-  await page.screenshot({ path: join(shots, 'versions-03-hover-prev-arrow-fullpage.png') })
+  await saveShot(page, 'versions-03-hover-prev-arrow-fullpage.png')
   await next.hover()
   await expect(next).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
   await prev.click()
@@ -115,10 +111,10 @@ test('regenerating shows dots, then ‹ 2 / 2 › with disabled and hover colors
   await expect(prev).toBeDisabled()
   await expect(next).toBeEnabled()
   await expect(prev).toHaveCSS('color', 'rgb(173, 178, 184)')
-  await page.screenshot({ path: join(shots, 'versions-04-switcher-1of2-prev-disabled.png') })
+  await saveShot(page, 'versions-04-switcher-1of2-prev-disabled.png')
   await next.hover()
   await expect(next).toHaveCSS('background-color', 'rgba(38, 49, 72, 0.06)')
-  await page.screenshot({ path: join(shots, 'versions-05-hover-next-arrow-at-1of2.png') })
+  await saveShot(page, 'versions-05-hover-next-arrow-at-1of2.png')
 })
 
 test('edited user message shows ‹ 2 / 2 › beside copy and edit', async ({ page }) => {
@@ -140,10 +136,10 @@ test('edited user message shows ‹ 2 / 2 › beside copy and edit', async ({ pa
   const row = await page.locator('.turn.user .user-actions').boundingBox()
   const bubble = await page.locator('.turn.user .bubble').boundingBox()
   expect(row && bubble ? row.y : 0).toBeGreaterThan(bubble?.y ?? 0)
-  await page.screenshot({ path: join(shots, 'versions-07-user-message-switcher-2of2.png') })
+  await saveShot(page, 'versions-07-user-message-switcher-2of2.png')
   await prev.hover()
   await expect(prev).toHaveCSS('background-color', 'rgba(38, 49, 72, 0.06)')
-  await page.screenshot({ path: join(shots, 'versions-08-hover-user-switcher-prev.png') })
+  await saveShot(page, 'versions-08-hover-user-switcher-prev.png')
   await prev.click()
   await expect(user).toContainText('1 / 2')
   await expect(page.locator('.turn.user .bubble')).toContainText('写一句关于春天的话')
