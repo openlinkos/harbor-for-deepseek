@@ -692,7 +692,7 @@ test('settings', async ({ page }) => {
   await page.getByTestId('language-trigger').click()
   await page.getByRole('option', { name: 'English' }).click()
   await page.getByRole('button', { name: 'Close' }).click()
-  await expect(page.getByTestId('composer')).toHaveAttribute('placeholder', 'Message DeepSeek')
+  await expect(page.getByTestId('composer')).toHaveAttribute('placeholder', 'Message DeepAPI')
 })
 
 test('key gate', async ({ page }) => {
