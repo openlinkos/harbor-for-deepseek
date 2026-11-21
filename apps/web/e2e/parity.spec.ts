@@ -552,7 +552,7 @@ test('mermaid card', async ({ page }) => {
   await send(page, '图')
   const card = page.getByTestId('mermaid-card')
   await expect(card.getByRole('tab', { name: '图表' })).toBeVisible()
-  await expect(card.locator('svg')).toBeVisible({ timeout: 15_000 })
+  await expect(card.locator('.diagram-view svg')).toBeVisible({ timeout: 15_000 })
   await card.getByRole('button', { name: '放大' }).click()
   await card.getByRole('tab', { name: '代码' }).click()
   await expect(card.locator('.diagram-source')).toContainText('graph LR')
@@ -588,7 +588,8 @@ test('errors', async ({ page }) => {
   await expect(page.locator('.form-error').last()).toBeVisible()
   mode = 'down'
   await send(page, '断网')
-  await expect(page.locator('.form-error').last()).toBeVisible()
+  await expect(page.getByTestId('user-hint').last()).toHaveText('请检查网络后重试')
+  await expect(page.getByTestId('hint-retry')).toBeVisible()
 })
 
 test('attachment', async ({ page }) => {
@@ -691,7 +692,7 @@ test('settings', async ({ page }) => {
   await page.getByTestId('language-trigger').click()
   await page.getByRole('option', { name: 'English' }).click()
   await page.getByRole('button', { name: 'Close' }).click()
-  await expect(page.getByTestId('composer')).toHaveAttribute('placeholder', 'Message DeepSeek')
+  await expect(page.getByTestId('composer')).toHaveAttribute('placeholder', 'Message DeepAPI')
 })
 
 test('key gate', async ({ page }) => {

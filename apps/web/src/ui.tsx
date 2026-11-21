@@ -10,6 +10,8 @@ import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
+import { HINT_NETWORK, replyErrorKey } from './errors.js'
+import { FileCard } from './file-card.js'
 import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
@@ -802,12 +804,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     )
   }
   if (block.type === 'file_ref') {
-    return (
-      <span className="file-chip">
-        {block.filename}
-        <small>{Math.ceil(block.bytes / 1024)} KB</small>
-      </span>
-    )
+    return <FileCard name={block.filename} bytes={block.bytes} status="done" />
   }
   return null
 }
@@ -1094,6 +1091,22 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   )
 }
 
+const BranchSwitcher = ({ ids, current, disabled, onStep }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void }) => {
+  if (ids.length <= 1) return null
+  const index = Math.max(0, ids.indexOf(current))
+  return (
+    <span className="branch" data-testid="versions">
+      <button type="button" className="branch-prev" aria-label="‹" disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
+        <Glyph name="chevronRight" size={14} />
+      </button>
+      <span className="branch-count">{index + 1} / {ids.length}</span>
+      <button type="button" aria-label="›" disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
+        <Glyph name="chevronRight" size={14} />
+      </button>
+    </span>
+  )
+}
+
 const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
@@ -1102,18 +1115,16 @@ const MessageRow = ({ message }: { message: Message }) => {
   const messages = useHarbor((state) => state.messages)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
+  const resend = useHarbor((state) => state.resend)
   const editUser = useHarbor((state) => state.editUser)
   const streaming = useHarbor((state) => state.streaming)
   const generatingHere = useHarbor((state) =>
     state.messages.some((item) => item.conversationId === message.conversationId && item.status === 'streaming'),
   )
   const siblings = siblingIds(messages, message.id)
-  const parent = messages.find((item) => item.id === message.parentId && item.role === 'user')
-  const userSiblings = parent ? siblingIds(messages, parent.id) : []
-  const versionIds = siblings.length > 1 ? siblings : userSiblings.length > 1 ? userSiblings : []
-  const versionCurrent = siblings.length > 1 ? message.id : parent?.id ?? ''
-  const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
+  const fileBlocks = message.blocks.flatMap((block) => (block.type === 'file_ref' ? [block] : []))
+  const errorKey = replyErrorKey(message.errorMessage)
   const [copied, setCopied] = useState(false)
   const voteKey = `deepapi-vote:${message.id}`
   const [vote, setVote] = useState<'up' | 'down' | null>(() => {
@@ -1130,13 +1141,21 @@ const MessageRow = ({ message }: { message: Message }) => {
     else localStorage.removeItem(voteKey)
   }
   const stepVersion = (dir: -1 | 1) => {
-    const next = versionIds[versionIndex + dir]
-    if (next && versionCurrent) void selectSibling(versionCurrent, next)
+    const index = siblings.indexOf(message.id)
+    const next = siblings[index + dir]
+    if (next) void selectSibling(message.id, next)
   }
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
       <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
       <div className="share-halo" aria-hidden="true" />
+      {message.role === 'user' && fileBlocks.length ? (
+        <div className="message-files" data-testid="message-files">
+          {fileBlocks.map((block, blockIndex) => (
+            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
+          ))}
+        </div>
+      ) : null}
       {message.role === 'user' ? (
         editing ? (
           <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
@@ -1148,7 +1167,17 @@ const MessageRow = ({ message }: { message: Message }) => {
           </form>
         ) : (
         <>
-          <div className="bubble">{textOf}</div>
+          <div className="bubble">
+            {textOf}
+            {message.errorMessage === HINT_NETWORK ? (
+              <HoverTip text={t('retry')}>
+                <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
+                  <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
+                </button>
+              </HoverTip>
+            ) : null}
+          </div>
+          {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
           <div className="user-actions">
             <HoverTip text={t('copy')}>
               <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
@@ -1160,6 +1189,7 @@ const MessageRow = ({ message }: { message: Message }) => {
                 <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
               </button>
             </HoverTip>
+            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
           </div>
         </>
         )
@@ -1168,25 +1198,17 @@ const MessageRow = ({ message }: { message: Message }) => {
       {message.role === 'assistant' && message.status === 'streaming' && phaseOf(message) === 'pending' ? (
         <div className="reply-dots" data-testid="reply-dots" aria-hidden="true"><i /><i /><i /></div>
       ) : null}
-      {message.role === 'assistant' ? <AssistantTurn message={message} /> : message.blocks.filter((block) => block.type === 'file_ref').map((block, blockIndex) => (
-            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
-          ))}
+      {message.role === 'assistant' ? <AssistantTurn message={message} /> : null}
       {message.status === 'error' ? (
         <p className="form-error">
-          {message.errorMessage || t('error')}
+          {errorKey ? t(errorKey) : message.errorMessage || t('error')}
           <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
         </p>
       ) : null}
       {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
-          {versionIds.length > 1 ? (
-            <span className="branch" data-testid="versions">
-              <button type="button" aria-label="‹" disabled={versionIndex <= 0} onClick={() => stepVersion(-1)}>‹</button>
-              <span>{versionIndex + 1} / {versionIds.length}</span>
-              <button type="button" aria-label="›" disabled={versionIndex >= versionIds.length - 1} onClick={() => stepVersion(1)}>›</button>
-            </span>
-          ) : null}
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
           <HoverTip text={copied ? t('copied') : t('copy')}>
             <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           </HoverTip>
@@ -1227,6 +1249,34 @@ const MessageRow = ({ message }: { message: Message }) => {
         </div>
       ) : null}
     </article>
+  )
+}
+
+export const BootSkeleton = () => {
+  const t = useT()
+  return (
+    <div className="shell boot-skeleton" data-testid="boot-skeleton">
+      <aside className="sidebar">
+        <div className="sider-top">
+          <span className="brand-name"><Mark /><Wordmark /></span>
+          <span className="sider-icons" aria-hidden="true">
+            <span className="icon-btn"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
+            <span className="icon-btn"><Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" /></span>
+          </span>
+        </div>
+        <div className="new-chat" role="presentation">
+          <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
+        </div>
+        <div className="boot-bars" aria-hidden="true"><i /><i /><i /></div>
+        <div className="user-bar">
+          <span className="avatar" />
+          <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+        </div>
+      </aside>
+      <section className="stage">
+        <div className="boot-title-bar" />
+      </section>
+    </div>
   )
 }
 
@@ -2080,17 +2130,18 @@ const Composer = () => {
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
       {drafts.length ? (
-        <ul className="drafts">
+        <div className="drafts" data-testid="draft-files">
           {drafts.map((file) => (
-            <li key={file.localId}>
-              <span>{file.busy ? t('uploading') : file.filename}</span>
-              {file.error ? <small>{file.error}</small> : null}
-              <button type="button" onClick={() => removeDraft(file.localId)}>
-                {t('remove')}
-              </button>
-            </li>
+            <FileCard
+              key={file.localId}
+              name={file.filename}
+              bytes={file.bytes}
+              status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
+              error={file.error}
+              onRemove={() => removeDraft(file.localId)}
+            />
           ))}
-        </ul>
+        </div>
       ) : null}
       <textarea
         ref={box}
