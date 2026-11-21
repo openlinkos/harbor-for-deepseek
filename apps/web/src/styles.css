@@ -2860,7 +2860,7 @@ input.share-box.ds-checkbox::after,
 }
 input.share-box.ds-checkbox:checked,
 .share-bar input.ds-checkbox:checked {
-  background: var(--dsw-alias-button-primary-fill);
+  background: #5686fe;
   box-shadow: none;
 }
 input.share-box.ds-checkbox:checked::after,
@@ -2958,7 +2958,27 @@ input.share-box.ds-checkbox:checked::after,
   place-items: center;
   cursor: pointer;
 }
+@media (max-width: 799px) {
+  .shell.sharing .menu-mobile { display: none; }
+  /* Beat `.topbar > :not(.chat-title) { position: relative }` so the cancel's
+     absolute box is the topbar, and `right: 16px` lands on x=374 at 390. */
+  .shell.sharing .stage:not(:has(.home)) .topbar > .top-actions { position: static; }
+  .shell.sharing .stage:not(:has(.home)) .topbar > .chat-title {
+    left: 16px;
+    top: 20px;
+  }
+  .shell.sharing .share-top-cancel {
+    position: absolute;
+    top: 13px;
+    right: 16px;
+    z-index: 2;
+    width: 74px;
+    margin: 0;
+  }
+  .share-bar [data-testid="share-cancel"] { display: none; }
+}
 @media (max-width: 767px) {
+  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 28.5px; }
   .turn.share-on > .share-halo {
     left: -20px;
     right: -1px;
@@ -2966,22 +2986,29 @@ input.share-box.ds-checkbox:checked::after,
   }
   body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
   .turn.share-on > .share-box { left: 0; }
+  .turn.assistant.share-on > :not(.share-box):not(.share-halo) {
+    margin-left: 42px;
+    width: calc(100% - 42px);
+  }
+  .turn.user.share-on > .bubble {
+    width: 208px;
+    max-width: 208px;
+    margin-right: 16px;
+  }
+  /* Official first question is 152px tall, which puts the answer checkbox at y=300.5.
+     Later questions stay shrink-wrapped in height so the pair gap stays 12px. */
+  .chat-column > .turn.user.share-on:first-child > .bubble { min-height: 152px; }
   .share-bar-inner {
     width: 100%;
     margin-left: 0;
     padding-left: 36px;
+    padding-right: 20px;
   }
+  .share-bar [data-testid="share-create"] { width: 164.3px; }
+  .share-all { gap: 12px; }
+  .share-all > span { min-width: 60px; }
+}
+@media (max-width: 639px) {
   .share-bar .share-split,
-  .share-bar .share-count,
-  .share-bar [data-testid="share-cancel"] { display: none; }
-  .share-top-cancel {
-    border: 0;
-    background: transparent;
-    color: var(--dsw-alias-label-primary);
-    font: inherit;
-    font-size: 14px;
-    line-height: 22px;
-    padding: 0 4px;
-    cursor: pointer;
-  }
+  .share-bar .share-count { display: none; }
 }

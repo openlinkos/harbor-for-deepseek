@@ -306,14 +306,23 @@ test('search cite numbers follow the result list', async ({ page }) => {
 })
 
 test('search cite marks sit at the end of the cited sentence', async ({ page }) => {
-  const cites = await openSearchAnswer(page)
-  const tails = await cites.evaluateAll((nodes) => nodes.map((node) => {
-    const previous = node.parentElement?.previousSibling
-    return previous && previous.nodeType === Node.TEXT_NODE ? previous.textContent ?? '' : ''
-  }))
-  expect(tails[0]?.endsWith('三十九万人。')).toBe(true)
-  expect(tails[1]?.endsWith('雷克雅未克。')).toBe(true)
-  expect(tails[0]?.includes('雷克雅未克')).toBe(false)
+  await openSearchAnswer(page)
+  const placed = await page.getByTestId('assistant-text').evaluate((root) => {
+    const groups = [...root.querySelectorAll('[data-citation-group]')]
+    const group = groups[0]
+    const previous = group?.previousSibling
+    return {
+      groups: groups.length,
+      cites: [...root.querySelectorAll('.cite')].map((node) => node.textContent),
+      prev: previous && previous.nodeType === Node.TEXT_NODE ? previous.textContent ?? '' : '',
+      onlyAnchors: group ? [...group.children].every((el) => el.tagName === 'A') : false,
+    }
+  })
+  expect(placed.groups).toBe(1)
+  expect(placed.cites).toEqual(['1', '5'])
+  expect(placed.prev.endsWith('雷克雅未克。')).toBe(true)
+  expect(placed.prev.includes('三十九万人。')).toBe(true)
+  expect(placed.onlyAnchors).toBe(true)
 })
 
 test('search cite hover shows the result title and site', async ({ page }) => {

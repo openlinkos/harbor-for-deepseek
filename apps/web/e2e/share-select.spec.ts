@@ -37,7 +37,7 @@ const OFF = {
   light: {
     checkBg: 'rgba(0, 0, 0, 0)',
     checkBorder: 'rgba(0, 0, 0, 0.12)',
-    checkOn: 'rgb(57, 100, 254)',
+    checkOn: 'rgb(86, 134, 254)',
     checkMark: 'rgb(255, 255, 255)',
     block: 'rgb(245, 246, 247)',
     barBg: 'rgb(255, 255, 255)',
@@ -86,7 +86,7 @@ const seed = async (page: Page) => {
     tx.objectStore('conversations').put({
       id, title: '分享样本', titleSource: 'user', model: 'deepseek-flash', thinking: false, search: false, readLink: false, effort: 'high', pinned: false, archived: false, activeLeafId: 'a2', createdAt: when, updatedAt: when, rev: 1, deletedAt: null,
     })
-    tx.objectStore('messages').put(message('u1', null, 'user', '第一问', '2026-11-20T00:00:00.000Z'))
+    tx.objectStore('messages').put(message('u1', null, 'user', '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗', '2026-11-20T00:00:00.000Z'))
     tx.objectStore('messages').put(message('a1', 'u1', 'assistant', '第一答', '2026-11-20T00:00:01.000Z'))
     tx.objectStore('messages').put(message('u2', 'a1', 'user', '第二问', '2026-11-20T00:00:02.000Z'))
     tx.objectStore('messages').put(message('a2', 'u2', 'assistant', '第二答', '2026-11-20T00:00:03.000Z'))
@@ -224,6 +224,10 @@ const firstLine = (root: Locator) => root.evaluate((node) => {
   return null
 })
 
+const near = (actual: number, expected: number, name: string, tolerance = 1) => {
+  expect(Math.abs(actual - expected), `${name} ${actual} vs ${expected} ±${tolerance}`).toBeLessThanOrEqual(tolerance)
+}
+
 const inkRatio = (png: Buffer) => {
   const { width, height, data } = decodePng(png)
   const inset = Math.max(1, Math.round(Math.min(width, height) * 0.08))
@@ -278,10 +282,19 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const bubbleAfter = await boxOf('.turn.user .bubble')
       expect(Math.abs(columnAfter.x - columnBefore.x), 'column x').toBeLessThanOrEqual(1)
       expect(Math.abs(columnAfter.width - columnBefore.width), 'column width').toBeLessThanOrEqual(1)
-      expect(Math.abs(proseAfter.x - proseBefore.x), 'prose x').toBeLessThanOrEqual(1)
-      expect(Math.abs(proseAfter.width - proseBefore.width), 'prose width').toBeLessThanOrEqual(1)
-      expect(Math.abs(bubbleAfter.x - bubbleBefore.x), 'bubble x').toBeLessThanOrEqual(1)
-      expect(Math.abs(bubbleAfter.width - bubbleBefore.width), 'bubble width').toBeLessThanOrEqual(1)
+      if (w >= 768) {
+        expect(Math.abs(proseAfter.x - proseBefore.x), 'prose x').toBeLessThanOrEqual(1)
+        expect(Math.abs(proseAfter.width - proseBefore.width), 'prose width').toBeLessThanOrEqual(1)
+        expect(Math.abs(bubbleAfter.x - bubbleBefore.x), 'bubble x').toBeLessThanOrEqual(1)
+        expect(Math.abs(bubbleAfter.width - bubbleBefore.width), 'bubble width').toBeLessThanOrEqual(1)
+      } else if (w === 390) {
+        near(proseBefore.x, 20, 'answer text stays at the column before selection')
+        near(proseAfter.x, 62, 'answer text area left')
+        near(proseAfter.width, 308, 'answer text area width')
+        near(proseAfter.x + proseAfter.width, 370, 'answer text area right')
+        near(bubbleAfter.x, 146, 'question bubble left')
+        near(bubbleAfter.x + bubbleAfter.width, 354, 'question bubble right')
+      }
       await expect(page.locator('.action-row:visible')).toHaveCount(0)
       await expect(page.locator('.user-actions:visible')).toHaveCount(0)
       await expect(page.locator('article.turn.assistant > .prose')).toHaveCount(2)
@@ -293,16 +306,20 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(boxes.nth(2)).toBeChecked()
       await expect(boxes.nth(3)).toBeChecked()
       await expect(page.getByTestId('share-all')).not.toBeChecked()
-      if (w >= 768) {
+      if (w >= 800) {
         await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
         await expect(page.locator('.chat-title')).toHaveText('分享样本')
       } else {
-        await expect(page.getByTestId('share-count')).toBeHidden()
+        if (w < 640) await expect(page.getByTestId('share-count')).toBeHidden()
+        else await expect(page.getByTestId('share-count')).toBeVisible()
         await expect(page.getByTestId('share-cancel')).toBeHidden()
         await expect(page.getByTestId('share-top-cancel')).toBeVisible()
         await expect(page.locator('.chat-title')).toHaveText('选择对话')
-        expect(Math.abs(columnAfter.x - 20), 'question column left').toBeLessThanOrEqual(1)
-        expect(Math.abs(columnAfter.x + columnAfter.width - 370), 'question column right').toBeLessThanOrEqual(1)
+        if (w === 390) {
+          near(columnAfter.x, 20, 'message column left')
+          near(columnAfter.width, 350, 'message column width')
+          near(columnAfter.x + columnAfter.width, 370, 'message column right')
+        }
       }
       await expect(page.getByRole('heading', { name: '选择对话' })).toHaveCount(0)
       await expect(page.locator('.share-halo:visible')).toHaveCount(2)
@@ -334,7 +351,23 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
           expect(Math.abs(rect.height - 18), 'checkbox height').toBeLessThanOrEqual(0.5)
         }
       }
-      if (w < 768) expect(Math.abs(allBox.x - 36), 'select-all x').toBeLessThanOrEqual(1)
+      if (w < 768) near(allBox.x, 36, 'select-all x')
+      if (w === 390) {
+        near(allBox.y, 802.5, 'select-all y')
+        const label = (await page.locator('.share-all span').boundingBox())!
+        near(label.x, 66, 'select-all label left')
+        near(label.x + label.width, 126, 'select-all label right')
+        const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
+        const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
+        near(firstQuestion.y, 76.5, 'question checkbox y')
+        near(firstAnswer.y, 300.5, 'answer checkbox y')
+        const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
+          const style = getComputedStyle(node)
+          return { margin: style.margin, padding: style.padding }
+        })
+        expect(boxStyle.margin, 'checkbox margin').toBe('0px')
+        expect(boxStyle.padding, 'checkbox padding').toBe('0px')
+      }
       const userGrey = (await userTurn.locator('.share-halo').boundingBox())!
       const answerGrey = (await answerTurn.locator('.share-halo').boundingBox())!
       expect(Math.abs(userGrey.x - answerGrey.x), 'question and answer grey left edges').toBeLessThanOrEqual(1)
@@ -359,8 +392,20 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)
       expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)), 'answer checkbox aligns with the first line').toBeLessThanOrEqual(2)
       expect(Math.abs(userCheck.y - userGrey.y - 3), 'user checkbox is about 3px from the grey top').toBeLessThanOrEqual(1)
+      if (w === 390) {
+        near(text!.x, 62, 'answer first line left')
+        expect(overlaps(answerCheck, text!), 'checkbox must not cover the answer first line').toBe(false)
+      }
       const createRect = (await page.getByTestId('share-create').boundingBox())!
       if (w >= 768) expect(Math.abs(createRect.x + createRect.width - (answerGrey.x + answerGrey.width)), 'create button right edge').toBeLessThanOrEqual(1)
+      else if (w === 390) {
+        near(createRect.x, 205.7, 'create button left')
+        near(createRect.width, 164.3, 'create button width')
+        near(createRect.x + createRect.width, 370, 'create button right')
+        near(createRect.height, 36, 'create button height')
+        near(createRect.y, 793.5, 'create button top')
+        near(createRect.y + createRect.height, 829.5, 'create button bottom')
+      }
       for (const id of (w >= 768 ? ['share-cancel', 'share-create'] : ['share-create']) as ('share-cancel' | 'share-create')[]) {
         const rect = (await page.getByTestId(id).boundingBox())!
         expect(rect.x, `${id} left`).toBeGreaterThanOrEqual(-0.5)
@@ -441,6 +486,30 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       expect(createBox.radius).toBe(OFF.buttonRadius)
       expect(createBox.color).toBe('rgb(255, 255, 255)')
       expect(createBox.fill).toBe(tone.primary)
+      if (w === 390) {
+        const topCancel = page.getByTestId('share-top-cancel')
+        await expect(topCancel).toHaveClass(/ds-button--outlined/)
+        const topBox = (await topCancel.boundingBox())!
+        near(topBox.x, 300, 'cancel left')
+        near(topBox.x + topBox.width, 374, 'cancel right')
+        near(topBox.width, 73.9, 'cancel width')
+        near(topBox.height, 36, 'cancel height')
+        near(topBox.y, 13, 'cancel y')
+        const titleBox = (await page.getByTestId('share-title').boundingBox())!
+        near(titleBox.x, 16, 'selection title left')
+        near((titleBox.y + titleBox.height / 2) - (topBox.y + topBox.height / 2), 0, 'cancel and title share a midline')
+        const headerButtons = await page.locator('header.topbar button').evaluateAll((nodes) => nodes.filter((node) => {
+          const style = getComputedStyle(node)
+          const box = node.getBoundingClientRect()
+          return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0
+        }).map((node) => node.getAttribute('data-testid')))
+        expect(headerButtons, 'selection top bar has only the cancel button').toEqual(['share-top-cancel'])
+        const border = await topCancel.evaluate((node) => {
+          const edge = node.querySelector('.ds-button__border')
+          return edge ? getComputedStyle(edge).borderTopWidth + ' ' + getComputedStyle(edge).borderTopStyle : 'none'
+        })
+        expect(border, 'cancel is an outlined button').toBe('1px solid')
+      }
       if (w >= 768) {
       const cancelBox = await cancel.evaluate((node) => {
         const style = getComputedStyle(node)
@@ -465,7 +534,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const fadedFill = await page.getByTestId('share-create').locator('.ds-button__background').evaluate((node) => getComputedStyle(node).backgroundColor)
       expect(fadedFill).toBe(tone.primary)
 
-      await (w >= 768 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
+      await (w >= 800 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(page.locator('input.share-box:visible')).toHaveCount(0)
       await expect(page.getByTestId('composer')).toBeVisible()
@@ -602,7 +671,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(toggle).toHaveAttribute('aria-expanded', 'false')
       expect(await label()).toBe(before)
       await expect(page.locator('article.turn.assistant > .prose').last()).toBeVisible()
-      await ((page.viewportSize()?.width ?? 1440) >= 768 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
+      await ((page.viewportSize()?.width ?? 1440) >= 800 ? page.getByTestId('share-cancel') : page.getByTestId('share-top-cancel')).click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(toggle).toHaveAttribute('aria-expanded', 'false')
       expect(await label()).toBe(before)
@@ -612,7 +681,9 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await boot(page, theme)
       await page.locator('.action-row button[aria-label="分享"]').last().click()
       await expect(page.locator('.share-bar')).toBeVisible()
+      if (w < 800) await expect(page.getByTestId('menu')).toBeHidden()
       if (w < 768) {
+        await page.getByTestId('share-top-cancel').click()
         await page.getByTestId('menu').click()
         await page.waitForTimeout(400)
       }
@@ -620,6 +691,33 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByText('旁边的问题')).toBeVisible()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(page.getByText('已选择 0 组对话')).toHaveCount(0)
+    })
+  })
+}
+
+// Official bundle: selection top bar when width < 800, selected-count hidden when width < 640.
+// 600/660 split the count breakpoint. 700/820 split the top-bar breakpoint. 767 sits in neither gap.
+for (const theme of ['light', 'dark'] as const) for (const w of [600, 660, 700, 820] as const) {
+  test.describe(`share breakpoints ${theme} ${w}`, () => {
+    test.use({ viewport: { width: w, height: 844 }, colorScheme: theme, bypassCSP: true })
+    test('top bar and selected count follow the official widths', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, theme)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const narrowTop = w < 800
+      if (narrowTop) {
+        await expect(page.getByTestId('share-top-cancel')).toBeVisible()
+        await expect(page.getByTestId('share-cancel')).toBeHidden()
+        await expect(page.locator('.chat-title')).toHaveText('选择对话')
+        await expect(page.getByTestId('menu')).toBeHidden()
+      } else {
+        await expect(page.getByTestId('share-top-cancel')).toHaveCount(0)
+        await expect(page.getByTestId('share-cancel')).toBeVisible()
+        await expect(page.locator('.chat-title')).toHaveText('分享样本')
+      }
+      if (w < 640) await expect(page.getByTestId('share-count')).toBeHidden()
+      else await expect(page.getByTestId('share-count')).toBeVisible()
     })
   })
 }

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const port = Number(process.env.PW_PORT || 4173)
+
 export default defineConfig({
   testDir: './e2e',
   // fb1344-parity.spec.ts is part of this run. The proposal's playwright.fb1344.config.ts
@@ -10,12 +12,12 @@ export default defineConfig({
   fullyParallel: false,
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1280, height: 820 },
   },
   webServer: {
-    command: 'pnpm preview --host 127.0.0.1 --port 4173 --strictPort',
-    url: 'http://127.0.0.1:4173',
+    command: `pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
+    url: `http://127.0.0.1:${port}`,
     reuseExistingServer: !process.env.CI,
   },
 })
