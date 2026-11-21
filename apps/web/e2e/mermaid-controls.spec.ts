@@ -39,10 +39,10 @@ const fulfill = async (route: Route) => {
   await route.fulfill({ status: 200, contentType: 'text/event-stream', body: sse(answer) })
 }
 
-const boot = async (page: Page, width = 1440, height = 900) => {
+const boot = async (page: Page, width = 1440, height = 900, theme: 'light' | 'dark' = 'light') => {
   answer = chart
   await page.route('https://api.deepseek.com/**', fulfill)
-  await page.addInitScript(() => localStorage.setItem('deepapi-theme', 'light'))
+  await page.addInitScript((value) => localStorage.setItem('deepapi-theme', value), theme)
   await page.setViewportSize({ width, height })
   await page.goto('/')
   await page.getByTestId('landing-send').click()
@@ -95,6 +95,67 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download does not open 
   await expect(card.getByRole('button', { name: '全屏' })).toBeVisible()
   await expect(card.locator('.diagram-source')).toContainText('graph LR')
   await page.screenshot({ path: join(shots, 'mermaid-02-code-view-Copy-Download-Fullscreen.png') })
+})
+
+const channel = (paint: string) => paint.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? []
+
+const luminance = (paint: string) => {
+  const parts = channel(paint)
+  if (parts.length < 3) return 0
+  const [r, g, b] = parts.map((value) => {
+    const unit = value / 255
+    return unit <= 0.03928 ? unit / 12.92 : ((unit + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+const contrast = (fill: string, color: string) => {
+  const hi = Math.max(luminance(fill), luminance(color))
+  const lo = Math.min(luminance(fill), luminance(color))
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+const nodePaint = (page: Page) => page.getByTestId('mermaid-card').locator('.diagram-view .node').first().evaluate((node) => {
+  const rect = node.querySelector('rect, polygon, circle, ellipse, path')
+  const label = node.querySelector('foreignObject div, foreignObject span, text')
+  const rectStyle = rect ? getComputedStyle(rect) : null
+  const labelStyle = label ? getComputedStyle(label) : null
+  return {
+    fill: rectStyle?.fill ?? '',
+    stroke: rectStyle?.stroke ?? '',
+    text: (label?.textContent ?? '').trim(),
+    color: labelStyle?.color ?? '',
+    opacity: labelStyle?.opacity ?? '',
+    visibility: labelStyle?.visibility ?? '',
+  }
+})
+
+test('light theme node fill follows mermaid and the label stays visible', async ({ page }) => {
+  await boot(page)
+  await ask(page)
+  const paint = await nodePaint(page)
+  expect(paint.text.length).toBeGreaterThan(0)
+  expect(paint.opacity).not.toBe('0')
+  expect(paint.visibility).not.toBe('hidden')
+  expect(paint.fill).not.toBe('rgb(0, 0, 0)')
+  expect(paint.fill).not.toBe('rgba(0, 0, 0, 0)')
+  expect(paint.fill).not.toBe('transparent')
+  expect(paint.fill).not.toBe('none')
+  expect(paint.stroke).not.toBe('none')
+  expect(paint.color).not.toBe(paint.fill)
+  expect(contrast(paint.fill, paint.color)).toBeGreaterThan(3)
+})
+
+test('dark theme mermaid nodes stay readable', async ({ page }) => {
+  await boot(page, 1440, 900, 'dark')
+  await ask(page)
+  await expect(page.locator('body')).toHaveAttribute('data-ds-dark-theme', '')
+  const paint = await nodePaint(page)
+  expect(paint.text.length).toBeGreaterThan(0)
+  expect(paint.opacity).not.toBe('0')
+  expect(paint.fill).not.toBe('rgb(0, 0, 0)')
+  expect(paint.stroke).not.toBe('none')
+  expect(contrast(paint.fill, paint.color)).toBeGreaterThan(3)
 })
 
 test('a wide diagram stays inside the card at 390px', async ({ page }) => {
