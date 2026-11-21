@@ -14,11 +14,12 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
 import type { TextCitation } from '@deepapi/types'
-import { Children, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, cloneElement, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type FocusEvent as ReactFocusEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
 import { citationNumbers, holdDelimitedMath, remarkCitations, stripPartialCitation } from './citations.js'
 import { MathBlock, MathInline, remarkDeepseekMath } from './math.js'
+import { renderMermaid } from './mermaid-render.js'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -51,52 +52,139 @@ const highlight = (language: string | undefined, value: string) => {
 
 const label = (zh: string, en: string) => (document.documentElement.lang === 'en' ? en : zh)
 
+const StreamContext = createContext(false)
+
 const BOX = /[┌┐└┘├┤┬┴┼─│╔╗╚╝╠╣╦╩╬═║╭╮╯╰]/
 
+const DiagramTip = ({ text, children }: { text: string; children: ReactElement<React.HTMLAttributes<HTMLElement>> }) => {
+  const anchor = useRef<HTMLElement>(null)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ left: 0, top: 0 })
+  const place = () => {
+    const rect = anchor.current?.getBoundingClientRect()
+    if (!rect) return
+    setPos({ left: rect.left + rect.width / 2, top: rect.bottom + 4 })
+  }
+  const previous = children.props
+  const child = cloneElement(children, {
+    ref: anchor,
+    onMouseEnter: (event: ReactMouseEvent<HTMLElement>) => {
+      place()
+      setOpen(true)
+      previous.onMouseEnter?.(event)
+    },
+    onMouseLeave: (event: ReactMouseEvent<HTMLElement>) => {
+      setOpen(false)
+      previous.onMouseLeave?.(event)
+    },
+    onFocus: (event: ReactFocusEvent<HTMLElement>) => {
+      if (event.currentTarget.matches(':focus-visible')) {
+        place()
+        setOpen(true)
+      }
+      previous.onFocus?.(event)
+    },
+    onBlur: (event: ReactFocusEvent<HTMLElement>) => {
+      setOpen(false)
+      previous.onBlur?.(event)
+    },
+  } as { ref: Ref<HTMLElement> } & HTMLAttributes<HTMLElement>)
+  return (
+    <>
+      {child}
+      {open ? createPortal(
+        <span className="ds-tooltip ds-tooltip--s is-open" role="tooltip" style={{ left: pos.left, top: pos.top }}>
+          {text}
+          <span className="ds-tooltip__arrow ds-tooltip__arrow--sharp" aria-hidden="true" />
+        </span>,
+        document.body,
+      ) : null}
+    </>
+  )
+}
+
+const IconSvg = ({ children }: { children: ReactNode }) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+)
+
+const saveBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 const Mermaid = ({ chart }: { chart: string }) => {
-  const view = useRef<HTMLDivElement>(null)
-  const card = useRef<HTMLDivElement>(null)
+  const streaming = useContext(StreamContext)
+  const latest = useRef(chart)
+  latest.current = chart
+  const settled = streaming ? null : chart
+  const [svg, setSvg] = useState('')
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<'chart' | 'code'>('chart')
   const [zoom, setZoom] = useState(1)
-  const [menu, setMenu] = useState(false)
+  const [full, setFull] = useState(false)
   useEffect(() => {
     let cancelled = false
-    setFailed(false)
-    void import('mermaid').then(async ({ default: mermaid }) => {
-      const dark = document.body.hasAttribute('data-ds-dark-theme')
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: dark ? 'dark' : 'neutral' })
-      const id = `m-${Math.random().toString(36).slice(2)}`
-      try {
-        const { svg } = await mermaid.render(id, chart)
-        if (!cancelled && view.current) {
-          view.current.innerHTML = svg
-        }
-      } catch {
-        if (!cancelled) {
-          setFailed(true)
+    let timer: ReturnType<typeof setTimeout> | undefined
+    let previous: string | undefined
+    let shown: string | undefined
+    const dark = document.body.hasAttribute('data-ds-dark-theme')
+    const draw = async (input: string) => {
+      if (cancelled || input === shown) return
+      const next = await renderMermaid(input, dark, () => cancelled)
+      if (next && !cancelled) {
+        shown = input
+        setSvg(next)
+        setFailed(false)
+      }
+    }
+    const renderLatest = async () => {
+      const input = latest.current
+      if (input !== previous) {
+        previous = input
+        try {
+          await draw(input)
+        } catch {
+          if (cancelled) return
+          if (streaming) {
+            const text = input.trimEnd()
+            const lineEnd = Math.max(text.lastIndexOf('\n'), text.lastIndexOf('\r'))
+            const prefix = text.slice(0, Math.max(0, lineEnd))
+            if (prefix && !shown?.startsWith(prefix)) {
+              try {
+                await draw(prefix)
+              } catch {
+                // A partial line is not a diagram yet. Keep the last good picture.
+              }
+            }
+          } else {
+            setFailed(true)
+            setSvg('')
+          }
         }
       }
-    })
+      if (!cancelled && streaming) timer = setTimeout(() => { void renderLatest() }, 100)
+    }
+    void renderLatest()
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
-  }, [chart])
+  }, [settled, streaming])
   const download = () => {
-    const svg = view.current?.querySelector('svg')
-    if (!svg) {
+    if (tab === 'code' || !svg) {
+      saveBlob(new Blob([chart], { type: 'text/plain' }), 'diagram.mmd')
       return
     }
-    const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'diagram.svg'
-    link.click()
-    URL.revokeObjectURL(url)
+    saveBlob(new Blob([svg], { type: 'image/svg+xml' }), 'diagram.svg')
   }
   return (
-    <div className="diagram-card" data-testid="mermaid-card" ref={card}>
+    <div className="diagram-card" data-testid="mermaid-card">
       <div className="diagram-bar">
         <div className="diagram-tabs" role="tablist">
           <button type="button" role="tab" aria-selected={tab === 'chart'} className={tab === 'chart' ? 'on' : ''} onClick={() => setTab('chart')}>{label('图表', 'Diagram')}</button>
@@ -105,27 +193,51 @@ const Mermaid = ({ chart }: { chart: string }) => {
         <div className="diagram-tools">
           {tab === 'chart' ? (
             <>
-              <button type="button" aria-label={label('缩小', 'Zoom out')} onClick={() => setZoom((value) => Math.max(0.5, Number((value - 0.1).toFixed(2))))}>−</button>
-              <button type="button" aria-label={label('放大', 'Zoom in')} onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}>+</button>
+              <DiagramTip text={label('缩小', 'Zoom out')}>
+                <button type="button" className="diagram-icon" aria-label={label('缩小', 'Zoom out')} onClick={() => setZoom((value) => Math.max(0.5, Number((value - 0.1).toFixed(2))))}>
+                  <IconSvg><circle cx="7" cy="7" r="4.2" /><path d="M10.2 10.2 13 13M5 7h4" /></IconSvg>
+                </button>
+              </DiagramTip>
+              <DiagramTip text={label('放大', 'Zoom in')}>
+                <button type="button" className="diagram-icon" aria-label={label('放大', 'Zoom in')} onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}>
+                  <IconSvg><circle cx="7" cy="7" r="4.2" /><path d="M10.2 10.2 13 13M7 5v4M5 7h4" /></IconSvg>
+                </button>
+              </DiagramTip>
             </>
           ) : (
-            <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>{label('复制', 'Copy')}</button>
+            <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>
+              <IconSvg><rect x="5.5" y="5.5" width="7" height="7" rx="1" /><path d="M3.5 10.5v-7h7" /></IconSvg>
+              <span>{label('复制', 'Copy')}</span>
+            </button>
           )}
-          <button type="button" aria-label={label('下载', 'Download')} onClick={() => setMenu((value) => !value)}>{label('下载', 'Download')}</button>
-          {menu ? (
-            <div className="menu diagram-menu">
-              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 SVG', 'Download SVG')}</button>
-              <button type="button" onClick={() => { setMenu(false); download() }}>{label('下载 PNG', 'Download PNG')}</button>
-            </div>
-          ) : null}
-          <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => void card.current?.requestFullscreen?.()}>{label('全屏', 'Full screen')}</button>
+          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
+            <IconSvg><path d="M8 2.5v7M5.5 7 8 9.5 10.5 7M3.5 12.5h9" /></IconSvg>
+            <span>{label('下载', 'Download')}</span>
+          </button>
+          <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => setFull(true)}>
+            <IconSvg><path d="M3 6.5V3.5H6M10 3.5h3V6.5M13 9.5v3h-3M6 12.5H3V9.5" /></IconSvg>
+            <span>{label('全屏', 'Full screen')}</span>
+          </button>
         </div>
       </div>
       {failed ? <pre className="diagram-source"><code>{chart}</code></pre> : null}
       <pre className="diagram-source" hidden={failed || tab !== 'code'}><code>{chart}</code></pre>
       <div className="diagram-view" hidden={failed || tab !== 'chart'}>
-        <div className="mermaid" ref={view} style={{ transform: `scale(${zoom})` }} />
+        <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} />
       </div>
+      {full ? createPortal(
+        <div className="diagram-modal" role="dialog" aria-modal="true" data-testid="mermaid-modal">
+          <button type="button" className="diagram-modal-close" aria-label={label('关闭', 'Close')} onClick={() => setFull(false)}>
+            <IconSvg><path d="M4 4l8 8M12 4 4 12" /></IconSvg>
+          </button>
+          <div className="diagram-modal-card">
+            {tab === 'code' || !svg
+              ? <pre className="diagram-source"><code>{chart}</code></pre>
+              : <div className="mermaid" dangerouslySetInnerHTML={{ __html: svg }} />}
+          </div>
+        </div>,
+        document.body,
+      ) : null}
     </div>
   )
 }
@@ -458,10 +570,12 @@ const components = {
 
 export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => (
   <CiteContext.Provider value={{ citations, cards }}>
+    <StreamContext.Provider value={streaming}>
     <Boundary text={text}>
       <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkCitations(citationNumbers(citations))]} components={components}>
         {holdDelimitedMath(stripPartialCitation(text, streaming), streaming)}
       </ReactMarkdown>
     </Boundary>
+    </StreamContext.Provider>
     </CiteContext.Provider>
 )

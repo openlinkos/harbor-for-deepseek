@@ -194,8 +194,43 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
 .action-row .branch button:hover:not(:disabled), .user-actions .branch button:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
 .action-row .branch button:hover:disabled, .user-actions .branch button:hover:disabled { background: transparent; }
 .feedback-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-.diagram-tools { position: relative; }
-.diagram-menu { position: absolute; right: 0; top: 32px; min-width: 140px; }
+.diagram-tools { position: relative; display: flex; align-items: center; gap: 4px; }
+.diagram-tools button { display: inline-flex; align-items: center; gap: 4px; }
+.diagram-tools button.diagram-icon { width: 28px; padding: 0; justify-content: center; }
+.diagram-tools svg { width: 16px; height: 16px; flex: none; }
+.diagram-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+  background: rgba(15, 17, 21, 0.62);
+}
+.diagram-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.diagram-modal-card {
+  width: fit-content;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  background: var(--dsw-alias-bg-base);
+  border-radius: 8px;
+  padding: 28px 24px;
+}
+.diagram-modal-card .mermaid svg { max-width: 100%; height: auto; }
 .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: ds-spin 0.6s linear infinite; }
 @keyframes ds-spin { to { transform: rotate(360deg); } }
 .side-scroll {
@@ -859,9 +894,10 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }
 .diagram-tabs button, .diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
 .diagram-tabs button.on { background: var(--dsw-alias-button-ghost-active-fill); color: var(--dsw-alias-brand-text); }
-.diagram-view { overflow: auto; min-height: 120px; display: grid; place-items: center; padding: 12px; }
+.diagram-view { overflow: auto; min-height: 120px; display: grid; place-items: center; padding: 12px; max-width: 100%; }
 .diagram-view[hidden], .diagram-source[hidden] { display: none; }
-.diagram-view .mermaid { transform-origin: center top; transition: transform 0.2s var(--ds-ease-out); }
+.diagram-view .mermaid { transform-origin: center top; transition: transform 0.2s var(--ds-ease-out); max-width: 100%; }
+.diagram-view .mermaid svg { max-width: 100%; height: auto; }
 .diagram-source { margin: 0; padding: 12px 14px; overflow: auto; }
 .diagram-source code { font: var(--dsw-font-markdown-code-block); letter-spacing: 0; white-space: pre; }
 .inline-code {
@@ -2629,6 +2665,20 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
   .prose { overflow-x: auto; }
+  .diagram-card { max-width: 100%; }
+  .diagram-tools button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .diagram-tools button:not(.diagram-icon) { width: 28px; padding: 0; justify-content: center; }
+  .diagram-modal { padding: 40px 12px 16px; }
   .prose table { display: block; overflow-x: auto; }
   .search-panel { display: none; }
   .sheet-scrim { display: block; position: fixed; inset: 0; border: 0; background: rgba(15, 17, 21, 0.45); z-index: 8; }

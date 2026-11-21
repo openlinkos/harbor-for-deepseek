@@ -552,7 +552,7 @@ test('mermaid card', async ({ page }) => {
   await send(page, '图')
   const card = page.getByTestId('mermaid-card')
   await expect(card.getByRole('tab', { name: '图表' })).toBeVisible()
-  await expect(card.locator('svg')).toBeVisible({ timeout: 15_000 })
+  await expect(card.locator('.diagram-view svg')).toBeVisible({ timeout: 15_000 })
   await card.getByRole('button', { name: '放大' }).click()
   await card.getByRole('tab', { name: '代码' }).click()
   await expect(card.locator('.diagram-source')).toContainText('graph LR')
