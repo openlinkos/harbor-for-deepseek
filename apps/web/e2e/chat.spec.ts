@@ -685,20 +685,16 @@ test('settings no longer show an upload file expiry row', async ({ page }) => {
 })
 
 test('a local upload does not send expires_after', async ({ page }) => {
-  let fileBody = ''
-  await page.route('https://api.deepseek.com/**', async (route) => {
-    if (route.request().method() === 'POST' && route.request().url().endsWith('/files')) {
-      fileBody = route.request().postData() ?? ''
-    }
-    await fulfill(route)
-  })
+  await install(page)
   await enterChat(page)
+  const req = page.waitForRequest((request) => request.method() === 'POST' && request.url().endsWith('/files'))
   await page.getByTestId('file-input').setInputFiles({
     name: 'note.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('hello harbor'),
   })
   await expect(page.locator('.drafts')).toContainText('note.txt')
+  const fileBody = (await req).postData() ?? ''
   expect(fileBody).toContain('user_data')
   expect(fileBody).toContain('note.txt')
   expect(fileBody).not.toContain('expires_after')

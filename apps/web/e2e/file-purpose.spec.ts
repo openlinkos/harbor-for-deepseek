@@ -156,12 +156,7 @@ test('a legacy text_recognition preference still uploads pdf as rich layout', as
   const uploads: string[] = []
   await seedLegacyPurpose(page)
   await page.emulateMedia({ colorScheme: 'light' })
-  await page.route('https://api.deepseek.com/**', async (route) => {
-    if (route.request().method() === 'POST' && route.request().url().endsWith('/files')) {
-      uploads.push(route.request().postData() ?? route.request().postDataBuffer()?.toString('utf8') ?? '')
-    }
-    await fulfill(route)
-  })
+  await page.route('https://api.deepseek.com/**', fulfill)
   await page.goto('/')
   expect(pageerrors).toEqual([])
   await page.getByTestId('landing-send').click()
@@ -177,8 +172,11 @@ test('a legacy text_recognition preference still uploads pdf as rich layout', as
     { name: 'notes.txt', mimeType: 'text/plain', purpose: 'user_data' },
   ]
   for (const file of files) {
+    const req = page.waitForRequest((request) => request.method() === 'POST' && request.url().endsWith('/files'))
     await page.getByTestId('file-input').setInputFiles({ name: file.name, mimeType: file.mimeType, buffer: Buffer.from(`payload ${file.name}`) })
     await expect(page.locator('.drafts')).toContainText(file.name)
+    const request = await req
+    uploads.push(request.postData() ?? request.postDataBuffer()?.toString('utf8') ?? '')
   }
   expect(uploads).toHaveLength(files.length)
   for (const [index, file] of files.entries()) {
