@@ -10,6 +10,7 @@ import { readTheme, saveTheme, type ThemeChoice } from './themeMode.js'
 import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
+import { HINT_NETWORK, replyErrorKey } from './errors.js'
 import { useHarbor } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
@@ -1102,6 +1103,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   const messages = useHarbor((state) => state.messages)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
+  const resend = useHarbor((state) => state.resend)
   const editUser = useHarbor((state) => state.editUser)
   const streaming = useHarbor((state) => state.streaming)
   const generatingHere = useHarbor((state) =>
@@ -1114,6 +1116,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   const versionCurrent = siblings.length > 1 ? message.id : parent?.id ?? ''
   const versionIndex = versionIds.indexOf(versionCurrent)
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
+  const errorKey = replyErrorKey(message.errorMessage)
   const [copied, setCopied] = useState(false)
   const voteKey = `deepapi-vote:${message.id}`
   const [vote, setVote] = useState<'up' | 'down' | null>(() => {
@@ -1148,7 +1151,17 @@ const MessageRow = ({ message }: { message: Message }) => {
           </form>
         ) : (
         <>
-          <div className="bubble">{textOf}</div>
+          <div className="bubble">
+            {textOf}
+            {message.errorMessage === HINT_NETWORK ? (
+              <HoverTip text={t('retry')}>
+                <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
+                  <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
+                </button>
+              </HoverTip>
+            ) : null}
+          </div>
+          {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
           <div className="user-actions">
             <HoverTip text={t('copy')}>
               <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
@@ -1173,7 +1186,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           ))}
       {message.status === 'error' ? (
         <p className="form-error">
-          {message.errorMessage || t('error')}
+          {errorKey ? t(errorKey) : message.errorMessage || t('error')}
           <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
         </p>
       ) : null}

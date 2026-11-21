@@ -588,7 +588,8 @@ test('errors', async ({ page }) => {
   await expect(page.locator('.form-error').last()).toBeVisible()
   mode = 'down'
   await send(page, '断网')
-  await expect(page.locator('.form-error').last()).toBeVisible()
+  await expect(page.getByTestId('user-hint').last()).toHaveText('请检查网络后重试')
+  await expect(page.getByTestId('hint-retry')).toBeVisible()
 })
 
 test('attachment', async ({ page }) => {

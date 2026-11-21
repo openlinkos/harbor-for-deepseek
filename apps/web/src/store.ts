@@ -1,4 +1,5 @@
 import { ApiClientError, buildRequest, continuationBlocks, createClient, messageUsedWebTool, purposeForFile } from '@deepapi/api-client'
+import { HINT_NETWORK, classifyApiError, replyErrorCode } from './errors.js'
 import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
@@ -17,6 +18,7 @@ import {
   DEFAULT_EFFORT,
   defaultSettings,
   type Balance,
+  type ContentBlock,
   type Conversation,
   type Message,
   type Settings,
@@ -249,6 +251,13 @@ const blockText = (block: Message['blocks'][number]) => {
 
 const messageText = (message: Message) => message.blocks.map(blockText).filter(Boolean).join('\n')
 
+const hasStreamOutput = (blocks: ContentBlock[]): boolean =>
+  blocks.some((block) => {
+    if (block.type === 'text') return block.text.trim().length > 0
+    if (block.type === 'thinking') return block.thinking.trim().length > 0
+    return block.type === 'server_tool_use' || block.type === 'web_search_tool_result' || block.type === 'web_fetch_tool_result'
+  })
+
 const blankConversation = (prefs: Prefs): Conversation => {
   const now = nowIso()
   return {
@@ -301,6 +310,8 @@ export type HarborState = {
   selectSibling: (messageId: string, siblingId: string) => Promise<void>
   send: (text: string) => Promise<void>
   regenerate: (assistantId: string) => Promise<void>
+  /** Resend a user turn whose completion never started. */
+  resend: (userId: string) => Promise<void>
   continueReply: (assistantId: string) => Promise<void>
   editUser: (messageId: string, text: string) => Promise<void>
   stop: () => void
@@ -724,6 +735,20 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     await runTurn('', assistant.parentId)
+  },
+
+  async resend(userId) {
+    const user = get().messages.find((item) => item.id === userId)
+    if (!user || user.role !== 'user' || get().streaming) return
+    if (get().serverMode) {
+      await runServerTurn('', user.id)
+      return
+    }
+    if (!get().key) return
+    const cleared: Message = { ...user, errorMessage: null, updatedAt: nowIso() }
+    await (await repository()).saveMessage(cleared)
+    set({ messages: get().messages.map((item) => (item.id === user.id ? cleared : item)) })
+    await runTurn('', user.id)
   },
 
   async continueReply(assistantId) {
@@ -1162,7 +1187,7 @@ const runContinuation = async (assistantId: string) => {
     const aborted = abort?.signal.aborted
     Object.assign(assistant, {
       status: aborted ? 'aborted' : 'error',
-      errorMessage: aborted ? null : error instanceof ApiClientError && error.status === 400 ? 'upstream 400' : error instanceof Error ? error.message : 'error',
+      errorMessage: aborted ? null : error instanceof ApiClientError && error.status === 400 ? 'upstream 400' : replyErrorCode(error),
       updatedAt: nowIso(),
     })
     useHarbor.setState({
@@ -1198,6 +1223,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   }
   const messages = created ? [] : state.messages.slice()
   let parentId = conversation.activeLeafId
+  const leafBefore = parentId
   if (regenerateParent !== undefined) {
     parentId = regenerateParent
   } else {
@@ -1285,6 +1311,9 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   abort = new AbortController()
   let draft = createDraft()
   const clock = createThinkingClock()
+  let dropEmptyNetwork = false
+  let hintedUser: Message | null = null
+  let restoreLeaf: string | null = parentId
   const publish = (patch: Partial<Message>) => {
     const next = { ...assistant, ...patch, updatedAt: nowIso() }
     Object.assign(assistant, next)
@@ -1324,19 +1353,36 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     }
   } catch (error) {
     const aborted = abort.signal.aborted
-    publish({
-      status: aborted ? 'aborted' : 'error',
-      blocks: draft.blocks.filter(Boolean),
-      usage: draft.usage,
-      errorMessage: aborted ? null : error instanceof Error ? error.message : 'error',
-      thinkingSeconds: clock.seconds(),
-    })
+    const blocks = draft.blocks.filter(Boolean)
+    if (!aborted && classifyApiError(error) === 'network' && !hasStreamOutput(blocks)) {
+      dropEmptyNetwork = true
+      const user = useHarbor.getState().messages.find((item) => item.id === parentId)
+      if (user) {
+        hintedUser = { ...user, errorMessage: HINT_NETWORK, updatedAt: nowIso() }
+        await store.saveMessage(hintedUser)
+      }
+      restoreLeaf = regenerateParent !== undefined ? (leafBefore ?? parentId) : parentId
+      conversation = stamp({ ...conversation, activeLeafId: restoreLeaf })
+      await store.saveConversation(conversation)
+    } else {
+      publish({
+        status: aborted ? 'aborted' : 'error',
+        blocks,
+        usage: draft.usage,
+        errorMessage: aborted ? null : replyErrorCode(error),
+        thinkingSeconds: clock.seconds(),
+      })
+    }
   } finally {
     window.clearTimeout(persistTimer)
     persistTimer = 0
     persistDue = 0
     persistFlush = null
-    await store.saveMessage({ ...assistant })
+    if (dropEmptyNetwork) {
+      await store.saveMessage({ ...assistant, status: 'error', errorMessage: null, deletedAt: nowIso(), updatedAt: nowIso() })
+    } else {
+      await store.saveMessage({ ...assistant })
+    }
     clearLiveSnap()
     persistMessage = null
     clearLive(assistant.id)
@@ -1347,7 +1393,21 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         usages.push(message.usage)
       }
     }
-    useHarbor.setState({ streaming: false, totals: sumUsage(usages) })
+    if (dropEmptyNetwork) {
+      useHarbor.setState({
+        messages: useHarbor
+          .getState()
+          .messages.filter((item) => item.id !== assistant.id)
+          .map((item) => (hintedUser && item.id === hintedUser.id ? hintedUser : item)),
+        conversations: useHarbor.getState().conversations.map((item) =>
+          item.id === conversation.id ? { ...conversation, activeLeafId: restoreLeaf } : item,
+        ),
+        streaming: false,
+        totals: sumUsage(usages),
+      })
+    } else {
+      useHarbor.setState({ streaming: false, totals: sumUsage(usages) })
+    }
   }
 }
 
