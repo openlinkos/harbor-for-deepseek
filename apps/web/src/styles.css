@@ -2986,27 +2986,30 @@ input.share-box.ds-checkbox:checked::after,
   }
   body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
   .turn.share-on > .share-box { left: 0; }
+  /* Official `._7729a77._63c77b1` (selection, width < 800): padding-left 42px.
+     The column starts at x=20, so the answer text starts at x=62. */
   .turn.assistant.share-on > :not(.share-box):not(.share-halo) {
     margin-left: 42px;
     width: calc(100% - 42px);
   }
-  .turn.user.share-on > .bubble {
-    width: 208px;
-    max-width: 208px;
-    margin-right: 16px;
-  }
-  /* Official first question is 152px tall, which puts the answer checkbox at y=300.5.
-     Later questions stay shrink-wrapped in height so the pair gap stays 12px. */
-  .chat-column > .turn.user.share-on:first-child > .bubble { min-height: 152px; }
+  /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
+     align-items: flex-end. Height stays the text height. The 16px inset is
+     `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's
+     right edge at column right 370 − 16 = 354. */
+  .turn.user.share-on > .bubble { margin-right: 16px; }
+  /* Official `._9f86274` padding is `0 calc(var(--message-list-padding-horizontal) - 16px)`.
+     Below 1024px that variable is 36px, so the right padding is 20px and the
+     create button's right edge is 370. The button is `.ds-button.ds-button--m`
+     (`--dsl-button-padding: 0 14px`, min-width 72px) with no width of its own.
+     Select-all uses checkbox theme gap 12px (the `mP` `theme.gap` in the bundle);
+     `.ds-checkbox-label` has no min-width. */
   .share-bar-inner {
     width: 100%;
     margin-left: 0;
     padding-left: 36px;
     padding-right: 20px;
   }
-  .share-bar [data-testid="share-create"] { width: 164.3px; }
   .share-all { gap: 12px; }
-  .share-all > span { min-width: 60px; }
 }
 @media (max-width: 639px) {
   .share-bar .share-split,

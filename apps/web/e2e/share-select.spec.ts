@@ -70,8 +70,8 @@ const install = async (page: Page) => {
   })
 }
 
-const seed = async (page: Page) => {
-  await page.evaluate(async () => {
+const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗') => {
+  await page.evaluate(async (firstUser) => {
     const db = await new Promise<IDBDatabase>((ok, ko) => {
       const request = indexedDB.open('deepapi')
       request.onsuccess = () => ok(request.result)
@@ -86,7 +86,7 @@ const seed = async (page: Page) => {
     tx.objectStore('conversations').put({
       id, title: '分享样本', titleSource: 'user', model: 'deepseek-flash', thinking: false, search: false, readLink: false, effort: 'high', pinned: false, archived: false, activeLeafId: 'a2', createdAt: when, updatedAt: when, rev: 1, deletedAt: null,
     })
-    tx.objectStore('messages').put(message('u1', null, 'user', '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗', '2026-11-20T00:00:00.000Z'))
+    tx.objectStore('messages').put(message('u1', null, 'user', firstUser, '2026-11-20T00:00:00.000Z'))
     tx.objectStore('messages').put(message('a1', 'u1', 'assistant', '第一答', '2026-11-20T00:00:01.000Z'))
     tx.objectStore('messages').put(message('u2', 'a1', 'user', '第二问', '2026-11-20T00:00:02.000Z'))
     tx.objectStore('messages').put(message('a2', 'u2', 'assistant', '第二答', '2026-11-20T00:00:03.000Z'))
@@ -97,7 +97,7 @@ const seed = async (page: Page) => {
     tx.objectStore('messages').put({ id: 'ou1', conversationId: other, parentId: null, role: 'user', blocks: [{ type: 'text', text: '旁边的问题' }], status: 'complete', usage: null, errorMessage: null, createdAt: when, updatedAt: when, rev: 1, deletedAt: null })
     await new Promise((ok, ko) => { tx.oncomplete = () => ok(null); tx.onerror = () => ko(tx.error) })
     db.close()
-  })
+  }, firstUser)
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
   const narrow = (page.viewportSize()?.width ?? 1440) < 768
@@ -111,7 +111,7 @@ const seed = async (page: Page) => {
   await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
 }
 
-const boot = async (page: Page, theme: string, staged = false) => {
+const boot = async (page: Page, theme: string, staged = false, firstUser?: string) => {
   await install(page)
   if (staged) await page.addInitScript(SSE)
   await page.addInitScript((value) => localStorage.setItem('deepapi-theme', value), theme)
@@ -120,7 +120,7 @@ const boot = async (page: Page, theme: string, staged = false) => {
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await seed(page)
+  await seed(page, firstUser)
 }
 
 const paeth = (left: number, up: number, upLeft: number) => {
@@ -292,7 +292,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(proseAfter.x, 62, 'answer text area left')
         near(proseAfter.width, 308, 'answer text area width')
         near(proseAfter.x + proseAfter.width, 370, 'answer text area right')
-        near(bubbleAfter.x, 146, 'question bubble left')
+        near(bubbleAfter.height, bubbleBefore.height, 'question bubble height follows its text')
         near(bubbleAfter.x + bubbleAfter.width, 354, 'question bubble right')
       }
       await expect(page.locator('.action-row:visible')).toHaveCount(0)
@@ -356,11 +356,10 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(allBox.y, 802.5, 'select-all y')
         const label = (await page.locator('.share-all span').boundingBox())!
         near(label.x, 66, 'select-all label left')
-        near(label.x + label.width, 126, 'select-all label right')
         const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
         near(firstQuestion.y, 76.5, 'question checkbox y')
-        near(firstAnswer.y, 300.5, 'answer checkbox y')
+        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 60, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
           return { margin: style.margin, padding: style.padding }
@@ -399,8 +398,6 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const createRect = (await page.getByTestId('share-create').boundingBox())!
       if (w >= 768) expect(Math.abs(createRect.x + createRect.width - (answerGrey.x + answerGrey.width)), 'create button right edge').toBeLessThanOrEqual(1)
       else if (w === 390) {
-        near(createRect.x, 205.7, 'create button left')
-        near(createRect.width, 164.3, 'create button width')
         near(createRect.x + createRect.width, 370, 'create button right')
         near(createRect.height, 36, 'create button height')
         near(createRect.y, 793.5, 'create button top')
@@ -696,8 +693,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
 }
 
 // Official bundle: selection top bar when width < 800, selected-count hidden when width < 640.
-// 600/660 split the count breakpoint. 700/820 split the top-bar breakpoint. 767 sits in neither gap.
-for (const theme of ['light', 'dark'] as const) for (const w of [600, 660, 700, 820] as const) {
+// 639/641 split the count breakpoint. 799/801 split the top-bar breakpoint. 767 sits in neither gap.
+for (const theme of ['light', 'dark'] as const) for (const w of [600, 639, 641, 660, 700, 780, 799, 801, 820] as const) {
   test.describe(`share breakpoints ${theme} ${w}`, () => {
     test.use({ viewport: { width: w, height: 844 }, colorScheme: theme, bypassCSP: true })
     test('top bar and selected count follow the official widths', async ({ page }) => {
@@ -718,6 +715,113 @@ for (const theme of ['light', 'dark'] as const) for (const w of [600, 660, 700, 
       }
       if (w < 640) await expect(page.getByTestId('share-count')).toBeHidden()
       else await expect(page.getByTestId('share-count')).toBeVisible()
+    })
+  })
+}
+
+// Width and height of a question come from its text. These fail while selection mode
+// forces the official sample's 152px bubble, 208px bubble, 164.3px button, or 60px label.
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`share natural size ${theme}`, () => {
+    test.use({ viewport: { width: 390, height: 844 }, colorScheme: theme, bypassCSP: true })
+    test('one-line question keeps its bubble height in selection mode', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, theme, false, '你好')
+      const before = (await page.locator('.turn.user .bubble').first().boundingBox())!
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const after = (await page.locator('.turn.user .bubble').first().boundingBox())!
+      near(after.height, before.height, 'one-line bubble height')
+    })
+    test('short question bubble shrink-wraps and stays right-aligned', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, theme)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const bubble = (await page.locator('.turn.user', { hasText: '第二问' }).locator('.bubble').boundingBox())!
+      expect(bubble.width, `short bubble width ${bubble.width}`).toBeLessThan(208)
+      near(bubble.x + bubble.width, 354, 'short bubble right')
+    })
+    test('create button and select-all label use natural width', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, theme)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const create = page.getByTestId('share-create')
+      const specified = await create.evaluate((node) => {
+        const read = (el: Element, prop: string) => {
+          const walk = (rules: CSSRule[]): string => {
+            let value = ''
+            for (const rule of rules) {
+              if (rule instanceof CSSMediaRule) {
+                if (window.matchMedia(rule.media.mediaText).matches) value = walk([...rule.cssRules]) || value
+              } else if (rule instanceof CSSStyleRule && rule.selectorText) {
+                let matches = false
+                try { matches = el.matches(rule.selectorText) } catch { matches = false }
+                if (matches) {
+                  const next = rule.style.getPropertyValue(prop)
+                  if (next) value = next
+                }
+              }
+            }
+            return value
+          }
+          let value = ''
+          for (const sheet of [...document.styleSheets]) {
+            let rules: CSSRule[]
+            try { rules = [...sheet.cssRules] } catch { continue }
+            const next = walk(rules)
+            if (next) value = next
+          }
+          return value || 'auto'
+        }
+        const style = getComputedStyle(node)
+        const content = node.querySelector('.ds-button__content')!.getBoundingClientRect().width
+        const pad = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+        return { width: read(node, 'width'), box: node.getBoundingClientRect().width, content, pad }
+      })
+      expect(specified.width, 'create button width').toBe('auto')
+      near(specified.pad, 28, 'create button horizontal padding')
+      near(specified.box, specified.content + specified.pad, 'create button width is content plus padding')
+      const label = await page.locator('.share-all span').evaluate((node) => {
+        const walk = (el: Element, prop: string) => {
+          const read = (rules: CSSRule[]): string => {
+            let value = ''
+            for (const rule of rules) {
+              if (rule instanceof CSSMediaRule) {
+                if (window.matchMedia(rule.media.mediaText).matches) value = read([...rule.cssRules]) || value
+              } else if (rule instanceof CSSStyleRule && rule.selectorText) {
+                let matches = false
+                try { matches = el.matches(rule.selectorText) } catch { matches = false }
+                if (matches) {
+                  const next = rule.style.getPropertyValue(prop)
+                  if (next) value = next
+                }
+              }
+            }
+            return value
+          }
+          let value = ''
+          for (const sheet of [...document.styleSheets]) {
+            let rules: CSSRule[]
+            try { rules = [...sheet.cssRules] } catch { continue }
+            const next = read(rules)
+            if (next) value = next
+          }
+          return value || 'auto'
+        }
+        const range = document.createRange()
+        range.selectNodeContents(node)
+        return {
+          width: walk(node, 'width'),
+          minWidth: walk(node, 'min-width'),
+          box: node.getBoundingClientRect().width,
+          text: range.getBoundingClientRect().width,
+        }
+      })
+      expect(label.width, 'select-all label width').toBe('auto')
+      expect(label.minWidth, 'select-all label min-width').toBe('auto')
+      near(label.box, label.text, 'select-all label matches its text')
     })
   })
 }
