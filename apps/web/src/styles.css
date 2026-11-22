@@ -2315,10 +2315,19 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 .timeline-browse { padding: 5px 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-small); }
 .timeline-browse.is-last { padding-bottom: 0; }
 .timeline-browse > svg:first-of-type { margin-top: 4px; margin-right: 6px; }
-.browse-line { flex-wrap: wrap; align-items: center; row-gap: 6px; }
+.browse-line { align-items: center; }
+.browse-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 6px;
+  width: calc(100% - 30px);
+  overflow: hidden;
+}
 .browse-count { margin-right: 6px; }
-.browse-item { display: inline-flex; align-items: center; max-width: 100%; margin-right: 6px; }
+.browse-item { white-space: nowrap; display: inline-flex; align-items: center; max-width: 100%; margin-right: 6px; }
 .browse-link {
+  display: inline-block;
   font: var(--dsw-font-xs-13);
   color: var(--dsw-alias-label-secondary);
   text-decoration-line: underline;
