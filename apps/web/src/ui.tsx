@@ -1489,6 +1489,7 @@ export const Shell = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
+  const filterInputRef = useRef<HTMLInputElement>(null)
   const [corpus, setCorpus] = useState<Record<string, string>>({})
   const [activeHit, setActiveHit] = useState(-1)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -1523,6 +1524,14 @@ export const Shell = () => {
       live = false
     }
   }, [filtering, state.conversations, state.messages])
+  // SP-SB-647: reopening the dialog selects the preserved query.
+  useEffect(() => {
+    if (!filtering) return
+    const input = filterInputRef.current
+    if (!input) return
+    input.focus()
+    input.select()
+  }, [filtering])
   useEffect(() => {
     const list = resultsRef.current
     if (!list || activeHit < 0) return
@@ -1650,7 +1659,10 @@ export const Shell = () => {
       const inComposer = target?.dataset.testid === 'composer'
       if (meta && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        setFiltering(true)
+        // SP-SB-635: ignore the shortcut while multi-select is on. A second press closes.
+        // closeSearch preserves the query (SP-SB-647 reopens it selected).
+        if (selecting) return
+        setFiltering((open) => !open)
       } else if (meta && event.key.toLowerCase() === 'j' && (!typing || inComposer)) {
         event.preventDefault()
         void state.newChat()
@@ -1659,7 +1671,6 @@ export const Shell = () => {
         closeRef.current()
         setUserMenu(false)
         setFiltering(false)
-        setFilter('')
         if (state.settingsOpen) {
           state.setSettingsOpen(false)
         }
@@ -1668,7 +1679,7 @@ export const Shell = () => {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [state])
+  }, [state, selecting])
   useEffect(() => {
     if (!userMenu) return undefined
     const onPointerDown = (event: PointerEvent) => {
@@ -1679,12 +1690,18 @@ export const Shell = () => {
     document.addEventListener('pointerdown', onPointerDown, true)
     return () => document.removeEventListener('pointerdown', onPointerDown, true)
   }, [userMenu])
+  // SP-SB-669: a history pop closes the user menu. Reload already drops it.
+  useEffect(() => {
+    const onPop = () => setUserMenu(false)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   const groups = useMemo(() => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
     const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group30')]
-    for (const item of state.conversations.filter((chat) => !filter || (chat.title || t('newChat')).includes(filter))) {
+    for (const item of state.conversations.filter((chat) => !filtering || !filter || (chat.title || t('newChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
       const label = item.pinned
@@ -1706,7 +1723,7 @@ export const Shell = () => {
       }
       return a[0] < b[0] ? 1 : -1
     })
-  }, [state.conversations, filter, t])
+  }, [state.conversations, filter, filtering, t])
   const serverName = state.serverUser?.username
   const who = serverName || profile.nickname || t('product')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
@@ -1861,12 +1878,13 @@ export const Shell = () => {
           </div>
         </>
       ) : null}
-      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }} /> : null}
+      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }} /> : null}
       {filtering ? (
         <form className={query ? 'search-dialog has-query' : 'search-dialog'} role="search" onSubmit={(event) => event.preventDefault()}>
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
           <input
+            ref={filterInputRef}
             className="side-filter"
             autoFocus
             placeholder={t('searchChats')}
@@ -1894,7 +1912,7 @@ export const Shell = () => {
               }
             }}
           />
-          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }}>
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
           {query ? (
@@ -2103,7 +2121,25 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
   const [confirming, setConfirming] = useState(false)
   const moreRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const cancelEdit = useRef(false)
+  const editingRef = useRef(false)
+  const titleRef = useRef(title)
+  editingRef.current = editing
+  titleRef.current = title
   usePopoverDismiss(open, () => setOpen(false), moreRef, menuRef)
+  // SP-SB-668: Back closes the row menu. A pop while renaming commits (SP-SB-670).
+  useEffect(() => {
+    const onPop = () => {
+      setOpen(false)
+      if (!editingRef.current || cancelEdit.current) return
+      const next = titleRef.current.trim()
+      if (next && next !== conversation.title) void rename(conversation.id, next)
+      cancelEdit.current = true
+      setEditing(false)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [conversation.id, conversation.title, rename])
   return (
     <a
       className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`}
@@ -2131,16 +2167,37 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
       ) : null}
       {editing ? (
         <form
-          onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}
+          onSubmit={(event) => {
+            event.preventDefault()
+            const next = title.trim()
+            if (next && next !== conversation.title) void rename(conversation.id, next)
+            setEditing(false)
+          }}
           onKeyDown={(event) => {
             if (event.key !== 'Escape' || event.nativeEvent.isComposing) return
             event.preventDefault()
             event.stopPropagation()
+            // Set before unmount so the blur that follows does not commit the typed title.
+            cancelEdit.current = true
             setTitle(conversation.title)
             setEditing(false)
           }}
         >
-          <input autoFocus aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
+          <input
+            autoFocus
+            aria-label={t('renameTitle')}
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            onBlur={(event) => {
+              // SP-SB-670: commit when focus moves to another control (New chat, another row).
+              // A reload blur has no element target, so the uncommitted title is not stored.
+              if (cancelEdit.current) return
+              if (!(event.relatedTarget instanceof Element)) return
+              const next = title.trim()
+              if (next && next !== conversation.title) void rename(conversation.id, next)
+              setEditing(false)
+            }}
+          />
         </form>
       ) : (
         <button type="button">{conversation.title || t('newChat')}</button>
@@ -2155,7 +2212,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
         <div ref={menuRef} className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" data-testid="chat-item-menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
-          <div role="menuitem" tabIndex={0} onClick={() => { setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { cancelEdit.current = false; setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onShare?.() }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
