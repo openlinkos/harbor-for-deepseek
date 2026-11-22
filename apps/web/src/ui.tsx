@@ -2384,7 +2384,8 @@ const Composer = () => {
   }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
-      setComposerText(useHarbor.getState().activeId, (event as CustomEvent<string>).detail)
+      const state = useHarbor.getState()
+      state.setComposerText(state.activeId, (event as CustomEvent<string>).detail)
       box.current?.focus()
     }
     window.addEventListener('deepapi-prefill', onPrefill)
