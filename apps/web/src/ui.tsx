@@ -1050,13 +1050,15 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       <p key={index} className={`timeline-step timeline-browse found-line browse-line ${last}`}>
         <span className="timeline-line" aria-hidden="true" />
         <Glyph name="document" size={14} />
-        <span className="browse-count">{t('browsedPages', { count: step.items.length })}</span>
-        {step.items.map((item) => (
-          <span key={item.url} className="browse-item">
-            <a className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
-            <BrowseExternalIcon />
-          </span>
-        ))}
+        <span className="browse-wrap">
+          <span className="browse-count">{t('browsedPages', { count: step.items.length })}</span>
+          {step.items.map((item) => (
+            <span key={item.url} className="browse-item">
+              <a className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
+              <BrowseExternalIcon />
+            </span>
+          ))}
+        </span>
       </p>
     )
   }
