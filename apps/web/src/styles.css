@@ -1080,6 +1080,19 @@ button.chip { appearance: none; margin: 0; }
   border-radius: 50%;
 }
 .favicon img.on { display: block; }
+/* SP-CITE-158: card and stacked fallbacks keep the official 14px link svg. */
+.favicon .site_logo_fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dsw-alias-label-tertiary);
+}
+.favicon .site_logo_fallback svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  display: block;
+}
 .favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); transition: box-shadow .2s; }
 .favicons i:first-child { margin-left: 0; }
 .source-meta .favicon {

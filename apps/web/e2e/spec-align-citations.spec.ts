@@ -1,6 +1,6 @@
 // Hover-card site icon and the citation chrome we render.
 // SP-CITE-158, 159, 160, 172, 173, 174, plus measured badge, card, and pill values.
-// The search-panel letter avatar stays; site-icon.spec asserts it.
+// Panel and strip empty or failed icons use the same 14px link svg. site-icon.spec covers those.
 import { expect, test, type Page } from '@playwright/test'
 import { boot } from './lib/fb1721-boot'
 

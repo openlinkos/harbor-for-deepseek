@@ -18,6 +18,7 @@ import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
 import { USER_MENU_ICONS } from './user-menu-icons.js'
 import { DsButton, DsFileButton } from './ds-button.js'
+import { failedSiteIcons, LinkMarkIcon } from './site-logo.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -310,14 +311,13 @@ const SOURCE_MARKS = 4
 
 const siteIconSrc = (icon?: string | null) => (typeof icon === 'string' ? icon.trim() : '')
 
-const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
+const Favicon = ({ icon }: { label: string; icon?: string | null }) => {
   const src = siteIconSrc(icon)
-  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
-  const [failed, setFailed] = useState(false)
+  const [failed, setFailed] = useState(() => !src || failedSiteIcons.has(src))
   const [ready, setReady] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
   useEffect(() => {
-    setFailed(false)
+    setFailed(!src || failedSiteIcons.has(src))
     setReady(false)
   }, [src])
   useEffect(() => {
@@ -326,7 +326,13 @@ const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
     if (img.complete && img.naturalWidth > 0) setReady(true)
   }, [src, failed])
   if (!src || failed) {
-    return <i className="favicon" aria-hidden="true">{letter}</i>
+    return (
+      <i className="favicon" aria-hidden="true">
+        <span className="site_logo_fallback">
+          <LinkMarkIcon />
+        </span>
+      </i>
+    )
   }
   return (
     <i className="favicon" aria-hidden="true">
@@ -336,7 +342,10 @@ const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
         alt=""
         className={ready ? 'on' : ''}
         onLoad={() => setReady(true)}
-        onError={() => setFailed(true)}
+        onError={() => {
+          failedSiteIcons.add(src)
+          setFailed(true)
+        }}
       />
     </i>
   )

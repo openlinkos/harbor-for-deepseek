@@ -225,7 +225,25 @@ test('mock site icons render on every shown source at 1440 and 390', async ({ pa
   await panel.screenshot({ path: join(shots, 'site-icons-390-list.png') })
 })
 
-test('a null site icon falls back to the site name initial', async ({ page }) => {
+const expectLinkFallback = async (icon: Locator) => {
+  const fallback = icon.locator('.site_logo_fallback')
+  await expect(fallback).toHaveCount(1)
+  await expect(icon.locator('img')).toHaveCount(0)
+  await expect(icon).toHaveText('')
+  const svg = fallback.locator('svg')
+  await expect(svg).toHaveAttribute('width', '14')
+  await expect(svg).toHaveAttribute('height', '14')
+  await expect(svg).toHaveAttribute('viewBox', '0 0 14 14')
+  await expect(svg.locator('path').first()).toHaveAttribute('d', /^M3\.2131 7\.12714/)
+  const box = await svg.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    return { width: rect.width, height: rect.height }
+  })
+  expect(Math.round(box.width)).toBe(14)
+  expect(Math.round(box.height)).toBe(14)
+}
+
+test('a null site icon falls back to the 14px link svg', async ({ page }) => {
   const results = [
     source('sohu.com', '搜狐', '搜狐天气', iconUrl('sohu.com'), 'red'),
     source('example.com', 'Example', '没有图标', null),
@@ -235,36 +253,38 @@ test('a null site icon falls back to the site name initial', async ({ page }) =>
   await install(page, results)
   await unlock(page)
 
-  const assertLetters = async () => {
+  const assertEmpty = async () => {
     for (const strip of [page.getByTestId('search-results').locator('.favicons'), page.locator('.found-line .favicons')]) {
       await expect(strip.locator('img')).toHaveCount(1)
       await expect(strip.locator('img')).toHaveAttribute('src', iconUrl('sohu.com'))
-      await expect(strip.locator('.favicon').nth(1)).toHaveText('E')
-      await expect(strip.locator('.favicon').nth(1).locator('img')).toHaveCount(0)
-      await expect(strip.locator('.favicon').nth(2)).toHaveText('空')
-      await expect(strip.locator('.favicon').nth(2).locator('img')).toHaveCount(0)
+      await expectLinkFallback(strip.locator('.favicon').nth(1))
+      await expectLinkFallback(strip.locator('.favicon').nth(2))
     }
   }
-  await assertLetters()
+  await assertEmpty()
   await page.getByTestId('search-results').click()
   const panel = page.getByTestId('search-panel')
   await expect(panel).toHaveCSS('transform', 'none')
   await expect(panel.locator('.source-card img')).toHaveCount(1)
-  await expect(panel.locator('.source-card').nth(1).locator('.favicon')).toHaveText('E')
+  await expectLinkFallback(panel.locator('.source-card').nth(1).locator('.favicon'))
   await expect(panel.locator('.source-card').nth(1).locator('img')).toHaveCount(0)
-  await expect(panel.locator('.source-card').nth(2).locator('.favicon')).toHaveText('空')
-  await panel.locator('.source-card').nth(1).screenshot({ path: join(shots, 'site-icons-null-letter.png') })
+  await expectLinkFallback(panel.locator('.source-card').nth(2).locator('.favicon'))
+  await panel.locator('.source-card').nth(1).screenshot({ path: join(shots, 'site-icons-null-link.png') })
 
   await panel.getByRole('button', { name: '关闭' }).click()
   await page.setViewportSize({ width: 390, height: 844 })
-  await assertLetters()
+  await assertEmpty()
   await page.getByTestId('search-results').click()
-  await expect(panel.locator('.source-card').nth(1).locator('.favicon')).toHaveText('E')
+  await expectLinkFallback(panel.locator('.source-card').nth(1).locator('.favicon'))
   await expect(panel.locator('.source-card img')).toHaveCount(1)
 })
 
-test('a site icon that fails to load falls back to the site name initial', async ({ page }) => {
+test('a site icon that fails to load falls back to the 14px link svg', async ({ page }) => {
   const broken = iconUrl('broken.example')
+  const hits: string[] = []
+  page.on('request', (request) => {
+    if (request.url() === broken) hits.push(request.url())
+  })
   const results = [
     source('sohu.com', '搜狐', '搜狐天气', iconUrl('sohu.com'), 'red'),
     source('broken.example', 'Broken', '图片打不开', broken),
@@ -277,23 +297,26 @@ test('a site icon that fails to load falls back to the site name initial', async
     for (const strip of [page.getByTestId('search-results').locator('.favicons'), page.locator('.found-line .favicons')]) {
       await expect(strip.locator('img')).toHaveCount(1)
       await expect(strip.locator('img')).toHaveAttribute('src', iconUrl('sohu.com'))
-      await expect(strip.locator('.favicon').nth(1)).toHaveText('B')
-      await expect(strip.locator('.favicon').nth(1).locator('img')).toHaveCount(0)
+      await expectLinkFallback(strip.locator('.favicon').nth(1))
     }
   }
   await assertFallback()
+  const afterStrips = hits.length
+  expect(afterStrips).toBeGreaterThan(0)
   await page.getByTestId('search-results').click()
   const panel = page.getByTestId('search-panel')
   await expect(panel).toHaveCSS('transform', 'none')
   await expect(panel.locator('.source-card img')).toHaveCount(1)
-  await expect(panel.locator('.source-card').nth(1).locator('.favicon')).toHaveText('B')
+  await expectLinkFallback(panel.locator('.source-card').nth(1).locator('.favicon'))
   await expect(panel.locator('.source-card').nth(1).locator('img')).toHaveCount(0)
-  await panel.locator('.source-card').nth(1).screenshot({ path: join(shots, 'site-icons-error-letter.png') })
+  expect(hits.length).toBe(afterStrips)
+  await panel.locator('.source-card').nth(1).screenshot({ path: join(shots, 'site-icons-error-link.png') })
 
   await panel.getByRole('button', { name: '关闭' }).click()
   await page.setViewportSize({ width: 390, height: 844 })
   await assertFallback()
   await page.getByTestId('search-results').click()
-  await expect(panel.locator('.source-card').nth(1).locator('.favicon')).toHaveText('B')
+  await expectLinkFallback(panel.locator('.source-card').nth(1).locator('.favicon'))
   await expect(panel.locator('img')).toHaveCount(1)
+  expect(hits.length).toBe(afterStrips)
 })
