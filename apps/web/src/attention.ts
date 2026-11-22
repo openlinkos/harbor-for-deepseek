@@ -177,8 +177,8 @@ function tokenizeAttention(this: AttentionThis, effects: Effects, ok: State): St
   }
 }
 
-const deepseekAttentionConstruct = {
-  name: 'deepseekAttention',
+const officialAttentionConstruct = {
+  name: 'officialAttention',
   tokenize: tokenizeAttention,
   resolveAll: resolveAllAttention,
 }
@@ -188,6 +188,6 @@ export function remarkDeepseekAttention(this: { data: () => unknown }) {
   const micromarkExtensions = data.micromarkExtensions ?? []
   data.micromarkExtensions = micromarkExtensions
   micromarkExtensions.push({
-    text: { [ASTERISK]: deepseekAttentionConstruct, [UNDERSCORE]: deepseekAttentionConstruct },
+    text: { [ASTERISK]: officialAttentionConstruct, [UNDERSCORE]: officialAttentionConstruct },
   })
 }
