@@ -414,6 +414,9 @@ const useScrollLock = (open: boolean) => {
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
   const panel = useRef<HTMLDivElement>(null)
+  // SP-MOD-572. Back closes the confirm. Esc still closes because interaction-gate expects that.
+  useOverlayHistory(true, () => onCancel())
+  useScrollLock(true)
   const onCancelRef = useRef(onCancel)
   onCancelRef.current = onCancel
   const previousFocus = useRef<HTMLElement | null>(null)
@@ -1580,6 +1583,37 @@ export const Shell = () => {
     input.focus()
     input.select()
   }, [filtering])
+  // SP-MOD-635. Back closes the search dialog. Tab stays in the card. The page does not scroll behind it.
+  useOverlayHistory(filtering, () => setFiltering(false))
+  useScrollLock(filtering)
+  useEffect(() => {
+    if (!filtering) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const root = document.querySelector('.search-dialog')
+      if (!(root instanceof HTMLElement)) return
+      const list = [...root.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE)].filter((node) => !node.hasAttribute('disabled') && node.getClientRects().length > 0)
+      if (!list.length) {
+        event.preventDefault()
+        return
+      }
+      const first = list[0]
+      const last = list[list.length - 1]
+      const current = document.activeElement
+      const inside = current instanceof Node && root.contains(current)
+      if (event.shiftKey) {
+        if (!inside || current === first) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || current === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [filtering])
   useEffect(() => {
     const list = resultsRef.current
     if (!list || activeHit < 0) return
@@ -1716,6 +1750,8 @@ export const Shell = () => {
         void state.newChat()
         focusComposer()
       } else if (event.key === 'Escape') {
+        // SP-MOD-601. An IME composition Escape stays in the field.
+        if (event.isComposing) return
         closeRef.current()
         setUserMenu(false)
         setFiltering(false)
