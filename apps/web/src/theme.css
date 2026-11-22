@@ -1,15 +1,55 @@
 /* Color and type tokens adapted from deepseek-ai/chat-demo (MIT). See NOTICE. */
+/* SP-GL-033: curly quotes (U+201C–201D, U+2018–2019) use a local face. No remote font fetch. */
+@font-face {
+  font-family: 'quote-cjk-patch';
+  src: local('PingFangSC-Regular');
+  unicode-range: U+201C-201D, U+2018-2019;
+}
+
 :root {
+  /* SP-GL-042 */
   --dsw-font-family:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
+    'quote-cjk-patch', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-variant-ligatures: no-contextual;
+}
+
+/* SP-GL-044: same stack without the quote patch. */
+.skip-quote-patch {
+  font-family:
+    Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell,
+    'Helvetica Neue', Oxygen, 'Open Sans', sans-serif;
+}
+
+/* SP-GL-045 */
+.cjk_fallback {
+  font-family: serif !important;
+}
+
+/* SP-GL-005..007, SP-GL-008 */
+body.change-theme *,
+body.change-theme *::before,
+body.change-theme *::after {
+  transition: none !important;
+}
+
+body.dark {
+  color-scheme: dark;
+}
+
+/* SP-GL-032 */
+body.apple,
+body.en_US,
+body.apple .ds-theme,
+body.en_US .ds-theme {
+  --ds-font-weight-strong: 500;
 }
 
 body {
   --dsl-modal-overlay-opacity: 0.36;
   --harbor-overlay-blur: 2px;
   --message-list-max-width: 840px;
+  --message-list-padding-horizontal: 44px;
   --sider-width: 261px;
   --ds-control-height-xl: 44px;
   --ds-control-height-l: 40px;
@@ -42,12 +82,12 @@ body {
   --dsw-static-blue-100: #dbeafe;
   --dsw-static-blue-200: #bfdbfe;
   --dsw-static-blue-300: #93c5fd;
-  --dsw-static-blue-400: #6b9bff;
-  --dsw-static-blue-450: #3b82f6;
-  --dsw-static-blue-500: #3964fe;
+  --dsw-static-blue-400: #60a5fa;
+  --dsw-static-blue-450: #4d93f8;
+  --dsw-static-blue-500: #3b82f6;
   --dsw-static-blue-50: #eff6ff;
-  --dsw-static-blue-600: #1d4ed8;
-  --dsw-static-blue-800: #1e3a8a;
+  --dsw-static-blue-600: #2563eb;
+  --dsw-static-blue-800: #1e40af;
   --dsw-static-blue-900: #172554;
   --dsw-static-deepseek-50: #edf3fe;
   --dsw-static-deepseek-100: #e4edfd;
@@ -98,12 +138,12 @@ body[data-ds-dark-theme] {
   --dsw-static-blue-100: #dbeafe;
   --dsw-static-blue-200: #bfdbfe;
   --dsw-static-blue-300: #93c5fd;
-  --dsw-static-blue-400: #6b9bff;
-  --dsw-static-blue-450: #3b82f6;
-  --dsw-static-blue-500: #3964fe;
+  --dsw-static-blue-400: #60a5fa;
+  --dsw-static-blue-450: #4d93f8;
+  --dsw-static-blue-500: #3b82f6;
   --dsw-static-blue-50: #eff6ff;
-  --dsw-static-blue-600: #1d4ed8;
-  --dsw-static-blue-800: #1e3a8a;
+  --dsw-static-blue-600: #2563eb;
+  --dsw-static-blue-800: #1e40af;
   --dsw-static-blue-900: #172554;
   --dsw-static-deepseek-50: #edf3fe;
   --dsw-static-deepseek-100: #e4edfd;
@@ -285,4 +325,281 @@ body {
   --dsw-font-s-strong-14: 500 14px/22px var(--dsw-font-family);
 
   --dsw-font-xs-13: 13px/20px var(--dsw-font-family);
+}
+
+/* SP-GL token fill */
+body {
+  --dsw-static-blue-50p: #eaf3ff;
+  --dsw-static-blue-75: #e5f0ff;
+  --dsw-static-blue-950: #172554;
+  --dsw-static-deepseek-700-delete: #2f4c8f;
+  --dsw-static-neutral-00: #fff;
+  --dsw-static-neutral-1000: #000;
+  --dsw-static-neutral-150: #ededed;
+  --dsw-static-neutral-200: #e5e5e5;
+  --dsw-static-neutral-250: #dcdcdc;
+  --dsw-static-neutral-400: #a2a4a6;
+  --dsw-static-neutral-50: #fafafa;
+  --dsw-static-neutral-500: #7f8287;
+  --dsw-static-neutral-600: #545557;
+  --dsw-static-neutral-700: #3c3c3d;
+  --dsw-static-neutral-800: #292929;
+  --dsw-static-neutral-900: #0f0f0f;
+  --dsw-static-neutral-bluish-500: #979da6;
+  --dsw-static-neutral-bluish-875: #232324;
+  --dsw-static-red-100: #fee2e2;
+  --dsw-static-red-50: #fef2f2;
+  --dsw-static-red-500: #ef4444;
+  --dsw-static-red-900: #570c0c;
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-mask-1: rgba(0,0,0,.24);
+  --dsw-alias-bg-mask-2: rgba(0,0,0,.12);
+  --dsw-alias-bg-mask-3: rgba(0,0,0,.48);
+  --dsw-alias-bg-mask-photo: rgba(0,0,0,.88);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-150);
+  --dsw-alias-border-inverted2: transparent;
+  --dsw-alias-border-l4: rgba(0,0,0,.16);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-tool-bar-fill: rgba(84,85,87,.5);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(31,31,31,.36);
+  --dsw-alias-button-tool-bar-hover: rgba(84,85,87,.6);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-300);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-300);
+  --dsw-alias-state-business-primary: var(--dsw-static-deepseek-500);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-100);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-success-secondary: var(--dsw-static-green-400);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-100);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+  --dsw-alias-state-warn-secondary: var(--dsw-static-amber-400);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-100);
+  --dsw-specific-bubble-highlight: var(--dsw-static-deepseek-200);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-60);
+  --dsw-linear-gradient-think: linear-gradient(180deg, #fff 20.19%, rgba(255,255,255,0) 100%);
+  --dsw-linear-think-select: linear-gradient(180deg, #f5f6f7 20.19%, rgba(245,246,247,0) 100%);
+  --dsw-mask-blur: blur(2px);
+  --dsw-shadow-lv1-blur: 0 4px 12px 0 rgba(0,0,0,.02);
+  --dsw-font-base-16: 16px/24px var(--dsw-font-family);
+  --dsw-font-base-16-font-family: var(--dsw-font-family);
+  --dsw-font-base-16-font-size: 16px;
+  --dsw-font-base-16-font-style: normal;
+  --dsw-font-base-16-font-weight: 400;
+  --dsw-font-base-16-line-height: 24px;
+  --dsw-font-base-strong-16: 500 16px/24px var(--dsw-font-family);
+  --dsw-font-base-strong-16-font-family: var(--dsw-font-family);
+  --dsw-font-base-strong-16-font-size: 16px;
+  --dsw-font-base-strong-16-font-style: normal;
+  --dsw-font-base-strong-16-font-weight: 500;
+  --dsw-font-base-strong-16-line-height: 24px;
+  --dsw-font-l-20: 500 20px/28px var(--dsw-font-family);
+  --dsw-font-l-20-font-family: var(--dsw-font-family);
+  --dsw-font-l-20-font-size: 20px;
+  --dsw-font-l-20-font-style: normal;
+  --dsw-font-l-20-font-weight: 500;
+  --dsw-font-l-20-line-height: 28px;
+  --dsw-font-m-18: 500 16px/28px var(--dsw-font-family);
+  --dsw-font-m-18-font-family: var(--dsw-font-family);
+  --dsw-font-m-18-font-size: 16px;
+  --dsw-font-m-18-font-style: normal;
+  --dsw-font-m-18-font-weight: 500;
+  --dsw-font-m-18-line-height: 28px;
+  --dsw-font-markdown-base-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-base-font-size: 16px;
+  --dsw-font-markdown-base-font-style: normal;
+  --dsw-font-markdown-base-font-weight: 400;
+  --dsw-font-markdown-base-italic: italic 16px/28px var(--dsw-font-family);
+  --dsw-font-markdown-base-italic-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-base-italic-font-size: 16px;
+  --dsw-font-markdown-base-italic-font-style: italic;
+  --dsw-font-markdown-base-italic-font-weight: 400;
+  --dsw-font-markdown-base-italic-line-height: 28px;
+  --dsw-font-markdown-base-line-height: 28px;
+  --dsw-font-markdown-base-strong-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-base-strong-font-size: 16px;
+  --dsw-font-markdown-base-strong-font-style: normal;
+  --dsw-font-markdown-base-strong-font-weight: 600;
+  --dsw-font-markdown-base-strong-italic: italic 600 16px/28px var(--dsw-font-family);
+  --dsw-font-markdown-base-strong-italic-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-base-strong-italic-font-size: 16px;
+  --dsw-font-markdown-base-strong-italic-font-style: italic;
+  --dsw-font-markdown-base-strong-italic-font-weight: 600;
+  --dsw-font-markdown-base-strong-italic-line-height: 28px;
+  --dsw-font-markdown-base-strong-line-height: 28px;
+  --dsw-font-markdown-code-block-font-family: var(--ds-font-family-code);
+  --dsw-font-markdown-code-block-font-size: 13px;
+  --dsw-font-markdown-code-block-font-style: normal;
+  --dsw-font-markdown-code-block-font-weight: 400;
+  --dsw-font-markdown-code-block-line-height: 22px;
+  --dsw-font-markdown-code-font-family: var(--ds-font-family-code);
+  --dsw-font-markdown-code-font-size: 14px;
+  --dsw-font-markdown-code-font-style: normal;
+  --dsw-font-markdown-code-font-weight: 400;
+  --dsw-font-markdown-code-line-height: 22px;
+  --dsw-font-markdown-h1-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-h1-font-size: 24px;
+  --dsw-font-markdown-h1-font-style: normal;
+  --dsw-font-markdown-h1-font-weight: 700;
+  --dsw-font-markdown-h1-line-height: 34px;
+  --dsw-font-markdown-h2-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-h2-font-size: 22px;
+  --dsw-font-markdown-h2-font-style: normal;
+  --dsw-font-markdown-h2-font-weight: 700;
+  --dsw-font-markdown-h2-line-height: 32px;
+  --dsw-font-markdown-h3-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-h3-font-size: 20px;
+  --dsw-font-markdown-h3-font-style: normal;
+  --dsw-font-markdown-h3-font-weight: 700;
+  --dsw-font-markdown-h3-line-height: 30px;
+  --dsw-font-markdown-h4-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-h4-font-size: 16px;
+  --dsw-font-markdown-h4-font-style: normal;
+  --dsw-font-markdown-h4-font-weight: 600;
+  --dsw-font-markdown-h4-line-height: 28px;
+  --dsw-font-markdown-small-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-small-font-size: 14px;
+  --dsw-font-markdown-small-font-style: normal;
+  --dsw-font-markdown-small-font-weight: 400;
+  --dsw-font-markdown-small-italic: italic 14px/24px var(--dsw-font-family);
+  --dsw-font-markdown-small-italic-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-small-italic-font-size: 14px;
+  --dsw-font-markdown-small-italic-font-style: italic;
+  --dsw-font-markdown-small-italic-font-weight: 400;
+  --dsw-font-markdown-small-italic-line-height: 24px;
+  --dsw-font-markdown-small-line-height: 24px;
+  --dsw-font-markdown-small-strong-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-small-strong-font-size: 14px;
+  --dsw-font-markdown-small-strong-font-style: normal;
+  --dsw-font-markdown-small-strong-font-weight: 600;
+  --dsw-font-markdown-small-strong-italic: italic 600 14px/24px var(--dsw-font-family);
+  --dsw-font-markdown-small-strong-italic-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-small-strong-italic-font-size: 14px;
+  --dsw-font-markdown-small-strong-italic-font-style: italic;
+  --dsw-font-markdown-small-strong-italic-font-weight: 600;
+  --dsw-font-markdown-small-strong-italic-line-height: 24px;
+  --dsw-font-markdown-small-strong-line-height: 24px;
+  --dsw-font-markdown-table-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-table-font-size: 15px;
+  --dsw-font-markdown-table-font-style: normal;
+  --dsw-font-markdown-table-font-weight: 400;
+  --dsw-font-markdown-table-head-font-family: var(--dsw-font-family);
+  --dsw-font-markdown-table-head-font-size: 15px;
+  --dsw-font-markdown-table-head-font-style: normal;
+  --dsw-font-markdown-table-head-font-weight: 500;
+  --dsw-font-markdown-table-head-line-height: 25px;
+  --dsw-font-markdown-table-line-height: 25px;
+  --dsw-font-s-14: 14px/22px var(--dsw-font-family);
+  --dsw-font-s-14-font-family: var(--dsw-font-family);
+  --dsw-font-s-14-font-size: 14px;
+  --dsw-font-s-14-font-style: normal;
+  --dsw-font-s-14-font-weight: 400;
+  --dsw-font-s-14-line-height: 22px;
+  --dsw-font-s-strong-14-font-family: var(--dsw-font-family);
+  --dsw-font-s-strong-14-font-size: 14px;
+  --dsw-font-s-strong-14-font-style: normal;
+  --dsw-font-s-strong-14-font-weight: 500;
+  --dsw-font-s-strong-14-line-height: 22px;
+  --dsw-font-xl-24: 600 24px/32px var(--dsw-font-family);
+  --dsw-font-xl-24-font-family: var(--dsw-font-family);
+  --dsw-font-xl-24-font-size: 24px;
+  --dsw-font-xl-24-font-style: normal;
+  --dsw-font-xl-24-font-weight: 600;
+  --dsw-font-xl-24-line-height: 32px;
+  --dsw-font-xs-13-font-family: var(--dsw-font-family);
+  --dsw-font-xs-13-font-size: 13px;
+  --dsw-font-xs-13-font-style: normal;
+  --dsw-font-xs-13-font-weight: 400;
+  --dsw-font-xs-13-line-height: 20px;
+  --dsw-font-xs-strong-13: 500 13px/20px var(--dsw-font-family);
+  --dsw-font-xs-strong-13-font-family: var(--dsw-font-family);
+  --dsw-font-xs-strong-13-font-size: 13px;
+  --dsw-font-xs-strong-13-font-style: normal;
+  --dsw-font-xs-strong-13-font-weight: 500;
+  --dsw-font-xs-strong-13-line-height: 20px;
+  --dsw-font-xxs-12: 12px/18px var(--dsw-font-family);
+  --dsw-font-xxs-12-font-family: var(--dsw-font-family);
+  --dsw-font-xxs-12-font-size: 12px;
+  --dsw-font-xxs-12-font-style: normal;
+  --dsw-font-xxs-12-font-weight: 400;
+  --dsw-font-xxs-12-line-height: 18px;
+  --dsw-font-xxs-strong-12: 500 12px/18px var(--dsw-font-family);
+  --dsw-font-xxs-strong-12-font-family: var(--dsw-font-family);
+  --dsw-font-xxs-strong-12-font-size: 12px;
+  --dsw-font-xxs-strong-12-font-style: normal;
+  --dsw-font-xxs-strong-12-font-weight: 500;
+  --dsw-font-xxs-strong-12-line-height: 18px;
+  --dsw-font-xxxs-11: 11px/14px var(--dsw-font-family);
+  --dsw-font-xxxs-11-font-family: var(--dsw-font-family);
+  --dsw-font-xxxs-11-font-size: 11px;
+  --dsw-font-xxxs-11-font-style: normal;
+  --dsw-font-xxxs-11-font-weight: 400;
+  --dsw-font-xxxs-11-line-height: 14px;
+  --dsw-font-xxxs-strong-11: 500 11px/14px var(--dsw-font-family);
+  --dsw-font-xxxs-strong-11-font-family: var(--dsw-font-family);
+  --dsw-font-xxxs-strong-11-font-size: 11px;
+  --dsw-font-xxxs-strong-11-font-style: normal;
+  --dsw-font-xxxs-strong-11-font-weight: 500;
+  --dsw-font-xxxs-strong-11-line-height: 14px;
+  --ds-font-size-l: 16px;
+  --ds-font-size-s: 12px;
+  --ds-font-size-sp: 13px;
+  --ds-font-size-xs: 10px;
+  --ds-font-size-xsp: 11px;
+  --ds-line-height-l: 28px;
+  --ds-line-height-m: 25px;
+  --ds-line-height-s: 21px;
+  --ds-line-height-sp: 23px;
+  --ds-line-height-xs: 18px;
+  --ds-line-height-xsp: 19.5px;
+  --ds-font-weight-strong: 600;
+}
+
+body[data-ds-dark-theme] {
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-875);
+  --dsw-alias-bg-mask-1: rgba(0,0,0,.5);
+  --dsw-alias-bg-mask-2: rgba(0,0,0,.2);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-850);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-border-inverted2: rgba(255,255,255,.08);
+  --dsw-alias-border-l4: rgba(255,255,255,.2);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-900);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-700);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-550);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-800);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-900);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-900);
+  --dsw-specific-bubble-highlight: var(--dsw-static-neutral-bluish-750);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-800);
+  --dsw-linear-gradient-think: linear-gradient(180deg, #151517 20.19%, rgba(21,21,23,0) 100%);
+  --dsw-linear-think-select: linear-gradient(180deg, #232325 20.19%, rgba(35,35,37,0) 100%);
+}
+
+@media (max-width: 1023px) {
+  body {
+    --message-list-max-width: 712px;
+    --message-list-padding-horizontal: 36px;
+  }
 }

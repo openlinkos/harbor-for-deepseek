@@ -1,7 +1,7 @@
 :root {
   --sider-width: 261px;
   color-scheme: light;
-  --font: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+  --font: var(--dsw-font-family);
 }
 html[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
@@ -27,12 +27,18 @@ body[data-ds-dark-theme] { --scroll-color: rgba(255, 255, 255, 0.15); --scroll-c
 }
 body {
   margin: 0;
-  font-family: var(--font);
-  font-size: 16px;
-  line-height: 1.7;
+  /* SP-GL-017, 021, 023, 024, 026, 031. color stays the label token (SP-GL-029 purple is a conflict). */
+  font-family: var(--dsw-font-family);
+  font-size: var(--ds-font-size-m);
   color: var(--dsw-alias-label-primary);
   background: var(--dsw-alias-bg-base);
+  overflow: hidden;
+  word-break: break-word;
+  font-feature-settings: 'kern';
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent;
 }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -40,6 +46,7 @@ a { color: var(--dsw-alias-brand-text); }
 
 .shell { display: flex; height: 100dvh; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; position: relative; }
 .sidebar {
+  --sider-top-slot-height: 40px;
   width: var(--sider-width);
   flex: 0 0 var(--sider-width);
   display: flex;
