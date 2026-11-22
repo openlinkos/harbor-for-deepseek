@@ -51,10 +51,8 @@ const current = (page: Page) => page.getByTestId('message-list')
 
 // 在 master e903ed1 上会失败的用例。修掉对应问题后删掉这条，否则意外通过会让 CI 失败。
 // fb1132-4 搜索弹窗结果列表与切换；fb1132-5 删除确认 Esc/遮罩与重命名 Esc。
-// fb1132-5 明确不改「设置点遮罩」和「重命名点外部」（待确认），这两项仍失败。
+// fb1132-5 重命名点外部仍失败。设置遮罩点击已按 SP-MOD-636 关闭，对应 knownFailure 已删除，断言仍在。
 const knownFailure = (width: number, title: string): string | null => {
-  // fb1132-5 待确认，不在该修复范围：.settings-modal 没有遮罩点击关闭。Esc 已能关。
-  if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
   // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
   if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
   // 390 上 ⋯ 是底部 sheet，.item-menu-scrim 挡住触发器。Esc 与点遮罩在同视口已通过。不得 skip。

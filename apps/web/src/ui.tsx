@@ -362,6 +362,54 @@ const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefi
 
 const MODAL_FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
+// SP-SET-736 / SP-SET-765. The settings mask covers New chat and the chat rows.
+// A press on those controls must not switch chats and must not dismiss the dialog.
+const pointHitsChatNav = (x: number, y: number) => {
+  const nodes = document.querySelectorAll('[data-testid="new-chat"], [data-testid="top-new"], a.chat-link')
+  for (const node of nodes) {
+    const rect = node.getBoundingClientRect()
+    if (rect.width < 2 || rect.height < 2) continue
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return true
+  }
+  return false
+}
+
+// Push one history entry while an overlay is open so Back closes it and leaves the URL string.
+const useOverlayHistory = (open: boolean, onClose: () => void) => {
+  const closeRef = useRef(onClose)
+  closeRef.current = onClose
+  useEffect(() => {
+    if (!open) return
+    let pushed = true
+    const prior = history.state
+    const base = prior && typeof prior === 'object' ? prior : {}
+    history.pushState({ ...base, deepapiOverlay: Date.now() }, '', location.href)
+    const onPop = () => {
+      pushed = false
+      closeRef.current()
+    }
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      if (pushed) {
+        pushed = false
+        history.back()
+      }
+    }
+  }, [open])
+}
+
+const useScrollLock = (open: boolean) => {
+  useEffect(() => {
+    if (!open) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [open])
+}
+
 /** Official ds-modal defaults: mask click and Escape close, focus stays inside, then returns to the trigger. */
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
@@ -2453,9 +2501,52 @@ const Settings = () => {
   const [initial, setInitial] = useState(profile.initial)
   const saveKey = useHarbor((state) => state.saveKey)
   const cost = estimateCost(totals, new Date())
+  const shellRef = useRef<HTMLDivElement>(null)
+  // SP-SET-765: Back closes and the URL stays. Reload unmounts this dialog. Reopen starts on General.
+  useOverlayHistory(true, () => setSettingsOpen(false))
+  useScrollLock(true)
+  useEffect(() => {
+    const root = shellRef.current
+    if (!root) return
+    root.focus()
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const list = [...root.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE)].filter((node) => !node.hasAttribute('disabled') && node.getClientRects().length > 0)
+      if (!list.length) {
+        event.preventDefault()
+        return
+      }
+      const first = list[0]
+      const last = list[list.length - 1]
+      const current = document.activeElement
+      const inside = current instanceof Node && root.contains(current)
+      if (event.shiftKey) {
+        if (!inside || current === first || current === root) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || current === last || current === root) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    root.addEventListener('keydown', onKey)
+    return () => root.removeEventListener('keydown', onKey)
+  }, [])
   return (
-    <div className="modal settings-modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
-      <div className="settings-shell" data-tab={tab}>
+    <div
+      className="modal settings-modal ds-fade-in ds-modal-focus-lock"
+      role="dialog"
+      aria-modal="true"
+      data-testid="settings-dialog"
+      onClick={(event) => {
+        if (event.target !== event.currentTarget) return
+        // SP-MOD-636 mask click closes. A press over New chat or a chat row does not (SP-SET-736).
+        if (pointHitsChatNav(event.clientX, event.clientY)) return
+        setSettingsOpen(false)
+      }}
+    >
+      <div className="settings-shell" data-tab={tab} ref={shellRef} tabIndex={-1}>
         <header className="settings-head">
           <h2>{t('systemSettings')}</h2>
           <button type="button" className="settings-x" data-testid="settings-close" aria-label={t('close')} onClick={() => {
