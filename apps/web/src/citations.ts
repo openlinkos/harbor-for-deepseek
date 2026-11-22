@@ -351,7 +351,7 @@ const linearize = (node: MdNode, parent: MdNode | null, out: Piece[]) => {
     out.push({ kind: 'bound', node, parent })
     return
   }
-  if (node.type === 'break' && parent) {
+  if ((node.type === 'break' || node.type === 'officialBreak') && parent) {
     out.push({ kind: 'bound', node, parent })
     return
   }

@@ -17,7 +17,9 @@ import type { TextCitation } from '@deepapi/types'
 import { Children, cloneElement, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type FocusEvent as ReactFocusEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
+import { remarkDeepseekAttention } from './attention.js'
 import { citationNumbers, holdDelimitedMath, remarkCitations, stripPartialCitation } from './citations.js'
+import { applyOfficialInline } from './inline-official.js'
 import { MathBlock, MathInline, remarkDeepseekMath } from './math.js'
 import { renderMermaid } from './mermaid-render.js'
 import ReactMarkdown, { type Components } from 'react-markdown'
@@ -50,7 +52,7 @@ const highlight = (language: string | undefined, value: string) => {
   return hljs.highlightAuto(value).value
 }
 
-const label = (zh: string, en: string) => (document.documentElement.lang === 'en' ? en : zh)
+const label = (zh: string, en: string) => (typeof document !== 'undefined' && document.documentElement.lang === 'en' ? en : zh)
 
 const StreamContext = createContext(false)
 
@@ -257,14 +259,15 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
     URL.revokeObjectURL(url)
   }
   return (
-    <div className="code-card">
-      <div className="code-sticky">
-      <div className="code-head">
+    <div className={`code-card md-code-block ${typeof document !== 'undefined' && document.body.hasAttribute('data-ds-dark-theme') ? 'md-code-block-dark' : 'md-code-block-light'}`}>
+      <div className="code-sticky md-code-block-banner-wrap">
+      <div className="code-head md-code-block-banner">
         <div className="code-bar">
-        <span>{(language || 'text').toLowerCase()}</span>
-        <span className="code-tools">
+        <div className="md-code-block-infostring">{(language || 'text').toLowerCase()}</div>
+        <div className="code-tools md-code-block-action">
           <button
             type="button"
+            className="ds-markdown-code-copy-button"
             onClick={() => {
               void navigator.clipboard.writeText(value).then(() => {
                 setCopied(true)
@@ -273,18 +276,19 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
             }}
           >
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="4.2" y="3.2" width="7.2" height="9.6" rx="1.2" /><path d="M2.6 11.2V2.8h6.2" /></svg>
-            <span>{copied ? '✓' : label('复制', 'Copy')}</span>
+            {/* SP-MD-982 / SP-MD-983 */}
+            <span>{copied ? label('复制成功', 'Copied') : label('复制', 'Copy')}</span>
           </button>
           <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M7 2.5v7.2M4.2 7.2 7 10l2.8-2.8M2.5 13h9" /></svg>
             <span>{label('下载', 'Download')}</span>
           </button>
-        </span>
+        </div>
         </div>
       </div>
       </div>
       <pre className={long && !expanded ? 'collapsed' : ''}>
-        <code dangerouslySetInnerHTML={{ __html: html }} />
+        {value ? <code dangerouslySetInnerHTML={{ __html: html }} /> : null}
       </pre>
       <svg className="code-corner" width="12" height="12" aria-hidden="true" />
       <svg className="code-corner end" width="12" height="12" aria-hidden="true" />
@@ -533,7 +537,19 @@ const components = {
   'math-inline': MathInline,
   'math-block': MathBlock,
   li({ children }: { children?: ReactNode }) {
-    return <li>{itemBlocks(children)}</li>
+    const task = Children.toArray(children).some((node) => isValidElement(node) && node.type === 'input')
+    return <li className={task ? 'ds-markdown-task-list-item' : undefined}>{itemBlocks(children)}</li>
+  },
+  input({ type, checked, disabled }: { type?: string; checked?: boolean; disabled?: boolean }) {
+    if (type !== 'checkbox') return <input type={type} />
+    return <input type="checkbox" className="ds-markdown-task-checkbox" checked={Boolean(checked)} disabled={disabled} readOnly />
+  },
+  table({ children }: { children?: ReactNode }) {
+    return (
+      <div className="markdown-table-wrapper">
+        <table>{children}</table>
+      </div>
+    )
   },
   a({ href, children }: { href?: string; children?: ReactNode }) {
     const safe = href && /^https?:\/\//i.test(href) ? href : undefined
@@ -544,8 +560,9 @@ const components = {
     )
   },
   code({ className, children }: { className?: string; children?: ReactNode }) {
-    const value = String(children).replace(/\n$/, '')
-    const language = /language-([\w-]+)/.exec(className ?? '')?.[1]
+    // An empty fence has no children. String(undefined) is the word "undefined" (md-0030).
+    const value = (children == null ? '' : String(children)).replace(/\n$/, '')
+    const language = /language-(\S+)/.exec(className ?? '')?.[1]
     const block = Boolean(className) || value.includes('\n')
     if (!block) {
       return <code className="inline-code">{children}</code>
@@ -568,14 +585,19 @@ const components = {
   },
 } as unknown as Components
 
-export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => (
+export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => {
+  const source = holdDelimitedMath(stripPartialCitation(text, streaming), streaming)
+  return (
   <CiteContext.Provider value={{ citations, cards }}>
     <StreamContext.Provider value={streaming}>
     <Boundary text={text}>
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkCitations(citationNumbers(citations))]} components={components}>
-        {holdDelimitedMath(stripPartialCitation(text, streaming), streaming)}
+      <div className="ds-markdown">
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkDeepseekAttention, () => (tree: unknown) => applyOfficialInline(tree as Parameters<typeof applyOfficialInline>[0], source), remarkCitations(citationNumbers(citations))]} components={components}>
+        {source}
       </ReactMarkdown>
+      </div>
     </Boundary>
     </StreamContext.Provider>
     </CiteContext.Provider>
-)
+  )
+}

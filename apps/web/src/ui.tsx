@@ -906,7 +906,7 @@ const Thinking = ({ text }: { text: string }) => {
         <PhaseTitle text={streaming ? t('phaseThinking') : t('thoughtFor', { seconds: 1 })} live={streaming} />
         <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
       </button>
-      {open ? <div className="thinking-body think-copy"><Markdown text={text} streaming={streaming} /></div> : null}
+      {open ? <div className="thinking-body think-copy ds-think-content"><Markdown text={text} streaming={streaming} /></div> : null}
     </section>
   )
 }
@@ -1020,7 +1020,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
       return (
-        <div key={index} className={`timeline-step timeline-think think-copy ${last}`}>
+        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ${last}`}>
           <span className="timeline-dot" aria-hidden="true" />
           <span className="timeline-line" aria-hidden="true" />
           <Markdown text={step.text} streaming={answerStreaming} />
