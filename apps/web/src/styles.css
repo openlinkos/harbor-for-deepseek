@@ -3132,6 +3132,11 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-border-color: transparent;
   --dsl-button-text-color: var(--dsw-alias-label-primary);
   --dsl-button-font-weight: 400;
+  --dsl-button-opacity-disabled: .45;
+  --dsl-button-ring-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-text-color-disabled: var(--dsl-button-text-color);
+  --dsl-button-text-color-hover: var(--dsl-button-text-color);
+  --dsl-button-text-color-loading: var(--dsl-button-text-color);
   --dsl-button-height: var(--ds-control-height-m);
   --dsl-button-font-size: 14px;
   --dsl-button-line-height: 22px;
@@ -3163,12 +3168,15 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   border: 0;
   flex-shrink: 0;
   vertical-align: middle;
+  transition: opacity var(--ds-transition-duration) var(--ds-ease-in-out), color var(--ds-transition-duration-slow) var(--ds-ease-in-out), text-decoration-color var(--ds-transition-duration-slow) var(--ds-ease-in-out);
 }
+.ds-button:hover:not(:disabled) { color: var(--dsl-button-text-color-hover); }
 .ds-button.ds-button--min-width { min-width: var(--dsl-button-min-width); }
 .ds-button.ds-button--xl {
   --dsl-button-height: var(--ds-control-height-xl);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 6px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
   --dsl-button-font-weight: 500;
 }
@@ -3176,6 +3184,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-height: var(--ds-control-height-l);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 6px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
 }
 .ds-button.ds-button--m {
@@ -3184,12 +3193,14 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-line-height: 22px;
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 4px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
 }
 .ds-button.ds-button--s {
   --dsl-button-height: var(--ds-control-height-s);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 4px;
+  --dsl-button-icon-size: 14px;
   --dsl-button-min-width: 58px;
 }
 .ds-button.ds-button--xs {
@@ -3198,6 +3209,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-line-height: 20px;
   --dsl-button-padding: 0 10px;
   --dsl-button-icon-gap: 3px;
+  --dsl-button-icon-size: 14px;
   --dsl-button-min-width: 58px;
 }
 .ds-button.ds-button--filled.ds-button--primary {
@@ -3216,6 +3228,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-border-color: var(--dsw-alias-state-error-primary);
   --dsl-button-color: transparent;
   --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover-danger);
+  --dsl-button-ring-color: var(--dsw-alias-state-error-primary);
   --dsl-button-text-color: var(--dsw-alias-state-error-primary);
 }
 .ds-button > .ds-button__background {
@@ -3225,6 +3238,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   position: absolute;
   inset: 0;
   pointer-events: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button > .ds-button__background::after {
   content: "";
@@ -3232,9 +3246,10 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   pointer-events: none;
   position: absolute;
   inset: -2px;
+  transition: box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button:hover:not(:disabled) > .ds-button__background { background-color: var(--dsl-button-color-hover); }
-.ds-button:focus-visible > .ds-button__background::after { box-shadow: 0 0 0 2px var(--dsw-alias-button-primary-fill); }
+.ds-button:focus-visible > .ds-button__background::after { box-shadow: 0 0 0 2px var(--dsl-button-ring-color); }
 .ds-button.ds-button--outlined > .ds-button__border {
   box-sizing: border-box;
   border: 1px solid var(--dsl-button-border-color);
@@ -3242,6 +3257,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   pointer-events: none;
   position: absolute;
   inset: 0;
+  transition: border-color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button > .ds-button__content {
   position: relative;
@@ -3249,7 +3265,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   align-items: center;
   justify-content: center;
 }
-.ds-button:disabled { opacity: 0.45; cursor: not-allowed; }
+.ds-button:disabled { opacity: var(--dsl-button-opacity-disabled); color: var(--dsl-button-text-color-disabled); cursor: not-allowed; }
 .ds-file { position: relative; display: inline-flex; flex: none; }
 .ds-file-input {
   position: absolute;
