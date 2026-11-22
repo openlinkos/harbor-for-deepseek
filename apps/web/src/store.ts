@@ -188,6 +188,24 @@ export type DraftFile = {
 
 type Prefs = Pick<Conversation, 'thinking' | 'search' | 'readLink'>
 
+// SP-CMP-297. Unsent files live in this tab only. Reload drops the map.
+const fileDrafts = new Map<string, DraftFile[]>()
+const draftKey = (id: string | null | undefined) => id ?? ''
+const snapshotFiles = (files: DraftFile[]) => files.map((item) => ({ ...item }))
+const stashFiles = (id: string | null | undefined, files: DraftFile[]) => {
+  fileDrafts.set(draftKey(id), snapshotFiles(files))
+}
+const takeFiles = (id: string | null | undefined) => snapshotFiles(fileDrafts.get(draftKey(id)) ?? [])
+const ACTIVE_KEY = 'deepapi-active-id'
+const rememberActive = (id: string | null) => {
+  try {
+    if (id) sessionStorage.setItem(ACTIVE_KEY, id)
+    else sessionStorage.removeItem(ACTIVE_KEY)
+  } catch {
+    // Private mode can reject sessionStorage. The in-memory chat still switches.
+  }
+}
+
 const TOGGLE_KEY = 'deepapi-toggles'
 
 type Toggles = Pick<Prefs, 'thinking' | 'search'>
@@ -292,6 +310,9 @@ export type HarborState = {
   notice: string | null
   prefs: Prefs
   drafts: DraftFile[]
+  /** SP-CMP-296. Per-chat composer text for this tab. Key '' is the landing page. Not stored. */
+  textDrafts: Record<string, string>
+  setComposerText: (id: string | null, value: string) => void
   boot: () => Promise<void>
   saveKey: (key: string, passphrase: string, acknowledged: boolean) => Promise<void>
   unlock: (passphrase: string) => Promise<boolean>
@@ -404,6 +425,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
   notice: null,
   prefs: withToggles(defaultPrefs()),
   drafts: [],
+  textDrafts: {},
+  setComposerText(id, value) {
+    const key = draftKey(id)
+    set({ textDrafts: { ...get().textDrafts, [key]: value } })
+  },
   hosted: false,
   setupRequired: false,
   serverUser: null,
@@ -428,7 +454,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
     const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     const usages: Array<Usage | null> = []
     let messages: Message[] = []
-    const activeId = conversations[0]?.id ?? null
+    let storedActive: string | null = null
+    try {
+      storedActive = sessionStorage.getItem(ACTIVE_KEY)
+    } catch {
+      storedActive = null
+    }
+    const activeId = storedActive && conversations.some((item) => item.id === storedActive) ? storedActive : (conversations[0]?.id ?? null)
     for (const conversation of conversations) {
       const rows = await store.listMessages(conversation.id)
       for (const row of rows) {
@@ -458,7 +490,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       activeId,
       messages,
       totals: sumUsage(usages),
-      prefs: prefsFor(conversations[0], defaultPrefs()),
+      prefs: prefsFor(conversations.find((item) => item.id === activeId), defaultPrefs()),
     })
     if (key) {
       void get().refreshBalance()
@@ -558,10 +590,26 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async newChat() {
-    set({ activeId: null, messages: [], drafts: [], sidebarOpen: false, prefs: withToggles(defaultPrefs()) })
+    // SP-CMP-296 / SP-CMP-297. Keep the chat we left. The landing composer starts empty.
+    stashFiles(get().activeId, get().drafts)
+    fileDrafts.delete('')
+    rememberActive(null)
+    set({
+      activeId: null,
+      messages: [],
+      drafts: [],
+      textDrafts: { ...get().textDrafts, '': '' },
+      sidebarOpen: false,
+      prefs: withToggles(defaultPrefs()),
+    })
   },
 
   async openChat(id) {
+    const leaving = get().activeId
+    // Re-opening the chat already on screen keeps the cards added since the last stash.
+    if (leaving !== id) stashFiles(leaving, get().drafts)
+    const restored = leaving === id ? get().drafts : takeFiles(id)
+    rememberActive(id)
     if (get().serverMode) {
       const data = await api<{ messages: Message[]; liveRun?: { id: string; messageId: string } | null }>(`/api/conversations/${id}/messages`)
       const conversation = get().conversations.find((item) => item.id === id)
@@ -569,7 +617,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
         activeId: id,
         messages: withLive(id, data.messages),
         sidebarOpen: false,
-        drafts: [],
+        drafts: restored,
         prefs: prefsFor(conversation, get().prefs),
       })
       if (data.liveRun && serverRunId !== data.liveRun.id) void followServerRun(data.liveRun.id, data.liveRun.messageId)
@@ -582,7 +630,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       activeId: id,
       messages,
       sidebarOpen: false,
-      drafts: [],
+      drafts: restored,
       prefs: prefsFor(conversation, get().prefs),
     })
   },
@@ -662,10 +710,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
       const wasActive = get().activeId === id
       const conversations = get().conversations.filter((item) => item.id !== id)
       const next = wasActive ? (conversations[0]?.id ?? null) : get().activeId
-      set({ conversations, activeId: next, messages: wasActive ? [] : get().messages })
-      if (wasActive && next) {
-        await get().openChat(next)
+      set({ conversations, messages: wasActive ? [] : get().messages })
+      if (wasActive && next) await get().openChat(next)
+      else if (wasActive) {
+        set({ activeId: null, drafts: [] })
+        rememberActive(null)
       }
+      fileDrafts.delete(id)
       return
     }
     const store = await repository()
@@ -673,13 +724,18 @@ export const useHarbor = create<HarborState>((set, get) => ({
     const conversations = get().conversations.filter((item) => item.id !== id)
     if (get().activeId !== id) {
       set({ conversations })
+      fileDrafts.delete(id)
       return
     }
     const next = conversations[0]?.id ?? null
-    set({ conversations, activeId: next, messages: [] })
-    if (next) {
-      await get().openChat(next)
+    // Leave activeId on the deleted chat so openChat treats this as a switch and restores the next chat's cards.
+    set({ conversations, messages: [] })
+    if (next) await get().openChat(next)
+    else {
+      set({ activeId: null, drafts: [] })
+      rememberActive(null)
     }
+    fileDrafts.delete(id)
   },
 
   async selectSibling(messageId, siblingId) {
@@ -823,29 +879,34 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async addFiles(files) {
+    // SP-CMP-297. A late upload result stays on the chat that received the file.
+    const writeDrafts = (owner: string | null, mutate: (rows: DraftFile[]) => DraftFile[]) => {
+      if (get().activeId === owner) {
+        set({ drafts: mutate(get().drafts) })
+        return
+      }
+      const key = draftKey(owner)
+      fileDrafts.set(key, mutate(snapshotFiles(fileDrafts.get(key) ?? [])))
+    }
     if (get().serverMode) {
       for (const file of files) {
+        const owner = get().activeId
         const localId = nid()
         const mapped = purposeForFile(file.name, file.type)
-        set({
-          drafts: [...get().drafts, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true }],
-        })
+        writeDrafts(owner, (rows) => [...rows, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true }])
         try {
           const form = new FormData()
           form.set('purpose', mapped.purpose)
           form.set('file', file)
           const uploaded = await api<{ id: string; expires_at: number | null }>('/api/files', { method: 'POST', body: form })
-          set({
-            drafts: get().drafts.map((item) =>
-              item.localId === localId ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at } : item,
-            ),
-          })
+          writeDrafts(owner, (rows) => rows.map((item) =>
+            item.localId === localId ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at } : item,
+          ))
         } catch (error) {
-          set({
-            drafts: get().drafts.map((item) =>
-              item.localId === localId ? { ...item, busy: false, error: error instanceof Error ? error.message : 'upload' } : item,
-            ),
-          })
+          const message = error instanceof Error ? error.message : 'upload'
+          writeDrafts(owner, (rows) => rows.map((item) =>
+            item.localId === localId ? { ...item, busy: false, error: message } : item,
+          ))
         }
       }
       return
@@ -855,39 +916,33 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     for (const file of files) {
+      const owner = get().activeId
       const localId = nid()
       const mapped = purposeForFile(file.name, file.type)
-      set({
-        drafts: [
-          ...get().drafts,
-          {
-            localId,
-            filename: file.name,
-            media: mapped.media,
-            purpose: mapped.purpose,
-            bytes: file.size,
-            expiresAt: null,
-            busy: true,
-          },
-        ],
-      })
+      writeDrafts(owner, (rows) => [
+        ...rows,
+        {
+          localId,
+          filename: file.name,
+          media: mapped.media,
+          purpose: mapped.purpose,
+          bytes: file.size,
+          expiresAt: null,
+          busy: true,
+        },
+      ])
       try {
         const uploaded = await client.uploadFile(key, file, file.name, mapped.purpose)
-        set({
-          drafts: get().drafts.map((item) =>
-            item.localId === localId
-              ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
-              : item,
-          ),
-        })
+        writeDrafts(owner, (rows) => rows.map((item) =>
+          item.localId === localId
+            ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
+            : item,
+        ))
       } catch (error) {
-        set({
-          drafts: get().drafts.map((item) =>
-            item.localId === localId
-              ? { ...item, busy: false, error: error instanceof Error ? error.message : 'upload' }
-              : item,
-          ),
-        })
+        const message = error instanceof Error ? error.message : 'upload'
+        writeDrafts(owner, (rows) => rows.map((item) =>
+          item.localId === localId ? { ...item, busy: false, error: message } : item,
+        ))
       }
     }
   },
@@ -1291,6 +1346,9 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   const conversations = created
     ? [conversation, ...state.conversations]
     : state.conversations.map((item) => (item.id === conversation.id ? conversation : item))
+  fileDrafts.delete(conversation.id)
+  fileDrafts.delete('')
+  rememberActive(conversation.id)
   useHarbor.setState({
     conversations,
     activeId: conversation.id,
@@ -1298,6 +1356,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
     streaming: true,
     drafts: [],
     sidebarOpen: false,
+    textDrafts: { ...useHarbor.getState().textDrafts, [conversation.id]: '', '': '' },
   })
 
   const history = activePath(messages, parentId)
@@ -1559,7 +1618,14 @@ const runServerTurn = async (text: string, regenerateParent: string | null, cont
     })
   }
   const files = state.drafts.filter((file) => file.fileId)
-  useHarbor.setState({ streaming: true, drafts: [] })
+  fileDrafts.delete(conversationId)
+  fileDrafts.delete('')
+  rememberActive(conversationId)
+  useHarbor.setState({
+    streaming: true,
+    drafts: [],
+    textDrafts: { ...useHarbor.getState().textDrafts, [conversationId]: '', '': '' },
+  })
   const started = await api<{ runId: string; userMessageId: string; assistantMessageId: string }>(
     `/api/conversations/${conversationId}/runs`,
     {

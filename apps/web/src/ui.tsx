@@ -2260,12 +2260,14 @@ const Composer = () => {
   const drafts = useHarbor((state) => state.drafts)
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
-  const [text, setText] = useState('')
+  const activeId = useHarbor((state) => state.activeId)
+  const text = useHarbor((state) => state.textDrafts[activeId ?? ''] ?? '')
+  const setComposerText = useHarbor((state) => state.setComposerText)
+  const setText = (value: string) => setComposerText(activeId, value)
   const [iconOnly, setIconOnly] = useState(false)
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
-  const activeId = useHarbor((state) => state.activeId)
   useEffect(() => {
     focusComposer()
   }, [activeId])
@@ -2298,7 +2300,7 @@ const Composer = () => {
   }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
-      setText((event as CustomEvent<string>).detail)
+      setComposerText(useHarbor.getState().activeId, (event as CustomEvent<string>).detail)
       box.current?.focus()
     }
     window.addEventListener('deepapi-prefill', onPrefill)
