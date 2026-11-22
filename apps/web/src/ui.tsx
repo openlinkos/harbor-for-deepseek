@@ -375,9 +375,11 @@ const pointHitsChatNav = (x: number, y: number) => {
 }
 
 // Push one history entry while an overlay is open so Back closes it and leaves the URL string.
+// The returned function keeps that entry. Search uses it when a result replaces the entry with the chat URL.
 const useOverlayHistory = (open: boolean, onClose: () => void) => {
   const closeRef = useRef(onClose)
   closeRef.current = onClose
+  const retain = useRef(false)
   useEffect(() => {
     if (!open) return
     let pushed = true
@@ -391,12 +393,17 @@ const useOverlayHistory = (open: boolean, onClose: () => void) => {
     window.addEventListener('popstate', onPop)
     return () => {
       window.removeEventListener('popstate', onPop)
-      if (pushed) {
+      const keep = retain.current
+      retain.current = false
+      if (pushed && !keep) {
         pushed = false
         history.back()
       }
     }
   }, [open])
+  return () => {
+    retain.current = true
+  }
 }
 
 const useScrollLock = (open: boolean) => {
@@ -1584,7 +1591,7 @@ export const Shell = () => {
     input.select()
   }, [filtering])
   // SP-MOD-635. Back closes the search dialog. Tab stays in the card. The page does not scroll behind it.
-  useOverlayHistory(filtering, () => setFiltering(false))
+  const retainSearchHistory = useOverlayHistory(filtering, () => setFiltering(false))
   useScrollLock(filtering)
   useEffect(() => {
     if (!filtering) return
@@ -1624,7 +1631,9 @@ export const Shell = () => {
     else if (delta + item.offsetHeight > list.clientHeight) list.scrollTop += delta + item.offsetHeight - list.clientHeight
   }, [activeHit, hitKey])
   const openSearched = (id: string) => {
-    window.history.pushState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
+    // The overlay entry is current. Replace it so closing does not history.back() over the chat URL.
+    retainSearchHistory()
+    window.history.replaceState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
     setFiltering(false)
     setFilter('')
     void state.openChat(id)

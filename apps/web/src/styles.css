@@ -1990,7 +1990,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   color: white;
   border-radius: 12px;
   padding: 8px 12px;
-  z-index: 9;
+  /* Above .modal (20), the phone settings layer (1100), and .share-modal (1400). */
+  z-index: 1500;
 }
 .mark { width: 22px; height: 22px; display: block; flex: none; }
 .greeting .mark { width: 34px; height: 25px; }
