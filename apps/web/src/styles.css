@@ -1073,7 +1073,7 @@ button.chip { appearance: none; margin: 0; }
   border-radius: 50%;
 }
 .favicon img.on { display: block; }
-.favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); }
+.favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); transition: box-shadow .2s; }
 .favicons i:first-child { margin-left: 0; }
 .source-meta .favicon {
   width: 18px;
@@ -1103,6 +1103,7 @@ button.chip { appearance: none; margin: 0; }
   user-select: none;
   cursor: pointer;
   position: relative;
+  flex-shrink: 0;
   text-decoration: none;
 }
 .cite.wide { min-width: 20px; }
@@ -1159,6 +1160,26 @@ a.cite:hover, .cite:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+.search-view-card__icon .site_logo_loading {
+  position: absolute;
+  inset: 0;
+  background-color: var(--dsw-alias-markdown-citation);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.search-view-card__icon .site_logo_fallback {
+  color: var(--dsw-alias-label-tertiary);
+  background-color: var(--dsw-alias-markdown-citation);
+}
+.search-view-card__icon .site_logo_fallback svg {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 .search-view-card__site {
   min-width: 0;
@@ -1203,7 +1224,7 @@ a.cite:hover, .cite:hover {
   width: fit-content;
   font-size: 14px;
   line-height: 24px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
   color: var(--dsw-alias-label-primary);
@@ -1214,6 +1235,15 @@ a.cite:hover, .cite:hover {
 .sources-pill:hover {
   background-color: var(--dsw-alias-interactive-bg-hover);
   --search-row-site-logo-color: var(--dsw-alias-interactive-bg-hover);
+}
+/* SP-CITE-071/155: share-select makes the pill not clickable. */
+.sources-pill.is-inert,
+.sources-pill.is-inert:hover {
+  cursor: default;
+  background-color: var(--search-sites-summary-bg-color, var(--dsw-alias-bg-base));
+}
+.sources-pill.is-inert:hover {
+  --search-row-site-logo-color: var(--dsw-alias-bg-base);
 }
 .search-panel {
   /* SP-SEARCH-192: min(50vw - 4rem, 390px). html font-size is the UA 16px, so 4rem is 64px. */

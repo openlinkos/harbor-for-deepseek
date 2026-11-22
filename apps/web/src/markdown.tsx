@@ -325,16 +325,39 @@ const hostOf = (url: string) => {
   }
 }
 
-const CiteIcon = ({ label, icon }: { label: string; icon?: string | null }) => {
+// SP-CITE-174: module memory, not React state and not storage. A reload clears it.
+const failedSiteIcons = new Set<string>()
+
+const LinkMarkIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M3.2131 7.12714L4.44639 5.89384L5.22393 6.67138L3.99064 7.90468C3.40952 8.4858 3.40952 9.42831 3.99064 10.0094C4.57176 10.5905 5.51428 10.5905 6.09539 10.0094L7.32868 8.77613L8.10622 9.55367L6.87293 10.787C5.86224 11.7977 4.2238 11.7976 3.2131 10.787C2.2024 9.77627 2.2024 8.13783 3.2131 7.12714Z" fill="currentColor" />
+    <path d="M7.12707 3.21304L5.89378 4.44633L6.67132 5.22387L7.90462 3.99058C8.48574 3.40946 9.42824 3.40946 10.0094 3.99058C10.5905 4.5717 10.5905 5.51421 10.0094 6.09533L8.77607 7.32862L9.55361 8.10616L10.7869 6.87287C11.7976 5.86218 11.7976 4.22374 10.7869 3.21304C9.77621 2.20234 8.13777 2.20234 7.12707 3.21304Z" fill="currentColor" />
+    <path d="M8.79388 5.98339L5.98341 8.79387L5.20587 8.01633L8.01634 5.20585L8.79388 5.98339Z" fill="currentColor" />
+  </svg>
+)
+
+// Hover-card icon only. The search-panel Favicon keeps its letter fallback because site-icon.spec asserts it.
+const CiteIcon = ({ icon }: { label: string; icon?: string | null }) => {
   const src = typeof icon === 'string' ? icon.trim() : ''
-  const [failed, setFailed] = useState(false)
-  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
+  const [failed, setFailed] = useState(() => !src || failedSiteIcons.has(src))
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    setFailed(!src || failedSiteIcons.has(src))
+    setLoaded(false)
+  }, [src])
   if (!src || failed) {
-    return <i className="search-view-card__icon" aria-hidden="true">{letter}</i>
+    return (
+      <i className="search-view-card__icon" aria-hidden="true">
+        <span className="site_logo_loading site_logo_fallback">
+          <LinkMarkIcon />
+        </span>
+      </i>
+    )
   }
   return (
     <i className="search-view-card__icon" aria-hidden="true">
-      <img src={src} alt="" onError={() => setFailed(true)} />
+      {loaded ? null : <span className="site_logo_loading" />}
+      <img src={src} alt="" style={loaded ? undefined : { display: 'none' }} onLoad={() => setLoaded(true)} onError={() => { failedSiteIcons.add(src); setFailed(true) }} />
     </i>
   )
 }

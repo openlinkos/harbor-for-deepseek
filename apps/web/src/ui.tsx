@@ -852,7 +852,7 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
         {t('foundPages', { count: results.length })}
         <SourceMarks items={items} />
       </p>
-      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => { if (!share?.on) sources.show(items) }}>
+      <button className={share?.on ? 'sources-pill is-inert' : 'sources-pill'} type="button" data-testid="search-results" onClick={() => { if (!share?.on) sources.show(items) }}>
         <span className="favicons">
           {results.slice(0, SOURCE_MARKS).map((result) => (
             <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
@@ -1088,7 +1088,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         </div>
       ) : null}
       {sources.length ? (
-        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => { if (!shareMode?.on) sourcesApi.show(sources) }}>
+        <button className={shareMode?.on ? 'sources-pill is-inert' : 'sources-pill'} type="button" data-testid="search-results" onClick={() => { if (!shareMode?.on) sourcesApi.show(sources) }}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
           {t('pagesPill', { count: sources.length })}
         </button>
