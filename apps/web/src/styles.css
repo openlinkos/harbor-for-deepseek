@@ -926,8 +926,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
 .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: -18px; color: var(--dsw-alias-label-secondary); }
 .markdown-table-wrapper { overflow-x: auto; max-width: 100%; }
-.ds-think-content .ds-markdown { font: var(--dsw-font-markdown-small); color: var(--dsw-alias-label-secondary); }
-.ds-think-content .ds-markdown h1, .ds-think-content .ds-markdown h2, .ds-think-content .ds-markdown h3, .ds-think-content .ds-markdown h4, .ds-think-content .ds-markdown h5, .ds-think-content .ds-markdown h6 { font: var(--dsw-font-markdown-small-strong); }
+.ds-think-content.ds-markdown, .ds-think-content .ds-markdown { font: var(--dsw-font-markdown-small); color: var(--dsw-alias-label-secondary); }
+.ds-think-content.ds-markdown h1, .ds-think-content.ds-markdown h2, .ds-think-content.ds-markdown h3, .ds-think-content.ds-markdown h4, .ds-think-content.ds-markdown h5, .ds-think-content.ds-markdown h6, .ds-think-content .ds-markdown h1, .ds-think-content .ds-markdown h2, .ds-think-content .ds-markdown h3, .ds-think-content .ds-markdown h4, .ds-think-content .ds-markdown h5, .ds-think-content .ds-markdown h6 { font: var(--dsw-font-markdown-small-strong); }
 .diagram-card { border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; margin: 12px 0; overflow: hidden; background: var(--dsw-alias-bg-layer-2); }
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; }
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }

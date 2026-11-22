@@ -537,7 +537,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByTestId('composer')).toBeVisible()
       await expect(page.locator('.chat-title')).toHaveText('分享样本')
 
-      await page.locator('.topbar button[aria-label="share"]').click()
+      await page.locator('.topbar button[aria-label="分享"]').click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
       await expect(page.getByTestId('share-all')).toBeChecked()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
@@ -615,9 +615,11 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByTestId('share-soon')).toHaveCount(0)
       await expect(page.locator('.share-bar')).toHaveCount(0)
 
-      await page.locator('.topbar button[aria-label="share"]').click()
+      await page.locator('.topbar button[aria-label="分享"]').click()
       await expect(page.locator('.share-bar')).toBeVisible()
       await page.keyboard.press('Escape')
+      await expect(page.locator('.share-bar')).toBeVisible()
+      await page.getByTestId(w < 800 ? 'share-top-cancel' : 'share-cancel').click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
 
       await page.locator('.action-row button[aria-label="分享"]').first().click()

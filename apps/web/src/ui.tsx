@@ -421,7 +421,7 @@ const useScrollLock = (open: boolean) => {
 const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
   const panel = useRef<HTMLDivElement>(null)
-  // SP-MOD-572. Back closes the confirm. Esc still closes because interaction-gate expects that.
+  // SP-MOD-572. Back closes the confirm. Escape does not.
   useOverlayHistory(true, () => onCancel())
   useScrollLock(true)
   const onCancelRef = useRef(onCancel)
@@ -440,9 +440,10 @@ const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel
     const nodes = focusables()
     nodes[0]?.focus()
     const onKey = (event: KeyboardEvent) => {
+      // SP-MOD-572. Escape leaves the confirm open. Mask click and Back close it.
       if (event.key === 'Escape') {
+        event.preventDefault()
         event.stopPropagation()
-        onCancelRef.current()
         return
       }
       if (event.key !== 'Tab') return
@@ -834,7 +835,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
       ? `${block.text.trimEnd()}${block.citations.map((_, index) => `[citation:${index + 1}]`).join('')}`
       : block.text
     return (
-      <div className="prose" data-testid={testId}>
+      <div className="prose ds-markdown" data-testid={testId}>
         <Markdown text={marked} citations={block.citations} />
       </div>
     )
@@ -976,7 +977,7 @@ const Thinking = ({ text }: { text: string }) => {
         <PhaseTitle text={streaming ? t('phaseThinking') : t('thoughtFor', { seconds: 1 })} live={streaming} />
         <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
       </button>
-      {open ? <div className="thinking-body think-copy ds-think-content"><Markdown text={text} streaming={streaming} /></div> : null}
+      {open ? <div className="thinking-body think-copy ds-think-content ds-markdown"><Markdown text={text} streaming={streaming} /></div> : null}
     </section>
   )
 }
@@ -1091,7 +1092,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
       return (
-        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ${last}`}>
+        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ds-markdown ${last}`}>
           <span className="timeline-dot" aria-hidden="true" />
           <span className="timeline-line" aria-hidden="true" />
           <Markdown text={step.text} streaming={answerStreaming} />
@@ -1150,7 +1151,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         </section>
       ) : steps.map(renderStep)}
       {article.text.trim() ? (
-        <div className="prose" data-testid="assistant-text">
+        <div className="prose ds-markdown" data-testid="assistant-text">
           <Markdown text={article.text} citations={article.citations} cards={article.cards} streaming={answerStreaming} />
         </div>
       ) : null}
@@ -1395,6 +1396,8 @@ export const Shell = () => {
   }
   const enterShare = (id: string | null) => {
     if (!id) return
+    // The phone drawer scrim covers the top-bar cancel, and share mode hides the menu button.
+    state.setSidebarOpen(false)
     setShareSoon(false)
     setShareAll(true)
     setShareConv(id)
@@ -1409,6 +1412,7 @@ export const Shell = () => {
   }
   const enterGroup = (messageId: string) => {
     if (!conversation?.id) return
+    state.setSidebarOpen(false)
     const group = turns.find((item) => item.messageIds.includes(messageId))
     setShareSoon(false)
     setShareAll(false)
@@ -1433,16 +1437,7 @@ export const Shell = () => {
     if (!sharing || !previous) return
     if (shareConv === previous && conversation?.id !== previous) exitShare()
   }, [sharing, shareConv, conversation?.id])
-  useEffect(() => {
-    if (!sharing) return undefined
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.isComposing) return
-      event.preventDefault()
-      exitShare()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [sharing])
+  // SP-SHARE-147. Escape stays in select mode. Cancel is the exit.
   const shareValue: ShareModeValue = {
     on: sharing,
     groupOf: (messageId) => turns.find((group) => group.messageIds.includes(messageId))?.id ?? null,
@@ -2074,7 +2069,7 @@ export const Shell = () => {
                   <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
                 </button>
                 {path.length > 0 ? (
-                  <button className="icon-btn" type="button" aria-label="share" onClick={() => enterShare(conversation?.id ?? null)}>
+                  <button className="icon-btn" type="button" aria-label={t('share')} onClick={() => enterShare(conversation?.id ?? null)}>
                     <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
                   </button>
                 ) : null}

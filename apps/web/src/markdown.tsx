@@ -600,11 +600,9 @@ export const Markdown = ({ text, citations, cards, streaming = false }: { text: 
   <CiteContext.Provider value={{ citations, cards }}>
     <StreamContext.Provider value={streaming}>
     <Boundary text={text}>
-      <div className="ds-markdown">
       <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkDeepseekAttention, () => (tree: unknown) => applyOfficialInline(tree as Parameters<typeof applyOfficialInline>[0], source), remarkCitations(citationNumbers(citations))]} components={components}>
         {source}
       </ReactMarkdown>
-      </div>
     </Boundary>
     </StreamContext.Provider>
     </CiteContext.Provider>

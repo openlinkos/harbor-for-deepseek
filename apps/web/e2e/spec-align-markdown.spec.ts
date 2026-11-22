@@ -41,8 +41,8 @@ const open = async (page: Page, theme: string) => {
   await page.getByTestId('composer').fill('样式')
   await page.getByTestId('send').click()
   await page.getByTestId('assistant-text').first().waitFor()
-  await expect(page.locator('.prose .ds-markdown strong').first()).toHaveText('33°C')
-  return page.locator('.prose .ds-markdown').first()
+  await expect(page.locator('.prose.ds-markdown strong').first()).toHaveText('33°C')
+  return page.locator('.prose.ds-markdown').first()
 }
 
 const css = (page: Page, selector: string, props: string[]) =>
@@ -57,12 +57,12 @@ test('SP-MD-424 bold and markdown chrome light', async ({ page }) => {
   await expect(root).not.toContainText('**')
   await expect(root.locator('h1')).toHaveCSS('font-size', '24px')
   await expect(root.locator('strong')).toHaveCSS('font-weight', '600')
-  const quote = await css(page, '.prose .ds-markdown blockquote', ['border-left-width', 'border-left-color', 'padding-left', 'margin-top'])
+  const quote = await css(page, '.prose.ds-markdown blockquote', ['border-left-width', 'border-left-color', 'padding-left', 'margin-top'])
   expect(quote['border-left-width']).toBe('2px')
   expect(quote['border-left-color']).toBe('rgb(173, 178, 184)')
   expect(quote['padding-left']).toBe('14px')
   expect(quote['margin-top']).toBe('16px')
-  const rule = await css(page, '.prose .ds-markdown hr', ['height', 'margin-top', 'margin-bottom', 'display', 'background-color'])
+  const rule = await css(page, '.prose.ds-markdown hr', ['height', 'margin-top', 'margin-bottom', 'display', 'background-color'])
   expect(rule.height).toBe('1px')
   expect(rule['margin-top']).toBe('32px')
   expect(rule['margin-bottom']).toBe('32px')
@@ -70,10 +70,10 @@ test('SP-MD-424 bold and markdown chrome light', async ({ page }) => {
   expect(rule['background-color']).toBe('rgba(0, 0, 0, 0.1)')
   await expect(root.locator('a').first()).toHaveCSS('color', 'rgb(57, 100, 254)')
   await expect(root.locator('a').first()).toHaveCSS('text-decoration-line', 'none')
-  const table = await css(page, '.prose .ds-markdown table', ['border-collapse'])
+  const table = await css(page, '.prose.ds-markdown table', ['border-collapse'])
   expect(table['border-collapse']).toBe('collapse')
   const widths = await page.evaluate(() => {
-    const table = document.querySelector('.prose .ds-markdown table') as HTMLElement
+    const table = document.querySelector('.prose.ds-markdown table') as HTMLElement
     const prose = document.querySelector('.prose') as HTMLElement
     return { table: table.getBoundingClientRect().width, prose: prose.getBoundingClientRect().width, specified: getComputedStyle(table).width }
   })
@@ -89,10 +89,10 @@ test('SP-MD-424 bold and markdown chrome light', async ({ page }) => {
 
 test('SP-MD markdown chrome dark', async ({ page }) => {
   const root = await open(page, 'dark')
-  const quote = await css(page, '.prose .ds-markdown blockquote', ['border-left-color'])
+  const quote = await css(page, '.prose.ds-markdown blockquote', ['border-left-color'])
   expect(quote['border-left-color']).toBe('rgb(129, 133, 140)')
   await expect(root.locator('a').first()).toHaveCSS('color', 'rgb(103, 158, 254)')
-  const rule = await css(page, '.prose .ds-markdown hr', ['background-color'])
+  const rule = await css(page, '.prose.ds-markdown hr', ['background-color'])
   expect(rule['background-color']).toBe('rgba(255, 255, 255, 0.12)')
   await expect(root).toHaveCSS('color', 'rgb(249, 250, 251)')
 })

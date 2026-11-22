@@ -6,7 +6,7 @@
 // sha256 b32ab0665cec907d32b99fc2bd1489ac7a65f4444d289447936f00a9f36b5442.
 // Staged SSE reuses e2e/lib/fb1344-sse.js. The route mock matches fb1344 (balance, models, messages).
 // 34 cases = 4 cells × 7 + 1440 × 3 × 2. Red cases on master are test.fail() via knownFailure().
-// IDs still open: fb1554-M2. fb1554-M1 is fixed. 390 的 cite-inline 已同行，不要再标 M4。T1 已随阶段标题删掉。A fix PR deletes only its own id.
+// IDs still open: none. fb1554-M1 and fb1554-M2 are fixed. 390 的 cite-inline 已同行，不要再标 M4。T1 已随阶段标题删掉。A fix PR deletes only its own id.
 // An unexpected pass fails the run. FB1554_STRICT=1 ignores knownFailure.
 // FB1344_STRICT does not open this file: that switch is the fb1344 baseline.
 import { expect, test, type Page } from '@playwright/test'
@@ -19,14 +19,12 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // 语料按真实接口形状把正文在引用处切成多个 text block。规则在冻结官方 DOM 上全绿。
 // 已知失败用 knownFailure(id)。FB1554_STRICT=1 时全部按真失败跑。修好一项就删掉对应 id，过期的 id 会让 test.fail 变红。
 // fb1554-M1 已修：一条回答一个 .prose。corpus-structure 不再标失败。
-// fb1554-M2 中文标点旁的 ** 不渲染：cjk-strong-single-block，以及 corpus-no-literal 里剩下的 **「…」**
+// fb1554-M2 已修：中文标点旁的 ** 会加粗。corpus-no-literal 与 cjk-strong-single-block 不再标失败。
 // cite-inline-same-line 在 1440 和 390 都已同行，不要标失败，否则意外通过会让 CI 变红。cite-style 已对齐。
 // fb1554-M5 已删：搜索行 favicon 重叠 4px（.thinking > button 不再漏到 button.favicons）。
 // fb1554-T1 「用时 N 秒」已随阶段标题落地：秒数来自思考片段，正文阶段和刷新都不再按墙钟涨。key 已删，thought-seconds-* 必须真过。
 const STRICT = process.env.FB1554_STRICT === '1'
-const KNOWN: Record<string, string> = {
-  'fb1554-M2': 'fb1554-M2: **「…」** 原样显示',
-}
+const KNOWN: Record<string, string> = {}
 // Same shape as fb1344-parity.spec.ts. FB1344_STRICT is intentionally not read here.
 const KNOWN_PASSING_CELLS: Record<string, string[]> = {}
 const knownFailure = (id: string) => {
@@ -65,8 +63,8 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
     test.use({ viewport: { width: w, height: h }, colorScheme: theme as 'light' | 'dark', bypassCSP: true })
     test('corpus-structure', async ({ page }) => { await boot(page, theme); await ask(page); const r = await md(page)
       expect(rules(r).filter((x) => ['one-markdown-root', 'count-topLevelP', 'count-li', 'count-table', 'count-tableRows', 'count-katex', 'cite-numbers', 'kinsoku-line-start'].includes(x))).toEqual([]) })
-    test('corpus-no-literal', async ({ page }) => { knownFailure('fb1554-M2'); await boot(page, theme); await ask(page); expect((await md(page)).metrics.literal).toEqual([]) })
-    test('cjk-strong-single-block', async ({ page }) => { knownFailure('fb1554-M2'); await boot(page, theme, { split: false }); await ask(page); const r = await md(page, false)
+    test('corpus-no-literal', async ({ page }) => { await boot(page, theme); await ask(page); expect((await md(page)).metrics.literal).toEqual([]) })
+    test('cjk-strong-single-block', async ({ page }) => { await boot(page, theme, { split: false }); await ask(page); const r = await md(page, false)
       expect(r.metrics.counts.strong).toEqual(EXPECT.strong); expect(r.metrics.literal).toEqual([]) })
     test('cite-inline-same-line', async ({ page }) => { await boot(page, theme); await ask(page); const r = await md(page)
       expect(r.fails.filter((f: { rule: string }) => f.rule === 'cite-inline-same-line')).toEqual([]) })

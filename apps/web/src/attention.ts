@@ -110,7 +110,10 @@ function resolveAllAttention(events: Event[], context: ResolveContext) {
       const openingSequence: Token = { type: sequence, start, end: { ...openingEnd } }
       const closingSequence: Token = { type: sequence, start: { ...closingStart }, end }
       const text: Token = { type: textType, start: { ...openingEnd }, end: { ...closingStart } }
-      const group: Token = { type: groupType, start: { ...openingSequence.start }, end: { ...closingSequence.end } }
+      const groupStart = openingSequence.start
+      const groupEnd = closingSequence.end
+      if (!groupStart || !groupEnd) continue
+      const group: Token = { type: groupType, start: { ...groupStart }, end: { ...groupEnd } }
       opener[1].end = { ...start }
       closer[1].start = { ...end }
       let next: Event[] = []

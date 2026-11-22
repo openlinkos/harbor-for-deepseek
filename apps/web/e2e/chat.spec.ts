@@ -354,7 +354,7 @@ test('390 top-bar buttons stay above the white fill', async ({ page }) => {
   await page.locator('.top-fill').evaluate((node) => { node.style.pointerEvents = 'auto' })
   expect(await topmostButton(page, '[data-testid="menu"]')).toBe('menu')
   expect(await topmostButton(page, '[data-testid="top-new"]')).toBe('top-new')
-  expect(await topmostButton(page, 'button[aria-label="share"]')).toBe('share')
+  expect(await topmostButton(page, 'button[aria-label="分享"]')).toBe('分享')
 })
 
 test('kept settings rows use the official 60px line and 36px controls', async ({ page }) => {

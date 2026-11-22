@@ -116,9 +116,14 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         if (name === 'rename edit') await t.fill('改了一半')
         if (way === 'esc') await page.keyboard.press('Escape')
         else if (way === 'outside') await page.mouse.click(vp.width - 8, vp.height / 2) // 弹层/对话框外的遮罩或页面
-        // 390 上遮罩会一直挡住 ⋯，不设上限时 click 拖到整例 60s 测试超时。
-        // 那种 timedOut 不会被 test.fail 当成预期失败。5s 动作超时仍是失败，断言未改。
         else await page.locator('.chat-link .more').first().click({ timeout: 5_000 })
+        // SP-MOD-572. Escape leaves the delete confirm open. Mask click still closes it.
+        if (name === 'delete confirm' && way === 'esc') {
+          await expect(t, '删除确认按 Esc 仍留在页面上').toBeVisible()
+          await sidebar(page)
+          for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)
+          return
+        }
         await expect(t, `${name} 必须能用 ${way} 取消`).toBeHidden()
         await sidebar(page)
         for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)
@@ -134,7 +139,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
       await page.getByTestId('composer').fill('hi'); await page.getByTestId('send').click()
       await expect(page.getByText('好的。')).toBeVisible()
       const entries: [string, () => Promise<void>][] = [
-        ['topbar', () => page.locator('.topbar button[aria-label="share"]').click()],
+        ['topbar', () => page.locator('.topbar button[aria-label="分享"]').click()],
         ['action row', () => page.locator('[data-tip="分享"]').last().click()],
         ['chat ⋯ menu', async () => { await sidebar(page); await row(page, TITLES[0]).hover(); await row(page, TITLES[0]).locator('.more').click(); await page.getByRole('menuitem', { name: /分享|Share/ }).click() }],
       ]
@@ -156,7 +161,11 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
           if (vp.width >= 640) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
         }
         if (vp.width < 640) await expect(page.getByTestId('share-count')).toBeHidden()
+        // SP-SHARE-147. Escape stays in select mode. Cancel leaves it.
         await page.keyboard.press('Escape')
+        await expect(page.locator('.share-bar'), `${name} 按 Esc 仍停留在选择模式`).toBeVisible()
+        await page.getByTestId(vp.width < 800 ? 'share-top-cancel' : 'share-cancel').click()
+        await expect(page.locator('.share-bar')).toHaveCount(0)
       }
     })
   })

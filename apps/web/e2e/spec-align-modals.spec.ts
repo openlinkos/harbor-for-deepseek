@@ -1,5 +1,5 @@
 // SP-MOD-572 delete confirm. SP-MOD-635 search-chats dialog.
-// Esc still closes the delete confirm because interaction-gate asserts that.
+// Escape leaves the delete confirm open. Mask click and Back close it.
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const sse = (events: unknown[]) => events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')
