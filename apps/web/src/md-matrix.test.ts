@@ -75,5 +75,10 @@ describe('official markdown matrix', () => {
     }
     expect(html('**33°**C左右')).toContain('<strong>33°</strong>')
     expect(html('**50%**左右')).toContain('<strong>50%</strong>')
+    // U+2103 ℃ is a symbol, same flanking class as ° and %. SP-MD-424.
+    expect(html('持在**33℃**左右。')).toContain('<strong>33℃</strong>')
+    expect(html('持在**33℃**左右。')).not.toContain('**')
+    expect(html('约**30%**的')).toContain('<strong>30%</strong>')
+    expect(html('约**30%**的')).not.toContain('**')
   })
 })
