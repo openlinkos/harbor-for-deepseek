@@ -347,8 +347,9 @@ type SourcesApi = {
   open: boolean
   show: (items: SourceItem[]) => void
   toggle: (items: SourceItem[]) => void
+  close: () => void
 }
-const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined })
+const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined, close: () => undefined })
 
 const MODAL_FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -812,6 +813,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
 const SourceMarks = ({ items }: { items: SourceItem[] }) => {
   const t = useT()
   const sources = useContext(SourcesPanel)
+  const share = useContext(ShareMode)
   if (!items.length) return null
   return (
     <button
@@ -820,7 +822,7 @@ const SourceMarks = ({ items }: { items: SourceItem[] }) => {
       data-testid="source-favicons"
       aria-expanded={sources.open}
       aria-label={t('foundPages', { count: items.length })}
-      onClick={() => sources.toggle(items)}
+      onClick={() => { if (!share?.on) sources.toggle(items) }}
     >
       {items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}
     </button>
@@ -830,6 +832,7 @@ const SourceMarks = ({ items }: { items: SourceItem[] }) => {
 const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_search_tool_result' }> }) => {
   const t = useT()
   const sources = useContext(SourcesPanel)
+  const share = useContext(ShareMode)
   const results = block.content.filter((item) => item.type === 'web_search_result')
   if (!results.length) {
     return null
@@ -849,7 +852,7 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
         {t('foundPages', { count: results.length })}
         <SourceMarks items={items} />
       </p>
-      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sources.show(items)}>
+      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => { if (!share?.on) sources.show(items) }}>
         <span className="favicons">
           {results.slice(0, SOURCE_MARKS).map((result) => (
             <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
@@ -955,6 +958,7 @@ const BrowseExternalIcon = () => (
 const AssistantTurn = ({ message }: { message: Message }) => {
   const t = useT()
   const sourcesApi = useContext(SourcesPanel)
+  const shareMode = useContext(ShareMode)
   const [open, setOpen] = useState(true)
   const steps: Array<
     | { type: 'think'; text: string }
@@ -1084,7 +1088,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         </div>
       ) : null}
       {sources.length ? (
-        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sourcesApi.show(sources)}>
+        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => { if (!shareMode?.on) sourcesApi.show(sources) }}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
           {t('pagesPill', { count: sources.length })}
         </button>
@@ -1115,6 +1119,7 @@ const MessageRow = ({ message }: { message: Message }) => {
   const groupId = share?.groupOf(message.id) ?? null
   const picked = Boolean(groupId && share?.selected.has(groupId))
   const messages = useHarbor((state) => state.messages)
+  const sources = useContext(SourcesPanel)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
   const resend = useHarbor((state) => state.resend)
@@ -1145,7 +1150,10 @@ const MessageRow = ({ message }: { message: Message }) => {
   const stepVersion = (dir: -1 | 1) => {
     const index = siblings.indexOf(message.id)
     const next = siblings[index + dir]
-    if (next) void selectSibling(message.id, next)
+    if (next) {
+      sources.close()
+      void selectSibling(message.id, next)
+    }
   }
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
@@ -1160,7 +1168,7 @@ const MessageRow = ({ message }: { message: Message }) => {
       ) : null}
       {message.role === 'user' ? (
         editing ? (
-          <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
+          <form className="edit-card" onSubmit={(event) => { event.preventDefault(); sources.close(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
             <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
             <div className="edit-actions">
               <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
@@ -1204,7 +1212,7 @@ const MessageRow = ({ message }: { message: Message }) => {
       {message.status === 'error' ? (
         <p className="form-error">
           {errorKey ? t(errorKey) : message.errorMessage || t('error')}
-          <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
+          <button type="button" data-testid="retry" onClick={() => { sources.close(); void regenerate(message.id) }}>{t('retry')}</button>
         </p>
       ) : null}
       {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
@@ -1215,7 +1223,7 @@ const MessageRow = ({ message }: { message: Message }) => {
             <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           </HoverTip>
           <HoverTip text={t('regenerate')}>
-            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => { sources.close(); void regenerate(message.id) }}>
               <FillIcon paths={[...ACTION_ICONS.regen]} />
             </button>
           </HoverTip>
@@ -1525,6 +1533,104 @@ export const Shell = () => {
   const [userMenu, setUserMenu] = useState(false)
   const userBarRef = useRef<HTMLDivElement>(null)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
+  const [showDesktopTitle, setShowDesktopTitle] = useState(true)
+  const panelRef = useRef<SourceItem[] | null>(null)
+  const coupledExpand = useRef(false)
+  const collapsedRef = useRef(collapsed)
+  collapsedRef.current = collapsed
+  panelRef.current = panel
+  const below1024 = () => !window.matchMedia('(min-width: 1024px)').matches
+  const below768 = () => !window.matchMedia('(min-width: 768px)').matches
+  // SP-SEARCH-242 / 244 / 247. matchMedia min-width, not innerWidth.
+  const collapseForCoupling = () => {
+    if (!below1024()) return
+    if (below768()) {
+      if (useHarbor.getState().sidebarOpen) {
+        coupledExpand.current = true
+        useHarbor.getState().setSidebarOpen(false)
+      }
+      return
+    }
+    if (!collapsedRef.current) {
+      coupledExpand.current = true
+      setCollapsed(true)
+    }
+  }
+  const restoreCoupled = () => {
+    if (!coupledExpand.current) return
+    coupledExpand.current = false
+    setCollapsed(false)
+    if (below768()) useHarbor.getState().setSidebarOpen(true)
+    else useHarbor.getState().setSidebarOpen(false)
+  }
+  const closeSearchPanel = () => {
+    panelRef.current = null
+    setPanel(null)
+    setShowDesktopTitle(true)
+    restoreCoupled()
+  }
+  const openSearchPanel = (items: SourceItem[]) => {
+    panelRef.current = items
+    setPanel(items)
+    collapseForCoupling()
+  }
+  const closeRef = useRef(closeSearchPanel)
+  const openRef = useRef(openSearchPanel)
+  closeRef.current = closeSearchPanel
+  openRef.current = openSearchPanel
+  const activeLoc = state.activeId ?? ''
+  const locRef = useRef(activeLoc)
+  useEffect(() => {
+    if (locRef.current === activeLoc) return
+    locRef.current = activeLoc
+    closeRef.current()
+  }, [activeLoc])
+  useEffect(() => {
+    const q1024 = window.matchMedia('(min-width: 1024px)')
+    const q768 = window.matchMedia('(min-width: 768px)')
+    const q1920 = window.matchMedia('(min-width: 1920px)')
+    let narrowDesktop = !q1024.matches
+    let phoneLayout = !q768.matches
+    let below1920 = !q1920.matches
+    const onChange = () => {
+      const nextNarrow = !q1024.matches
+      const nextPhone = !q768.matches
+      const nextBelow1920 = !q1920.matches
+      if (nextNarrow === narrowDesktop && nextPhone === phoneLayout && nextBelow1920 === below1920) return
+      narrowDesktop = nextNarrow
+      phoneLayout = nextPhone
+      below1920 = nextBelow1920
+      // SP-SEARCH-245 / 247. Opening search alone does not run this effect.
+      if (nextNarrow) {
+        if (nextPhone) {
+          // SP-SEARCH-248: below 768 the sider is a fixed drawer. Do not add sider-collapsed (width 0).
+          if (!collapsedRef.current || useHarbor.getState().sidebarOpen) {
+            coupledExpand.current = true
+            if (useHarbor.getState().sidebarOpen) useHarbor.getState().setSidebarOpen(false)
+          }
+        } else if (!collapsedRef.current) {
+          coupledExpand.current = true
+          setCollapsed(true)
+        }
+        if (panelRef.current) setShowDesktopTitle(false)
+      } else {
+        setShowDesktopTitle(true)
+        if (coupledExpand.current) {
+          coupledExpand.current = false
+          setCollapsed(false)
+          useHarbor.getState().setSidebarOpen(false)
+        }
+      }
+    }
+    q1024.addEventListener('change', onChange)
+    q768.addEventListener('change', onChange)
+    q1920.addEventListener('change', onChange)
+    return () => {
+      q1024.removeEventListener('change', onChange)
+      q768.removeEventListener('change', onChange)
+      q1920.removeEventListener('change', onChange)
+    }
+  }, [])
   const [selecting, setSelecting] = useState(false)
   const [picked, setPicked] = useState<string[]>([])
   useEffect(() => {
@@ -1541,7 +1647,7 @@ export const Shell = () => {
         void state.newChat()
         focusComposer()
       } else if (event.key === 'Escape') {
-        setPanel(null)
+        closeRef.current()
         setUserMenu(false)
         setFiltering(false)
         setFilter('')
@@ -1598,8 +1704,14 @@ export const Shell = () => {
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
   const sourcesApi = useMemo<SourcesApi>(() => ({
     open: panel !== null,
-    show: (items) => setPanel(items),
-    toggle: (items) => setPanel((current) => (current ? null : items)),
+    show: (items) => openRef.current(items),
+    toggle: (items) => {
+      const current = panelRef.current
+      const same = !!current && current.length === items.length && current.every((item, index) => item.url === items[index]?.url)
+      if (same) closeRef.current()
+      else openRef.current(items)
+    },
+    close: () => closeRef.current(),
   }), [panel])
 
   return (
@@ -1728,7 +1840,7 @@ export const Shell = () => {
         <>
           <span className="collapsed-mark"><Mark /></span>
           <div className="float-pill">
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(false)}>
+            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => { if (!window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); setCollapsed(false) }}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
             <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
@@ -1821,10 +1933,10 @@ export const Shell = () => {
       <section className="stage">
         {path.length > 0 ? <div className="top-fill" aria-hidden="true" /> : null}
         <header className="topbar">
-          <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
+          <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => { const opening = !state.sidebarOpen; if (opening && !window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); state.setSidebarOpen(opening) }}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
-          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation?.title ? <div className="chat-title">{conversation.title}</div> : null}
+          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation?.title && (showDesktopTitle || (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)) ? <div className="chat-title" data-testid="chat-title">{conversation.title}</div> : null}
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
@@ -1913,30 +2025,40 @@ export const Shell = () => {
       {panel ? (
         <aside className="search-panel" data-testid="search-panel">
           <header>
-            <strong>{t('searchPanel')}</strong>
-            <button className="icon-btn panel-close" type="button" aria-label={t('close')} onClick={() => setPanel(null)}>
-              <Icon d="M6 6l12 12M18 6 6 18" />
+            <div role="heading">{t('searchPanel')}</div>
+            <button className="icon-btn panel-close" type="button" aria-label={t('close')} onClick={() => closeRef.current()}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M14.1871 13.1265L13.1265 14.1872L1.81275 2.87347L2.87341 1.81281L14.1871 13.1265Z" fill="currentColor" />
+                <path d="M13.1265 1.81282L14.1871 2.87348L2.8734 14.1872L1.81274 13.1265L13.1265 1.81282Z" fill="currentColor" />
+              </svg>
             </button>
           </header>
           <ol>
-            {panel.map((item, index) => (
-              <li key={item.url}>
-                <a className="source-card" href={item.url} target="_blank" rel="noreferrer noopener">
-                  <span className="source-meta">
-                    <Favicon label={item.site} icon={item.icon} />
-                    <span className="source-site">{item.site}</span>
-                    {item.date ? <span>{item.date}</span> : null}
-                    <span className="source-index">{index + 1}</span>
-                  </span>
-                  <strong>{item.title}</strong>
-                  {item.snippet ? <p>{item.snippet}</p> : null}
-                </a>
-              </li>
-            ))}
+            {panel.map((item, index) => {
+              const site = item.site && item.site !== item.url ? item.site : (() => {
+                const host = hostOf(item.url)
+                return host && host !== item.url ? host : ''
+              })()
+              return (
+                <li key={item.url}>
+                  <a className="source-card" href={item.url} target="_blank" rel="noreferrer">
+                    <span className="source-meta">
+                      <Favicon label={site || item.title} icon={item.icon} />
+                      {site ? <span className="source-site">{site}</span> : null}
+                      {site && item.date ? <span className="source-divider" aria-hidden="true" /> : null}
+                      {item.date ? <span className="source-date">{item.date}</span> : null}
+                      <span className="source-index ds-markdown-cite">{index + 1}</span>
+                    </span>
+                    <span className="search-view-card__title">{item.title}</span>
+                    {item.snippet ? <span className="search-view-card__snippet">{item.snippet}</span> : null}
+                  </a>
+                </li>
+              )
+            })}
           </ol>
         </aside>
       ) : null}
-      {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => setPanel(null)} /> : null}
+      {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => closeRef.current()} /> : null}
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}

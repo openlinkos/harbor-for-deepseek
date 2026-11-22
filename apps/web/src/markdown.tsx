@@ -343,13 +343,9 @@ const CiteCardBody = ({ card }: { card: SearchCiteCard }) => (
   <>
     <span className="search-view-card__meta">
       <CiteIcon label={card.site || card.title} icon={card.icon} />
-      <span className="search-view-card__site">{card.site}</span>
-      {card.date ? (
-        <>
-          <span className="search-view-card__rule" aria-hidden="true" />
-          <span className="search-view-card__date">{card.date}</span>
-        </>
-      ) : null}
+      {card.site ? <span className="search-view-card__site">{card.site}</span> : null}
+      {card.site && card.date ? <span className="search-view-card__rule" aria-hidden="true" /> : null}
+      {card.date ? <span className="search-view-card__date">{card.date}</span> : null}
     </span>
     <span className="search-view-card__title">{card.title}</span>
     {card.snippet ? <span className="search-view-card__snippet">{card.snippet}</span> : null}

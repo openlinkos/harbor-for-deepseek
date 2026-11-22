@@ -38,7 +38,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: var(--dsw-alias-brand-text); }
 
-.shell { display: flex; height: 100dvh; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; }
+.shell { display: flex; height: 100dvh; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; position: relative; }
 .sidebar {
   width: var(--sider-width);
   flex: 0 0 var(--sider-width);
@@ -633,7 +633,7 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
   position: fixed;
   left: 16px;
   top: 20px;
-  z-index: 6;
+  z-index: 8;
   width: 27px;
   height: 24px;
   display: grid;
@@ -643,7 +643,7 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
   position: fixed;
   top: 12px;
   left: 59px;
-  z-index: 6;
+  z-index: 8;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -693,7 +693,18 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .user-actions button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4096px; background: transparent; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; display: grid; place-items: center; }
 .settings-tabs { display: none; }
 .settings-x svg { display: block; }
-.sheet-scrim { display: none; }
+.sheet-scrim {
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.24);
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 0;
+  padding: 0;
+}
 .jump-end {
   display: grid;
   place-items: center;
@@ -1205,51 +1216,143 @@ a.cite:hover, .cite:hover {
   --search-row-site-logo-color: var(--dsw-alias-interactive-bg-hover);
 }
 .search-panel {
-  width: 380px;
-  flex: 0 0 380px;
-  border-left: 1px solid var(--dsw-alias-border-l1);
+  /* SP-SEARCH-192: min(50vw - 4rem, 390px). html font-size is the UA 16px, so 4rem is 64px. */
+  --sidebar-width: min(calc(50vw - 4rem), 390px);
+  --search-view-card-title-font: 500 14px/22px var(--dsw-font-family);
+  --search-view-card-meta-font: 13px/20px var(--dsw-font-family);
+  --search-view-card-meta-padding-top: 2px;
+  --search-view-card-secondary-color: var(--dsw-alias-label-tertiary);
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  max-width: 390px;
+  flex: 0 0 var(--sidebar-width);
+  margin-left: auto;
+  z-index: 10;
+  position: relative;
+  height: 100%;
+  border-left: 1px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-primary);
   background: var(--dsw-alias-bg-base);
-  padding: 12px 16px;
-  overflow: auto;
+  padding: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition: flex-basis 0.2s ease-out;
+  box-shadow: none;
 }
-.search-panel header { display: flex; justify-content: space-between; align-items: center; min-height: 40px; }
-.search-panel .panel-close { flex: 0 0 32px; }
-.search-panel ol { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 0; }
-.search-panel li { border-bottom: 1px solid var(--dsw-alias-border-l2); }
-.source-card {
+.search-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  height: 60px;
+  min-height: 60px;
+  padding: 0 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+.search-panel header [role="heading"] {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.search-panel .panel-close {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  padding: 0;
   display: grid;
-  gap: 4px;
-  padding: 14px 0;
+  place-items: center;
+}
+.search-panel ol {
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  position: relative;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-color) transparent;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+.search-panel:hover ol { scrollbar-color: var(--scroll-color-hover) transparent; }
+.search-panel li { border: 0; }
+.source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 6px;
+  padding: 12px;
+  border-radius: 12px;
   text-decoration: none;
   color: var(--dsw-alias-label-primary);
+  cursor: pointer;
 }
+.source-card:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .source-meta {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
-  color: #8b9096;
-  font-size: 12px;
+  padding-top: var(--search-view-card-meta-padding-top, 0);
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+  font: var(--search-view-card-meta-font, 500 12px/17px var(--dsw-font-family));
 }
-.source-site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.source-index { margin-left: auto; }
-.source-card strong {
-  display: block;
-  color: var(--dsw-alias-label-primary);
-  font-weight: 650;
-  font-size: 15px;
-  line-height: 1.4;
-  text-decoration: none;
-}
-.source-card p {
-  margin: 0;
-  color: #8b9096;
-  font-size: 13px;
-  line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.source-meta .favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
   overflow: hidden;
+}
+.source-site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.source-divider {
+  width: 1px;
+  height: 12px;
+  margin: 0 3px;
+  background: var(--dsw-alias-border-l3);
+  flex-shrink: 0;
+}
+.source-date { flex-shrink: 0; font-weight: 400; }
+.source-index {
+  margin-left: auto;
+  top: unset;
+  flex-shrink: 0;
+  font-family: var(--ds-font-family-code);
+  font-weight: 400;
+  pointer-events: none;
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+}
+.search-panel .search-view-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin-top: 6px;
+  font: var(--search-view-card-title-font, 500 16px/25px var(--dsw-font-family));
+  color: var(--dsw-alias-label-primary);
+}
+.search-panel .search-view-card__snippet {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 6px 0 0;
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .transcript:has(.home) { justify-content: center; padding: 0; gap: 0; }
@@ -1566,7 +1669,8 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 }
 
 .scrim { display: none; }
-.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 8; padding: 20px; }
+/* Search shell is z-index 10 (SP-SEARCH-067). A dialog has to sit above that panel. Menus stay at 30. */
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 20; padding: 20px; }
 .modal-card, .gate-card, .admin-card, .key-card {
   width: min(720px, 100%);
   max-height: min(88vh, 900px);
@@ -2480,8 +2584,14 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   }
   .shell.nav-open .sidebar {
     visibility: visible;
+    opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+    width: var(--sider-width, 261px);
+    max-width: var(--sider-width, 261px);
+    flex-basis: var(--sider-width, 261px);
+    padding-left: 12px;
+    padding-right: 12px;
     transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
   }
   .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; z-index: 1001; }
@@ -2718,25 +2828,31 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .diagram-modal { padding: 40px 12px 16px; }
   .markdown-table-wrapper { max-width: 100%; }
   .search-panel { display: none; }
-  .sheet-scrim { display: block; position: fixed; inset: 0; border: 0; background: rgba(15, 17, 21, 0.45); z-index: 8; }
+  .sheet-scrim { display: block; }
   .shell.panel-open .search-panel {
+    /* SP-SEARCH-193 / SP-SEARCH-248 */
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
+    top: 20px;
     bottom: 0;
-    top: auto;
-    width: auto;
-    height: 94dvh;
-    max-height: 94dvh;
+    width: 100vw;
+    max-width: unset;
+    height: auto;
+    max-height: none;
+    flex: none;
+    margin: 0;
+    border: none;
     border-radius: 24px 24px 0 0;
-    z-index: 9;
-    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    padding: 0;
     background: var(--dsw-alias-bg-base);
-    box-shadow: var(--dsw-shadow-lv3);
+    box-shadow: none;
+    --sidebar-width: 100vw;
   }
-  .search-panel ol { overflow: auto; }
+  .search-panel ol { overflow: auto; max-width: unset !important; }
   .search-panel p {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -2804,7 +2920,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 @keyframes harbor-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes harbor-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 .modal { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in); backdrop-filter: blur(2px); }
-.settings-shell, .modal-card, .menu, .search-panel { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in); }
+.settings-shell, .modal-card, .menu { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in); }
+@media (max-width: 439px) {
+  .search-panel .search-view-card__title { -webkit-line-clamp: 1; line-clamp: 1; }
+  .search-panel ol { padding: 0 6px; }
+  .search-panel .source-card { margin-bottom: 4px; }
+}
 .settings-modal.closing { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .settings-modal.closing .settings-shell { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .action-row button, .user-actions button { position: relative; }
