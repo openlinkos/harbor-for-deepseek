@@ -3038,9 +3038,13 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  /* SP-SET-800 / SP-SET-802 / SP-SET-803. Icon is 16px, gap above the label is 0, border uses the outlined token. */
+  --dsl-button-border-color: var(--dsw-alias-border-l2);
+  --dsl-button-icon-size: 16px;
+  --dsl-button-icon-gap: 0;
+  gap: 0;
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
   color: rgb(15, 17, 21);
   font-size: 14px;
   font-weight: 400;
@@ -3063,9 +3067,10 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   position: relative;
   z-index: 1;
 }
+.settings-shell .theme-cards button.chip > svg { width: 16px; height: 16px; }
 .settings-shell .theme-cards button.chip.on {
   background: rgb(241, 243, 245);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
   color: rgb(15, 17, 21);
   font-weight: 400;
 }
@@ -3073,12 +3078,13 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip,
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* SP-SET-801. Dark outlined border is rgba(255,255,255,.12). */
+  border: 1px solid var(--dsl-button-border-color);
   color: var(--dsw-alias-label-primary);
 }
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: rgb(67, 69, 74);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
 }
 /* SP-SET-794/795. Hover fills an unselected theme card with the selector color. */
 .settings-shell .theme-cards button.chip:hover:not(.on),
@@ -3624,16 +3630,17 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     min-width: 128px;
     height: 82px;
     padding: 21px 32px;
-    border-radius: 14px;
+    /* SP-SET-798. Radius stays 12px on the phone sheet too. */
+    border-radius: 12px;
   }
   .settings-shell .theme-cards button.chip.on {
     background: var(--dsw-specific-selector);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--dsl-button-border-color);
     color: var(--dsw-alias-label-primary);
   }
   body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     background: rgb(67, 69, 74);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--dsl-button-border-color);
     color: var(--dsw-alias-label-primary);
   }
 }
