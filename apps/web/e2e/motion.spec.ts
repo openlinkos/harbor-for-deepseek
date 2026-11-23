@@ -32,6 +32,8 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
     isMobile: mobile,
     hasTouch: mobile,
     deviceScaleFactor: 1,
+    // browser.newContext() does not inherit use.timezoneId. Greeting hours must stay +08:00 under TZ=UTC.
+    timezoneId: 'Asia/Shanghai',
     userAgent: mobile
       ? 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36'
       : devices['Desktop Chrome'].userAgent,
