@@ -1950,6 +1950,7 @@ export const Shell = () => {
           onBlur={() => setUserMenu(false)}
         >
           <span className="avatar" aria-hidden="true">
+            <img className="profile-photo" alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
             {initial || 'D'}
           </span>
           <span className="user-copy">
@@ -2250,8 +2251,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
   return (
     <a
       className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`}
-      href={`#${conversation.id}`}
+      href={`/a/chat/s/${encodeURIComponent(conversation.id)}`}
       onClick={(event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
         event.preventDefault()
         const target = event.target
         // Menu rows and the phone scrim are portaled to document.body, so a click there is not a hit on this row.
