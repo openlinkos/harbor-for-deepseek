@@ -4500,11 +4500,20 @@ input.share-box.ds-checkbox,
   flex: none;
   border: 0;
   border-radius: var(--dsl-checkbox-border-radius);
-  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsw-alias-border-l3);
-  background: transparent;
+  /* SP-SET-357. Checked fill stays #5686fe in the :checked rule. */
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsl-checkbox-border-color);
+  background: var(--dsl-checkbox-color);
   display: grid;
   place-content: center;
   cursor: pointer;
+  outline: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out), box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+/* SP-SET-358 / SP-SET-359. Hover ring uses the hover border token. Checked fill is unchanged. */
+input.share-box.ds-checkbox:hover:not(:checked),
+.share-bar input.ds-checkbox:hover:not(:checked) {
+  background-color: var(--dsl-checkbox-hover-color);
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsl-checkbox-hover-border-color);
 }
 input.share-box[hidden] { display: none; }
 input.share-box.ds-checkbox.ds-checkbox--l,
