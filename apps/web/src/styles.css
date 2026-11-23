@@ -1211,8 +1211,22 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   pointer-events: none;
   width: calc(100% + 10px);
 }
+/* SP-CV-182. Official .c99b79f8 fade under the thinking title. */
+.think-fade {
+  background-color: var(--dsw-alias-bg-base);
+  opacity: 0;
+  height: 24px;
+  position: absolute;
+  top: calc(100% - 1px);
+  right: 0;
+  transform: translateZ(0);
+  pointer-events: none;
+  width: calc(100% + 10px);
+}
+[dir='rtl'] .think-fade { left: 0; right: auto; }
 .turn.share-picked .thinking > button::before,
-.turn.share-picked .thinking > button::after {
+.turn.share-picked .thinking > button::after,
+.turn.share-picked .think-fade {
   background-color: var(--dsw-alias-bg-multi-select);
 }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; margin-right: 6px; }
@@ -2057,6 +2071,8 @@ body.rtl .sources-pill-text { margin-left: 0; margin-right: 6px; }
   min-height: 247px;
   padding-bottom: 64px;
 }
+/* SP-TB-243. Official header padding-bottom is 48px. The column below stays 64px. */
+.home-header { padding-bottom: 48px; }
 /* SP-TB-248/249, SP-TB-255..257. */
 .greeting {
   display: flex;
@@ -3013,6 +3029,7 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, var(--dsl-m
 }
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
 .settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
+/* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
 /* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
 .settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; display: flex; flex: 1; min-height: 0; align-items: center; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }

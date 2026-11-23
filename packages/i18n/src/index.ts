@@ -260,7 +260,7 @@ const zh = {
   browsedPages: '浏览 {count} 个页面',
   viewAll: '查看全部',
   aiNote: '内容由 AI 生成，请仔细甄别',
-  answerNote: '本回答由 AI 生成，内容仅供参考，请仔细甄别',
+  answerNote: '本回答由 AI 生成，内容仅供参考，请仔细甄别。',
   systemSettings: '系统设置',
   navGeneral: '通用设置',
   navAccount: '账号管理',

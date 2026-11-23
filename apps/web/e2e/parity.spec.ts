@@ -763,7 +763,7 @@ test('disclaimer', async ({ page }) => {
   await unlock(page)
   await expect(page.locator('.ai-note')).toHaveCount(0)
   await send(page, '声明')
-  await expect(page.locator('.ai-note')).toHaveText('内容由 AI 生成，请仔细甄别')
+  await expect(page.locator('.ai-note')).toHaveText('本回答由 AI 生成，内容仅供参考，请仔细甄别。')
 })
 
 test('official states', async ({ page }) => {

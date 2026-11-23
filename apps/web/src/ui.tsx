@@ -1045,6 +1045,8 @@ const Thinking = ({ text }: { text: string }) => {
         <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
         <PhaseTitle text={streaming ? t('phaseThinking') : t('thoughtFor', { seconds: 1 })} live={streaming} />
         <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
+        {/* SP-CV-182. Official fade sits under the title. Opacity 0 keeps the ink unchanged. */}
+        <span className="think-fade" aria-hidden="true" />
       </button>
       {open ? <div className="thinking-body think-copy ds-think-content ds-markdown"><Markdown text={text} streaming={streaming} /></div> : null}
     </section>
@@ -2302,7 +2304,7 @@ export const Shell = () => {
                 <div className="composer-wrap">
                   <div className="composer-back" aria-hidden="true" />
                   <Composer />
-                  <p className="footnote ai-note">{t('aiNote')}</p>
+                  <p className="footnote ai-note">{t('answerNote')}</p>
                 </div>
               )}
             </div>
@@ -2554,7 +2556,9 @@ const Empty = () => {
       : t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /><span>{line}</span></h2>
+      <div className="home-header">
+        <h2 className="greeting"><Mark /><span>{line}</span></h2>
+      </div>
       <Composer />
     </div>
   )
