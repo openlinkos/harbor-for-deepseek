@@ -95,7 +95,7 @@ test('SP-SEARCH-214..220 search panel closes on navigation and stays for delete-
   await page.getByTestId('regenerate').click()
   await expect(page.getByTestId('search-panel')).toBeHidden()
 
-  await page.getByRole('button', { name: '分享' }).click()
+  await page.locator('.action-row').getByRole('button', { name: '分享' }).click()
   await expect(page.locator('.share-bar')).toBeVisible()
   await page.getByTestId('search-results').click()
   await expect(page.getByTestId('search-panel')).toBeHidden()
@@ -130,7 +130,7 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
 
   await measure(860, 366, 0, 494)
   await expect(page.getByTestId('chat-title')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: '分享' })).toBeVisible()
+  await expect(page.locator('.topbar').getByRole('button', { name: '分享' })).toBeVisible()
   await expect(page.getByTestId('search-panel')).toBeVisible()
 
   await measure(1024, 390, 261, 373)
@@ -139,7 +139,7 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
 
   await measure(800, 336, 0, 464)
   await expect(page.getByTestId('chat-title')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: '分享' })).toBeVisible()
+  await expect(page.locator('.topbar').getByRole('button', { name: '分享' })).toBeVisible()
 
   await page.getByTestId('search-panel').getByRole('button', { name: '关闭' }).click()
   await expect(page.getByTestId('search-panel')).toBeHidden()
