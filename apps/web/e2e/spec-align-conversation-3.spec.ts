@@ -22,7 +22,7 @@ test('transcript scroll container keeps the pinned scroller metrics', async ({ p
   await expect(list).toHaveCSS('overflow-y', 'auto')
   await expect(list).toHaveCSS('overflow-x', 'hidden')
   await expect(list).toHaveCSS('flex-grow', '1')
-  await expect(list).toHaveCSS('position', 'static')
+  await expect(list).toHaveCSS('position', 'relative')
   await expect(list).toHaveCSS('max-width', '840px')
   const bar = await list.evaluate((node) => getComputedStyle(node).scrollbarWidth)
   expect(bar).toBe('none')

@@ -4,6 +4,10 @@
 
 `.transcript` 增加 `position: relative`，没有位移。
 
+改过的断言：
+
+- apps/web/e2e/spec-align-conversation-3.spec.ts:25 static -> relative SP-CV-352
+
 `.action-row` 从 `margin-left: -6px` 改成 `left: -6px` 和 `width: calc(100% + 6px)`。
 
-没有改已有断言。SP-CV-076、SP-CV-080、SP-CV-120、SP-CV-121、SP-CV-122、SP-CV-133、SP-CV-140、SP-CV-352。
+SP-CV-076、SP-CV-080、SP-CV-120、SP-CV-121、SP-CV-122、SP-CV-133、SP-CV-140、SP-CV-352。
