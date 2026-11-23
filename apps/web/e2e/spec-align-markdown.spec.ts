@@ -83,7 +83,8 @@ test('SP-MD-424 bold and markdown chrome light', async ({ page }) => {
   await expect(root.locator('code.inline-code')).toHaveCSS('padding-left', '5px')
   await expect(root.locator('code.inline-code')).toHaveCSS('padding-right', '5px')
   await expect(root.locator('.md-code-block')).toHaveCSS('margin-top', '16px')
-  await expect(root.locator('.code-card pre')).toHaveCSS('word-break', 'normal')
+  // SP-MD-401. Official .md-code-block > pre is break-all.
+  await expect(root.locator('.code-card pre')).toHaveCSS('word-break', 'break-all')
   await expect(root.locator('.code-card code')).toHaveCSS('word-break', 'normal')
   await expect(root.locator('code.inline-code')).toHaveCSS('word-break', 'normal')
   await expect(root.locator('.ds-markdown-code-copy-button')).toContainText('复制')
