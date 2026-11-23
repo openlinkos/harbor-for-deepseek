@@ -2129,10 +2129,14 @@ body[data-ds-dark-theme] .composer-back {
   font-size: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
 }
-/* SP-CMP input wrapper. Dark border is the thin white line. The shadow is none. */
+/* SP-CMP input wrapper. Dark border is the thin white line. Home shadow stays none. */
 body[data-ds-dark-theme] .composer {
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow: none;
+}
+/* SP-CMP-110. Chat wrapper keeps the short shadow in dark. Home stays none. */
+body[data-ds-dark-theme] .stage:not(:has(.home)) .composer {
+  box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
 }
 .composer textarea {
   /* Composer padding and type size stay on SP-CMP-095 / SP-CMP-123. These are the textarea tokens. */
@@ -2158,8 +2162,9 @@ body[data-ds-dark-theme] .composer {
 .composer textarea:focus { outline: none; box-shadow: none; }
 .composer textarea::placeholder { color: var(--dsw-alias-label-caption, #c2c3c4); }
 .composer { position: relative; }
-/* SP-CMP-109. Official ._77cefa5._4039df9 drag-over border. Attachments already use addFiles. */
-.composer.is-dragover {
+/* SP-CMP-109. Official ._77cefa5._4039df9 drag-over border. The dark resting border is more specific, so the drag rule repeats it. */
+.composer.is-dragover,
+body[data-ds-dark-theme] .composer.is-dragover {
   border-style: dashed;
   border-color: var(--dsw-alias-brand-primary);
 }

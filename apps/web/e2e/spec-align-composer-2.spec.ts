@@ -68,7 +68,8 @@ test('composer fill, caret, and disclaimer follow the official field', async ({ 
   await expect(note).toHaveCSS('font-size', '11px')
   await expect(note).toHaveCSS('line-height', '16px')
   await expect(note).toHaveCSS('color', 'rgb(173, 178, 184)')
-  await expect(page.locator('.composer').last()).toHaveCSS('box-shadow', 'none')
+  // SP-CMP-110. Chat wrapper keeps the short shadow in dark. Home stays none.
+  await expect(page.locator('.composer').last()).toHaveCSS('box-shadow', 'rgba(0, 0, 0, 0.02) 0px 4px 10px 0px, rgba(0, 0, 0, 0.04) 0px 2px 4px 0px')
   await page.evaluate(() => document.body.removeAttribute('data-ds-dark-theme'))
   await expect(note).toHaveCSS('color', 'rgb(129, 133, 140)')
 })
