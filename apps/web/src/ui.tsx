@@ -1522,6 +1522,24 @@ export const Shell = () => {
   const allTurns = turns.length > 0 && selectedCount === turns.length
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const [shareNarrow, setShareNarrow] = useState(false)
+  useLayoutEffect(() => {
+    const list = listRef.current
+    if (!sharing || !list) {
+      setShareNarrow(false)
+      return
+    }
+    const apply = () => {
+      const width = list.offsetWidth
+      list.style.setProperty('--panel-width', `${width}px`)
+      const next = width < 800
+      setShareNarrow((current) => (current === next ? current : next))
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [sharing, path.length])
   const stick = useRef(true)
   const consumed = useRef<string | null>(null)
   const seenChat = useRef<string | null | undefined>(undefined)
@@ -1951,7 +1969,7 @@ export const Shell = () => {
   return (
     <SourcesPanel.Provider value={sourcesApi}>
     <ShareMode.Provider value={shareValue}>
-    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''} ${sharing ? 'sharing' : ''}`}>
+    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''} ${sharing ? 'sharing' : ''} ${shareNarrow ? 'share-narrow' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
         <div className="sider-top">

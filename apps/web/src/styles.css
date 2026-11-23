@@ -4025,6 +4025,29 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 .turn.assistant > .share-halo { top: -28px; }
 .turn.share-picked > .share-halo { display: block; }
 body[data-ds-dark-theme] .share-halo { background: var(--dsw-static-neutral-bluish-850); }
+/* SP-CV-099 / SP-SHARE-030. Padding is on the select wrapper when the message list is under 800px. */
+.shell.share-narrow .turn.share-on { box-sizing: border-box; padding-left: 42px; }
+body.rtl .shell.share-narrow .turn.share-on { padding-left: 0; padding-right: 42px; }
+/* SP-CV-112 / SP-CV-113. Selected message tokens inherit into the code block and sources pill. */
+.turn.share-picked {
+  --search-sites-summary-bg-color: transparent;
+  --search-sites-summary-bg-transition-duration: 0;
+}
+/* SP-SHARE-029. Selected wash token on the message ::before. The halo keeps the measured box. */
+.turn.share-on.share-picked::before {
+  content: "";
+  position: absolute;
+  background-color: var(--dsw-alias-bg-multi-select);
+  pointer-events: none;
+}
+/* SP-SHARE-099. Narrow select ::before drops the radius and uses the measured panel width. */
+.shell.share-narrow .turn.share-on::before {
+  content: "";
+  position: absolute;
+  width: var(--panel-width);
+  border-radius: 0;
+  pointer-events: none;
+}
 input.share-box.ds-checkbox,
 .share-bar input.ds-checkbox {
   --dsl-checkbox-size: 16px;
@@ -4191,12 +4214,9 @@ input.share-box.ds-checkbox:checked::after,
   }
   body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
   .turn.share-on > .share-box { left: 0; }
-  /* Official `._7729a77._63c77b1` (selection, width < 800): padding-left 42px.
-     The column starts at x=20, so the answer text starts at x=62. */
-  .turn.assistant.share-on > :not(.share-box):not(.share-halo) {
-    margin-left: 42px;
-    width: calc(100% - 42px);
-  }
+  /* Padding-left 42px (SP-CV-099 / SP-SHARE-030) moves the padding edge. Pull the checkbox and halo back to the border edge. */
+  .shell.share-narrow .turn.share-on > .share-box { left: -42px; }
+  .shell.share-narrow .turn.share-on > .share-halo { left: -62px; }
   /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
      align-items: flex-end. Height stays the text height. The 16px inset is
      `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's
