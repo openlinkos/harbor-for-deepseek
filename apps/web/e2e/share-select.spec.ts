@@ -100,10 +100,13 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
   }, firstUser)
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
-  const narrow = (page.viewportSize()?.width ?? 1440) < 768
-  if (narrow) {
+  const width = page.viewportSize()?.width ?? 1440
+  if (width < 768) {
     await page.getByTestId('menu').click()
     await page.waitForTimeout(400)
+  } else if (width < 1024) {
+    // SP-SB-631. The in-flow sider starts collapsed from 768 through 1023.
+    await page.getByRole('button', { name: '打开边栏' }).click()
   }
   await page.locator('.chat-link', { hasText: '分享样本' }).click()
   await expect(page.getByText('第二答')).toBeVisible()

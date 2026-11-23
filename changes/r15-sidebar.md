@@ -4,4 +4,5 @@
 
 - apps/web/e2e/motion.spec.ts:104 768 侧栏可见 -> 隐藏 SP-SB-631。问候时钟插在前面之后，这两条在最终文件是 :105 和 :107。
 - apps/web/e2e/motion.spec.ts:106 768 宽度 261 -> 0，随后点「打开边栏」再测后面的菜单 SP-SB-631
-- apps/web/e2e/spec-align-search-panel.spec.ts:196 全新 768 侧栏 261 -> 0，再点「打开边栏」回到 261，之后的联动仍回到 261 SP-SB-631
+- apps/web/e2e/spec-align-search-panel.spec.ts:202 全新 768 侧栏 261 -> 0，再点「打开边栏」回到 261，之后的联动仍回到 261 SP-SB-631
+- apps/web/e2e/share-select.spec.ts:109 宽度 768–1023 直接点会话 -> 先点「打开边栏」 SP-SB-631
