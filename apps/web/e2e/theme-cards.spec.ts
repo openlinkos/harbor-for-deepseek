@@ -184,9 +184,11 @@ test('selected theme cards keep their ink, hit their own content, and show the 1
       await card.scrollIntoViewIfNeeded()
       const where = `${viewport.name} ${theme}`
       const fill = theme === '浅色' ? 'rgb(241, 243, 245)' : 'rgb(67, 69, 74)'
+      // SP-SET-800 light rgba(0, 0, 0, 0.1). SP-SET-801 dark rgba(255, 255, 255, 0.12).
+      const border = theme === '浅色' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.12)'
       await expect(card, where).toHaveCSS('border-top-width', '1px')
       await expect(card, where).toHaveCSS('border-top-style', 'solid')
-      await expect(card, where).toHaveCSS('border-top-color', 'rgba(0, 0, 0, 0.1)')
+      await expect(card, where).toHaveCSS('border-top-color', border)
       await expect(card, where).toHaveCSS('background-color', fill)
       const pointer = await hit(card)
       expect(pointer.center.face, `${where} center ${pointer.center.className}`).toBe(false)
