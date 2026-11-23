@@ -1553,7 +1553,7 @@ export const Shell = () => {
     const includes = (value: string) => value.toLowerCase().includes(needle)
     const rows = state.conversations.flatMap((chat) => {
       if (chat.deletedAt) return []
-      const title = chat.title || t('newChat')
+      const title = chat.title || t('untitledChat')
       const snippet = snippetAround(corpus[chat.id] || '', query)
       if (!includes(title) && !snippet) return []
       return [{ id: chat.id, title, updatedAt: chat.updatedAt, snippet }]
@@ -1789,7 +1789,7 @@ export const Shell = () => {
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
     const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group30')]
-    for (const item of state.conversations.filter((chat) => !filtering || !filter || (chat.title || t('newChat')).includes(filter))) {
+    for (const item of state.conversations.filter((chat) => !filtering || !filter || (chat.title || t('untitledChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
       const label = item.pinned
@@ -2249,7 +2249,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
     >
       <div className="chat-row">
       {picking ? (
-        <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('newChat')}>
+        <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('untitledChat')}>
           {picked ? <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.1 11.3 2.7 7.9l1.4-1.4 2 2 5.2-5.2 1.4 1.4z" /></svg> : null}
         </span>
       ) : null}
@@ -2288,7 +2288,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
           />
         </form>
       ) : (
-        <button type="button">{conversation.title || t('newChat')}</button>
+        <button type="button">{conversation.title || t('untitledChat')}</button>
       )}
       {picking ? null : <button ref={moreRef} className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
