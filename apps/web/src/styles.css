@@ -219,9 +219,10 @@ body[data-ds-dark-theme] .new-chat:hover {
 .chat-link .pick.on { background: #3964fe; box-shadow: none; }
 body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.16); }
 .chat-row > button:not(.more) { max-width: calc(100% - 30px); }
-.edit-card { width: 100%; margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 22px; padding: 10px 12px; background: var(--dsw-specific-bubble); display: flex; flex-direction: column; position: relative; }
-.edit-card textarea { width: 100%; min-height: 72px; border: 0; background: transparent; resize: vertical; }
-.edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.edit-card { width: 100%; margin-top: 10px; margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 22px; padding: 10px 12px; background: var(--dsw-specific-bubble); display: flex; flex-direction: column; justify-content: flex-end; position: relative; max-height: 268px; overflow: hidden; }
+body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base); }
+.edit-card textarea { width: 100%; min-height: 0; max-height: 202px; border: 0; background: transparent; resize: vertical; touch-action: pan-y; overflow: hidden; }
+.edit-actions { display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; margin: 6px 10px 10px; }
 .branch { display: inline-flex; align-items: center; gap: 2px; height: 28px; flex: none; }
 .branch-count { color: var(--dsw-alias-label-tertiary); font-size: 15px; line-height: 18px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; user-select: none; }
 .branch-prev svg { transform: rotate(180deg); }
@@ -1713,6 +1714,7 @@ body[data-ds-dark-theme] .greeting { color: #fff; }
 .composer-back {
   pointer-events: none;
   z-index: -1;
+  align-self: flex-end;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--dsw-alias-bg-base) 24px);
   height: 100%;
   position: absolute;
@@ -1810,7 +1812,12 @@ body[data-ds-dark-theme] .shell.selecting .composer-fill-alt { display: none; }
   align-items: center;
   justify-content: center;
   gap: 4px;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  user-select: none;
+  /* SP-CMP-047. Official transition-property is border, background. */
+  transition-property: border, background;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
 .chip:hover:not(:disabled):not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
 .composer .chip:not(.on) {
@@ -1864,6 +1871,9 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   justify-content: center;
   align-items: center;
   line-height: 22px;
+  white-space: nowrap;
+  margin-top: auto;
+  transition: background 0.2s;
 }
 .send.ready { background: var(--dsw-alias-button-primary-fill); color: #fff; opacity: 1; }
 .send.ready:hover { background: var(--dsw-alias-button-primary-hover); }
