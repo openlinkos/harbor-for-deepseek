@@ -1559,6 +1559,8 @@ a.cite:hover, .cite:hover {
 .transcript:has(.home) { justify-content: center; padding: 0; gap: 0; }
 @media (min-width: 768px) {
   .stage:has(.home) .topbar { position: absolute; inset: 0 0 auto 0; z-index: 2; }
+  /* SP-GL-083 / SP-GL-213 / SP-SEARCH-154. Stage floor is 384px from 768 up. */
+  .stage { min-width: 384px; }
 }
 .home {
   margin: 0 auto;

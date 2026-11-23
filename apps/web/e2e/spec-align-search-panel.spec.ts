@@ -124,7 +124,7 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
   await expect(page.getByTestId('chat-title')).toBeVisible()
   await expect(page.getByTestId('search-panel')).toBeVisible()
 
-  await measure(1024, 390, 261, 373)
+  await measure(1024, 390, 261, 384)
   await expect(page.getByTestId('chat-title')).toBeVisible()
   await expect(page.getByTestId('search-panel')).toBeVisible()
 
@@ -133,7 +133,7 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
   await expect(page.locator('.topbar').getByRole('button', { name: '分享' })).toBeVisible()
   await expect(page.getByTestId('search-panel')).toBeVisible()
 
-  await measure(1024, 390, 261, 373)
+  await measure(1024, 390, 261, 384)
   await expect(page.getByTestId('chat-title')).toBeVisible()
   await expect(page.getByTestId('search-panel')).toBeVisible()
 
