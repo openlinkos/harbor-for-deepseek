@@ -285,7 +285,9 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
   border-radius: var(--dsl-textarea-border-radius);
   color: var(--dsl-textarea-text-color);
 }
-.edit-actions { display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; margin: 6px 10px 10px; }
+/* SP-MOD-016/482. Official button-group children use margin-right 8px, not a gap. */
+.edit-actions { display: flex; justify-content: flex-end; flex-shrink: 0; margin: 6px 10px 10px; }
+.edit-actions > :not(:last-child) { margin-right: 8px; }
 /* Text button. Official ds-button--text: no padding, auto height, no min width. Cancel in the edit card is this role. */
 .edit-actions > button:not(.primary):not(.ds-button) {
   --dsl-button-padding: 0;
@@ -2958,11 +2960,13 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, var(--dsl-m
 }
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
 .settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
-.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; }
+/* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
+.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; display: flex; flex: 1; min-height: 0; align-items: center; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
 .settings-x svg { width: 14px; height: 14px; }
 .settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 4px 0 0; }
-.settings-nav button { display: flex; align-items: center; gap: 8px; width: 164px; height: 40px; margin-left: 4px; margin-right: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
+/* SP-MOD-185/187. min-height 40px and justify-content flex-start. The max-width 767 rule still sets center. */
+.settings-nav button { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 164px; height: 40px; min-height: 40px; margin-left: 4px; margin-right: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
 .settings-nav button.on,
 body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-alias-interactive-bg-hover); }
