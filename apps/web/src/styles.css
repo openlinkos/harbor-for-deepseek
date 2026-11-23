@@ -2843,6 +2843,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   color: var(--dsw-alias-label-secondary);
   font: var(--dsw-font-markdown-small);
 }
+.timeline-search:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .timeline-search.is-last .timeline-line { display: none; }
 .timeline-search > svg,
 .timeline-browse > svg:first-of-type {
