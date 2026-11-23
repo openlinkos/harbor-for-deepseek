@@ -49,7 +49,15 @@ button { cursor: pointer; }
 a { color: var(--dsw-alias-brand-text); }
 
 .shell { display: flex; min-height: 0; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); overflow: hidden; position: absolute; inset: 0; }
-.sidebar {
+/* SP-GL-091/092/093. Official .cb86951c inset. env() is 0px in desktop Chromium, so the composer and transcript edges stay put. */
+@supports (top: env(safe-area-inset-top)) {
+  .shell {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
   --sider-top-slot-height: 40px;
   width: var(--sider-width);
   max-width: var(--sider-width);
