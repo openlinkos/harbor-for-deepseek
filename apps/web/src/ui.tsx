@@ -327,7 +327,7 @@ const Favicon = ({ icon }: { label: string; icon?: string | null }) => {
   }, [src, failed])
   if (!src || failed) {
     return (
-      <i className="favicon" aria-hidden="true">
+      <i className="favicon site_logo_back" aria-hidden="true">
         <span className="site_logo_fallback">
           <LinkMarkIcon />
         </span>
@@ -335,7 +335,7 @@ const Favicon = ({ icon }: { label: string; icon?: string | null }) => {
     )
   }
   return (
-    <i className="favicon" aria-hidden="true">
+    <i className="favicon site_logo_back" aria-hidden="true">
       <img
         ref={imgRef}
         src={src}

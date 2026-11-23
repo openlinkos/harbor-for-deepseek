@@ -1575,6 +1575,8 @@ button.chip { appearance: none; margin: 0; }
   display: block;
 }
 .favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); transition: box-shadow .2s; }
+/* SP-CITE-134. Pill icons are .site_logo_back. Dark fill is the citation token, not the light #eceef1. */
+body[data-ds-dark-theme] .favicons .site_logo_back { background: #353638; }
 .favicons i:first-child { margin-left: 0; }
 .source-meta .favicon {
   width: 18px;
