@@ -882,7 +882,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .top-actions .ds-button { flex-shrink: 0; }
 .top-new, .download-app { display: none; }
 .found-line { display: flex; }
-.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; }
+.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity; }
 .turn.user:hover .user-actions, .turn.user:focus-within .user-actions { opacity: 1; }
 .user-actions button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4096px; background: transparent; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; display: grid; place-items: center; }
 .settings-tabs { display: none; }
@@ -919,6 +919,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 }
 .menu-mobile { display: none; }
 .transcript {
+  position: relative;
   flex: 1;
   overflow: auto;
   overflow-x: hidden;
@@ -979,6 +980,9 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-base); }
 .thinking + .prose { margin-top: 10px; }
 .thinking > button {
+  --collapsible-area-title-height: 34px;
+  --group-title-sticky-base-top: 0px;
+  --group-title-sticky-top: var(--group-title-sticky-base-top);
   background: none;
   border: 0;
   color: var(--dsw-alias-label-secondary);
@@ -987,14 +991,39 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   align-items: center;
   gap: 6px;
   box-sizing: border-box;
-  height: 34px;
-  max-height: 34px;
+  height: var(--collapsible-area-title-height);
+  max-height: var(--collapsible-area-title-height);
   margin-bottom: 2px;
   font-size: 16px;
   line-height: 28px;
   cursor: pointer;
   pointer-events: all;
   user-select: none;
+  /* Desktop stays in flow. Sticky top and z-index 7 overlap .chat-title (chat.spec.ts:606). Phone overrides position and width. Width stays shrink-to-fit; 100% would stretch the title. Base top is 0 in a normal chat (6px is the share-link page only). */
+  position: relative;
+}
+.thinking > button::before {
+  content: "";
+  top: calc(-1 * var(--group-title-sticky-base-top) - 1px);
+  width: 100%;
+  height: calc(var(--group-title-sticky-base-top) + 1px);
+  background-color: var(--dsw-alias-bg-base);
+  position: absolute;
+}
+.thinking > button::after {
+  content: "";
+  background-color: var(--dsw-alias-bg-base);
+  z-index: -1;
+  height: calc(100% + 1px);
+  position: absolute;
+  top: -1px;
+  right: 0;
+  pointer-events: none;
+  width: calc(100% + 10px);
+}
+.turn.share-picked .thinking > button::before,
+.turn.share-picked .thinking > button::after {
+  background-color: var(--dsw-alias-bg-multi-select);
 }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
@@ -1320,8 +1349,8 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
   white-space: pre;
 }
 .code-card pre > code { display: block; }
-/* SP-CV-074, SP-CV-079. Width and left stay off this row: fb1344-parity.spec.ts measures the continue edge. */
-.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
+/* SP-CV-076/080. Official ._0a3d93b width and left. The continue inset is measured inside the row (fb1344-parity.spec.ts:216). */
+.action-row { margin-top: 0; margin-left: 0; left: -6px; width: calc(100% + 6px); padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
 .action-row button:disabled { cursor: not-allowed; }
 .action-row button {
   width: 28px;
