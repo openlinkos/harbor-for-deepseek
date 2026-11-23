@@ -505,7 +505,8 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   box-sizing: border-box;
   padding: 12px 12px 12px 8px;
 }
-.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; border-radius: 28px; display: grid; place-items: center; }
+/* SP-MOD-253/254/256. The icon box is flex, centered, and does not shrink. */
+.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; border-radius: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .search-glyph svg { width: 16px; height: 16px; }
 .search-dialog input.side-filter:not([type='hidden']):not([type='file']) {
   /* ds-input tokens. Used height 24, padding 0, radius 0, and font 16 stay on the search-dialog rows. */
@@ -807,7 +808,8 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 0, 0, 0.02), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 .item-menu button { height: 40px; padding: 8px 10px; border-radius: 8px; line-height: 24px; font-size: 14px; font-weight: 400; }
-.item-menu svg { flex: none; width: 16px; height: 16px; }
+/* SP-MOD-041. Option icon size is calc(var(--ds-font-size-m) + 2px), which is 16px. */
+.item-menu svg { flex: none; width: 16px; height: 16px; font-size: calc(var(--ds-font-size-m) + 2px); }
 .item-menu .danger { color: var(--dsw-alias-state-error-primary); }
 .menu button, .menu a, .menu [role='menuitem'], .menu-item {
   display: flex;
@@ -3649,6 +3651,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   border-radius: 24px;
   padding: 22px 22px 16px;
   line-height: 22px;
+  /* SP-MOD-469. Official .ds-modal-content is a column. The title stays content-sized. */
+  display: flex;
+  flex-direction: column;
   box-shadow: inset 0 0 0 1px var(--dsw-alias-border-inverted), var(--dsw-shadow-lv3);
 }
 /* SP-MOD-471, 472. Title is 16px/24px with a 28px minimum. Weight stays 500. */
@@ -3850,6 +3855,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .settings-nav button:last-child { margin-right: 4px; }
   /* The desktop head uses flex-basis 100% to wrap a row. In this column that basis is height and flex-shrink 0, so the head ate the sheet and the main collapsed to its padding. */
   .settings-head { flex: 0 0 auto; }
+  /* SP-MOD-444. Below 768 the title is flex-direction column. */
+  .settings-head h2 { flex-direction: column; }
   .settings-main { flex: 1 1 0%; min-height: 0; height: auto; overflow: auto; position: relative; z-index: 1; margin: 6px -4px; }
   .footnote { margin: 28px 0 calc(8px + env(safe-area-inset-bottom)); font-size: 11px; }
   .turn.user { flex-direction: column; align-items: flex-end; }
