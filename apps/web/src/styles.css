@@ -168,6 +168,7 @@ a { color: var(--dsw-alias-brand-text); }
   height: 32px;
   min-width: 0;
   padding: 0;
+  gap: 0;
   border-radius: 8px;
   color: var(--dsl-button-text-color);
   background: var(--dsl-button-color);
@@ -251,6 +252,23 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
 body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base); }
 .edit-card textarea { width: 100%; min-height: 0; max-height: 202px; border: 0; background: transparent; resize: vertical; touch-action: pan-y; overflow: hidden; }
 .edit-actions { display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; margin: 6px 10px 10px; }
+/* Text button. Official ds-button--text: no padding, auto height, no min width. Cancel in the edit card is this role. */
+.edit-actions > button:not(.primary):not(.ds-button) {
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color-disabled: var(--dsw-alias-label-caption);
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+.edit-actions > button:not(.primary):not(.ds-button):disabled {
+  color: var(--dsl-button-text-color-disabled);
+}
 .branch { display: inline-flex; align-items: center; gap: 2px; height: 28px; flex: none; }
 .branch-count { color: var(--dsw-alias-label-tertiary); font-size: 15px; line-height: 18px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; user-select: none; }
 .branch-prev svg { transform: rotate(180deg); }
@@ -977,13 +995,16 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   height: 24px;
   padding: 0;
   border: 0;
+  /* Filled warning + circle. warn-primary/secondary are amber-500/400, so the painted rgb stays. */
   border-radius: 50%;
-  background: var(--dsw-static-amber-500);
+  --dsl-button-ring-color: var(--dsw-alias-state-warn-primary);
+  background: var(--dsw-alias-state-warn-primary);
   color: var(--dsw-static-neutral-bluish-00);
+  font-weight: 500;
   display: grid;
   place-items: center;
 }
-.hint-retry:hover { background: var(--dsw-static-amber-400); }
+.hint-retry:hover { background: var(--dsw-alias-state-warn-secondary); }
 .user-hint {
   margin: 6px 0 0;
   color: var(--dsw-alias-label-tertiary);
