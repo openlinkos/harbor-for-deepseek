@@ -67,6 +67,20 @@ describe('official markdown matrix', () => {
     expect(bad).toEqual([])
   })
 
+  it('renders a single-line fence with no language as a code block (SP-MD-401)', () => {
+    const bare = html('```\nprint(1)\n```')
+    expect(bare).toContain('code-card')
+    expect(bare).toContain('is-plain')
+    expect(bare).not.toContain('inline-code')
+    expect(bare).toContain('print(1)')
+    const text = html('```text\nconst long = 1\n```')
+    expect(text).toContain('code-card')
+    expect(text).toContain('is-plain')
+    const js = html('```js\nconst n = 1\n```')
+    expect(js).toContain('code-card')
+    expect(js).not.toContain('is-plain')
+  })
+
   it('bolds the 昊辰 sentence and the punctuation edges around it (SP-MD-424)', () => {
     for (const sentence of ['持在**33°C**左右。', '当前水温维持在**33°C**左右。', '**33°C**左右']) {
       const markup = html(sentence)

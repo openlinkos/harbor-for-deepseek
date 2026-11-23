@@ -13,6 +13,7 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
+import { translate, type Locale } from '@deepapi/i18n'
 import type { TextCitation } from '@deepapi/types'
 import { Children, cloneElement, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type FocusEvent as ReactFocusEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
@@ -54,8 +55,12 @@ const highlight = (language: string | undefined, value: string) => {
 }
 
 const label = (zh: string, en: string) => (typeof document !== 'undefined' && document.documentElement.lang === 'en' ? en : zh)
+const mdLocale = (): Locale => (typeof document !== 'undefined' && document.documentElement.lang === 'en' ? 'en' : 'zh')
 
 const StreamContext = createContext(false)
+const InPre = createContext(false)
+
+const escapeHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 const BOX = /[┌┐└┘├┤┬┴┼─│╔╗╚╝╠╣╦╩╬═║╭╮╯╰]/
 
@@ -255,8 +260,8 @@ const Mermaid = ({ chart }: { chart: string }) => {
       </div>
       <pre className="diagram-source" hidden={tab !== 'code'}><code>{chart}</code></pre>
       <div className="diagram-view" hidden={tab !== 'chart'}>
-        {failed ? <p className="diagram-status" data-testid="mermaid-status">{chart.trim() ? '渲染失败' : '图表为空'}</p> : null}
-        {!failed && !svg ? <p className="diagram-status" data-testid="mermaid-status">图表生成中...</p> : null}
+        {failed ? <p className="diagram-status" data-testid="mermaid-status">{chart.trim() ? translate(mdLocale(), 'mermaidFailed') : translate(mdLocale(), 'mermaidEmpty')}</p> : null}
+        {!failed && !svg ? <p className="diagram-status" data-testid="mermaid-status">{translate(mdLocale(), 'mermaidLoading')}</p> : null}
         {svg && !failed ? <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} /> : null}
       </div>
       {full ? createPortal(
@@ -276,8 +281,8 @@ const Mermaid = ({ chart }: { chart: string }) => {
   )
 }
 
-const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
-  const html = highlight(language, value)
+const CodeBlock = ({ language, value, plain = false }: { language?: string; value: string; plain?: boolean }) => {
+  const html = plain ? escapeHtml(value) : highlight(language, value)
   const [copied, setCopied] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const long = value.split('\n').length > 18
@@ -320,7 +325,7 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
       </div>
       </div>
       <pre className={long && !expanded ? 'collapsed' : ''}>
-        {value ? <code dangerouslySetInnerHTML={{ __html: html }} /> : null}
+        {value ? <code className={plain ? 'is-plain' : undefined} dangerouslySetInnerHTML={{ __html: html }} /> : null}
       </pre>
       <svg className="code-corner" width="12" height="12" aria-hidden="true" />
       <svg className="code-corner end" width="12" height="12" aria-hidden="true" />
@@ -571,6 +576,30 @@ const itemBlocks = (children: ReactNode) => {
   return out
 }
 
+const MarkdownCode = ({ className, children }: { className?: string; children?: ReactNode }) => {
+  const inPre = useContext(InPre)
+  // An empty fence has no children. String(undefined) is the word "undefined" (md-0030).
+  const value = (children == null ? '' : String(children)).replace(/\n$/, '')
+  const language = /language-(\S+)/.exec(className ?? '')?.[1]
+  // A fenced block is pre>code even when the fence has one line and no language (SP-MD-401).
+  const block = inPre || Boolean(className) || value.includes('\n')
+  if (!block) {
+    return <code className="inline-code">{children}</code>
+  }
+  if (language === 'mermaid') {
+    return <Mermaid chart={value} />
+  }
+  if (BOX.test(value)) {
+    return (
+      <div className="code-card">
+        <pre className="box-drawing"><code>{value}</code></pre>
+      </div>
+    )
+  }
+  const plain = !language || language.toLowerCase() === 'text'
+  return <CodeBlock language={language} value={value} plain={plain} />
+}
+
 const components = {
   p({ children }: { children?: ReactNode }) {
     return <p className="ds-markdown-paragraph">{children}</p>
@@ -607,25 +636,11 @@ const components = {
       </a>
     )
   },
+  pre({ children }: { children?: ReactNode }) {
+    return <InPre.Provider value={true}>{children}</InPre.Provider>
+  },
   code({ className, children }: { className?: string; children?: ReactNode }) {
-    // An empty fence has no children. String(undefined) is the word "undefined" (md-0030).
-    const value = (children == null ? '' : String(children)).replace(/\n$/, '')
-    const language = /language-(\S+)/.exec(className ?? '')?.[1]
-    const block = Boolean(className) || value.includes('\n')
-    if (!block) {
-      return <code className="inline-code">{children}</code>
-    }
-    if (language === 'mermaid') {
-      return <Mermaid chart={value} />
-    }
-    if (BOX.test(value)) {
-      return (
-        <div className="code-card">
-          <pre className="box-drawing"><code>{value}</code></pre>
-        </div>
-      )
-    }
-    return <CodeBlock language={language} value={value} />
+    return <MarkdownCode className={className}>{children}</MarkdownCode>
   },
   img({ src, alt }: { src?: string; alt?: string }) {
     const safe = src && (/^https:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) ? src : undefined

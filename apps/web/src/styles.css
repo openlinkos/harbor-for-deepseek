@@ -348,8 +348,8 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 56px;
-  background: rgba(15, 17, 21, 0.62);
+  padding: 0;
+  background: rgb(31, 31, 31);
 }
 .diagram-modal-close {
   position: absolute;
@@ -365,15 +365,29 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
   display: grid;
   place-items: center;
 }
+/* SP-MD-981. Fullscreen panel is #f9fafb, about 906×965 and centered at 1920×1072. */
 .diagram-modal-card {
-  width: fit-content;
-  max-height: calc(100vh - 96px);
-  overflow: auto;
-  background: var(--dsw-alias-bg-base);
+  width: min(906px, calc(100vw - 96px));
+  height: min(965px, calc(100vh - 107px));
+  max-height: none;
+  overflow: hidden;
+  background: #f9fafb;
   border-radius: 8px;
-  padding: 28px 24px;
+  padding: 40px 46px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.diagram-modal-card .mermaid svg { max-width: 100%; height: auto; }
+body[data-ds-dark-theme] .diagram-modal-card { background: #1b1b1c; }
+.diagram-modal-card .mermaid {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.diagram-modal-card .mermaid svg { width: auto; height: 100%; max-width: 100%; max-height: 100%; }
 .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: ds-spin 0.6s linear infinite; }
 @keyframes ds-spin { to { transform: rotate(360deg); } }
 .side-scroll-wrap {
@@ -1442,9 +1456,9 @@ body[data-ds-dark-theme] .diagram-card { background: #1b1b1c; }
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 42px; padding: 0 8px; box-sizing: border-box; }
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }
 .diagram-tools { gap: 8px; user-select: none; }
-/* Segmented track. Selected tab is a white pill: 图表 76×26, 代码 59×26. */
+/* Segmented track. Tab width follows the label (SP-SET-217 padding), not a fixed 76/59. */
 .diagram-tabs {
-  /* Official .ds-segmented. Button boxes stay 76×26 and 59×26 (border-box). */
+  /* Official .ds-segmented. */
   --dsl-segmented-color: #f1f3f5;
   --dsl-segmented-border-radius: 10px;
   --dsl-segmented-font-size: 12px;
@@ -1479,10 +1493,8 @@ body[data-ds-dark-theme] .diagram-tabs {
   background-color: var(--dsw-alias-border-l3);
 }
 
-.diagram-tabs button { box-sizing: border-box; height: 26px; border: 0; border-radius: var(--dsl-segmented-button-border-radius); background: transparent; color: var(--dsl-segmented-button-color); padding: var(--dsl-segmented-button-padding); font-size: 12px; line-height: 18px; font-weight: var(--dsl-segmented-button-font-weight); }
+.diagram-tabs button { box-sizing: border-box; width: auto; height: 26px; border: 0; border-radius: var(--dsl-segmented-button-border-radius); background: transparent; color: var(--dsl-segmented-button-color); padding: var(--dsl-segmented-button-padding); font-size: 12px; line-height: 18px; font-weight: var(--dsl-segmented-button-font-weight); white-space: nowrap; }
 .diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
-.diagram-tabs button:first-child { width: 76px; }
-.diagram-tabs button:last-child { width: 59px; }
 .diagram-tabs button.on {
   background: var(--dsl-segmented-button-selected-bg);
   color: var(--dsl-segmented-button-selected-color);
@@ -1618,6 +1630,12 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
   font-feature-settings: "liga" 0, "calt" 0;
   line-height: 22px;
   white-space: pre;
+}
+/* SP-MD-401. Untagged and ```text blocks have no language-* class, so they wrap with the pre. */
+.code-card code.is-plain,
+.code-card code.is-plain span {
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .code-card pre > code { display: block; }
 /* SP-CV-076/080. Official ._0a3d93b width and left. The continue inset is measured inside the row (fb1344-parity.spec.ts:216). */
@@ -3965,7 +3983,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     border: 0;
   }
   .diagram-tools button:not(.diagram-icon) { width: 28px; padding: 0; justify-content: center; }
-  .diagram-modal { padding: 40px 12px 16px; }
+  .diagram-modal { padding: 0; }
   .markdown-table-wrapper { max-width: 100%; }
   /* SP-SEARCH-121. Closed phone sheet sits 36px below its open position. */
   .search-panel { display: none; transform: translateY(36px); }
