@@ -362,7 +362,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
         near(firstQuestion.y, 76.5, 'question checkbox y')
-        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 60, 'answer checkbox follows the question bubble')
+        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 76, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
           return { margin: style.margin, padding: style.padding }

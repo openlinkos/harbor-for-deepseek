@@ -121,7 +121,7 @@ test('edited user message shows ‹ 2 / 2 › beside copy and edit', async ({ pa
   await boot(page)
   await ask(page, '写一句关于春天的话')
   answer = '夏天的风，是冰镇汽水打开时，那一声“呲啦”的轻响。'
-  await page.getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('button', { name: '修改' }).click()
   await page.locator('.edit-card textarea').fill('写一句关于夏天的话')
   await page.locator('.edit-card button.primary').click()
   await expect(page.getByTestId('assistant-text')).toContainText('夏天的风')

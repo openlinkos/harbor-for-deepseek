@@ -940,8 +940,11 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .top-actions .ds-button { flex-shrink: 0; }
 .top-new, .download-app { display: none; }
 .found-line { display: flex; }
-.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity; }
-.turn.user:hover .user-actions, .turn.user:focus-within .user-actions { opacity: 1; }
+/* SP-CV-306 / SP-CV-312. Earlier user messages stay hidden until hover or focus. The last user message on a chat page stays visible. Assistant .action-row is not this row. */
+.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 0; transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity; }
+.turn.user:hover .user-actions,
+.turn.user:focus-within .user-actions,
+.turn.user.is-last-user .user-actions { opacity: 1; }
 .user-actions button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4096px; background: transparent; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; display: grid; place-items: center; }
 .user-actions button:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-tertiary); }
 .settings-tabs { display: none; }
@@ -996,8 +999,25 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .turn { flex: none; content-visibility: auto; contain-intrinsic-size: auto 140px; }
 .turn.streaming, .turn:last-of-type, .turn:has(.modal) { content-visibility: visible; }
 .turn.streaming { content-visibility: visible; }
-/* SP-CV-341..344. The 16px gap stays margin-bottom. padding-bottom 16px plus share-on margin 55px misses share-select.spec.ts at 390. */
-.turn.user { display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 16px; position: relative; z-index: 0; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
+/* SP-CV-279. User message block padding-bottom is 16px. The 16px gap stays margin-bottom as well. */
+.turn.user { display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 16px; padding-bottom: 16px; position: relative; z-index: 0; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
+/* SP-CV-285 / SP-CV-300. Highlight wash on the user message. Opacity stays 0 until .is-highlight. The first user message's wash starts at top 22px. */
+.turn.user::before {
+  content: "";
+  background-color: var(--dsw-alias-bg-multi-select);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s;
+  position: absolute;
+  top: -12px;
+  bottom: 10px;
+  left: -16px;
+  right: -16px;
+}
+.turn.user.is-first::before { top: 22px; }
+.turn.user.is-highlight::before { opacity: 1; }
 .bubble {
   /* SP-CV-340. */
   margin-top: 10px;
@@ -1158,7 +1178,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--dsw-alias-label-tertiary);
+  /* SP-CV-407 / SP-CV-408. Loading dots only. The timeline reply dot stays label-tertiary. */
+  background: var(--dsw-alias-label-dimmed);
 }
 .thinking .chev svg { width: 14px; height: 14px; }
 .thinking-collapse {

@@ -193,9 +193,9 @@ const painted = async (page: Page, layer: Locator, name: string) => {
   expect(problems, name).toEqual([])
 }
 
-const hoverTip = async (page: Page, button: Locator, text: string, name: string) => {
-  await button.scrollIntoViewIfNeeded()
-  await button.hover()
+const hoverTip = async (page: Page, button: Locator, text: string, name: string, force = false) => {
+  if (!force) await button.scrollIntoViewIfNeeded()
+  await button.hover({ force })
   const tips = page.locator('.ds-tooltip').filter({ hasText: text })
   await expect.poll(async () => tips.evaluateAll((nodes) => nodes.some((node) => getComputedStyle(node).opacity !== '0'))).toBe(true)
   const index = await tips.evaluateAll((nodes) => nodes.findIndex((node) => getComputedStyle(node).opacity !== '0'))
@@ -214,8 +214,8 @@ for (const theme of ['light', 'dark'] as const) {
         const assistant = page.locator('.turn.assistant').first()
         await expect(page.locator('.turn.user')).toHaveCount(2)
         await expect(page.locator('.turn.assistant')).toHaveCount(2)
-        await hoverTip(page, user.getByRole('button', { name: '复制' }), '复制', '非最后一条用户回合 复制')
-        await hoverTip(page, user.getByRole('button', { name: '编辑' }), '编辑', '非最后一条用户回合 编辑')
+        await hoverTip(page, user.locator('button[aria-label="复制"]'), '复制', '非最后一条用户回合 复制', true)
+        await hoverTip(page, user.locator('button[aria-label="修改"]'), '修改', '非最后一条用户回合 修改', true)
         await hoverTip(page, assistant.locator('.action-row').getByRole('button', { name: '复制' }), '复制', '非最后一条回答回合 复制')
         await hoverTip(page, assistant.locator('.action-row').getByRole('button', { name: '分享' }), '分享', '非最后一条回答回合 分享')
       })

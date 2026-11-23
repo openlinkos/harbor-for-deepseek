@@ -186,7 +186,7 @@ test('edit and copy', async ({ page }) => {
   await unlock(page)
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await send(page, '要改的句子')
-  await page.getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('button', { name: '修改' }).click()
   await expect(page.locator('.edit-card textarea')).toHaveValue('要改的句子')
   await page.getByRole('button', { name: '取消' }).click()
   const copy = page.locator('.action-row').getByRole('button', { name: '复制' })

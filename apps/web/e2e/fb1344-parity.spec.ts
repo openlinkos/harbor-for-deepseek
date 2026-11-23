@@ -149,7 +149,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
     test('phase-live', async ({ page }) => {
       const lead = cell.thinkLeadFill
       const label = cell.thinkLabelColor
-      const dot = theme === 'dark' ? 'rgb(173, 178, 184)' : 'rgb(129, 133, 140)'
+      const dot = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(225, 229, 238)'
       const stopBg = theme === 'dark' ? 'rgb(86, 134, 254)' : 'rgb(57, 100, 254)'
       const capsule = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(255, 255, 255)'
       const capsuleBorder = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)'

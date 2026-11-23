@@ -1263,6 +1263,10 @@ const MessageRow = ({ message }: { message: Message }) => {
     state.messages.some((item) => item.conversationId === message.conversationId && item.status === 'streaming'),
   )
   const siblings = siblingIds(messages, message.id)
+  const userIds = messages.filter((item) => item.conversationId === message.conversationId && item.role === 'user').map((item) => item.id)
+  const isFirstUser = message.role === 'user' && userIds[0] === message.id
+  const onSharePage = typeof window !== 'undefined' && window.location.pathname.startsWith('/share')
+  const isLastUser = message.role === 'user' && userIds[userIds.length - 1] === message.id && !onSharePage
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const fileBlocks = message.blocks.flatMap((block) => (block.type === 'file_ref' ? [block] : []))
   const errorKey = replyErrorKey(message.errorMessage)
@@ -1290,7 +1294,7 @@ const MessageRow = ({ message }: { message: Message }) => {
     }
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (share?.on && groupId) share.toggle(groupId) }}>
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${isFirstUser ? 'is-first' : ''} ${isLastUser ? 'is-last-user' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (share?.on && groupId) share.toggle(groupId) }}>
       <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
       <div className="share-halo" aria-hidden="true" />
       {message.role === 'user' && fileBlocks.length ? (
@@ -1328,8 +1332,8 @@ const MessageRow = ({ message }: { message: Message }) => {
                 <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
               </button>
             </HoverTip>
-            <HoverTip text={t('edit')}>
-              <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
+            <HoverTip text={t('editMessageTooltip')}>
+              <button type="button" data-tip={t('editMessageTooltip')} aria-label={t('editMessageTooltip')} onClick={() => { setDraft(textOf); setEditing(true) }}>
                 <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
               </button>
             </HoverTip>
