@@ -2245,7 +2245,8 @@ body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67
 .settings-copy { width: auto; max-width: 100%; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .settings-copy.wide { width: auto; max-width: 100%; }
 .settings-copy > span { display: block; width: 100%; height: auto; min-height: 22px; font-size: 14px; font-weight: 400; line-height: 22px; }
-.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; font-size: 12px; font-weight: 400; line-height: 18px; color: rgb(129, 133, 140); }
+/* SP-SET-454. Row descriptions are 12px/18px tertiary in both themes. */
+.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; font-size: 12px; font-weight: 400; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
 .settings-main .settings-line a.account-quiet { display: inline-flex; align-items: center; justify-content: center; width: 72px; text-decoration: none; }
 .settings-main .settings-line a.account-quiet span { display: block; height: 22px; line-height: 22px; font-size: 14px; font-weight: 400; }
 .settings-main button.switch,
@@ -2442,14 +2443,18 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
 body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.account-value.short:not([type='hidden']):not([type='file'])::placeholder {
   color: rgb(185, 188, 194);
 }
-.theme-cards { display: grid; grid-template-columns: repeat(3, 164px); gap: 12px; margin: 0 0 10px; justify-content: start; }
+/* SP-SET-770..773. Theme choices wrap in a row with a 12px gap. */
+.theme-cards { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; justify-content: stretch; }
 .settings-shell .theme-cards button.chip {
   position: relative;
-  width: 164px;
+  flex: 1;
+  min-width: 128px;
+  width: auto;
   height: 82px;
   border-radius: 12px;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   gap: 2px;
   background: transparent;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -2458,6 +2463,8 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   font-weight: 400;
   line-height: 22px;
   padding: 21px 32px;
+  text-align: center;
+  user-select: none;
 }
 .settings-shell .theme-cards button.chip .theme-face {
   position: absolute;
@@ -2479,15 +2486,21 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   color: rgb(15, 17, 21);
   font-weight: 400;
 }
+/* SP-SET-779. Dark theme-card ink is the primary label color. */
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip,
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f5f6f7;
+  color: var(--dsw-alias-label-primary);
 }
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: rgb(67, 69, 74);
   border: 1px solid rgba(0, 0, 0, 0.1);
+}
+/* SP-SET-794/795. Hover fills an unselected theme card with the selector color. */
+.settings-shell .theme-cards button.chip:hover:not(.on),
+body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on) {
+  background: var(--dsw-specific-selector);
 }
 .timeline-step { margin: 0; padding: 5px 0 5px 22px; position: relative; }
 .thinking-body .timeline-step + .timeline-step { margin-top: 4px; }
@@ -2973,11 +2986,13 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .settings-close-word { display: none; }
   .settings-x { width: 32px; height: 32px; display: grid; place-items: center; padding: 0; }
   .settings-x svg { display: block; }
-  .settings-shell .theme-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  /* Three cards stay on one row inside the centred dialog. min-width 0 and the tighter padding override SP-SET-789/790 here. */
+  .settings-shell .theme-cards { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
   .settings-shell .theme-cards button.chip {
-    width: 100%;
+    width: auto;
+    flex: 1 1 0;
     min-width: 0;
-    height: 84px;
+    height: 82px;
     padding: 12px 4px;
     border-radius: 14px;
   }
@@ -2989,7 +3004,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     background: rgb(67, 69, 74);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #f5f6f7;
+    color: var(--dsw-alias-label-primary);
   }
 }
 
