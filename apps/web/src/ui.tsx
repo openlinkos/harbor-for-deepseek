@@ -1301,8 +1301,8 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('dislike')}>
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
-          <HoverTip text={t('share')}>
-            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
+          <HoverTip text={message.status === 'complete' ? t('share') : t('shareUnsupported')}>
+            <button type="button" data-tip={message.status === 'complete' ? t('share') : t('shareUnsupported')} aria-label={t('share')} disabled={message.status !== 'complete' && message.status !== 'aborted'} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
           {message.status === 'aborted' && !generatingHere && childIds(messages, message.id).length === 0 ? (
             <button type="button" className="continue-gen" data-testid="continue" onClick={() => void useHarbor.getState().continueReply(message.id)}>{t('continueGenerating')}</button>
