@@ -30,7 +30,7 @@ test('desktop shell fills the viewport and the sidebar stays a 261px column', as
   expect(box.shellH).toBe(820)
   expect(box.sideW).toBe(261)
   expect(Math.abs(box.sideH - box.shellH)).toBeLessThanOrEqual(1)
-  expect(box.stageMin).toBe('0px')
+  expect(box.stageMin).toBe('384px')
   expect(box.ligatures).toBe('no-contextual')
   const side = page.locator('.sidebar')
   await expect(side).toHaveCSS('position', 'relative')

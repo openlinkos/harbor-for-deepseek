@@ -103,7 +103,7 @@ test('link focus, pill hover, and dark citation rings', async ({ page }) => {
     display: 'flex',
     direction: 'column',
     grow: '1',
-    minWidth: '0px',
+    minWidth: '384px',
     maxWidth: '100%',
     width: '1179px',
     position: 'relative',
