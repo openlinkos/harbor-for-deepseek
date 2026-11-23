@@ -2039,6 +2039,78 @@ body[data-ds-dark-theme] .composer {
   border-style: dashed;
   border-color: var(--dsw-alias-brand-primary);
 }
+/* SP-CMP-278/279. Page mask plus the composer wash. Both copy strings are real UI. */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  border-radius: 24px;
+  display: flex;
+  pointer-events: none;
+  background: transparent;
+  backdrop-filter: blur(8px);
+}
+.drop-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #d3e2ff;
+  opacity: 0.6;
+}
+body[data-ds-dark-theme] .drop-overlay::before { background: #43454a; }
+.drop-overlay-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  gap: 4px;
+  text-align: center;
+}
+.drop-overlay-title {
+  margin: 0;
+  color: var(--dsw-alias-label-primary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.drop-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  pointer-events: none;
+  cursor: copy;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+}
+body[data-ds-dark-theme] .drop-mask { background: rgba(39, 39, 48, 0.7); }
+.drop-mask-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: -3%;
+  padding: 0 40px;
+  text-align: center;
+  color: var(--dsw-alias-label-primary);
+}
+.drop-mask-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  white-space: normal;
+}
 .composer-fill, .composer-fill-alt { display: none; position: absolute; left: 11.5px; top: 30px; width: 752px; height: 40px; background: rgb(255, 255, 255); pointer-events: none; }
 @media (min-width: 1600px) {
   .shell.selecting .composer-fill, .shell.selecting .composer-fill-alt { display: block; }
@@ -2267,6 +2339,79 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   color: var(--dsw-alias-label-primary-foreground);
   background: var(--dsw-alias-state-error-primary);
 }
+/* Upload and sent image cards. 64×64, radius 16, filename on the mask. */
+.image-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  min-height: 64px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+  background: #f5f6f7;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+body[data-ds-dark-theme] .image-card {
+  background: #2c2c2e;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.image-card img,
+.image-card-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-card-fallback { background: #f5f6f7; }
+.image-card-shade {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.48);
+  pointer-events: none;
+}
+.image-card-name {
+  margin: 0 8px 8px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  text-align: center;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.image-card-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #61666b;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+body[data-ds-dark-theme] .image-card-remove { background: #f9fafb; color: #353638; }
+.image-card:hover .image-card-remove,
+.image-card.is-failed .image-card-remove { opacity: 1; }
+.image-card.is-failed .image-card-shade { box-shadow: inset 0 0 0 1px var(--dsw-alias-state-error-primary); }
+.image-card.is-failed .image-card-remove { background: var(--dsw-alias-state-error-primary); color: #fff; }
 
 .scrim { display: none; }
 /* Search shell is z-index 10 (SP-SEARCH-067). A dialog has to sit above that panel. Menus stay at 30. */

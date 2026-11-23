@@ -157,3 +157,42 @@ export const FileCard = ({
     </div>
   )
 }
+
+/** SP-CMP upload image card and the sent image. 64×64, filename over a mask, remove on hover. */
+export const ImageCard = ({
+  name,
+  src,
+  failed,
+  onRemove,
+}: {
+  name: string
+  src?: string
+  failed?: boolean
+  onRemove?: () => void
+}) => {
+  const locale = useHarbor((state) => state.settings.locale)
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key)
+  return (
+    <div className={`image-card${failed ? ' is-failed' : ''}`} data-testid="image-card" title={name}>
+      {src ? <img src={src} alt="" /> : <span className="image-card-fallback" aria-hidden="true" />}
+      <span className="image-card-shade">
+        <span className="image-card-name">{name}</span>
+      </span>
+      {onRemove ? (
+        <button
+          type="button"
+          className="image-card-remove"
+          aria-label={t('remove')}
+          onClick={(event) => {
+            event.stopPropagation()
+            onRemove()
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
+      ) : null}
+    </div>
+  )
+}

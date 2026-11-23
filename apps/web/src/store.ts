@@ -186,7 +186,33 @@ export type DraftFile = {
   expiresAt: number | null
   busy: boolean
   error?: string
+  /** Object URL for an image draft. Kept in imagePreviews after upload so the sent card can still show it. */
+  previewUrl?: string
 }
+
+export type StatusToastCode =
+  | 'msgGeneratingTryLater'
+  | 'hintLastMessageIsWIP'
+  | 'commonNetworkErrorToast'
+  | 'completionNetworkErrorToast'
+  | 'completionWipNetworkErrorToast'
+  | 'networkToasts'
+  | 'alreadyLatest'
+  | 'dropUnsupported'
+
+const imagePreviews = new Map<string, string>()
+export const imagePreview = (fileId?: string) => (fileId ? imagePreviews.get(fileId) : undefined)
+const rememberImage = (fileId: string | undefined, url: string | undefined) => {
+  if (fileId && url) imagePreviews.set(fileId, url)
+}
+
+const SUPPORTED_UPLOAD = /\.(pdf|docx?|xlsx?|pptx?|png|jpe?g|gif|webp|bmp|svg|txt|md|csv|json|log|js|jsx|mjs|cjs|ts|tsx|py|go|rs|java|c|h|cpp|cc|hpp|css|html?|sh|bash|zsh|ya?ml|xml|toml|sql|rb|php|vue|kt|swift|cs|lua|r|scala|ini|cfg)$/i
+const supportedUpload = (file: File) =>
+  file.type.startsWith('image/')
+  || file.type.startsWith('text/')
+  || file.type === 'application/pdf'
+  || file.type === 'application/json'
+  || SUPPORTED_UPLOAD.test(file.name)
 
 type Prefs = Pick<Conversation, 'thinking' | 'search' | 'readLink'>
 
@@ -317,7 +343,7 @@ export type HarborState = {
   sidebarOpen: boolean
   notice: string | null
   /** SP-CV-369/370/418/419. A toast key, or networkToasts for the two network sentences. */
-  statusToast: 'msgGeneratingTryLater' | 'hintLastMessageIsWIP' | 'commonNetworkErrorToast' | 'completionNetworkErrorToast' | 'completionWipNetworkErrorToast' | 'networkToasts' | null
+  statusToast: StatusToastCode | null
   dismissStatusToast: () => void
   prefs: Prefs
   drafts: DraftFile[]
@@ -902,6 +928,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async addFiles(files) {
+    // SP-CMP-280. Unsupported drops toast and are not added. PDF, Office, images, text, and code stay.
+    const incoming = files.filter((file) => supportedUpload(file))
+    if (incoming.length !== files.length) set({ statusToast: 'dropUnsupported' })
+    if (!incoming.length) return
+    files = incoming
     // SP-CMP-297. A late upload result stays on the chat that received the file.
     const writeDrafts = (owner: string | null, mutate: (rows: DraftFile[]) => DraftFile[]) => {
       if (get().activeId === owner) {
@@ -916,15 +947,18 @@ export const useHarbor = create<HarborState>((set, get) => ({
         const owner = get().activeId
         const localId = nid()
         const mapped = purposeForFile(file.name, file.type)
-        writeDrafts(owner, (rows) => [...rows, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true }])
+        const previewUrl = mapped.media === 'image' ? URL.createObjectURL(file) : undefined
+        writeDrafts(owner, (rows) => [...rows, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true, previewUrl }])
         try {
           const form = new FormData()
           form.set('purpose', mapped.purpose)
           form.set('file', file)
           const uploaded = await api<{ id: string; expires_at: number | null }>('/api/files', { method: 'POST', body: form })
-          writeDrafts(owner, (rows) => rows.map((item) =>
-            item.localId === localId ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at } : item,
-          ))
+          writeDrafts(owner, (rows) => rows.map((item) => {
+            if (item.localId !== localId) return item
+            rememberImage(uploaded.id, item.previewUrl)
+            return { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
+          }))
         } catch (error) {
           const message = error instanceof Error ? error.message : 'upload'
           writeDrafts(owner, (rows) => rows.map((item) =>
@@ -942,6 +976,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       const owner = get().activeId
       const localId = nid()
       const mapped = purposeForFile(file.name, file.type)
+      const previewUrl = mapped.media === 'image' ? URL.createObjectURL(file) : undefined
       writeDrafts(owner, (rows) => [
         ...rows,
         {
@@ -952,15 +987,16 @@ export const useHarbor = create<HarborState>((set, get) => ({
           bytes: file.size,
           expiresAt: null,
           busy: true,
+          previewUrl,
         },
       ])
       try {
         const uploaded = await client.uploadFile(key, file, file.name, mapped.purpose)
-        writeDrafts(owner, (rows) => rows.map((item) =>
-          item.localId === localId
-            ? { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
-            : item,
-        ))
+        writeDrafts(owner, (rows) => rows.map((item) => {
+          if (item.localId !== localId) return item
+          rememberImage(uploaded.id, item.previewUrl)
+          return { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
+        }))
       } catch (error) {
         const message = error instanceof Error ? error.message : 'upload'
         writeDrafts(owner, (rows) => rows.map((item) =>
@@ -971,7 +1007,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   removeDraft(localId) {
-    set({ drafts: get().drafts.filter((item) => item.localId !== localId) })
+    const item = get().drafts.find((row) => row.localId === localId)
+    if (item?.previewUrl && !(item.fileId && imagePreviews.get(item.fileId) === item.previewUrl)) {
+      URL.revokeObjectURL(item.previewUrl)
+    }
+    set({ drafts: get().drafts.filter((row) => row.localId !== localId) })
   },
 
   async exportJson() {
@@ -1369,6 +1409,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
   const conversations = created
     ? [conversation, ...state.conversations]
     : state.conversations.map((item) => (item.id === conversation.id ? conversation : item))
+  for (const file of state.drafts) rememberImage(file.fileId, file.previewUrl)
   fileDrafts.delete(conversation.id)
   fileDrafts.delete('')
   rememberActive(conversation.id)
@@ -1643,6 +1684,7 @@ const runServerTurn = async (text: string, regenerateParent: string | null, cont
     })
   }
   const files = state.drafts.filter((file) => file.fileId)
+  for (const file of files) rememberImage(file.fileId, file.previewUrl)
   fileDrafts.delete(conversationId)
   fileDrafts.delete('')
   rememberActive(conversationId)

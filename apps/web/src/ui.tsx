@@ -11,8 +11,8 @@ import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
-import { FileCard } from './file-card.js'
-import { useHarbor } from './store.js'
+import { FileCard, ImageCard } from './file-card.js'
+import { imagePreview, useHarbor, type StatusToastCode } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -936,6 +936,9 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     )
   }
   if (block.type === 'file_ref') {
+    if (block.media === 'image') {
+      return <ImageCard name={block.filename} src={imagePreview(block.fileId)} />
+    }
     return <FileCard name={block.filename} bytes={block.bytes} status="done" />
   }
   return null
@@ -2562,6 +2565,7 @@ const Composer = () => {
   const setText = (value: string) => setComposerText(activeId, value)
   const [iconOnly, setIconOnly] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [dropKind, setDropKind] = useState<'any' | 'text'>('any')
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -2622,6 +2626,9 @@ const Composer = () => {
       onDragEnter={(event) => {
         if (!event.dataTransfer.types.includes('Files')) return
         event.preventDefault()
+        const kinds = [...event.dataTransfer.items].map((item) => item.type).filter(Boolean)
+        const hasImage = kinds.some((kind) => kind.startsWith('image/'))
+        setDropKind(hasImage || kinds.length === 0 ? 'any' : 'text')
         dragDepth.current += 1
         setDragOver(true)
       }}
@@ -2644,17 +2651,42 @@ const Composer = () => {
     >
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
+      {dragOver ? (
+        <div className="drop-overlay" aria-hidden="true">
+          <div className="drop-overlay-copy">
+            <p className="drop-overlay-title">{dropKind === 'any' ? t('dropFilesAndImages') : t('dropFilesTextOnly')}</p>
+          </div>
+        </div>
+      ) : null}
+      {dragOver ? createPortal(
+        <div className="drop-mask" data-testid="drop-overlay">
+          <div className="drop-mask-copy">
+            <p className="drop-mask-title">{dropKind === 'any' ? t('dropFilesAndImages') : t('dropFilesTextOnly')}</p>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
       {drafts.length ? (
         <div className="drafts" data-testid="draft-files">
           {drafts.map((file) => (
-            <FileCard
-              key={file.localId}
-              name={file.filename}
-              bytes={file.bytes}
-              status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
-              error={file.error}
-              onRemove={() => removeDraft(file.localId)}
-            />
+            file.media === 'image' ? (
+              <ImageCard
+                key={file.localId}
+                name={file.filename}
+                src={file.previewUrl}
+                failed={Boolean(file.error)}
+                onRemove={() => removeDraft(file.localId)}
+              />
+            ) : (
+              <FileCard
+                key={file.localId}
+                name={file.filename}
+                bytes={file.bytes}
+                status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
+                error={file.error}
+                onRemove={() => removeDraft(file.localId)}
+              />
+            )
           ))}
         </div>
       ) : null}
@@ -2687,20 +2719,33 @@ const Composer = () => {
       <div className="composer-tools">
         <div className="chips" ref={chips}>
           <span className="chip-wrap">
-            <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-              <Glyph name="thinking" size={14} />
-              <span className="chip-label">{t('thinking')}</span>
-            </button>
+            <HoverTip text={t('thinkTip')}>
+              <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+                <Glyph name="thinking" size={14} />
+                <span className="chip-label">{t('thinking')}</span>
+              </button>
+            </HoverTip>
           </span>
-          <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
-            <Glyph name="search" size={14} />
-            <span className="chip-label">{t('search')}</span>
-          </button>
+          {hasFile ? (
+            <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
+              <Glyph name="search" size={14} />
+              <span className="chip-label">{t('search')}</span>
+            </button>
+          ) : (
+            <HoverTip text={t('searchTip')}>
+              <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
+                <Glyph name="search" size={14} />
+                <span className="chip-label">{t('search')}</span>
+              </button>
+            </HoverTip>
+          )}
         </div>
         <div className="tool-right">
-          <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
-            <Glyph name="attach" size={16} />
-          </button>
+          <HoverTip text={t('attachTip')}>
+            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
+              <Glyph name="attach" size={16} />
+            </button>
+          </HoverTip>
           <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             generating ? (
@@ -3146,7 +3191,7 @@ const Settings = () => {
   )
 }
 
-const StatusToast = ({ code }: { code: 'msgGeneratingTryLater' | 'hintLastMessageIsWIP' | 'commonNetworkErrorToast' | 'completionNetworkErrorToast' | 'completionWipNetworkErrorToast' | 'networkToasts' }) => {
+const StatusToast = ({ code }: { code: StatusToastCode }) => {
   const t = useT()
   const dismiss = useHarbor((state) => state.dismissStatusToast)
   const text = code === 'networkToasts'
