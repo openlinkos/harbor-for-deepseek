@@ -59,9 +59,9 @@ test('theme cards and setting descriptions follow the official field', async ({ 
   const hint = page.locator('.settings-line.stack', { hasText: '导出所有历史对话' }).locator('.settings-copy .hint')
   await expect(hint).toHaveCSS('font-size', '12px')
   await expect(hint).toHaveCSS('line-height', '18px')
-  await expect(hint).toHaveCSS('color', 'rgb(173, 178, 184)')
+  await expect(hint).toHaveCSS('color', 'rgb(207, 211, 214)')
   await page.evaluate(() => document.body.removeAttribute('data-ds-dark-theme'))
-  await expect(hint).toHaveCSS('color', 'rgb(129, 133, 140)')
+  await expect(hint).toHaveCSS('color', 'rgb(97, 102, 107)')
 
   await page.getByTestId('settings-nav-general').click()
   await page.getByRole('button', { name: '深色' }).click()

@@ -129,9 +129,9 @@ test('settings select, menu, and switch match the settings skin', async ({ page 
 
   await page.getByTestId('settings-nav-data').click()
   const hint = page.locator('.settings-line.stack', { hasText: '导出所有历史对话' }).locator('.settings-copy .hint')
-  await expect(hint).toHaveCSS('color', 'rgb(173, 178, 184)')
+  await expect(hint).toHaveCSS('color', 'rgb(207, 211, 214)')
   await expect(hint).toHaveCSS('min-height', '22px')
   await expect(hint).toHaveCSS('padding-top', '2px')
   await page.evaluate(() => document.body.removeAttribute('data-ds-dark-theme'))
-  await expect(hint).toHaveCSS('color', 'rgb(129, 133, 140)')
+  await expect(hint).toHaveCSS('color', 'rgb(97, 102, 107)')
 })
