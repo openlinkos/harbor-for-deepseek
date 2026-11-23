@@ -2352,21 +2352,21 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, 0.62); }
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0) 0 0 0 1px inset, rgba(0, 0, 0, 0.2) 0 0 1px 0, rgba(0, 0, 0, 0.02) 0 0 4px 0, rgba(0, 0, 0, 0.08) 0 12px 32px 0;
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-border-inverted), 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 4px 0 rgba(0, 0, 0, 0.02), 0 12px 32px 0 rgba(0, 0, 0, 0.08);
 }
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
 .settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
-.settings-head h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 24px; }
+.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
 .settings-x svg { width: 14px; height: 14px; }
-.settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 10px 0 0; }
-.settings-nav button { display: flex; align-items: center; gap: 8px; width: 164px; height: 40px; margin-left: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
+.settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 4px 0 0; }
+.settings-nav button { display: flex; align-items: center; gap: 8px; width: 164px; height: 40px; margin-left: 4px; margin-right: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
-.settings-nav button.on { background: rgba(38, 49, 72, 0.06); }
-body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
+.settings-nav button.on,
+body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-alias-interactive-bg-hover); }
 /* SP-MOD-197. The wash is the hover, not the resting tab. .on keeps its selected fill. */
 .settings-nav button:hover:not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
-.settings-main { flex: 1 1 0%; overflow: auto; padding: 10px 24px 0; min-width: 0; min-height: 0; height: calc(100% - 54px); }
+.settings-main { flex: 1 1 0%; overflow: auto; padding: 10px 24px 0; margin-top: 6px; margin-left: -12px; margin-right: 12px; min-width: 0; min-height: 0; height: calc(100% - 54px); }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
 .settings-main button:not(.chip):not(.ds-button) {
   height: 36px;
@@ -2576,7 +2576,7 @@ body[data-ds-dark-theme] .settings-line .pill-menu > button:hover {
 .settings-copy.wide { width: auto; max-width: 100%; }
 .settings-copy > span { display: block; width: 100%; height: auto; min-height: 22px; font-size: 14px; font-weight: 400; line-height: 22px; color: var(--dsw-alias-label-secondary); }
 /* SP-SET-454. Row descriptions are 12px/18px tertiary in both themes. spec-align-settings-2 pins that color. */
-.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; min-height: 22px; padding: 2px 0; box-sizing: border-box; font-size: 12px; font-weight: 400; line-height: 18px; color: var(--dsw-alias-label-secondary); transition: color var(--ds-transition-duration) var(--ds-ease-in-out); }
+.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; min-height: 22px; padding: 2px; box-sizing: border-box; font-size: 12px; font-weight: 400; line-height: 18px; color: var(--dsw-alias-label-secondary); transition: color var(--ds-transition-duration) var(--ds-ease-in-out); }
 .settings-main .settings-line a.account-quiet { display: inline-flex; align-items: center; justify-content: center; width: 72px; text-decoration: none; }
 .settings-main .settings-line a.account-quiet span { display: block; height: 22px; line-height: 22px; font-size: 14px; font-weight: 400; }
 .settings-main button.switch:not(.ds-button),
@@ -3215,11 +3215,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     flex-direction: column;
     flex-wrap: nowrap;
   }
-  .settings-nav { flex: none; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 0 8px; }
-  .settings-nav button { flex: none; width: auto; margin-left: 0; }
+  .settings-nav { flex: none; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 4px 0; }
+  .settings-nav button { flex: 1 1 auto; width: auto; margin-left: 0; white-space: nowrap; justify-content: center; min-width: 108px; }
+  .settings-nav button:last-child { margin-right: 4px; }
   /* The desktop head uses flex-basis 100% to wrap a row. In this column that basis is height and flex-shrink 0, so the head ate the sheet and the main collapsed to its padding. */
   .settings-head { flex: 0 0 auto; }
-  .settings-main { flex: 1 1 0%; min-height: 0; height: auto; overflow: auto; position: relative; z-index: 1; }
+  .settings-main { flex: 1 1 0%; min-height: 0; height: auto; overflow: auto; position: relative; z-index: 1; margin: 6px -4px; }
   .footnote { margin: 28px 0 calc(8px + env(safe-area-inset-bottom)); font-size: 11px; }
   .turn.user { flex-direction: column; align-items: flex-end; }
   .turn.assistant { display: flex; flex-direction: column; }
