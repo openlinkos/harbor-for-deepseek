@@ -1499,7 +1499,7 @@ a.cite:hover, .cite:hover {
 .stage:not(:has(.home)) .composer-wrap > .composer,
 .stage:not(:has(.home)) .composer-wrap > .ai-note { pointer-events: auto; width: 100%; }
 @media (min-width: 768px) {
-  .stage:not(:has(.home)) .composer {
+  body:not([data-ds-dark-theme]) .stage:not(:has(.home)) .composer {
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
   .topbar .top-actions > button.icon-btn:not(.top-new) {
@@ -1525,8 +1525,9 @@ a.cite:hover, .cite:hover {
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
 }
+/* SP-CMP input wrapper. Dark border is the thin white line. The shadow is none. */
 body[data-ds-dark-theme] .composer {
-  border-color: var(--dsw-static-neutral-bluish-800);
+  border-color: rgba(255, 255, 255, 0.06);
   box-shadow: none;
 }
 .composer textarea {
@@ -1535,6 +1536,7 @@ body[data-ds-dark-theme] .composer {
   resize: none;
   outline: none;
   background: transparent;
+  caret-color: var(--dsw-alias-brand-text);
   min-height: 60px;
   margin-top: 4px;
   padding: 12px 12px 0 16px;
@@ -1613,20 +1615,22 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   gap: 0;
 }
 .composer.icon-only .chip svg { width: 14px; height: 14px; }
-.chip:disabled { opacity: 0.45; }
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
 .send, .tool-right .icon-btn { width: 34px; height: 34px; padding: 0; }
 .tool-right .icon-btn { border-radius: 4096px; color: var(--dsw-alias-label-primary); }
 .tool-right .icon-btn svg, .send svg { width: 16px; height: 16px; }
+/* SP-CMP send. Fill follows the primary button token, so dark is #5686fe. */
 .send {
   border-radius: 50%;
-  background: #3964fe;
+  background: var(--dsw-alias-button-primary-fill);
   color: #fff;
   opacity: 0.4;
   display: grid;
   place-items: center;
   line-height: 22px;
 }
-.send.ready { background: #3964fe; color: #fff; opacity: 1; }
+.send.ready { background: var(--dsw-alias-button-primary-fill); color: #fff; opacity: 1; }
+.send.ready:hover { background: var(--dsw-alias-button-primary-hover); }
 .send.stop {
   background: var(--dsw-alias-button-primary-fill);
   color: var(--dsw-alias-label-primary-foreground);
@@ -1872,7 +1876,7 @@ body[data-ds-dark-theme] .landing::before { display: block; }
   color: #1e3a5f;
 }
 .landing-title, body[data-ds-dark-theme] .landing-title { color: #24324a; letter-spacing: 0.14em; font-weight: 500; }
-.landing-composer .send { background: #3964fe; color: #fff; }
+.landing-composer .send { background: var(--dsw-alias-button-primary-fill); color: #fff; }
 .landing-composer { width: min(720px, 100%); background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); }
 .landing-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
 .landing-pill {
@@ -2585,9 +2589,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   font-size: 11px;
   font-weight: 400;
   line-height: 16px;
-  color: rgb(129, 133, 140);
+  /* SP-CMP disclaimer. Light stays #81858c. Dark follows tertiary #adb2b8. */
+  color: var(--dsw-alias-label-tertiary);
   background: var(--dsw-alias-bg-base);
   text-align: center;
+  user-select: none;
 }
 .answer-note {
   margin: 16px 0 0;
@@ -2761,6 +2767,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     padding: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
   }
+  body[data-ds-dark-theme] .composer { box-shadow: none; border-color: rgba(255, 255, 255, 0.06); }
   .composer textarea { height: 42px; min-height: 42px; margin-top: 4px; padding: 12px 12px 0 16px; }
   .greeting .mark { width: 30px; height: 22px; margin-top: -1px; }
   .send, .tool-right .icon-btn { width: 34px; height: 34px; }
@@ -3126,7 +3133,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 }
 .send:disabled {
   color: #fff;
-  background: #3964fe;
+  background: var(--dsw-alias-button-primary-fill);
   opacity: 0.4;
 }
 .send:disabled,
