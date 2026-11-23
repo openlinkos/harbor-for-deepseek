@@ -3858,7 +3858,8 @@ input.share-box.ds-checkbox:checked::after,
   cursor: pointer;
   flex: none;
 }
-.share-all .ds-checkbox { margin-left: -26px; }
+/* SP-SHARE-015. Beats .share-bar input.ds-checkbox { margin: 0 }. */
+.share-bar .share-all input.ds-checkbox { margin-left: -26px; }
 .share-split {
   width: 1px;
   height: 14px;
