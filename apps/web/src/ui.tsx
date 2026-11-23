@@ -924,7 +924,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
   }
   if (block.type === 'web_fetch_tool_result') {
     if (block.content.type === 'web_fetch_tool_result_error') {
-      return <p className="tool-line">{block.content.error_code}</p>
+      return <p className="tool-line" data-testid="browse-status">{t('browseFailed')}</p>
     }
     const title = block.content.content?.title
     return (
@@ -967,9 +967,10 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
   const t = useT()
   const sources = useContext(SourcesPanel)
   const share = useContext(ShareMode)
+  const failed = block.content.some((item) => item.type === 'web_search_tool_result_error')
   const results = block.content.filter((item) => item.type === 'web_search_result')
   if (!results.length) {
-    return null
+    return <p className="tool-line" data-testid="search-status">{failed ? t('searchUnavailable') : t('searchEmpty')}</p>
   }
   const items = results.map((result) => ({
     url: result.url,

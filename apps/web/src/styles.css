@@ -3372,6 +3372,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   color: var(--dsw-alias-label-secondary);
   font: var(--dsw-font-markdown-small);
   transform: translateZ(0);
+  /* SP-TH-180. The search query stays on one line. */
+  white-space: nowrap;
 }
 .timeline-search:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .timeline-search.is-last .timeline-line { display: none; }
