@@ -382,6 +382,7 @@ body[data-ds-dark-theme] .side-scroll-wrap::after {
   gap: 0;
   width: min(660px, calc(100vw - 24px));
   height: 60px;
+  min-height: 60px;
   padding: 0;
   border: 0;
   border-radius: 20px;
@@ -390,7 +391,7 @@ body[data-ds-dark-theme] .side-scroll-wrap::after {
   box-shadow: rgba(0, 0, 0, 0.04) 0 2px 4px 0, rgba(0, 0, 0, 0.02) 0 4px 10px 0;
 }
 body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-bluish-850); }
-.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; display: grid; place-items: center; }
+.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; border-radius: 28px; display: grid; place-items: center; }
 .search-glyph svg { width: 16px; height: 16px; }
 .search-dialog input.side-filter:not([type='hidden']):not([type='file']) {
   flex: 1;
@@ -417,7 +418,7 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   border: 0;
   background: transparent;
   color: var(--dsw-alias-label-tertiary);
-  width: 32px;
+  width: 28px;
   height: 28px;
   border-radius: 28px;
   padding: 0;
@@ -433,7 +434,7 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   top: 20px;
   width: 1px;
   height: 20px;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--dsw-alias-border-l1);
 }
 .search-dialog.has-query {
   box-sizing: border-box;
@@ -3027,6 +3028,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
 }
 /* SP-MOD-471, 472. Title is 16px/24px with a 28px minimum. Weight stays 500. */
 .confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 500; line-height: 24px; min-height: 28px; }
+.confirm-card .edit-actions { margin-top: 20px; }
 .confirm-card .confirm-body { margin: -8px 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 22px; }
 .confirm-card .danger.outline {
   background: transparent;
