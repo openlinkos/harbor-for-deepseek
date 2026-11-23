@@ -2870,6 +2870,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
 }
 /* SP-MOD-471, 472. Title is 16px/24px with a 28px minimum. Weight stays 500. */
 .confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 500; line-height: 24px; min-height: 28px; }
+.confirm-card .confirm-body { margin: -8px 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 22px; }
 .confirm-card .danger.outline {
   background: transparent;
   color: #f25a5a;

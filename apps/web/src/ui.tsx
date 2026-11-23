@@ -418,7 +418,7 @@ const useScrollLock = (open: boolean) => {
 }
 
 /** Official ds-modal defaults: mask click and Escape close, focus stays inside, then returns to the trigger. */
-const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
+const ConfirmDialog = ({ label, body, confirm, onCancel, onConfirm }: { label: string; body: string; confirm: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
   const panel = useRef<HTMLDivElement>(null)
   // SP-MOD-572. Back closes the confirm. Escape does not.
@@ -497,9 +497,10 @@ const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel
     >
       <div className="confirm-card">
         <h2>{label}</h2>
+        <p className="confirm-body">{body}</p>
         <div className="edit-actions">
           <DsButton type="button" onClick={onCancel}>{t('cancel')}</DsButton>
-          <DsButton type="button" variant="danger" data-testid="confirm-delete" onClick={onConfirm}>{t('delete')}</DsButton>
+          <DsButton type="button" variant="danger" data-testid="confirm-delete" onClick={onConfirm}>{confirm}</DsButton>
         </div>
       </div>
     </div>,
@@ -2329,7 +2330,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
       ) : null}
       {confirming ? (
         <ConfirmDialog
-          label={t('deleteConfirm')}
+          label={t('deleteChatTitle')}
+          body={t('deleteChatBody')}
+          confirm={t('deleteChatConfirm')}
           onCancel={() => setConfirming(false)}
           onConfirm={() => { setConfirming(false); void removeChat(conversation.id) }}
         />
@@ -2555,6 +2558,7 @@ const Settings = () => {
   const [exporting, setExporting] = useState(false)
   const [sharedNote, setSharedNote] = useState(false)
   const [confirmAll, setConfirmAll] = useState(false)
+  const [deletedOk, setDeletedOk] = useState(false)
   const profile = useProfile()
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
@@ -2749,14 +2753,18 @@ const Settings = () => {
             <DsButton type="button" variant="danger" onClick={() => setConfirmAll(true)}>{t('delete')}</DsButton>
             {confirmAll ? (
               <ConfirmDialog
-                label={t('deleteConfirm')}
+                label={t('deleteAllTitle')}
+                body={t('deleteAllBody')}
+                confirm={t('deleteAllConfirm')}
                 onCancel={() => setConfirmAll(false)}
                 onConfirm={() => {
                   setConfirmAll(false)
                   const { conversations: rows, removeChat: drop } = useHarbor.getState()
                   for (const item of rows) void drop(item.id)
+                  setDeletedOk(true)
                 }}
               />
+              {deletedOk ? createPortal(<p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p>, document.body) : null}
             ) : null}
           </div>
         </section>

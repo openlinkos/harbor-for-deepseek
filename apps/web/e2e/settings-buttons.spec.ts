@@ -314,7 +314,7 @@ for (const theme of ['light', 'dark'] as const) {
           await Promise.all(node.getAnimations().map((animation) => animation.finished))
         })
         const dialogButtons = await measure(page, 'confirm-dialog')
-        expect(dialogButtons.map((button) => button.text)).toEqual(['取消', '删除'])
+        expect(dialogButtons.map((button) => button.text)).toEqual(['取消', '删除所有对话'])
         const bad = problems(dialogButtons, theme, false)
         expect(bad, bad.join('\n')).toEqual([])
         const rowRight = dialogButtons[0]?.lineRight ?? 0
