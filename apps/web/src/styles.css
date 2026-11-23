@@ -4408,13 +4408,57 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   opacity: 0.4;
   cursor: default;
 }
-/* SP-SHARE-033 / 102 / 103 / 104 / 105 / 106. Official .d30139ff is the checkbox column. */
+/* SP-SHARE-033 / 102 / 103 / 104 / 105 / 106. Official .d30139ff is the checkbox column.
+   Its top:0 is the message-row padding edge (._9663006 / ._4f9bf79), not our .turn top.
+   .share-port is that edge: same height as the turn, shifted so sticky padding-top 13px
+   lands the checkbox on the 1280×800 capture (user ~3px under the grey, answer on the first line).
+   The port is also the sticky scrollport (overflow:hidden). The transcript's padding edge
+   is lower than this origin on a phone, and sticky top:0 would otherwise clamp the
+   checkbox down onto that edge. .share-origin restores the turn's left edge so the
+   column can keep left:-42px without painting outside the scrollport. */
+.share-port { display: contents; }
+.turn.user.share-on > .share-port {
+  display: block;
+  position: absolute;
+  overflow: hidden;
+  top: -25px;
+  bottom: 25px;
+  left: -42px;
+  right: 0;
+  min-height: 44px;
+  pointer-events: none;
+}
+.turn.assistant.share-on > .share-port {
+  display: block;
+  position: absolute;
+  overflow: hidden;
+  top: -8px;
+  bottom: 8px;
+  left: -42px;
+  right: 0;
+  min-height: 44px;
+  pointer-events: none;
+}
+.share-origin { display: contents; }
+.turn.share-on .share-port > .share-origin {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 42px;
+  right: 0;
+  pointer-events: none;
+}
 .share-col { display: contents; }
-.turn.share-on > .share-col {
+.turn.share-on .share-col {
   --dsl-virtual-list-transform-y: 0px;
   --dsl-virtual-list-ios-compensation-y: 0px;
   position: absolute;
   display: flex;
+  /* A definite-height sticky is not packed to the start when align-items stays normal
+     and the column is taller than the sticky box. flex-start keeps padding-top 13px
+     measured from the column origin (official checkbox align-self is flex-start). */
+  align-items: flex-start;
   top: 0;
   bottom: 40px;
   left: -42px;
@@ -4423,7 +4467,7 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   pointer-events: none;
 }
 /* SP-SHARE-034. Narrow list (panel under 800) pins the column at left 0. */
-.shell.share-narrow .turn.share-on > .share-col { left: 0; }
+.shell.share-narrow .turn.share-on .share-col { left: 0; }
 /* SP-SHARE-035 / 109 / 110 / 111 / 112. Sticky box around the 18px checkbox. No virtual list, so the transform vars stay 0. */
 .share-sticky {
   position: sticky;
@@ -4442,7 +4486,7 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 .turn.share-on .action-row,
 .turn.share-on .user-actions { display: none; }
 .turn.share-on { isolation: isolate; }
-.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col) { position: relative; z-index: 1; }
+.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col):not(.share-origin):not(.share-port) { position: relative; z-index: 1; }
 /* SP-SHARE-149. Official ._7729a77 > * is pointer-events none so the message wrapper receives the click. */
 .turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }

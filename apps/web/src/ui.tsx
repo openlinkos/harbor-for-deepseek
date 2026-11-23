@@ -1316,9 +1316,13 @@ const MessageRow = ({ message }: { message: Message }) => {
   }
   return (
     <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${isFirstUser ? 'is-first' : ''} ${isLastUser ? 'is-last-user' : ''} ${share?.on ? 'share-on' : ''} ${locked ? 'share-locked' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (!share?.on || !groupId) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }}>
-      <span className="share-col">
-        <span className="share-sticky">
-          <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on || locked} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (!groupId || !share) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }} />
+      <span className="share-port">
+        <span className="share-origin">
+          <span className="share-col">
+            <span className="share-sticky">
+              <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on || locked} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (!groupId || !share) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }} />
+            </span>
+          </span>
         </span>
       </span>
       <div className="share-halo" aria-hidden="true" />
