@@ -53,8 +53,11 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       const a = await st(page); await page.waitForTimeout(600); const b = await st(page)
       for (const s of [a, b]) { expect(s.dots.length, 'one think dot').toBe(1); expect(s.dots[0].bg).toBe(B); expect(s.dots[0].anim).toBe(`${OFF.dot.animationDuration} ${OFF.dot.animationTimingFunction} infinite`) }
       expect(a.icon, 'title icon while WIP').toBe(B); expect(a.lines.every((c: string) => c === DIM), `line colours ${a.lines}`).toBe(true) })
-    test('dot-turns-grey-when-think-ends', async ({ page }) => { knownFailure('fb1721-D1'); await start(page, theme); await push(page, E.think0); await page.waitForTimeout(400)
-      await page.evaluate(() => (window as any).__sampler.start()); await push(page, E.search); await page.waitForTimeout(500); const rec = await page.evaluate(() => (window as any).__sampler.stop())
+    test('dot-turns-grey-when-think-ends', async ({ page }) => { await start(page, theme); await push(page, E.think0); await page.waitForTimeout(400)
+      // Sample one frame of the live brand dot before the search block replaces it. The pulse stays a known failure on the other D1 tests.
+      await page.evaluate(() => (window as any).__sampler.start())
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+      await push(page, E.search); await page.waitForTimeout(500); const rec = await page.evaluate(() => (window as any).__sampler.stop())
       const seq = rec.map((r: { s?: { dots?: { bg: string }[] } }) => r.s?.dots?.[0]?.bg).filter(Boolean); const uniq = seq.filter((c: string, i: number) => c !== seq[i - 1])
       expect(uniq, 'dot colour sequence across the transition: blue then grey, no intermediate frames').toEqual([B, T])
       const s = await st(page); expect(s.dots[0].anim).toBe('none'); expect(s.icon).toBe(B) })

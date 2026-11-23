@@ -2537,8 +2537,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   border-radius: 50%;
   background: var(--dsw-alias-label-tertiary);
 }
-/* SP-TH-004/005. The step still in progress uses the brand dot. Finished steps stay tertiary. */
-.turn.streaming .timeline-step.is-last .timeline-dot::before { background: var(--dsw-alias-brand-primary); }
+/* SP-TH-004/005. Brand only while this think step is the live phase. Answer streaming stays tertiary (fb1721 answer-streaming-and-done-all-grey). */
+.timeline-step.timeline-think.is-live .timeline-dot::before { background: var(--dsw-alias-brand-primary); }
 .timeline-line {
   position: absolute;
   top: 31px;

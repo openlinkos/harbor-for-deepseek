@@ -1092,7 +1092,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
       return (
-        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ds-markdown ${last}`}>
+        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ds-markdown ${last}${phase === 'thinking' && last ? ' is-live' : ''}`}>
           <span className="timeline-dot" aria-hidden="true" />
           <span className="timeline-line" aria-hidden="true" />
           <Markdown text={step.text} streaming={answerStreaming} />
