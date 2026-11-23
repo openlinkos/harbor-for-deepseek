@@ -57,7 +57,7 @@ a { color: var(--dsw-alias-brand-text); }
     padding-right: env(safe-area-inset-right);
   }
 }
-
+.sidebar {
   --sider-top-slot-height: 40px;
   width: var(--sider-width);
   max-width: var(--sider-width);
