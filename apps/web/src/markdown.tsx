@@ -133,6 +133,14 @@ const Mermaid = ({ chart }: { chart: string }) => {
   const [full, setFull] = useState(false)
   const [downloadOpen, setDownloadOpen] = useState(false)
   useEffect(() => {
+    if (!full) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setFull(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [full])
+  useEffect(() => {
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | undefined
     let previous: string | undefined
@@ -245,13 +253,14 @@ const Mermaid = ({ chart }: { chart: string }) => {
           </button>
         </div>
       </div>
-      {failed ? <pre className="diagram-source"><code>{chart}</code></pre> : null}
-      <pre className="diagram-source" hidden={failed || tab !== 'code'}><code>{chart}</code></pre>
-      <div className="diagram-view" hidden={failed || tab !== 'chart'}>
-        <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} />
+      <pre className="diagram-source" hidden={tab !== 'code'}><code>{chart}</code></pre>
+      <div className="diagram-view" hidden={tab !== 'chart'}>
+        {failed ? <p className="diagram-status" data-testid="mermaid-status">{chart.trim() ? '渲染失败' : '图表为空'}</p> : null}
+        {!failed && !svg ? <p className="diagram-status" data-testid="mermaid-status">图表生成中...</p> : null}
+        {svg && !failed ? <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} /> : null}
       </div>
       {full ? createPortal(
-        <div className="diagram-modal" role="dialog" aria-modal="true" data-testid="mermaid-modal">
+        <div className="diagram-modal" data-testid="mermaid-modal">
           <button type="button" className="diagram-modal-close" aria-label={label('关闭', 'Close')} onClick={() => setFull(false)}>
             <IconSvg><path d="M4 4l8 8M12 4 4 12" /></IconSvg>
           </button>
