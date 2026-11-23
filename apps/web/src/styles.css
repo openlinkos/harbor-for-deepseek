@@ -1010,9 +1010,7 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content.ds-markdown h5 + ul,
 .ds-think-content.ds-markdown h5 + ol,
 .ds-think-content.ds-markdown h6 + ul,
-.ds-think-content.ds-markdown h6 + ol,
-.ds-think-content.ds-markdown p + ul,
-.ds-think-content.ds-markdown p + ol { margin-top: 4px; }
+.ds-think-content.ds-markdown h6 + ol { margin-top: 4px; }
 .ds-think-content.ds-markdown h3:has(+ ul),
 .ds-think-content.ds-markdown h3:has(+ ol),
 .ds-think-content.ds-markdown h4:has(+ ul),
@@ -1020,8 +1018,7 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content.ds-markdown h5:has(+ ul),
 .ds-think-content.ds-markdown h5:has(+ ol),
 .ds-think-content.ds-markdown h6:has(+ ul),
-.ds-think-content.ds-markdown h6:has(+ ol),
-.ds-think-content.ds-markdown p:has(+ ol) { margin-bottom: 4px; }
+.ds-think-content.ds-markdown h6:has(+ ol) { margin-bottom: 4px; }
 .ds-think-content.ds-markdown li > :first-child { margin-top: 0; }
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
