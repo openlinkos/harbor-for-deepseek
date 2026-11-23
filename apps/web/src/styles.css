@@ -620,6 +620,8 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
 .menu button, .menu a, .menu [role='menuitem'], .menu-item {
   display: flex;
   align-items: center;
+  min-height: 24px;
+  cursor: pointer;
   gap: 8px;
   width: 100%;
   text-align: left;
@@ -1889,7 +1891,7 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 
 .scrim { display: none; }
 /* Search shell is z-index 10 (SP-SEARCH-067). A dialog has to sit above that panel. Menus stay at 30. */
-.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 20; padding: 20px; }
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 1024; padding: 20px; }
 .modal-card, .gate-card, .admin-card, .key-card {
   width: min(720px, 100%);
   max-height: min(88vh, 900px);
@@ -2155,7 +2157,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* SP-MOD-046..049, 497..502. Toast padding, line, and shadow follow the official toast. */
 .toast {
   position: fixed;
-  bottom: 16px;
+  top: calc(40px + env(safe-area-inset-top));
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -2846,7 +2849,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   font-size: 14px;
   box-shadow: var(--dsw-shadow-lv3);
 }
-.confirm-modal { z-index: 40; }
+.confirm-modal { z-index: 1024; }
 /* SP-MOD-010, 466, 468. Confirm card uses the modal surface, radius, and line height. */
 .confirm-card {
   width: min(400px, calc(100vw - 32px));
