@@ -1245,6 +1245,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-markdown hr { background: var(--dsw-alias-border-l2); border: none; height: 1px; margin: 32px 0; display: block; }
 .ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
 .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: -18px; color: var(--dsw-alias-label-secondary); }
+.ds-markdown .ds-markdown-task-list-item > .ds-markdown-task-checkbox + .ds-markdown-paragraph { display: inline; }
+body.rtl .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: 0; margin-right: -18px; }
 .markdown-table-wrapper { overflow-x: auto; max-width: 100%; }
 /* SP-MD-1051. A table with a fourth column is inline-block so it can grow past the column. */
 .markdown-table-wrapper:has(th:nth-child(4), td:nth-child(4)) table { display: inline-block; }
