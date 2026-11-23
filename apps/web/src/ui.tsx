@@ -194,6 +194,8 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
 
 const focusComposer = () => {
   window.requestAnimationFrame(() => {
+    // SP-MOD-635. A frame queued before the search dialog opened must not take the input.
+    if (document.querySelector('.search-dialog')) return
     const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
     if (!box) return
     box.focus({ preventScroll: true })
