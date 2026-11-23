@@ -206,15 +206,15 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
-test('tools default on', async ({ page }) => {
+test('tools default off', async ({ page }) => {
   await unlock(page)
-  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
-  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
   await expect(page.getByTestId('toggle-search')).toContainText('智能搜索')
   await page.getByTestId('toggle-thinking').click()
-  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
   await page.getByTestId('toggle-search').click()
-  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
 })
 
 test('search citations', async ({ page }) => {
@@ -876,15 +876,15 @@ test('welcome back', async ({ page }) => {
   await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('1')
   await expect(page.locator('.new-chat')).toHaveCSS('justify-content', 'center')
   const on = page.getByTestId('toggle-thinking')
+  await expect(on).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+  await expect(on).toHaveCSS('color', 'rgb(15, 17, 21)')
+  await expect(on).toHaveCSS('border-top-width', '1px')
+  await on.click()
+  await page.mouse.move(0, 0)
   await expect(on).toHaveCSS('background-color', 'rgb(237, 243, 254)')
   await expect(on).toHaveCSS('color', 'rgb(57, 100, 254)')
   await expect(on).toHaveCSS('border-top-width', '1px')
   await expect(on).toHaveCSS('border-top-color', 'rgb(183, 200, 254)')
-  await on.click()
-  await page.mouse.move(0, 0)
-  await expect(on).toHaveCSS('background-color', 'rgb(255, 255, 255)')
-  await expect(on).toHaveCSS('color', 'rgb(15, 17, 21)')
-  await expect(on).toHaveCSS('border-top-width', '1px')
 })
 
 test('reduced motion', async ({ page }) => {

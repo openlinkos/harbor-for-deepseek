@@ -211,13 +211,14 @@ const TOGGLE_KEY = 'deepapi-toggles'
 type Toggles = Pick<Prefs, 'thinking' | 'search'>
 
 const defaultPrefs = (): Prefs => ({
-  thinking: true,
-  search: true,
+  thinking: false,
+  search: false,
   readLink: false,
 })
 
-// SP-CMP-256. Search stays in this page session (New chat keeps it) and a reload resets it.
-// The on/off default stays true until the owner decides. Thinking still persists (SP-CMP-255).
+// SP-CMP-255 / SP-CMP-256. 昊辰 11/23 12:51: both default off.
+// Search stays in this page session (New chat keeps it) and a reload resets it to the default.
+// Thinking still persists through localStorage.
 let sessionSearch = defaultPrefs().search
 
 const withFixedModel = (prefs: Prefs) => ({
@@ -227,7 +228,7 @@ const withFixedModel = (prefs: Prefs) => ({
 })
 
 const readToggles = (): Toggles => {
-  const fallback: Toggles = { thinking: true, search: sessionSearch }
+  const fallback: Toggles = { thinking: false, search: sessionSearch }
   try {
     const raw = localStorage.getItem(TOGGLE_KEY)
     if (!raw) return fallback

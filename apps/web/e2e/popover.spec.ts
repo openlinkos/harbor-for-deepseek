@@ -176,8 +176,10 @@ test('thinking and search chips toggle on Enter and Space', async ({ page }) => 
   await unlock(page)
   const thinking = page.getByTestId('toggle-thinking')
   const search = page.getByTestId('toggle-search')
-  await expect(thinking).toHaveClass(/on/)
-  await expect(search).toHaveClass(/on/)
+  await expect(thinking).not.toHaveClass(/on/)
+  await expect(search).not.toHaveClass(/on/)
+  await thinking.click()
+  await search.click()
 
   await tabTo(page, thinking)
   await expect(thinking).toBeFocused()

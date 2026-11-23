@@ -171,8 +171,8 @@ test('capture official states at 1920x1072', async ({ page }) => {
   await expect(page.getByTestId('sidebar')).toContainText('快排介绍')
   await page.getByTestId('new-chat').click()
   await pinGreeting(page)
-  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
-  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
   await shot(page, 'home.png')
 
   await page.getByTestId('composer').focus()
@@ -267,8 +267,8 @@ test('capture official states at 1920x1072', async ({ page }) => {
 
   await page.getByTestId('new-chat').click()
   await pinGreeting(page)
-  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
-  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
+  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
   const idle = page.locator('.chat-link').filter({ hasText: '快排介绍' })
   await expect(idle).not.toHaveClass(/active/)
   await idle.hover()
