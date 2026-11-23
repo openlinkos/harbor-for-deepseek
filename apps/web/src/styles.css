@@ -818,7 +818,8 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .stage:not(:has(.home)) .topbar > :not(.chat-title) { position: relative; z-index: 1; }
 .menu-mobile, .top-actions { position: relative; z-index: 1; }
 /* SP-TB-016..018, SP-TB-035..042, SP-TB-003, SP-TB-034. Static title, not the editable chip. */
-.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 1; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; align-items: center; height: 22px; max-width: min(480px, calc(100% - 140px)); overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; }
+/* SP-TB-001 / 004–008. Header title column. margin-left 174px stays off: the stage sits beside the sider, not under it. */
+.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 12; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; flex: 1; flex-direction: column; align-content: center; justify-content: center; align-items: center; height: 22px; max-width: min(480px, calc(100% - 140px)); overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; transition: margin-left var(--ds-transition-duration-slow) var(--ds-ease-in-out); }
 @media (max-width: 767px) {
   .stage:not(:has(.home)) .topbar > .chat-title { left: 54px; max-width: 60vw; }
 }
@@ -1674,6 +1675,9 @@ a.cite:hover, .cite:hover {
   font-weight: 600;
   line-height: 32px;
 }
+/* SP-TB-290 / SP-TB-291. The mark is brand. SP-TB-301. Dark greeting text is #fff. */
+.greeting .mark { color: var(--dsw-alias-brand-primary); }
+body[data-ds-dark-theme] .greeting { color: #fff; }
 .composer-wrap { width: min(840px, calc(100% - 88px)); max-width: 840px; margin: 0 auto calc(8px + var(--keyboard-inset, 0px)); padding-bottom: env(safe-area-inset-bottom); }
 .stage:not(:has(.home)) { overflow: hidden; min-height: 0; }
 .stage:not(:has(.home)) .transcript.chat-scroll {
