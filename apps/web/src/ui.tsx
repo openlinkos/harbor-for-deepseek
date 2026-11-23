@@ -2470,9 +2470,11 @@ const Composer = () => {
   const setComposerText = useHarbor((state) => state.setComposerText)
   const setText = (value: string) => setComposerText(activeId, value)
   const [iconOnly, setIconOnly] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const dragDepth = useRef(0)
   useEffect(() => {
     focusComposer()
   }, [activeId])
@@ -2524,7 +2526,31 @@ const Composer = () => {
     focusComposer()
   }
   return (
-    <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
+    <div
+      className={`composer ${iconOnly ? 'icon-only' : ''} ${dragOver ? 'is-dragover' : ''}`}
+      onDragEnter={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+        dragDepth.current += 1
+        setDragOver(true)
+      }}
+      onDragOver={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+      }}
+      onDragLeave={() => {
+        dragDepth.current = Math.max(0, dragDepth.current - 1)
+        if (dragDepth.current === 0) setDragOver(false)
+      }}
+      onDrop={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+        dragDepth.current = 0
+        setDragOver(false)
+        const list = [...event.dataTransfer.files]
+        if (list.length) void addFiles(list)
+      }}
+    >
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
       {drafts.length ? (

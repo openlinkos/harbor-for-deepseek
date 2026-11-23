@@ -1868,6 +1868,11 @@ body[data-ds-dark-theme] .composer {
 .composer textarea:focus { outline: none; box-shadow: none; }
 .composer textarea::placeholder { color: var(--dsw-alias-label-caption, #c2c3c4); }
 .composer { position: relative; }
+/* SP-CMP-109. Official ._77cefa5._4039df9 drag-over border. Attachments already use addFiles. */
+.composer.is-dragover {
+  border-style: dashed;
+  border-color: var(--dsw-alias-brand-primary);
+}
 .composer-fill, .composer-fill-alt { display: none; position: absolute; left: 11.5px; top: 30px; width: 752px; height: 40px; background: rgb(255, 255, 255); pointer-events: none; }
 @media (min-width: 1600px) {
   .shell.selecting .composer-fill, .shell.selecting .composer-fill-alt { display: block; }
