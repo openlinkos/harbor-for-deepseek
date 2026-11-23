@@ -12,3 +12,7 @@
 - apps/web/e2e/overlay-paint.spec.ts:218 getByRole「编辑」/ tooltip「编辑」-> button[aria-label="修改"] / tooltip「修改」且 force hover SP-CV-306 SP-CV-365
 
 手机宽度里 `.user-actions { opacity: 1 }` 会盖住上面的默认 opacity 0。已去掉这一条，让更早的用户消息在 390 也保持 opacity 0（SP-CV-306）。断言无新增改动。
+
+后续：停止后的思考头图标不是加载圆点。
+- apps/web/e2e/fb1344-parity.spec.ts:201 思考头 fill 加载圆点色 rgb(225, 229, 238) / rgb(67, 69, 74) -> 时间线三级色 rgb(129, 133, 140) / rgb(173, 178, 184) SP-TH-010 SP-TH-011
+加载圆点仍在 :162，颜色是 label-dimmed（SP-CV-407、SP-CV-408）。
