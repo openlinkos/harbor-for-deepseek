@@ -633,6 +633,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async newChat() {
+    // SP-SB-630. Already on an empty new chat: say so, don't reset again.
+    const idle = get()
+    const idleText = (idle.textDrafts[draftKey(idle.activeId)] ?? '').trim()
+    if (!idle.activeId && idle.messages.length === 0 && idle.drafts.length === 0 && !idleText) {
+      set({ statusToast: 'alreadyLatest' })
+      return
+    }
     // SP-CMP-296 / SP-CMP-297. Keep the chat we left. The landing composer starts empty.
     stashFiles(get().activeId, get().drafts)
     fileDrafts.delete('')
