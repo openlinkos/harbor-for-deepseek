@@ -3844,6 +3844,8 @@ input.share-box.ds-checkbox:checked::after,
   width: calc(min(752px, calc(100% - 88px)) + 56px);
   height: 65px;
   margin-left: calc((100% - min(752px, calc(100% - 88px))) / 2 - 41px);
+  /* Pairs with .share-all margin-left -26px so the checkbox stays on the message column. */
+  padding-left: 26px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -3852,15 +3854,14 @@ input.share-box.ds-checkbox:checked::after,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0;
+  /* SP-SHARE-015. Official ._692accd is the whole select-all control, not the input. */
+  margin: 0 0 0 -26px;
   font-size: 14px;
   line-height: 22px;
   color: var(--dsw-alias-label-primary);
   cursor: pointer;
   flex: none;
 }
-/* SP-SHARE-015. Beats .share-bar input.ds-checkbox { margin: 0 }. */
-.share-bar .share-all input.ds-checkbox { margin-left: -26px; }
 .share-split {
   width: 1px;
   height: 14px;
@@ -3967,10 +3968,12 @@ input.share-box.ds-checkbox:checked::after,
   .share-bar-inner {
     width: 100%;
     margin-left: 0;
-    padding-left: 36px;
+    /* Official padding is calc(36px - 16px). Margin 16px then lands the box at x=36. */
+    padding-left: 20px;
     padding-right: 20px;
   }
-  .share-all { gap: 12px; }
+  /* Below 800px official ._117e7c4 ._692accd is margin-left 16px, not -26px. */
+  .share-all { gap: 12px; margin-left: 16px; }
 }
 @media (max-width: 639px) {
   .share-bar .share-split,
