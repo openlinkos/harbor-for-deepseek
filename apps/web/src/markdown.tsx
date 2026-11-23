@@ -213,9 +213,9 @@ const Mermaid = ({ chart }: { chart: string }) => {
               <span>{label('复制', 'Copy')}</span>
             </button>
           )}
-          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
+          <button type="button" aria-label={tab === 'code' ? label('下载代码', 'Download code') : label('下载 SVG', 'Download SVG')} onClick={download}>
             <IconSvg><path d="M8 2.5v7M5.5 7 8 9.5 10.5 7M3.5 12.5h9" /></IconSvg>
-            <span>{label('下载', 'Download')}</span>
+            <span>{tab === 'code' ? label('下载代码', 'Download code') : label('下载 SVG', 'Download SVG')}</span>
           </button>
           <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => setFull(true)}>
             <IconSvg><path d="M3 6.5V3.5H6M10 3.5h3V6.5M13 9.5v3h-3M6 12.5H3V9.5" /></IconSvg>

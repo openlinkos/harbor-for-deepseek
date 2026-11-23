@@ -1007,6 +1007,9 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .think-copy li { font: var(--dsw-font-markdown-small); height: auto; }
 .think-copy ul,
 .think-copy ol { margin: 12px 0; padding-left: 18px; }
+.ds-think-content.ds-markdown p + ul,
+.ds-think-content.ds-markdown p + ol { margin-top: 4px; }
+.ds-think-content.ds-markdown p:has(+ ol) { margin-bottom: 4px; }
 .think-copy p + ol { margin-top: 4px; }
 .think-copy li { color: var(--dsw-alias-label-secondary); }
 .think-copy li + li { margin-top: 2px; }
