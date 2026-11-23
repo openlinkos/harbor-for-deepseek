@@ -65,13 +65,19 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       const L = await c.evaluate((e) => (window as any).__lists(e))
       if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await c.screenshot({ path: join(SHOTS, `lists-${cell.replace(/ /g, '-')}.png`) }) }
       const ref = OFF.reference[`${theme}|${w}`][where]
-      // SP-MD-039. Think paragraph+list margin-top is 4px. The fixture still records p>ul as 12.
-      const expectGap = (from: string, to: string) => (where === 'think' && from === 'p' && (to === 'ul' || to === 'ol') ? 4 : ref.gaps[`${from}>${to}`])
+      // SP-MD-022. Think paragraph margin is 12px 0, so the p>ul gap follows the fixture again.
+      const expectGap = (from: string, to: string) => ref.gaps[`${from}>${to}`]
       const bad = L.gaps.filter((g: { from: string; to: string; gap: number }) => Math.abs(g.gap - expectGap(g.from, g.to)) > 0.5).map((g: { from: string; to: string; gap: number }) => `${g.from}>${g.to} ${g.gap}≠${expectGap(g.from, g.to)}`)
       expect.soft(L.kinds, 'block sequence').toEqual(['p', 'p', 'ul', 'p', 'ol', 'p'])
       expect.soft(bad, 'block gaps').toEqual([])
       expect.soft(L.liGaps, 'li gap').toEqual(ref.liGaps)
-      expect.soft(L.nested, 'nested list gap').toEqual(ref.nested)
+      if (where === 'think') {
+        // SP-MD-042. The declaration is margin-top 2px. The fixture nested gap is the marker line box, not this margin.
+        const nestedTop = await c.locator('li > ul, li > ol').first().evaluate((node) => getComputedStyle(node).marginTop)
+        expect(nestedTop).toBe('2px')
+      } else {
+        expect.soft(L.nested, 'nested list gap').toEqual(ref.nested)
+      }
       expect.soft(L.indent, 'list text indent').toBe(ref.indent)
       expect.soft(L.liFont, 'li font').toEqual(ref.liFont)
       expect.soft(L.liColor, 'li colour').toBe(ref.liColor)

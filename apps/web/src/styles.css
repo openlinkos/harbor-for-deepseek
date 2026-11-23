@@ -278,6 +278,31 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
 .action-row .branch button:hover:disabled, .user-actions .branch button:hover:disabled { background: transparent; }
 .feedback-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .diagram-tools { position: relative; display: flex; align-items: center; gap: 4px; }
+.diagram-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 5;
+  min-width: 100px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--dsw-specific-menu);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 0, 0, 0.02), 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+.diagram-menu [role='menuitem'] {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  padding: 0 8px;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+}
 .diagram-tools button { display: inline-flex; align-items: center; gap: 4px; }
 .diagram-tools svg { width: 16px; height: 16px; flex: none; }
 .diagram-modal {
@@ -1165,15 +1190,12 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .think-copy li { font: var(--dsw-font-markdown-small); height: auto; }
 .think-copy ul,
 .think-copy ol { margin: 12px 0; padding-left: 18px; }
-.ds-think-content.ds-markdown p + ul,
-.ds-think-content.ds-markdown p + ol { margin-top: 4px; }
-.ds-think-content.ds-markdown p:has(+ ol) { margin-bottom: 4px; }
-.think-copy p + ol { margin-top: 4px; }
+.think-copy p + ol { margin-top: 12px; }
 .think-copy li { color: var(--dsw-alias-label-secondary); }
 .think-copy li + li { margin-top: 2px; }
-/* Marker line-height is 28px on a 24px line and absorbs 2px of margin, so 4px measures as the official 6px gap. */
+/* SP-MD-042. Think nested list margin-top is 2px. */
 .think-copy li > ul,
-.think-copy li > ol { margin-top: 4px; margin-bottom: 0; }
+.think-copy li > ol { margin-top: 2px; margin-bottom: 0; }
 .think-copy li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose { font: var(--dsw-font-markdown-base); font-weight: 400; }
 /* SP-CV-287–299. Official ._9663006::before. Opacity stays 0, so the wash does not paint. */
@@ -1207,22 +1229,6 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content.ds-markdown blockquote { margin: 12px 0 0; }
 .ds-think-content.ds-markdown th { font: var(--dsw-font-markdown-small-strong); text-align: left; }
 .ds-think-content.ds-markdown td { font: var(--dsw-font-markdown-small); }
-.ds-think-content.ds-markdown h3 + ul,
-.ds-think-content.ds-markdown h3 + ol,
-.ds-think-content.ds-markdown h4 + ul,
-.ds-think-content.ds-markdown h4 + ol,
-.ds-think-content.ds-markdown h5 + ul,
-.ds-think-content.ds-markdown h5 + ol,
-.ds-think-content.ds-markdown h6 + ul,
-.ds-think-content.ds-markdown h6 + ol { margin-top: 4px; }
-.ds-think-content.ds-markdown h3:has(+ ul),
-.ds-think-content.ds-markdown h3:has(+ ol),
-.ds-think-content.ds-markdown h4:has(+ ul),
-.ds-think-content.ds-markdown h4:has(+ ol),
-.ds-think-content.ds-markdown h5:has(+ ul),
-.ds-think-content.ds-markdown h5:has(+ ol),
-.ds-think-content.ds-markdown h6:has(+ ul),
-.ds-think-content.ds-markdown h6:has(+ ol) { margin-bottom: 4px; }
 .ds-think-content.ds-markdown li > :first-child { margin-top: 0; }
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
@@ -1267,6 +1273,23 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
 .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: -18px; color: var(--dsw-alias-label-secondary); }
 .ds-markdown .ds-markdown-task-list-item > .ds-markdown-task-checkbox + .ds-markdown-paragraph { display: inline; }
+/* SP-MD-022. Think headings and paragraphs. Our think root is .ds-think-content.ds-markdown. */
+.ds-think-content.ds-markdown :is(h1, h2, h3, h4, h5, h6),
+.ds-think-content .ds-markdown :is(h1, h2, h3, h4, h5, h6),
+.ds-think-content.ds-markdown .ds-markdown-paragraph,
+.ds-think-content .ds-markdown .ds-markdown-paragraph { margin: 12px 0; }
+/* SP-MD-043. Think list paragraph. Wins over the 12px rule inside a list item. */
+.ds-think-content.ds-markdown li > .ds-markdown-paragraph,
+.ds-think-content .ds-markdown li > .ds-markdown-paragraph { margin: 2px 0; }
+/* SP-MD-103 / SP-MD-104. Nested ol under ul or ol. */
+.ds-markdown ul ol,
+.ds-markdown ol ol { padding-left: 0; list-style-position: inside; }
+/* SP-MD-105. Nested list paragraph is inline. */
+.ds-markdown ul ol li p,
+.ds-markdown ol ol li p { display: inline; }
+/* SP-MD-192 / SP-MD-193. */
+.ds-markdown li > :first-child { margin-top: 0; }
+.ds-markdown li > :last-child:not(.md-code-block) { margin-bottom: 0; }
 body.rtl .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: 0; margin-right: -18px; }
 .markdown-table-wrapper { overflow-x: auto; max-width: 100%; }
 /* SP-MD-1051. A table with a fourth column is inline-block so it can grow past the column. */
@@ -3491,7 +3514,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   }
   .prose { overflow-x: auto; }
   .diagram-card { max-width: 100%; }
-  .diagram-tools button span {
+  .diagram-tools > button span {
     position: absolute;
     width: 1px;
     height: 1px;

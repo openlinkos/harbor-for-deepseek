@@ -57,7 +57,7 @@ const ask = async (page: Page) => {
   await expect(page.getByTestId('mermaid-card').locator('.diagram-view svg')).toBeVisible({ timeout: 15_000 })
 }
 
-test('diagram fullscreen is a modal, zoom has a tooltip, download does not open a format menu', async ({ page }) => {
+test('diagram fullscreen is a modal, zoom has a tooltip, download opens the format menu', async ({ page }) => {
   await boot(page)
   await ask(page)
   const card = page.getByTestId('mermaid-card')
@@ -69,9 +69,10 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download does not open 
   await card.getByRole('button', { name: '放大' }).click()
   await expect(card.locator('.mermaid')).toHaveCSS('transform', /matrix|scale/)
   await saveShot(page, 'mermaid-05-diagram-zoomed-in.png')
+  await card.getByRole('button', { name: '下载', exact: true }).click()
+  await expect(card.getByRole('menuitem', { name: '下载 PNG' })).toBeVisible()
   const downloadPromise = page.waitForEvent('download')
-  await card.getByRole('button', { name: '下载' }).click()
-  await expect(card.locator('.diagram-menu')).toHaveCount(0)
+  await card.getByRole('menuitem', { name: '下载 SVG' }).click()
   expect((await downloadPromise).suggestedFilename()).toBe('diagram.svg')
   await card.getByRole('button', { name: '全屏' }).click()
   const modal = page.getByTestId('mermaid-modal')

@@ -131,6 +131,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
   const [tab, setTab] = useState<'chart' | 'code'>('chart')
   const [zoom, setZoom] = useState(1)
   const [full, setFull] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
   useEffect(() => {
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -179,12 +180,25 @@ const Mermaid = ({ chart }: { chart: string }) => {
       clearTimeout(timer)
     }
   }, [settled, streaming])
-  const download = () => {
-    if (tab === 'code' || !svg) {
-      saveBlob(new Blob([chart], { type: 'text/plain' }), 'diagram.mmd')
-      return
-    }
+  const downloadCode = () => saveBlob(new Blob([chart], { type: 'text/plain' }), 'diagram.mmd')
+  const downloadSvg = () => {
+    if (!svg) return
     saveBlob(new Blob([svg], { type: 'image/svg+xml' }), 'diagram.svg')
+  }
+  const downloadPng = () => {
+    if (!svg) return
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
+    const image = new Image()
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = image.naturalWidth || 800
+      canvas.height = image.naturalHeight || 600
+      canvas.getContext('2d')?.drawImage(image, 0, 0)
+      URL.revokeObjectURL(url)
+      canvas.toBlob((blob) => { if (blob) saveBlob(blob, 'diagram.png') })
+    }
+    image.onerror = () => URL.revokeObjectURL(url)
+    image.src = url
   }
   return (
     <div className="diagram-card" data-testid="mermaid-card">
@@ -214,10 +228,17 @@ const Mermaid = ({ chart }: { chart: string }) => {
               <span>{label('复制', 'Copy')}</span>
             </button>
           )}
-          <button type="button" aria-label={tab === 'code' ? label('下载代码', 'Download code') : label('下载 SVG', 'Download SVG')} onClick={download}>
+          <button type="button" aria-haspopup="menu" aria-expanded={downloadOpen} aria-label={label('下载', 'Download')} onClick={() => setDownloadOpen((open) => !open)}>
             <IconSvg><path d="M8 2.5v7M5.5 7 8 9.5 10.5 7M3.5 12.5h9" /></IconSvg>
-            <span>{tab === 'code' ? label('下载代码', 'Download code') : label('下载 SVG', 'Download SVG')}</span>
+            <span>{label('下载', 'Download')}</span>
           </button>
+          {downloadOpen ? (
+            <div className="diagram-menu" role="menu">
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadSvg() }}>{label('下载 SVG', 'SVG')}</button>
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadPng() }}>{label('下载 PNG', 'PNG')}</button>
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadCode() }}>{label('下载代码', 'Code')}</button>
+            </div>
+          ) : null}
           <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => setFull(true)}>
             <IconSvg><path d="M3 6.5V3.5H6M10 3.5h3V6.5M13 9.5v3h-3M6 12.5H3V9.5" /></IconSvg>
             <span>{label('全屏', 'Full screen')}</span>
