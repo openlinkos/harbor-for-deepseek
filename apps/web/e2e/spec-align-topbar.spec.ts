@@ -23,6 +23,7 @@ const unlock = async (page: Page) => {
 }
 
 test('greeting type and chat title follow the official top bar', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-11-23T15:00:00+08:00') })
   await page.setViewportSize({ width: 1440, height: 900 })
   await unlock(page)
   const greeting = page.locator('.greeting')

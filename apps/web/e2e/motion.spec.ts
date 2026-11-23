@@ -57,6 +57,7 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
   const nextReply = (text: string) => {
     reply = text
   }
+  await page.clock.install({ time: new Date('2026-11-23T08:00:00+08:00') })
   await page.goto('/')
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-input').fill('demo-local-key')
@@ -71,7 +72,7 @@ for (const point of points) {
     const mobile = point.layout === 'mobile'
     const { page } = await openAt(browser, point.width, point.height, mobile)
     try {
-      await expect(page.locator('.greeting')).toContainText('今天有什么可以帮到你？')
+      await expect(page.locator('.greeting')).toContainText('早上好，今天想做点什么？')
       const bar = await page.locator('.transcript').evaluate((node) => getComputedStyle(node).scrollbarWidth)
       expect(bar).toBe('none')
       const max = await page.locator('.transcript').evaluate((node) => getComputedStyle(node).maxWidth)

@@ -2458,13 +2458,21 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
 
 const Empty = () => {
   const t = useT()
+  const locale = useHarbor((state) => state.settings.locale)
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
   // Official home-with-history text: 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
   const wide = typeof window !== 'undefined' && window.matchMedia('(min-width: 1600px)').matches
   // Official home-with-history text, by the capture for that viewport:
   // 1920 dark 「你好，我能帮什么忙吗？」, 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
-  const line = t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
+  // SP-TB-318/319/320. Time of day and locale pick the fresh greeting. A fresh Chinese
+  // landing outside 05:00–12:00 keeps the catalog fallback. Returning Chinese lines stay the viewport set.
+  const hour = new Date().getHours()
+  const line = locale === 'en'
+    ? (narrow ? t('greetingBegin') : t('greetingMind'))
+    : !hasHistory && hour >= 5 && hour < 12
+      ? t('greetingMorning')
+      : t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
   return (
     <div className="home">
       <h2 className="greeting"><Mark /><span>{line}</span></h2>
