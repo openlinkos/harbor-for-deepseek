@@ -797,7 +797,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
     <div className="pill-menu">
       <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
-        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" data-testid={testId ? `${testId}-menu` : undefined} style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, maxWidth: 'calc(100vw - 16px)', overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
+        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" data-testid={testId ? `${testId}-menu` : undefined} style={{ top: box.top, right: box.right, maxHeight: Math.min(box.maxHeight, 28 * 8.5), maxWidth: 'min(280px, calc(100vw - 16px))', overflowY: 'auto' }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
