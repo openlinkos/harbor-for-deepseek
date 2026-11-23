@@ -61,7 +61,7 @@ test('sidebar chrome follows the official list, new-chat, and group label', asyn
   await expect(fresh).toHaveCSS('font-weight', '500')
   await expect(fresh).toHaveCSS('color', 'rgb(15, 17, 21)')
   const label = page.locator('.group-label').first()
-  await expect(label).toHaveCSS('position', 'sticky')
+  await expect(label).toHaveCSS('position', 'relative')
   await expect(label).toHaveCSS('font-size', '12px')
   await expect(label).toHaveCSS('line-height', '18px')
   await expect(label).toHaveCSS('font-weight', '500')

@@ -413,9 +413,8 @@ body[data-ds-dark-theme] .side-scroll-wrap::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 20;
+  /* SP-SB-297. Official history group row is position: relative. */
+  position: relative;
   user-select: none;
 }
 .group-label .icon-btn {
