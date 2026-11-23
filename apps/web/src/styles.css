@@ -2507,7 +2507,8 @@ body[data-ds-dark-theme] .pill-menu > button, body[data-ds-dark-theme] .pill-men
 }
 .anchored-menu {
   position: fixed;
-  z-index: 30;
+  /* Portaled to document.body, so it has to sit above the dialog stack at 1024. Phone media raises it again to 1200. */
+  z-index: 1100;
   box-sizing: border-box;
   min-width: 124px;
   max-width: 280px;
