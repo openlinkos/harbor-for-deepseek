@@ -51,6 +51,7 @@ test('sidebar header, list, select bar, and collapsed pill match the inner piece
   await expect(empty).toHaveCSS('font-weight', '500')
   await expect(empty).toHaveCSS('color', 'rgb(129, 133, 140)')
   await expect(page.locator('.side-scroll')).toHaveCSS('margin-top', '24px')
+  await expect(page.locator('.side-scroll')).toHaveCSS('overflow-x', 'auto')
   await expect(page.locator('.side-scroll')).toHaveCSS('overflow-y', 'auto')
   const avatar = page.locator('.user-bar .avatar')
   await expect(avatar).toHaveCSS('width', '32px')
