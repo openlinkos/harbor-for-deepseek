@@ -580,7 +580,12 @@ const components = {
   'math-inline': MathInline,
   'math-block': MathBlock,
   li({ children }: { children?: ReactNode }) {
-    const task = Children.toArray(children).some((node) => isValidElement(node) && node.type === 'input')
+    // SP-MD-098. remark-gfm hands the li a checkbox component, not a host input, so type === 'input' never matches.
+    const task = Children.toArray(children).some((node) => {
+      if (!isValidElement(node)) return false
+      const props = node.props as { type?: string }
+      return node.type === 'input' || props.type === 'checkbox'
+    })
     return <li className={task ? 'ds-markdown-task-list-item' : undefined}>{itemBlocks(children)}</li>
   },
   input({ type, checked, disabled }: { type?: string; checked?: boolean; disabled?: boolean }) {
