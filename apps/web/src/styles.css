@@ -2595,7 +2595,8 @@ body[data-ds-dark-theme] .settings-line .pill-menu > button:hover {
 .settings-main button.switch.on:not(.ds-button),
 .switch.on { background: #3964fe; }
 body[data-ds-dark-theme] .settings-main button.switch:not(.on) { background: var(--dsw-alias-label-caption); }
-body[data-ds-dark-theme] .settings-main button.switch.on { background: rgb(57, 100, 254); }
+/* SP-SET-390 / SP-SET-418 / SP-SET-444. Dark checked switch is #5686fe, not the light brand. */
+body[data-ds-dark-theme] .settings-main button.switch.on { background: #5686fe; }
 .switch.on .knob { left: 19px; }
 .settings-main button.danger.outline,
 .settings-line button.danger {

@@ -751,5 +751,5 @@ test('a dark settings switch stays brand blue when on', async ({ page }) => {
   await page.getByTestId('settings-open').click()
   await page.getByTestId('toggle-read').click()
   await page.getByRole('button', { name: '深色' }).click()
-  await expect(page.getByTestId('toggle-read')).toHaveCSS('background-color', 'rgb(57, 100, 254)')
+  await expect(page.getByTestId('toggle-read')).toHaveCSS('background-color', 'rgb(86, 134, 254)')
 })
