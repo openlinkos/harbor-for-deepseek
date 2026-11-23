@@ -587,8 +587,21 @@ type ShareModeValue = {
   on: boolean
   groupOf: (messageId: string) => string | null
   selected: ReadonlySet<string>
+  /** SP-SHARE-006. OK (complete) and INCOMPLETE (aborted) can be selected. Error, refused, and streaming cannot. */
+  locked: (messageId: string) => boolean
   toggle: (groupId: string) => void
+  reject: (messageId: string) => void
   enter: (messageId: string) => void
+}
+
+const shareableStatus = (status: Message['status']) => status === 'complete' || status === 'aborted'
+
+const selectableGroupIds = (groups: TurnGroup[], rows: Message[]) => {
+  const byId = new Map(rows.map((message) => [message.id, message]))
+  return groups.filter((group) => group.messageIds.every((id) => {
+    const message = byId.get(id)
+    return Boolean(message && shareableStatus(message.status))
+  })).map((group) => group.id)
 }
 
 const ShareMode = createContext<ShareModeValue | null>(null)
@@ -1251,7 +1264,8 @@ const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
   const groupId = share?.groupOf(message.id) ?? null
-  const picked = Boolean(groupId && share?.selected.has(groupId))
+  const locked = Boolean(share?.on && share.locked(message.id))
+  const picked = Boolean(groupId && share?.selected.has(groupId) && !locked)
   const messages = useHarbor((state) => state.messages)
   const sources = useContext(SourcesPanel)
   const selectSibling = useHarbor((state) => state.selectSibling)
@@ -1294,8 +1308,8 @@ const MessageRow = ({ message }: { message: Message }) => {
     }
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${isFirstUser ? 'is-first' : ''} ${isLastUser ? 'is-last-user' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (share?.on && groupId) share.toggle(groupId) }}>
-      <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${isFirstUser ? 'is-first' : ''} ${isLastUser ? 'is-last-user' : ''} ${share?.on ? 'share-on' : ''} ${locked ? 'share-locked' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (!share?.on || !groupId) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }}>
+      <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on || locked} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (!groupId || !share) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }} />
       <div className="share-halo" aria-hidden="true" />
       {message.role === 'user' && fileBlocks.length ? (
         <div className="message-files" data-testid="message-files">
@@ -1450,6 +1464,7 @@ export const Shell = () => {
   const [sharePrimed, setSharePrimed] = useState(false)
   const [shareSoon, setShareSoon] = useState(false)
   const [shareAll, setShareAll] = useState(true)
+  const [shareToast, setShareToast] = useState<null | 'shareSelectBlocked' | 'shareSelectLater'>(null)
   const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 799px)').matches)
   const sharing = shareIds !== null
   useEffect(() => {
@@ -1479,7 +1494,7 @@ export const Shell = () => {
       void state.openChat(id)
       return
     }
-    setShareIds(turns.map((group) => group.id))
+    setShareIds(selectableGroupIds(turns, path))
     setSharePrimed(true)
   }
   const enterGroup = (messageId: string) => {
@@ -1499,9 +1514,11 @@ export const Shell = () => {
       setSharePrimed(true)
       return
     }
-    setShareIds(shareAll ? turns.map((group) => group.id) : [turns[turns.length - 1].id])
+    const selectable = selectableGroupIds(turns, path)
+    const lastId = turns[turns.length - 1]?.id
+    setShareIds(shareAll ? selectable : selectable.filter((id) => id === lastId))
     setSharePrimed(true)
-  }, [shareConv, sharePrimed, shareAll, conversation?.id, turns])
+  }, [shareConv, sharePrimed, shareAll, conversation?.id, turns, path])
   const shareConvRef = useRef(shareConv)
   useEffect(() => {
     const previous = shareConvRef.current
@@ -1510,18 +1527,31 @@ export const Shell = () => {
     if (shareConv === previous && conversation?.id !== previous) exitShare()
   }, [sharing, shareConv, conversation?.id])
   // SP-SHARE-147. Escape stays in select mode. Cancel is the exit.
+  const selectableIds = selectableGroupIds(turns, path)
   const shareValue: ShareModeValue = {
     on: sharing,
     groupOf: (messageId) => turns.find((group) => group.messageIds.includes(messageId))?.id ?? null,
     selected: new Set(shareIds ?? []),
+    locked: (messageId) => {
+      const group = turns.find((item) => item.messageIds.includes(messageId))
+      return !group || !selectableIds.includes(group.id)
+    },
     toggle: (groupId) => setShareIds((current) => {
+      if (!selectableIds.includes(groupId)) return current ?? []
       const ids = current ?? []
       return ids.includes(groupId) ? ids.filter((item) => item !== groupId) : [...ids, groupId]
     }),
+    reject: (messageId) => {
+      const group = turns.find((item) => item.messageIds.includes(messageId))
+      if (!group) return
+      const byId = new Map(path.map((message) => [message.id, message]))
+      const refused = group.messageIds.some((id) => byId.get(id)?.status === 'refused')
+      setShareToast(refused ? 'shareSelectBlocked' : 'shareSelectLater')
+    },
     enter: (messageId) => enterGroup(messageId),
   }
-  const selectedCount = turns.filter((group) => (shareIds ?? []).includes(group.id)).length
-  const allTurns = turns.length > 0 && selectedCount === turns.length
+  const selectedCount = selectableIds.filter((id) => (shareIds ?? []).includes(id)).length
+  const allTurns = selectableIds.length > 0 && selectedCount === selectableIds.length
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const [shareNarrow, setShareNarrow] = useState(false)
@@ -2270,12 +2300,12 @@ export const Shell = () => {
                       data-testid="share-all"
                       type="checkbox"
                       checked={allTurns}
-                      onChange={() => setShareIds(allTurns ? [] : turns.map((group) => group.id))}
+                      onChange={() => setShareIds(allTurns ? [] : selectableIds)}
                     />
                     <span>{t('shareSelectAll')}</span>
                   </label>
                   <span className="share-split" aria-hidden="true" />
-                  <span className="share-count" data-testid="share-count">{t('shareSelected', { count: selectedCount })}</span>
+                  <span className="share-count" data-testid="share-count">{path.length === 0 ? t('shareNone') : t('shareSelected', { count: selectedCount })}</span>
                   <span className="share-gap" />
                   <DsButton data-testid="share-cancel" onClick={exitShare}>{t('cancel')}</DsButton>
                   <DsButton data-testid="share-create" variant="primary" disabled={selectedCount === 0} onClick={() => setShareSoon(true)}>
@@ -2336,6 +2366,14 @@ export const Shell = () => {
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
       {state.statusToast ? <StatusToast code={state.statusToast} /> : null}
+      {shareToast ? (
+        <div className="toast-layer">
+          <p className="toast" role="status" data-testid="share-select-toast">
+            {t(shareToast)}
+            <button type="button" onClick={() => setShareToast(null)}>{t('close')}</button>
+          </p>
+        </div>
+      ) : null}
       {shareSoon ? (
         <div className="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="share-soon-title" data-testid="share-soon" onClick={exitShare}>
           <div className="share-soon-card" onClick={(event) => event.stopPropagation()}>

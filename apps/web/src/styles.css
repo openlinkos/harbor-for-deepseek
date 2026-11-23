@@ -4049,6 +4049,11 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   content-visibility: visible;
   margin-bottom: 55px;
 }
+/* SP-SHARE-031 / SP-SHARE-101 / SP-CV-108 / SP-CV-109. Error, refused, and streaming turns are not selectable. */
+.turn.share-on.share-locked {
+  opacity: 0.4;
+  cursor: default;
+}
 .turn.share-on > .share-box {
   position: absolute;
   left: -41px;
