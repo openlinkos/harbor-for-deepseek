@@ -65,9 +65,10 @@ const near = (actual: number, expected: number, tol: number) => {
 const pillMetrics = (page: Page) => page.getByTestId('search-results').last().evaluate((pill) => {
   const box = pill.getBoundingClientRect()
   const style = getComputedStyle(pill)
-  const textNode = [...pill.childNodes].find((node) => node.nodeType === Node.TEXT_NODE && (node.textContent || '').trim())
+  // SP-CITE-041. The label is .sources-pill-text, not a direct text node of the pill.
+  const textHost = pill.querySelector('.sources-pill-text')
   const range = document.createRange()
-  range.selectNodeContents(textNode!)
+  range.selectNodeContents(textHost!)
   const text = range.getBoundingClientRect()
   const icons = [...pill.querySelectorAll('.favicons > *')].map((icon) => {
     const rect = icon.getBoundingClientRect()
