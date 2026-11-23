@@ -3856,7 +3856,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .modal { align-items: end; padding: 0; background: rgba(15, 17, 21, 0.45); }
+  .modal { align-items: end; padding: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
   /* The shell is one auto row. Pack that row to the end so the sheet sits on the bottom edge. */
   .modal.settings-modal { display: grid; align-items: flex-end; align-content: flex-end; justify-items: stretch; padding: 0; background: rgba(0, 0, 0, 0.36); }
   body[data-ds-dark-theme] .modal.settings-modal { background: rgba(0, 0, 0, 0.62); }
