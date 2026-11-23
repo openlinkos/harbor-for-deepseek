@@ -357,7 +357,7 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   display: flex;
   align-items: center;
   gap: 0;
-  width: 660px;
+  width: min(660px, calc(100vw - 24px));
   height: 60px;
   padding: 0;
   border: 0;
@@ -416,8 +416,8 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   box-sizing: border-box;
   align-items: stretch;
   flex-direction: column;
-  height: min(72vh, calc(100vh - 24px));
-  max-height: min(72vh, calc(100vh - 24px));
+  height: 72vh;
+  max-height: calc(var(--app-height, 100vh) - 24px);
   padding-top: 60px;
   overflow: hidden;
 }
@@ -521,7 +521,7 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
     left: 0;
     width: 100vw;
     max-width: none;
-    height: 100dvh;
+    height: 100vh;
     max-height: none;
     margin: auto;
     transform: none;
@@ -542,7 +542,7 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 100%;
     max-height: none;
     transform: none;
     border-radius: 0;
@@ -643,7 +643,7 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   box-sizing: border-box;
   user-select: none;
 }
-.item-menu [role='menuitem'] { display: flex; align-items: center; gap: 8px; width: 116px; height: 40px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; color: inherit; cursor: pointer; }
+.item-menu [role='menuitem'] { display: flex; align-items: center; gap: 8px; width: 116px; min-height: 24px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; color: inherit; cursor: pointer; }
 .item-menu [role='menuitem']:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .item-menu .danger:hover { background: var(--dsw-alias-interactive-bg-hover-danger); }
 .menu.item-menu button { height: 40px; padding: 8px 10px; line-height: 24px; font-weight: 400; }
@@ -1924,7 +1924,7 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 
 .scrim { display: none; }
 /* Search shell is z-index 10 (SP-SEARCH-067). A dialog has to sit above that panel. Menus stay at 30. */
-.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 1024; padding: 20px; }
+.modal { --dsl-modal-content-width: 525px; position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 1024; padding: 20px; color: var(--dsw-alias-label-primary); }
 .modal-card, .gate-card, .admin-card, .key-card {
   width: min(720px, 100%);
   max-height: min(88vh, 900px);
@@ -2188,12 +2188,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .form-error { color: var(--dsw-alias-state-error-primary); }
 /* SP-MOD-046..049, 497..502. Toast padding, line, and shadow follow the official toast. */
-.toast {
+.toast-layer {
   position: fixed;
+  z-index: 2000;
+  pointer-events: none;
   top: calc(40px + env(safe-area-inset-top));
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  left: calc(40px + env(safe-area-inset-left));
+  right: calc(40px + env(safe-area-inset-right));
+}
+.toast {
+  position: relative;
+  top: auto;
   bottom: auto;
-  left: 50%;
-  transform: translateX(-50%);
+  left: auto;
+  width: fit-content;
+  max-width: min(100%, 480px);
+  margin-right: auto;
+  margin-left: auto;
+  pointer-events: auto;
+  transform: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2234,9 +2248,9 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, 0.62); }
   width: min(760px, calc(100vw - 48px));
   height: 500px;
   max-height: min(500px, calc(100vh - 48px));
-  display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-content: stretch;
   background: #fff;
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
@@ -2244,16 +2258,16 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, 0.62); }
   box-shadow: rgba(0, 0, 0, 0) 0 0 0 1px inset, rgba(0, 0, 0, 0.2) 0 0 1px 0, rgba(0, 0, 0, 0.02) 0 0 4px 0, rgba(0, 0, 0, 0.08) 0 12px 32px 0;
 }
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
-.settings-head { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
+.settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
 .settings-head h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 24px; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
 .settings-x svg { width: 14px; height: 14px; }
-.settings-nav { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 10px 0 0; }
+.settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 10px 0 0; }
 .settings-nav button { display: flex; align-items: center; gap: 8px; width: 164px; height: 40px; margin-left: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
 .settings-nav button.on { background: rgba(38, 49, 72, 0.06); }
 body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
-.settings-main { grid-column: 2; grid-row: 2; overflow: auto; padding: 10px 24px 0; min-width: 0; }
+.settings-main { flex: 1 1 auto; overflow: auto; padding: 10px 24px 0; min-width: 0; height: calc(100% - 54px); }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
 .settings-main button:not(.chip):not(.ds-button) {
   height: 36px;
@@ -2553,15 +2567,14 @@ body[data-ds-dark-theme] .pill-menu > button, body[data-ds-dark-theme] .pill-men
   gap: 12px;
   box-sizing: border-box;
   width: 100%;
-  height: 40px;
-  min-height: 40px;
-  padding: 0 10px;
+  min-height: 24px;
+  padding: 8px 10px;
   border: 0;
   border-radius: 10px;
   background: transparent;
   color: var(--dsw-alias-label-primary);
   font-size: 14px;
-  line-height: 22px;
+  line-height: 24px;
   text-align: left;
   overflow: hidden;
   cursor: pointer;
@@ -2886,7 +2899,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
 .confirm-modal { z-index: 1024; }
 /* SP-MOD-010, 466, 468. Confirm card uses the modal surface, radius, and line height. */
 .confirm-card {
-  width: min(400px, calc(100vw - 32px));
+  /* SP-MOD-006 base token is 525px. SP-MOD-007 dialog width is 380px. */
+  --dsl-modal-content-width: 380px;
+  width: min(var(--dsl-modal-content-width), calc(100vw - 32px));
   background: var(--dsw-alias-bg-layer-2);
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
@@ -3084,12 +3099,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     border-radius: 24px 24px 0 0;
     align-self: flex-end;
     justify-self: stretch;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    flex-direction: column;
+    flex-wrap: nowrap;
   }
-  .settings-nav { grid-column: 1; grid-row: 2; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 0 8px; }
+  .settings-nav { flex: none; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 0 8px; }
   .settings-nav button { flex: none; width: auto; margin-left: 0; }
-  .settings-main { grid-column: 1; grid-row: 3; position: relative; z-index: 1; }
+  .settings-main { flex: 1 1 auto; height: auto; position: relative; z-index: 1; }
   .footnote { margin: 28px 0 calc(8px + env(safe-area-inset-bottom)); font-size: 11px; }
   .turn.user { flex-direction: column; align-items: flex-end; }
   .turn.assistant { display: flex; flex-direction: column; }

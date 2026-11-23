@@ -2767,7 +2767,7 @@ const Settings = () => {
                 }}
               />
             ) : null}
-            {deletedOk ? createPortal(<p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p>, document.body) : null}
+            {deletedOk ? createPortal(<div className="toast-layer"><p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p></div>, document.body) : null}
           </div>
         </section>
         <section className="settings-data">
@@ -2940,11 +2940,13 @@ const ImportToast = ({ notice }: { notice: string }) => {
   const dismiss = useHarbor((state) => state.dismissNotice)
   const [added, skipped] = notice.split(':')
   return (
+    <div className="toast-layer">
     <p className="toast" data-testid="import-toast" role="status">
       {t('imported', { added: added ?? '0', skipped: skipped ?? '0' })}
       <button type="button" onClick={dismiss}>
         {t('close')}
       </button>
     </p>
+    </div>
   )
 }
