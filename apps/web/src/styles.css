@@ -2545,7 +2545,26 @@ body[data-ds-dark-theme] .key-card { background: #2a2b2f; border-color: #3a3b40;
 .key-card h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
 .key-lead { margin: 0 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 1.6; }
 .key-field { position: relative; display: block; }
-.key-field input { width: 100%; padding-right: 44px; box-sizing: border-box; height: 44px; }
+.key-field input {
+  /* Official .ds-input--m. Extra right padding keeps the eye button off the text. */
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-placeholder-color: var(--dsw-alias-label-caption);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-padding: 0 10px;
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-line-height: var(--ds-line-height-m);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--dsl-input-height);
+  border-radius: var(--dsl-input-border-radius);
+  padding: 0 44px 0 10px;
+  font-size: var(--dsl-input-font-size);
+  line-height: var(--dsl-input-line-height);
+  color: var(--dsl-input-text-color);
+  caret-color: var(--dsl-input-caret-color);
+}
 .eye {
   position: absolute;
   right: 6px;
@@ -3202,6 +3221,15 @@ body[data-ds-dark-theme] .settings-main button.switch.on { background: #5686fe; 
 }
 .pill-menu { position: relative; }
 .pill-menu > button, .pill-menu > div { height: 32px; border: 0; border-radius: 999px; background: var(--dsw-static-neutral-bluish-75); color: inherit; padding: 0 12px 0 14px; }
+/* Language trigger is the settings select. Used radius stays 18px (SP-SET-659). */
+[data-testid='language-trigger'] {
+  --dsl-select-height: var(--ds-control-height-m);
+  --dsl-select-border-radius: 10px;
+  --dsl-select-padding: 0 28px 0 10px;
+  --dsl-select-font-size: var(--ds-font-size-m);
+  --dsl-select-line-height: var(--ds-line-height-m);
+  --dsl-select-text-color: var(--dsw-alias-label-primary);
+}
 body[data-ds-dark-theme] .pill-menu > button, body[data-ds-dark-theme] .pill-menu > div { background: var(--dsw-static-neutral-bluish-800); }
 .pill-menu > button::after {
   content: '';
