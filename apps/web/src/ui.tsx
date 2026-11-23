@@ -2764,8 +2764,8 @@ const Settings = () => {
                   setDeletedOk(true)
                 }}
               />
-              {deletedOk ? createPortal(<p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p>, document.body) : null}
             ) : null}
+            {deletedOk ? createPortal(<p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p>, document.body) : null}
           </div>
         </section>
         <section className="settings-data">
