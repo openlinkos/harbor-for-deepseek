@@ -3940,6 +3940,8 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 .turn.share-on .user-actions { display: none; }
 .turn.share-on { isolation: isolate; }
 .turn.share-on > :not(.share-box):not(.share-halo) { position: relative; z-index: 1; }
+/* SP-SHARE-149. Official ._7729a77 > * is pointer-events none so the message wrapper receives the click. */
+.turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }
 .share-halo {
   display: none;

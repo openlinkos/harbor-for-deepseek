@@ -411,7 +411,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(hit, `${id} center`).toBe(id)
       }
 
-      await boxes.nth(0).click()
+      await page.locator('.turn').first().click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-all')).toBeChecked()
@@ -432,7 +432,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await page.getByTestId('share-all').click()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-create')).toBeEnabled()
-      await boxes.nth(0).click()
+      await page.locator('.turn').first().click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
 
