@@ -60,7 +60,7 @@ a { color: var(--dsw-alias-brand-text); }
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 8;
+  z-index: 1;
   background: var(--dsw-specific-sidebar-fill);
   border-right: 1px solid var(--dsw-alias-border-l1);
   padding-top: env(safe-area-inset-top);
