@@ -3301,7 +3301,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   transition-delay: 0s;
   z-index: 5;
 }
-.ds-tooltip.ds-tooltip--s.is-above-composer { z-index: 9; }
+.ds-tooltip.ds-tooltip--s.is-above-composer { z-index: 11; }
 .ds-tooltip.ds-tooltip--s.is-open {
   opacity: 1;
   pointer-events: auto;
