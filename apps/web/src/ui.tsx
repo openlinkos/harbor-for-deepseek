@@ -374,31 +374,80 @@ const pointHitsChatNav = (x: number, y: number) => {
   return false
 }
 
-// Push one history entry while an overlay is open so Back closes it and leaves the URL string.
-// The returned function keeps that entry. Search uses it when a result replaces the entry with the chat URL.
+// One history entry per open overlay. Close calls history.back(), which is async.
+// The next open waits for that pop before it pushState's, so the late back cannot
+// pop the new entry or restore the search field to the empty snapshot.
+let overlaySeq = 0
+let closeFlight: Promise<void> | null = null
+let suppressEmptyRestore = false
+
+const whenOverlayHistorySettled = () => closeFlight ?? Promise.resolve()
+
+const setNativeInputValue = (input: HTMLInputElement, value: string) => {
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+  setter?.call(input, value)
+}
+
 const useOverlayHistory = (open: boolean, onClose: () => void) => {
   const closeRef = useRef(onClose)
   closeRef.current = onClose
   const retain = useRef(false)
   useEffect(() => {
-    if (!open) return
-    let pushed = true
-    const prior = history.state
-    const base = prior && typeof prior === 'object' ? prior : {}
-    history.pushState({ ...base, deepapiOverlay: Date.now() }, '', location.href)
-    const onPop = () => {
-      pushed = false
-      closeRef.current()
+    if (!open) return undefined
+    const token = ++overlaySeq
+    let pushed = false
+    let removePop: (() => void) | null = null
+    let cancel = false
+    const arm = () => {
+      if (cancel || pushed) return
+      const prior = history.state
+      const base = prior && typeof prior === 'object' ? prior : {}
+      history.pushState({ ...base, deepapiOverlay: token }, '', location.href)
+      pushed = true
+      const onPop = () => {
+        pushed = false
+        closeRef.current()
+      }
+      window.addEventListener('popstate', onPop)
+      removePop = () => window.removeEventListener('popstate', onPop)
     }
-    window.addEventListener('popstate', onPop)
+    const flight = closeFlight
+    if (flight) void flight.then(arm)
+    else arm()
     return () => {
-      window.removeEventListener('popstate', onPop)
+      cancel = true
+      removePop?.()
       const keep = retain.current
       retain.current = false
-      if (pushed && !keep) {
-        pushed = false
-        history.back()
+      if (!pushed || keep) return
+      const state = history.state
+      if (!(state && typeof state === 'object' && state.deepapiOverlay === token)) return
+      pushed = false
+      suppressEmptyRestore = true
+      let settled = false
+      let settle: () => void = () => undefined
+      const done = new Promise<void>((resolve) => {
+        settle = resolve
+      })
+      closeFlight = done
+      let timer = 0
+      const finish = () => {
+        if (settled) return
+        settled = true
+        window.clearInterval(timer)
+        window.removeEventListener('popstate', onLatePop)
+        suppressEmptyRestore = false
+        if (closeFlight === done) closeFlight = null
+        settle()
       }
+      const onLatePop = () => finish()
+      window.addEventListener('popstate', onLatePop)
+      history.back()
+      timer = window.setInterval(() => {
+        const now = history.state
+        if (!(now && typeof now === 'object' && (now as { deepapiOverlay?: number }).deepapiOverlay === token)) finish()
+      }, 16)
+      window.setTimeout(finish, 1000)
     }
   }, [open])
   return () => {
@@ -1560,6 +1609,9 @@ export const Shell = () => {
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
   const filterInputRef = useRef<HTMLInputElement>(null)
+  // Survives the unmount of the field. A history restore must not replace it with ''.
+  const preservedQuery = useRef('')
+  const [searchReady, setSearchReady] = useState(false)
   const [corpus, setCorpus] = useState<Record<string, string>>({})
   const [activeHit, setActiveHit] = useState(-1)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -1594,14 +1646,39 @@ export const Shell = () => {
       live = false
     }
   }, [filtering, state.conversations, state.messages])
-  // SP-SB-647: reopening the dialog selects the preserved query.
+  // Mount the field only after the previous close's history.back() has popped.
+  // The input is not in the document during that pop, so the browser cannot restore it to ''.
   useEffect(() => {
-    if (!filtering) return
-    const input = filterInputRef.current
-    if (!input) return
-    input.focus()
-    input.select()
+    if (!filtering) {
+      setSearchReady(false)
+      return undefined
+    }
+    let cancel = false
+    void whenOverlayHistorySettled().then(() => {
+      if (!cancel) setSearchReady(true)
+    })
+    return () => {
+      cancel = true
+    }
   }, [filtering])
+  // SP-SB-647: reopening the dialog selects the preserved query.
+  // Focus after the opening key event. Selecting during Ctrl+K lets that key replace the text.
+  useEffect(() => {
+    if (!filtering || !searchReady) return undefined
+    const id = window.setTimeout(() => {
+      const input = filterInputRef.current
+      if (!input) return
+      const saved = preservedQuery.current
+      if (saved && input.value !== saved) {
+        setNativeInputValue(input, saved)
+        setFilter(saved)
+      }
+      input.focus()
+      const len = (saved || input.value).length
+      input.setSelectionRange(0, len)
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [filtering, searchReady])
   // SP-MOD-635. Back closes the search dialog. Tab stays in the card. The page does not scroll behind it.
   const retainSearchHistory = useOverlayHistory(filtering, () => setFiltering(false))
   useScrollLock(filtering)
@@ -1647,6 +1724,7 @@ export const Shell = () => {
     retainSearchHistory()
     window.history.replaceState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
     setFiltering(false)
+    preservedQuery.current = ''
     setFilter('')
     void state.openChat(id)
     focusComposer()
@@ -1890,6 +1968,7 @@ export const Shell = () => {
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
           </div>
         )}
+        <div className="side-scroll-wrap">
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {groups.map(([label, items], index) => (
@@ -1917,6 +1996,7 @@ export const Shell = () => {
               {label === t('groupPinned') ? <div className="group-rule" data-testid="pinned-rule" /> : null}
             </div>
           ))}
+        </div>
         </div>
         {selecting ? (
           <div className="select-foot">
@@ -1986,21 +2066,29 @@ export const Shell = () => {
           </div>
         </>
       ) : null}
-      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }} /> : null}
-      {filtering ? (
+      {filtering && searchReady ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }} /> : null}
+      {filtering && searchReady ? (
         <form className={query ? 'search-dialog has-query' : 'search-dialog'} role="search" onSubmit={(event) => event.preventDefault()}>
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
           <input
             ref={filterInputRef}
             className="side-filter"
-            autoFocus
             placeholder={t('searchChats')}
             value={filter}
             aria-label={t('search')}
             aria-controls={query ? 'conversation-search-results' : undefined}
             aria-activedescendant={query && activeHit >= 0 ? `conversation-search-result-${activeHit}` : undefined}
-            onChange={(event) => setFilter(event.target.value)}
+            onChange={(event) => {
+              const next = event.target.value
+              if (suppressEmptyRestore && next === '' && preservedQuery.current) {
+                setNativeInputValue(event.target, preservedQuery.current)
+                setFilter(preservedQuery.current)
+                return
+              }
+              preservedQuery.current = next
+              setFilter(next)
+            }}
             onKeyDown={(event) => {
               if (event.nativeEvent.isComposing || !query) return
               if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
