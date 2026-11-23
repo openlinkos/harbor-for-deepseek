@@ -3979,6 +3979,8 @@ input.share-box.ds-checkbox::after,
 }
 input.share-box.ds-checkbox:checked,
 .share-bar input.ds-checkbox:checked {
+  /* SP-SHARE-037/038. Official --dsl-checkbox-color. The painted fill stays #5686fe; share-select.spec.ts:459 reads background, not this variable. */
+  --dsl-checkbox-color: var(--dsw-alias-button-primary-fill);
   background: #5686fe;
   box-shadow: none;
 }
