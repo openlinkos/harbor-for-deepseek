@@ -121,7 +121,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
   })
 }
 
-// 一行收成一组。组内相邻角标间距 4px：每个 .cite 的水平 margin 是 2px，组内不再被 .cite + .cite 清掉左间距。
+// 一行收成一组。组内相邻角标间距 2px：每个 .cite 的水平 margin 是 2px，.cite + .cite 把左间距清掉（SP-CITE-113）。
 const cite = (url: string) => ({ type: 'web_search_result_location', url, title: 't', cited_text: '', encrypted_index: '' })
 const groupEvents = () => {
   const results = [1, 2].map((n) => ({ type: 'web_search_result', title: `来源${n}`, url: `https://site${n}.example/g`, snippet: 's', site_name: `站${n}`, site_icon: null, page_age: null, encrypted_content: 'x' }))
@@ -246,7 +246,7 @@ test.describe('fb1554 citation group', () => {
     expect(info.finished).toBe(true)
     expect(sentences?.marginLeft).toBe('2px')
     expect(sentences?.marginRight).toBe('2px')
-    expect(Math.abs((sentences?.inner ?? 99) - 4)).toBeLessThanOrEqual(0.5)
+    expect(Math.abs((sentences?.inner ?? 99) - 2)).toBeLessThanOrEqual(0.5)
     expect(Math.abs((sentences?.firstGap ?? 99) - OFF.cells.light.cite.firstGapPx)).toBeLessThanOrEqual(0.5)
   })
 

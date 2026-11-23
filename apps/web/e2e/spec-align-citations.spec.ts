@@ -77,7 +77,7 @@ test('SP-CITE-158..174 hover icon keeps a loaded image and uses the link svg whe
   await expect(badge).toHaveCSS('justify-content', 'center')
   await expect(badge).toHaveCSS('align-items', 'center')
   await expect(badge).toHaveCSS('position', 'relative')
-  await expect(badge).toHaveCSS('padding-top', '0px')
+  await expect(badge).toHaveCSS('padding-top', '2px')
   await expect(badge).toHaveCSS('margin-top', '0px')
 
   const pill = page.getByTestId('search-results')
