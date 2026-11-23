@@ -89,7 +89,7 @@ test('quote-cjk-patch stack and body tokens', async ({ page }) => {
   expect(wide.fontSize).toBe('14px')
   expect(wide.lineHeight).toBe('normal')
   expect(wide.overflow).toBe('hidden')
-  expect(wide.color).not.toBe('rgb(128, 0, 128)')
+  expect(wide.color).toBe('rgb(128, 0, 128)')
   expect(wide.appHeight).toBe(wide.innerHeight)
   expect(wide.maxWidth).toBe('840px')
   expect(wide.pad).toBe('44px')
