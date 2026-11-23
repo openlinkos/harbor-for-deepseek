@@ -1007,7 +1007,9 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content.ds-markdown h5 + ul,
 .ds-think-content.ds-markdown h5 + ol,
 .ds-think-content.ds-markdown h6 + ul,
-.ds-think-content.ds-markdown h6 + ol { margin-top: 4px; }
+.ds-think-content.ds-markdown h6 + ol,
+.ds-think-content.ds-markdown p + ul,
+.ds-think-content.ds-markdown p + ol { margin-top: 4px; }
 .ds-think-content.ds-markdown h3:has(+ ul),
 .ds-think-content.ds-markdown h3:has(+ ol),
 .ds-think-content.ds-markdown h4:has(+ ul),
@@ -1015,7 +1017,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content.ds-markdown h5:has(+ ul),
 .ds-think-content.ds-markdown h5:has(+ ol),
 .ds-think-content.ds-markdown h6:has(+ ul),
-.ds-think-content.ds-markdown h6:has(+ ol) { margin-bottom: 4px; }
+.ds-think-content.ds-markdown h6:has(+ ol),
+.ds-think-content.ds-markdown p:has(+ ol) { margin-bottom: 4px; }
 .ds-think-content.ds-markdown li > :first-child { margin-top: 0; }
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
@@ -1060,6 +1063,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
 .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: -18px; color: var(--dsw-alias-label-secondary); }
 .markdown-table-wrapper { overflow-x: auto; max-width: 100%; }
+/* SP-MD-1051. A table with a fourth column is inline-block so it can grow past the column. */
+.markdown-table-wrapper:has(th:nth-child(4), td:nth-child(4)) table { display: inline-block; }
 .ds-think-content.ds-markdown, .ds-think-content .ds-markdown { font: var(--dsw-font-markdown-small); color: var(--dsw-alias-label-secondary); }
 /* Answer text stays on the pre-Inter stack. Inter on this line shifts the cite badge 1px vs the preceding glyph. Body keeps Inter. */
 .prose,
