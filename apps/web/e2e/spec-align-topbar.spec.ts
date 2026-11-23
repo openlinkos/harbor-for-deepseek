@@ -33,7 +33,8 @@ test('greeting type and chat title follow the official top bar', async ({ page }
   await expect(greeting).toHaveCSS('line-height', '32px')
   await expect(greeting).toHaveCSS('color', 'rgb(15, 17, 21)')
   await page.evaluate(() => document.body.setAttribute('data-ds-dark-theme', ''))
-  await expect(greeting).toHaveCSS('color', 'rgb(255, 255, 255)')
+  // SP-TB-249. Dark greeting text is label-primary, rgb(249, 250, 251).
+  await expect(greeting).toHaveCSS('color', 'rgb(249, 250, 251)')
   await page.evaluate(() => document.body.removeAttribute('data-ds-dark-theme'))
 
   await page.setViewportSize({ width: 390, height: 844 })

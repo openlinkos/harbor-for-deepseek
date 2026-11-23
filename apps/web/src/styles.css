@@ -2041,9 +2041,8 @@ body.rtl .sources-pill-text { margin-left: 0; margin-right: 6px; }
   font-weight: 600;
   line-height: 32px;
 }
-/* SP-TB-290 / SP-TB-291. The mark is brand. SP-TB-301. Dark greeting text is #fff. */
+/* SP-TB-290 / SP-TB-291. The mark is brand. SP-TB-249. Dark greeting text is label-primary (#f9fafb), not the wrapper's #fff. */
 .greeting .mark { color: var(--dsw-alias-brand-primary); }
-body[data-ds-dark-theme] .greeting { color: #fff; }
 .composer-wrap { width: min(840px, calc(100% - 88px)); max-width: 840px; margin: 0 auto calc(8px + var(--keyboard-inset, 0px)); padding-bottom: env(safe-area-inset-bottom); }
 .stage:not(:has(.home)) { overflow: hidden; min-height: 0; }
 .stage:not(:has(.home)) .transcript.chat-scroll {
