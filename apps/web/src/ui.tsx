@@ -2000,7 +2000,7 @@ export const Shell = () => {
     })
   }, [state.conversations, filter, filtering, t])
   const serverName = state.serverUser?.username
-  const who = serverName || profile.nickname || t('product')
+  const who = serverName || profile.nickname || t('profileLabel')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
   const sourcesApi = useMemo<SourcesApi>(() => ({
