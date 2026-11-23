@@ -2625,7 +2625,20 @@ const Composer = () => {
   const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
   const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
   const canSend = !filesBlocking && (trimmed.length > 0 || hasFile)
+  const sendTip = drafts.some((file) => file.error) ? t('removeBadFiles') : !trimmed && !hasFile ? t('emptyQuestion') : text.length > 100_000 ? t('overCharLimit') : ''
   const submit = () => {
+    if (!trimmed && !hasFile) {
+      useHarbor.setState({ statusToast: 'emptyQuestion' })
+      return
+    }
+    if (text.length > 100_000) {
+      useHarbor.setState({ statusToast: 'overCharLimit' })
+      return
+    }
+    if (drafts.some((file) => file.error)) {
+      useHarbor.setState({ statusToast: 'removeBadFiles' })
+      return
+    }
     if (!canSend) return
     const value = text
     setText('')
@@ -2696,12 +2709,16 @@ const Composer = () => {
                 bytes={file.bytes}
                 status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
                 error={file.error}
+                pasteText={file.pasteText}
+                onPasteBack={file.pasteText ? () => { setText(file.pasteText ?? ''); removeDraft(file.localId) } : undefined}
                 onRemove={() => removeDraft(file.localId)}
               />
             )
           ))}
         </div>
       ) : null}
+      <div className="composer-field ds-textarea">
+      <div className="composer-mirror ds-textarea__mirror" aria-hidden="true">{text ? `${text}\n` : ''}</div>
       <textarea
         ref={box}
         data-testid="composer"
@@ -2709,6 +2726,20 @@ const Composer = () => {
         placeholder={t('composerPlaceholder')}
         value={text}
         onChange={(event) => setText(event.target.value)}
+        onPaste={(event) => {
+          const data = event.clipboardData.getData('text/plain')
+          if (data.length > 100_000) {
+            event.preventDefault()
+            useHarbor.setState({ statusToast: 'pasteTooLong' })
+            return
+          }
+          if (data.length >= 8_000) {
+            event.preventDefault()
+            const file = new File([data], `${t('pastedText')}.txt`, { type: 'text/plain' })
+            Object.assign(file, { pasteText: data })
+            void addFiles([file])
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
@@ -2728,6 +2759,7 @@ const Composer = () => {
           })
         }}
       />
+      </div>
       <div className="composer-tools">
         <div className="chips" ref={chips}>
           <span className="chip-wrap">
@@ -2738,23 +2770,16 @@ const Composer = () => {
               </button>
             </HoverTip>
           </span>
-          {hasFile ? (
-            <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
+          <HoverTip text={hasFile ? t('searchNeedsNoFiles') : t('searchTip')}>
+            <button type="button" data-testid="toggle-search" className={`ds-toggle-button ${prefs.search ? 'chip on' : 'chip'}`} aria-pressed={prefs.search} aria-disabled={hasFile} onClick={() => { if (hasFile) return; void setPrefs({ search: !prefs.search }) }}>
               <Glyph name="search" size={14} />
               <span className="chip-label">{t('search')}</span>
             </button>
-          ) : (
-            <HoverTip text={t('searchTip')}>
-              <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
-                <Glyph name="search" size={14} />
-                <span className="chip-label">{t('search')}</span>
-              </button>
-            </HoverTip>
-          )}
+          </HoverTip>
         </div>
         <div className="tool-right">
-          <HoverTip text={t('attachTip')}>
-            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
+          <HoverTip text={prefs.search ? t('filesNeedNoSearch') : t('attachTip')}>
+            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => { if (prefs.search) return; fileRef.current?.click() }}>
               <Glyph name="attach" size={16} />
             </button>
           </HoverTip>
@@ -2774,7 +2799,7 @@ const Composer = () => {
               </button>
             )
           ) : (
-            <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
+            <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} title={sendTip || undefined} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
           )}
         </div>
       </div>

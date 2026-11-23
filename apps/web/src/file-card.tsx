@@ -106,38 +106,47 @@ export const FileCard = ({
   status = 'done',
   error,
   onRemove,
+  pasteText,
+  onPasteBack,
 }: {
   name: string
   bytes: number
   status?: 'uploading' | 'done' | 'error'
   error?: string
   onRemove?: () => void
+  pasteText?: string
+  onPasteBack?: () => void
 }) => {
   const locale = useHarbor((state) => state.settings.locale)
   const t = (key: Parameters<typeof translate>[1]) => translate(locale, key)
   const ext = fileExtension(name)
   const failed = status === 'error'
+  const errorKey = error === 'parse' || error === 'upload' ? 'parseFailed' : error === 'tooLong' ? 'fileContentTooLong' : error === 'noText' ? 'noTextExtracted' : error === 'policy' ? 'policyViolation' : ''
   const meta =
     status === 'uploading'
       ? t('uploadFileStatusUploading')
       : failed
-        ? error && error !== 'upload'
-          ? error
-          : t('uploadFileStatusFailed')
+        ? errorKey
+          ? t(errorKey)
+          : error || t('parseFailed')
         : fileMetaText(name, bytes)
+  const label = pasteText ? t('pastedText') : name
   return (
     <div
       className={`file-card${onRemove ? ' is-editable' : ''}${failed ? ' is-failed' : ''}`}
       data-testid="file-card"
       data-status={status}
-      title={name}
+      title={label}
     >
       <div className="file-card-icon">
         {status === 'uploading' ? <span className="file-card-spinner" data-testid="file-card-spinner" /> : <FileTypeIcon ext={ext} />}
       </div>
       <div className="file-card-body">
-        <div className="file-card-name">{name}</div>
+        <div className="file-card-name">{label}</div>
         <div className="file-card-meta" data-testid="file-card-meta">{meta}</div>
+        {pasteText && onPasteBack ? (
+          <button type="button" className="file-card-paste" onClick={(event) => { event.stopPropagation(); onPasteBack() }}>{t('pasteIntoInput')}</button>
+        ) : null}
       </div>
       {onRemove ? (
         <button

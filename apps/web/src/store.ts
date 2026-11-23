@@ -186,6 +186,8 @@ export type DraftFile = {
   expiresAt: number | null
   busy: boolean
   error?: string
+  /** Original text when this draft came from a long paste. */
+  pasteText?: string
   /** Object URL for an image draft. Kept in imagePreviews after upload so the sent card can still show it. */
   previewUrl?: string
 }
@@ -199,6 +201,11 @@ export type StatusToastCode =
   | 'networkToasts'
   | 'alreadyLatest'
   | 'dropUnsupported'
+  | 'emptyQuestion'
+  | 'filesNeedNoSearch'
+  | 'pasteTooLong'
+  | 'overCharLimit'
+  | 'removeBadFiles'
 
 const imagePreviews = new Map<string, string>()
 export const imagePreview = (fileId?: string) => (fileId ? imagePreviews.get(fileId) : undefined)
@@ -213,6 +220,16 @@ const supportedUpload = (file: File) =>
   || file.type === 'application/pdf'
   || file.type === 'application/json'
   || SUPPORTED_UPLOAD.test(file.name)
+
+const FILE_TOO_LONG = 20 * 1024 * 1024
+const pasteTextOf = (file: File) => (file as File & { pasteText?: string }).pasteText
+const fileErrorCode = (error: unknown): 'parse' | 'policy' | 'tooLong' | 'noText' => {
+  const message = error instanceof Error ? error.message : String(error ?? '')
+  if (/规范|policy|content.filter|unsafe/i.test(message)) return 'policy'
+  if (/过长|too long|context length/i.test(message)) return 'tooLong'
+  if (/未提取|no text/i.test(message)) return 'noText'
+  return 'parse'
+}
 
 type Prefs = Pick<Conversation, 'thinking' | 'search' | 'readLink'>
 
@@ -831,9 +848,18 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     if (!trimmed && drafts.every((file) => !file.fileId)) {
+      set({ statusToast: 'emptyQuestion' })
       return
     }
-    if (drafts.some((file) => file.busy || file.error || !file.fileId)) {
+    if (trimmed.length > 100_000) {
+      set({ statusToast: 'overCharLimit' })
+      return
+    }
+    if (drafts.some((file) => file.error)) {
+      set({ statusToast: 'removeBadFiles' })
+      return
+    }
+    if (drafts.some((file) => file.busy || !file.fileId)) {
       return
     }
     await runTurn(trimmed)
@@ -935,6 +961,10 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async addFiles(files) {
+    if (get().prefs.search) {
+      set({ statusToast: 'filesNeedNoSearch' })
+      return
+    }
     // SP-CMP-280. Unsupported drops toast and are not added. PDF, Office, images, text, and code stay.
     const incoming = files.filter((file) => supportedUpload(file))
     if (incoming.length !== files.length) set({ statusToast: 'dropUnsupported' })
@@ -949,13 +979,22 @@ export const useHarbor = create<HarborState>((set, get) => ({
       const key = draftKey(owner)
       fileDrafts.set(key, mutate(snapshotFiles(fileDrafts.get(key) ?? [])))
     }
+    const staged = (file: File, localId: string, mapped: ReturnType<typeof purposeForFile>, previewUrl: string | undefined) => {
+      const pasteText = pasteTextOf(file)
+      const base = { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null as number | null, previewUrl, pasteText }
+      if (file.size === 0) return { ...base, busy: false, error: 'noText' as const }
+      if (file.size > FILE_TOO_LONG) return { ...base, busy: false, error: 'tooLong' as const }
+      return { ...base, busy: true }
+    }
     if (get().serverMode) {
       for (const file of files) {
         const owner = get().activeId
         const localId = nid()
         const mapped = purposeForFile(file.name, file.type)
         const previewUrl = mapped.media === 'image' ? URL.createObjectURL(file) : undefined
-        writeDrafts(owner, (rows) => [...rows, { localId, filename: file.name, media: mapped.media, purpose: mapped.purpose, bytes: file.size, expiresAt: null, busy: true, previewUrl }])
+        const row = staged(file, localId, mapped, previewUrl)
+        writeDrafts(owner, (rows) => [...rows, row])
+        if (!row.busy) continue
         try {
           const form = new FormData()
           form.set('purpose', mapped.purpose)
@@ -967,9 +1006,8 @@ export const useHarbor = create<HarborState>((set, get) => ({
             return { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
           }))
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'upload'
           writeDrafts(owner, (rows) => rows.map((item) =>
-            item.localId === localId ? { ...item, busy: false, error: message } : item,
+            item.localId === localId ? { ...item, busy: false, error: fileErrorCode(error) } : item,
           ))
         }
       }
@@ -984,19 +1022,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
       const localId = nid()
       const mapped = purposeForFile(file.name, file.type)
       const previewUrl = mapped.media === 'image' ? URL.createObjectURL(file) : undefined
-      writeDrafts(owner, (rows) => [
-        ...rows,
-        {
-          localId,
-          filename: file.name,
-          media: mapped.media,
-          purpose: mapped.purpose,
-          bytes: file.size,
-          expiresAt: null,
-          busy: true,
-          previewUrl,
-        },
-      ])
+      const row = staged(file, localId, mapped, previewUrl)
+      writeDrafts(owner, (rows) => [...rows, row])
+      if (!row.busy) continue
       try {
         const uploaded = await client.uploadFile(key, file, file.name, mapped.purpose)
         writeDrafts(owner, (rows) => rows.map((item) => {
@@ -1005,9 +1033,8 @@ export const useHarbor = create<HarborState>((set, get) => ({
           return { ...item, busy: false, fileId: uploaded.id, expiresAt: uploaded.expires_at }
         }))
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'upload'
         writeDrafts(owner, (rows) => rows.map((item) =>
-          item.localId === localId ? { ...item, busy: false, error: message } : item,
+          item.localId === localId ? { ...item, busy: false, error: fileErrorCode(error) } : item,
         ))
       }
     }

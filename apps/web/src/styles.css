@@ -2158,6 +2158,27 @@ body[data-ds-dark-theme] .composer {
 body[data-ds-dark-theme] .stage:not(:has(.home)) .composer {
   box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
 }
+.composer-field {
+  position: relative;
+  margin-top: 4px;
+}
+/* SP-CMP-186. Hidden mirror grows with the text and stops at 336px. The textarea fills it. */
+.composer-mirror {
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-height: 336px;
+  overflow: hidden;
+  min-height: 60px;
+  margin: 0;
+  padding: 12px 12px 0 16px;
+  font-size: 16px;
+  line-height: 24px;
+  box-sizing: border-box;
+  width: 100%;
+}
 .composer textarea {
   /* Composer padding and type size stay on SP-CMP-095 / SP-CMP-123. These are the textarea tokens. */
   --dsl-textarea-text-color: var(--dsw-alias-label-primary);
@@ -2167,17 +2188,23 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .composer {
   --dsl-textarea-line-height: var(--ds-line-height-m);
   --dsl-textarea-padding: 6px 10px;
   --dsl-textarea-caret-color: var(--dsw-alias-brand-primary);
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   border: 0;
   resize: none;
   outline: none;
   background: transparent;
   caret-color: var(--dsw-alias-brand-text);
   min-height: 60px;
-  margin-top: 4px;
+  margin: 0;
   padding: 12px 12px 0 16px;
   font-size: 16px;
   line-height: 24px;
+  /* SP-CMP-160 */
+  overscroll-behavior: contain;
+  overflow: auto;
 }
 .composer textarea:focus { outline: none; box-shadow: none; }
 .composer textarea::placeholder { color: var(--dsw-alias-label-caption, #c2c3c4); }
@@ -2447,6 +2474,7 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 }
 @keyframes file-card-spin { to { transform: rotate(360deg); } }
 .file-card-body { flex: 1; min-width: 0; padding: 10px 0; user-select: none; }
+.file-card-paste { display: block; margin-top: 2px; padding: 0; border: 0; background: transparent; color: var(--dsw-alias-brand-primary); font-size: 12px; line-height: 18px; cursor: pointer; text-align: left; }
 .file-card-name {
   overflow: hidden;
   font-size: 14px;
@@ -3818,7 +3846,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
   }
   body[data-ds-dark-theme] .composer { box-shadow: none; border-color: rgba(255, 255, 255, 0.06); }
-  .composer textarea { height: 42px; min-height: 42px; margin-top: 4px; padding: 12px 12px 0 16px; }
+  .composer-mirror { min-height: 42px; padding: 12px 12px 0 16px; }
+  .composer textarea { height: 100%; min-height: 42px; margin: 0; padding: 12px 12px 0 16px; }
   .greeting .mark { width: 30px; height: 22px; margin-top: -1px; }
   .send, .tool-right .icon-btn { width: 34px; height: 34px; }
   .tool-right .icon-btn svg, .send svg { width: 16px; height: 16px; }
