@@ -182,7 +182,7 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
   const sheet = page.getByTestId('search-panel')
   await expect(sheet).toBeVisible()
   await expect(sheet).toHaveCSS('position', 'absolute')
-  await expect(sheet).toHaveCSS('transform', 'none')
+  await expect(sheet).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)')
   await expect.poll(() => widthOf(page, '[data-testid=search-panel]')).toBeGreaterThan(380)
   near(await widthOf(page, '[data-testid=search-panel]'), 390, 'sheet width')
   const box = await sheet.boundingBox()

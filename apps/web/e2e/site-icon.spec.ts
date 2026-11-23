@@ -217,7 +217,7 @@ test('mock site icons render on every shown source at 1440 and 390', async ({ pa
   await checkStrip('site-icons-390')
   await pill.click()
   await expect(panel).toBeVisible()
-  await expect(panel).toHaveCSS('transform', 'none')
+  await expect(panel).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)')
   await expect(panel.locator('.source-card img')).toHaveCount(withIcons.length)
   for (let index = 0; index < withIcons.length; index += 1) {
     await expectOfficialIcon(panel.locator('.source-card img').nth(index), withIcons[index]!.icon!, LIST)

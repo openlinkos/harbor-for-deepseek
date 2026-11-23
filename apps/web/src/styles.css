@@ -3566,7 +3566,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .diagram-tools button:not(.diagram-icon) { width: 28px; padding: 0; justify-content: center; }
   .diagram-modal { padding: 40px 12px 16px; }
   .markdown-table-wrapper { max-width: 100%; }
-  .search-panel { display: none; }
+  /* SP-SEARCH-121. Closed phone sheet sits 36px below its open position. */
+  .search-panel { display: none; transform: translateY(36px); }
   .sheet-scrim { display: block; }
   .shell.panel-open .search-panel {
     /* SP-SEARCH-193 / SP-SEARCH-248 */
@@ -3590,6 +3591,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     background: var(--dsw-alias-bg-base);
     box-shadow: none;
     --sidebar-width: 100vw;
+    /* SP-SEARCH-122 / SP-SEARCH-123 / SP-SEARCH-124. Open phone sheet. Desktop panels stay transform none. */
+    transform: translateY(0);
+    transition-property: transform;
   }
   .search-panel ol { overflow: auto; max-width: unset !important; }
   .search-panel p {
