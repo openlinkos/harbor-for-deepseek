@@ -901,7 +901,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
 .thinking .chev { display: inline-flex; }
-.phase-label { color: var(--dsw-alias-label-secondary); }
+.phase-label { color: var(--dsw-alias-label-secondary); height: 100%; display: inline-block; position: relative; overflow: hidden; }
 /* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
   height: 100%;
