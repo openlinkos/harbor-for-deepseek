@@ -501,6 +501,15 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
 .search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; border-radius: 28px; display: grid; place-items: center; }
 .search-glyph svg { width: 16px; height: 16px; }
 .search-dialog input.side-filter:not([type='hidden']):not([type='file']) {
+  /* ds-input tokens. Used height 24, padding 0, radius 0, and font 16 stay on the search-dialog rows. */
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-placeholder-color: var(--dsw-alias-label-caption);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-padding: 0 10px;
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-line-height: var(--ds-line-height-m);
   flex: 1;
   width: auto;
   min-height: 24px;
