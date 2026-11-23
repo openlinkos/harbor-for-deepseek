@@ -4293,17 +4293,41 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   opacity: 0.4;
   cursor: default;
 }
-.turn.share-on > .share-box {
+/* SP-SHARE-033 / 102 / 103 / 104 / 105 / 106. Official .d30139ff is the checkbox column. */
+.share-col { display: contents; }
+.turn.share-on > .share-col {
+  --dsl-virtual-list-transform-y: 0px;
+  --dsl-virtual-list-ios-compensation-y: 0px;
   position: absolute;
-  left: -41px;
+  display: flex;
+  top: 0;
+  bottom: 40px;
+  left: -42px;
+  right: 0;
   z-index: 2;
+  pointer-events: none;
 }
-.turn.user.share-on > .share-box { top: -12px; }
-.turn.assistant.share-on > .share-box { top: 5px; }
+/* SP-SHARE-034. Narrow list (panel under 800) pins the column at left 0. */
+.shell.share-narrow .turn.share-on > .share-col { left: 0; }
+/* SP-SHARE-035 / 109 / 110 / 111 / 112. Sticky box around the 18px checkbox. No virtual list, so the transform vars stay 0. */
+.share-sticky {
+  position: sticky;
+  top: calc(0px - var(--dsl-virtual-list-transform-y) + var(--dsl-virtual-list-ios-compensation-y));
+  display: flex;
+  align-items: flex-start;
+  box-sizing: content-box;
+  height: 18px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  pointer-events: none;
+}
+/* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
+.shell.share-narrow .share-sticky { z-index: 1; }
+.turn.share-on .share-box { position: static; pointer-events: none; }
 .turn.share-on .action-row,
 .turn.share-on .user-actions { display: none; }
 .turn.share-on { isolation: isolate; }
-.turn.share-on > :not(.share-box):not(.share-halo) { position: relative; z-index: 1; }
+.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col) { position: relative; z-index: 1; }
 /* SP-SHARE-149. Official ._7729a77 > * is pointer-events none so the message wrapper receives the click. */
 .turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }
@@ -4344,9 +4368,15 @@ body.rtl .shell.share-narrow .turn.share-on { padding-left: 0; padding-right: 42
 }
 input.share-box.ds-checkbox,
 .share-bar input.ds-checkbox {
+  /* Official .ds-checkbox tokens. The checked fill stays #5686fe below. */
   --dsl-checkbox-size: 16px;
   --dsl-checkbox-border-radius: 6px;
   --dsl-checkbox-border-width: 1.5px;
+  --dsl-checkbox-color: transparent;
+  --dsl-checkbox-hover-color: transparent;
+  --dsl-checkbox-border-color: var(--dsw-alias-border-l3);
+  --dsl-checkbox-hover-border-color: var(--dsw-alias-brand-primary);
+  --dsl-checkbox-ring-color: var(--dsw-alias-brand-primary);
   --dsl-checkbox-icon-color: var(--dsw-alias-label-primary-inverted);
   appearance: none;
   width: var(--dsl-checkbox-size);

@@ -361,8 +361,9 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(label.x, 66, 'select-all label left')
         const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
-        near(firstQuestion.y, 76.5, 'question checkbox y')
-        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 76, 'answer checkbox follows the question bubble')
+        // SP-SHARE-111. Question moved +25px (old top -12 -> padding 13). Answer moved +8px (old top 5 -> padding 13).
+        near(firstQuestion.y, 101.5, 'question checkbox y')
+        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 84, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
           return { margin: style.margin, padding: style.padding }
@@ -390,10 +391,11 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(contained(answerCheck, answerGrey), 'answer checkbox sits inside the selected fill').toBe(true)
       }
       expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 12), 'grey blocks in one pair are 12px apart').toBeLessThanOrEqual(1)
-      expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(32)
-      expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)
-      expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)), 'answer checkbox aligns with the first line').toBeLessThanOrEqual(2)
-      expect(Math.abs(userCheck.y - userGrey.y - 3), 'user checkbox is about 3px from the grey top').toBeLessThanOrEqual(1)
+      // SP-SHARE-111. Sticky padding-top 13px puts the checkbox lower than the old top offsets.
+      expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(40)
+      expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(42)
+      expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2) - 8), 'answer checkbox sits 8px below the first line').toBeLessThanOrEqual(2)
+      expect(Math.abs(userCheck.y - userGrey.y - 28), 'user checkbox is 28px from the grey top').toBeLessThanOrEqual(1)
       if (w === 390) {
         near(text!.x, 62, 'answer first line left')
         expect(overlaps(answerCheck, text!), 'checkbox must not cover the answer first line').toBe(false)
