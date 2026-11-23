@@ -2494,7 +2494,7 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
   border: 0;
 }
 .settings-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: auto; min-height: 60px; padding: 12px 0; border: 0; font-size: 14px; font-weight: 400; line-height: 22px; box-shadow: none; }
-.settings-line > span:first-child { flex-shrink: 0; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
+.settings-line > span:first-child { flex: 1; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
 @media (max-width: 767px) {
   .settings-line > span:first-child { flex: 1 1 auto; min-width: 0; white-space: normal; }
   .settings-line.balance-line > span:first-child { flex: 0 0 auto; white-space: nowrap; }
