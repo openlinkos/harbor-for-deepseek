@@ -599,12 +599,16 @@ test('390 composer and title stay above a sticky code header', async ({ page }) 
   const composer = await page.getByTestId('composer').boundingBox()
   const hit = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-testid="composer"], .code-sticky, .code-head')?.getAttribute('data-testid') || document.elementFromPoint(x, y)?.closest('.code-sticky, .code-head')?.className || '', { x: composer!.x + 20, y: composer!.y + 20 })
   expect(hit).toContain('composer')
+  const thinkBtn = page.locator('.thinking > button').first()
+  await expect(thinkBtn).toHaveCSS('position', 'sticky')
+  await expect(thinkBtn).toHaveCSS('z-index', '7')
+  await expect(thinkBtn).toHaveCSS('top', '0px')
   const title = await page.locator('.chat-title').boundingBox()
-  const thought = await page.getByText(/已思考/).first().boundingBox()
-  if (title && thought) {
-    const overlaps = title.x < thought.x + thought.width && thought.x < title.x + title.width && title.y < thought.y + thought.height && thought.y < title.y + title.height
-    expect(overlaps).toBe(false)
-  }
+  const thought = await thinkBtn.boundingBox()
+  expect(title).toBeTruthy()
+  expect(thought).toBeTruthy()
+  const overlaps = title!.x < thought!.x + thought!.width && thought!.x < title!.x + title!.width && title!.y < thought!.y + thought!.height && thought!.y < title!.y + title!.height
+  expect(overlaps).toBe(false)
 })
 
 test('dark landing matches the light landing', async ({ page }) => {

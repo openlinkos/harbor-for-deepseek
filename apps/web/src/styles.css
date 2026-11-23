@@ -1005,7 +1005,6 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
   box-sizing: border-box;
   height: var(--collapsible-area-title-height);
   max-height: var(--collapsible-area-title-height);
@@ -1015,8 +1014,16 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   cursor: pointer;
   pointer-events: all;
   user-select: none;
-  /* Desktop stays in flow. Sticky top and z-index 7 overlap .chat-title (chat.spec.ts:606). Phone overrides position and width. Width stays shrink-to-fit; 100% would stretch the title. Base top is 0 in a normal chat (6px is the share-link page only). */
-  position: relative;
+  /* SP-CV-125/126/130/131. Official ._245c867 is sticky, top var(--group-title-sticky-top), z-index 7.
+     Base top is 0 in a normal chat (6px is the share-link page only). Our list scrolls natively, so the
+     virtual-list transform terms stay 0. The scrollport starts under .chat-title, so top 0 does not cover it.
+     Width stays shrink-to-fit; 100% would stretch the title. Gap is 0 because the icon and the label each
+     carry margin-right 6px (SP-CV-157); a 6px gap on top of that margin would double the ink space. */
+  gap: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--group-title-sticky-top);
+  z-index: 7;
 }
 .thinking > button::before {
   content: "";
@@ -1041,7 +1048,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .turn.share-picked .thinking > button::after {
   background-color: var(--dsw-alias-bg-multi-select);
 }
-.thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
+.thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; margin-right: 6px; }
 .thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
 .thinking .chev { display: inline-flex; }
@@ -1058,7 +1065,11 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   flex-grow: 1;
   flex-shrink: 0;
   transition: color 0.2s;
+  /* SP-CV-157. Official ._4d41763 margin-right is 6px. The button gap is 0 so this is the whole gap before the chevron. */
+  margin-right: 6px;
 }
+[dir='rtl'] .phase-label { margin-right: 0; margin-left: 6px; }
+[dir='rtl'] .thinking > button > svg { margin-right: 0; margin-left: 6px; }
 /* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
   height: 100%;
@@ -3377,9 +3388,6 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
   .user-actions button { border: 0; background: transparent; color: rgb(129, 133, 140); display: grid; place-items: center; }
   .thinking > button {
-    position: sticky;
-    top: 0;
-    z-index: 2;
     height: 34px;
     box-sizing: border-box;
     background: var(--dsw-alias-bg-base);
