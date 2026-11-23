@@ -2309,7 +2309,7 @@ body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
 .settings-nav button.on { background: rgba(38, 49, 72, 0.06); }
 body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
-.settings-main { flex: 1 1 auto; overflow: auto; padding: 10px 24px 0; min-width: 0; height: calc(100% - 54px); }
+.settings-main { flex: 1 1 0%; overflow: auto; padding: 10px 24px 0; min-width: 0; min-height: 0; height: calc(100% - 54px); }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
 .settings-main button:not(.chip):not(.ds-button) {
   height: 36px;
@@ -3146,7 +3146,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   }
   .settings-nav { flex: none; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 0 8px; }
   .settings-nav button { flex: none; width: auto; margin-left: 0; }
-  .settings-main { flex: 1 1 auto; height: auto; position: relative; z-index: 1; }
+  /* The desktop head uses flex-basis 100% to wrap a row. In this column that basis is height and flex-shrink 0, so the head ate the sheet and the main collapsed to its padding. */
+  .settings-head { flex: 0 0 auto; }
+  .settings-main { flex: 1 1 0%; min-height: 0; height: auto; overflow: auto; position: relative; z-index: 1; }
   .footnote { margin: 28px 0 calc(8px + env(safe-area-inset-bottom)); font-size: 11px; }
   .turn.user { flex-direction: column; align-items: flex-end; }
   .turn.assistant { display: flex; flex-direction: column; }
