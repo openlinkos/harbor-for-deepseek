@@ -100,9 +100,17 @@ for (const point of points) {
         await expect(page.getByTestId('toggle-thinking')).toHaveCSS('height', '34px')
         const pill = await page.getByTestId('toggle-thinking').boundingBox()
         expect(pill?.width ?? 0).toBeGreaterThan(34)
-        await expect(page.locator('.sidebar')).toBeVisible()
-        const width = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
-        expect(width).toBe(261)
+        if (point.width < 1024) {
+          await expect(page.locator('.sidebar')).toBeHidden()
+          const collapsedWidth = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+          expect(collapsedWidth).toBe(0)
+          await page.getByRole('button', { name: '打开边栏' }).click()
+          await expect(page.locator('.sidebar')).toBeVisible()
+        } else {
+          await expect(page.locator('.sidebar')).toBeVisible()
+          const width = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+          expect(width).toBe(261)
+        }
         const motion = await page.locator('.sidebar').evaluate((node) => getComputedStyle(node).transitionDuration)
         expect(motion).toContain('0.3s')
       }

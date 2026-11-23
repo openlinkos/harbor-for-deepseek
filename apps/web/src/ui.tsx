@@ -1605,7 +1605,26 @@ export const Shell = () => {
   }, [])
 
   const profile = useProfile()
-  const [collapsed, setCollapsed] = useState(false)
+  // SP-SB-631. Below 1024 the official sider starts collapsed. Phone uses the drawer (sidebarOpen), not the in-flow width-0 class. At 1024 and above the stored flag wins, and the default is expanded.
+  const [collapsed, setCollapsedState] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const phone = !window.matchMedia('(min-width: 768px)').matches
+    if (phone) return false
+    if (!window.matchMedia('(min-width: 1024px)').matches) return true
+    try {
+      return localStorage.getItem('deepapi-sider-collapsed') === '1'
+    } catch {
+      return false
+    }
+  })
+  const setCollapsed = (value: boolean) => {
+    setCollapsedState(value)
+    try {
+      if (window.matchMedia('(min-width: 1024px)').matches) localStorage.setItem('deepapi-sider-collapsed', value ? '1' : '0')
+    } catch {
+      /* private mode */
+    }
+  }
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
   const filterInputRef = useRef<HTMLInputElement>(null)

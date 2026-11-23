@@ -193,6 +193,8 @@ test('SP-SEARCH-242..248 fresh 768, 800 and 390 coupling', async ({ page }) => {
   test.setTimeout(90_000)
   await page.setViewportSize({ width: 768, height: 1024 })
   await boot(page, 'light', { body: () => search, freezeTransitions: false })
+  await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(0)
+  await page.locator('.float-pill').getByRole('button', { name: '打开边栏' }).click()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(261)
   await ask(page)
   await openPanel(page)
