@@ -754,14 +754,18 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .turn { flex: none; content-visibility: auto; contain-intrinsic-size: auto 140px; }
 .turn.streaming, .turn:last-of-type, .turn:has(.modal) { content-visibility: visible; }
 .turn.streaming { content-visibility: visible; }
-.turn.user { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 16px; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
+/* SP-CV-341..344. The 16px gap stays margin-bottom. padding-bottom 16px plus share-on margin 55px misses share-select.spec.ts at 390. */
+.turn.user { display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 16px; position: relative; z-index: 0; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
 .bubble {
+  /* SP-CV-340. */
+  margin-top: 10px;
   max-width: calc(100% - 88px);
   background: var(--dsw-specific-bubble);
   border-radius: 22px;
   padding: 10px 16px;
   font-size: 16px;
   line-height: 24px;
+  color: var(--dsw-alias-label-primary);
   white-space: pre-wrap;
   word-break: break-word;
   transition: background 0.3s;
@@ -804,6 +808,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   margin-bottom: 2px;
   font-size: 16px;
   line-height: 28px;
+  cursor: pointer;
 }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
@@ -844,7 +849,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   0% { transform: translateX(calc(var(--shimmer-direction) * -100%)); }
   90%, 100% { transform: translateX(calc(var(--shimmer-direction) * 100%)); }
 }
-.reply-dots { display: flex; align-items: center; gap: 6px; height: 24px; margin: 2px 0 8px; }
+/* SP-CV-067..069, SP-CV-402..403. The _821570d padding-top 0 variant is not a class we render. */
+.reply-dots { display: flex; align-items: center; justify-content: flex-start; gap: 6px; height: 34px; padding-top: 10px; box-sizing: border-box; margin: 0; }
 .reply-dots i {
   width: 6px;
   height: 6px;
@@ -1037,7 +1043,8 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
   white-space: pre;
 }
 .code-card pre > code { display: block; }
-.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); }
+/* SP-CV-074, SP-CV-079. Width and left stay off this row: fb1344-parity.spec.ts measures the continue edge. */
+.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
 .action-row button {
   width: 28px;
   height: 28px;
@@ -1456,7 +1463,8 @@ a.cite:hover, .cite:hover {
 }
 .chat-scroll .code-fold,
 .chat-scroll .action-row { scroll-margin-bottom: 240px; }
-.chat-column { width: min(752px, calc(100% - 88px)); margin-top: 33px; }
+/* SP-CV-391. Official column margin-top is 0. The 44px side inset is the width. */
+.chat-column { width: min(752px, calc(100% - 88px)); margin-top: 0; }
 .stage:not(:has(.home)) .composer-wrap {
   position: sticky;
   bottom: 0;
@@ -2858,7 +2866,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     color: rgb(15, 17, 21);
   }
   .stage:not(:has(.home)) .topbar .top-actions > button.icon-btn svg { width: 20px; height: 20px; }
-  .stage:not(:has(.home)) .chat-column { width: calc(100% - 40px); margin-top: 0; }
+  /* SP-CV-355. margin 0 20px. stretch keeps the column from shrink-wrapping. */
+  .stage:not(:has(.home)) .chat-column { align-self: stretch; width: auto; margin: 0 20px; }
   .stage:not(:has(.home)) .composer-wrap {
     z-index: 8;
     width: calc(100% - 32px);
@@ -2963,7 +2972,6 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 
 @media (max-width: 440px) {
   .offline-banner { width: calc(100vw - 32px); text-align: center; box-sizing: border-box; }
-  .bubble { max-width: calc(100% - 68px); }
   body:not([data-ds-dark-theme]) .composer .chip:not(.on) {
     background: #fff;
     border: 1px solid var(--dsw-alias-border-l2);
@@ -2974,6 +2982,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   /* SP-TB-295..298. Official media is not-all and (min-width: 440px). */
   .greeting { font-size: 20px; font-weight: 500; line-height: 28px; }
   .greeting .mark { width: 34px; height: 25px; transform: scale(0.88); transform-origin: center; }
+  /* SP-CV-345. Same media: bubble max-width calc(100% - 68px). */
+  .bubble { max-width: calc(100% - 68px); }
 }
 @media (hover: none) {
   .chip:hover:not(.on), .icon-btn:hover, .chat-link:hover, .menu button:hover { background: transparent; }
@@ -3115,16 +3125,18 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   border-radius: 999px;
   border: 1px solid var(--dsw-alias-border-l2);
   background: var(--dsw-alias-button-elevated-fill);
-  color: var(--dsw-alias-label-primary);
+  /* SP-CV-440..442. */
+  color: var(--dsw-alias-label-secondary);
   font-size: 14px;
   line-height: 22px;
+  text-align: right;
   white-space: nowrap;
 }
 .action-row .continue-gen::after { content: none; }
 .action-row .continue-gen:hover,
 .action-row .continue-gen:focus-visible {
   background: var(--dsw-alias-button-elevated-fill);
-  color: var(--dsw-alias-label-primary);
+  color: var(--dsw-alias-label-secondary);
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
