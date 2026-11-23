@@ -951,6 +951,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   line-height: 28px;
   cursor: pointer;
   pointer-events: all;
+  user-select: none;
 }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
