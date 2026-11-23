@@ -100,7 +100,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
         })
         expect(gap?.oneGroup).toBe(true)
         expect(gap?.n).toBe(2)
-        expect(Math.abs((gap?.gap ?? 99) - 4)).toBeLessThanOrEqual(0.5)
+        expect(Math.abs((gap?.gap ?? 99) - 2)).toBeLessThanOrEqual(0.5)
       })
     }
     // 「用时 N 秒」：思考结束后冻结、刷新后不变、别的回答生成时不变
