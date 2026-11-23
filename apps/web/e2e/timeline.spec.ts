@@ -201,9 +201,10 @@ test('thinking timeline matches the official rhythm', async ({ page }) => {
       expect(area, viewport.name).not.toBeNull()
       const gaps = inkGaps(png, Math.floor(area!.x + 48), Math.floor(area!.x + Math.min(area!.width, 420)), Math.floor(area!.y), Math.ceil(area!.y + area!.height))
       expect(gaps.length, `${viewport.name} ${gaps.join(',')}`).toBeGreaterThanOrEqual(3)
-      expect(Math.abs(gaps[0] - 21), `${viewport.name} title ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
+      // SP-MD-022. Think paragraphs use margin 12px 0. The title-to-body and second-step gaps grow by that margin.
+      expect(Math.abs(gaps[0] - 33), `${viewport.name} title ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
       expect(Math.abs(gaps[1] - 24), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
-      expect(Math.abs(gaps[2] - 24), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
+      expect(Math.abs(gaps[2] - 36), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
     }
   }
 })

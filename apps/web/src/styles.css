@@ -1219,7 +1219,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .think-copy li { font: var(--dsw-font-markdown-small); height: auto; }
 .think-copy ul,
 .think-copy ol { margin: 12px 0; padding-left: 18px; }
-.think-copy p + ol { margin-top: 12px; }
+/* SP-MD-039. A think paragraph's following list keeps margin-top 4px. */
+.think-copy p + ol { margin-top: 4px; }
 .think-copy li { color: var(--dsw-alias-label-secondary); }
 .think-copy li + li { margin-top: 2px; }
 /* SP-MD-042. Think nested list margin-top is 2px. */
@@ -1307,6 +1308,19 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-think-content .ds-markdown :is(h1, h2, h3, h4, h5, h6),
 .ds-think-content.ds-markdown .ds-markdown-paragraph,
 .ds-think-content .ds-markdown .ds-markdown-paragraph { margin: 12px 0; }
+/* SP-MD-039. The list after a think paragraph is margin-top 4px. Paragraph margin-bottom 12 still wins the collapse, except before an ol. */
+.ds-think-content.ds-markdown .ds-markdown-paragraph + ul,
+.ds-think-content.ds-markdown .ds-markdown-paragraph + ol,
+.ds-think-content .ds-markdown .ds-markdown-paragraph + ul,
+.ds-think-content .ds-markdown .ds-markdown-paragraph + ol { margin-top: 4px; }
+/* SP-MD-040 / SP-MD-041. A paragraph directly before an ol uses margin-bottom 4px. */
+.ds-think-content.ds-markdown .ds-markdown-paragraph:has(+ ol),
+.ds-think-content .ds-markdown .ds-markdown-paragraph:has(+ ol) { margin-bottom: 4px; }
+/* SP-MD-031..038. Headings before a list use margin-bottom 4px, and that list uses margin-top 4px. */
+.ds-think-content.ds-markdown :is(h3, h4, h5, h6):is(:has(+ ul), :has(+ ol)),
+.ds-think-content .ds-markdown :is(h3, h4, h5, h6):is(:has(+ ul), :has(+ ol)) { margin-bottom: 4px; }
+.ds-think-content.ds-markdown :is(h3, h4, h5, h6) + :is(ul, ol),
+.ds-think-content .ds-markdown :is(h3, h4, h5, h6) + :is(ul, ol) { margin-top: 4px; }
 /* SP-MD-043. Think list paragraph. Wins over the 12px rule inside a list item. */
 .ds-think-content.ds-markdown li > .ds-markdown-paragraph,
 .ds-think-content .ds-markdown li > .ds-markdown-paragraph { margin: 2px 0; }
