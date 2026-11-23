@@ -684,15 +684,21 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 }
 .topbar h2 { margin: 0; font-size: 16px; font-weight: 560; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage:not(:has(.home)) .topbar { height: 49px; }
-.stage:not(:has(.home)) .topbar { position: relative; z-index: 7; }
+/* SP-TB-108/109. Chat header paints the page background. Home stays transparent. */
+.stage:not(:has(.home)) .topbar { position: relative; z-index: 7; background: var(--dsw-alias-bg-base); }
 .stage:not(:has(.home)) .topbar > :not(.chat-title) { position: relative; z-index: 1; }
 .menu-mobile, .top-actions { position: relative; z-index: 1; }
-.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 1; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; align-items: center; height: 22px; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; }
-body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: #f2f3f5; }
+/* SP-TB-016..018, SP-TB-035..042, SP-TB-003, SP-TB-034. Static title, not the editable chip. */
+.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 1; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; align-items: center; height: 22px; max-width: min(480px, calc(100% - 140px)); overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; }
 @media (max-width: 767px) {
-  .stage:not(:has(.home)) .topbar > .chat-title { left: 54px; }
+  .stage:not(:has(.home)) .topbar > .chat-title { left: 54px; max-width: 60vw; }
 }
-.top-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+/* SP-TB-047. Share and the other actions do not shrink. */
+.top-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.top-actions .icon-btn,
+.top-actions .download-app,
+.top-actions .share-top-cancel,
+.top-actions .ds-button { flex-shrink: 0; }
 .top-new, .download-app { display: none; }
 .found-line { display: flex; }
 .user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; }
@@ -1417,6 +1423,7 @@ a.cite:hover, .cite:hover {
   min-height: 247px;
   padding-bottom: 64px;
 }
+/* SP-TB-248/249, SP-TB-255..257. */
 .greeting {
   display: flex;
   align-items: center;
@@ -1425,6 +1432,7 @@ a.cite:hover, .cite:hover {
   width: max-content;
   max-width: 100%;
   margin: 0 auto 27px;
+  color: var(--dsw-alias-label-primary);
   font-size: 24px;
   font-weight: 600;
   line-height: 32px;
@@ -2954,8 +2962,6 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 }
 
 @media (max-width: 440px) {
-  .greeting { font-size: 20px; font-weight: 600; line-height: 28px; }
-  .greeting .mark { width: 30px; height: 22px; transform: none; }
   .offline-banner { width: calc(100vw - 32px); text-align: center; box-sizing: border-box; }
   .bubble { max-width: calc(100% - 68px); }
   body:not([data-ds-dark-theme]) .composer .chip:not(.on) {
@@ -2963,6 +2969,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     border: 1px solid var(--dsw-alias-border-l2);
     color: var(--dsw-alias-label-primary);
   }
+}
+@media (max-width: 439px) {
+  /* SP-TB-295..298. Official media is not-all and (min-width: 440px). */
+  .greeting { font-size: 20px; font-weight: 500; line-height: 28px; }
+  .greeting .mark { width: 34px; height: 25px; transform: scale(0.88); transform-origin: center; }
 }
 @media (hover: none) {
   .chip:hover:not(.on), .icon-btn:hover, .chat-link:hover, .menu button:hover { background: transparent; }
