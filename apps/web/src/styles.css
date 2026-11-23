@@ -2937,7 +2937,8 @@ body[data-ds-dark-theme] .code-card pre ::selection,
 .code-card.md-code-block-dark pre ::selection { background: #3c526d; }
 
 .settings-modal { align-items: center; padding: 24px; background: rgba(0, 0, 0, 0.36); }
-body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, 0.62); }
+/* SP-MOD-002. Dark overlay is the token 0.6, not a hardcoded 0.62. */
+body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
 .settings-shell {
   width: min(760px, calc(100vw - 48px));
   height: 500px;
@@ -3985,7 +3986,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .modal { align-items: end; padding: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
   /* The shell is one auto row. Pack that row to the end so the sheet sits on the bottom edge. */
   .modal.settings-modal { display: grid; align-items: flex-end; align-content: flex-end; justify-items: stretch; padding: 0; background: rgba(0, 0, 0, 0.36); }
-  body[data-ds-dark-theme] .modal.settings-modal { background: rgba(0, 0, 0, 0.62); }
+  body[data-ds-dark-theme] .modal.settings-modal { background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
   .modal-card {
     width: 100%;
     height: 93dvh;
