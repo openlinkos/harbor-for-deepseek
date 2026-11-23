@@ -2850,7 +2850,17 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   background: var(--dsw-alias-label-tertiary);
 }
 /* SP-TH-004/005. Brand only while this think step is the live phase. Answer streaming stays tertiary (fb1721 answer-streaming-and-done-all-grey). */
-.timeline-step.timeline-think.is-live .timeline-dot::before { background: var(--dsw-alias-brand-primary); }
+/* SP-TH-009. The live dot scales 1 → 1.3. Settled dots stay still. */
+.timeline-step.timeline-think.is-live .timeline-dot::before {
+  background: var(--dsw-alias-brand-primary);
+  animation: 1.5s linear infinite timeline-dot-pulse;
+}
+@keyframes timeline-dot-pulse {
+  0% { animation-timing-function: ease-out; transform: scale(1); }
+  40% { animation-timing-function: linear; transform: scale(1.3); }
+  60% { animation-timing-function: ease-out; transform: scale(1.3); }
+  to { transform: scale(1); }
+}
 .timeline-line {
   position: absolute;
   top: 31px;
