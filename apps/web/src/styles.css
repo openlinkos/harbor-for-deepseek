@@ -900,7 +900,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 }
 .turn.assistant { text-align: left; }
 .turn header { display: flex; justify-content: flex-end; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
-.thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); }
+.thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-base); }
 .thinking + .prose { margin-top: 10px; }
 .thinking > button {
   background: none;
