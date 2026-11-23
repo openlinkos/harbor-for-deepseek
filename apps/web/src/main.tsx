@@ -18,8 +18,6 @@ migrateStoredKeys(localStorage)
 migrateSessionMode(sessionStorage)
 import './theme.css'
 import './styles.css'
-import './spec-role-gallery.css'
-import { mountSpecRoleGallery } from './spec-role-gallery.js'
 
 applyTheme(readTheme())
 // SP-GL-086
@@ -52,4 +50,3 @@ if (root) {
     </StrictMode>,
   )
 }
-mountSpecRoleGallery()
