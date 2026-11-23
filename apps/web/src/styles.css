@@ -2486,6 +2486,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   border-radius: 50%;
   background: var(--dsw-alias-label-tertiary);
 }
+/* SP-TH-004/005. The step still in progress uses the brand dot. Finished steps stay tertiary. */
+.turn.streaming .timeline-step.is-last .timeline-dot::before { background: var(--dsw-alias-brand-primary); }
 .timeline-line {
   position: absolute;
   top: 31px;
