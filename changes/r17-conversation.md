@@ -10,3 +10,5 @@
 - apps/web/e2e/answer-footer.spec.ts:17 USER_LABELS 编辑 -> 修改 SP-CV-365
 - apps/web/e2e/overlay-paint.spec.ts:217 getByRole「复制」-> button[aria-label="复制"] 且 force hover SP-CV-306
 - apps/web/e2e/overlay-paint.spec.ts:218 getByRole「编辑」/ tooltip「编辑」-> button[aria-label="修改"] / tooltip「修改」且 force hover SP-CV-306 SP-CV-365
+
+手机宽度里 `.user-actions { opacity: 1 }` 会盖住上面的默认 opacity 0。已去掉这一条，让更早的用户消息在 390 也保持 opacity 0（SP-CV-306）。断言无新增改动。

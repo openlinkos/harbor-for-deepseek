@@ -3469,7 +3469,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .action-row button, .user-actions button { width: 28px; height: 28px; }
   .action-row svg, .user-actions svg { width: 16px; height: 16px; }
   .code-head button { width: auto; min-height: 0; height: auto; font-size: 13px; padding: 0; }
-  .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
+  /* SP-CV-306. Earlier user actions stay opacity 0 until hover or focus. The base rule does that; do not force 1 here. */
+  .user-actions { display: flex; justify-content: flex-end; gap: 10px; }
   .user-actions button { border: 0; background: transparent; color: rgb(129, 133, 140); display: grid; place-items: center; }
   .thinking > button {
     height: 34px;
