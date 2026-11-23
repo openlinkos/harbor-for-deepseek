@@ -1494,12 +1494,14 @@ a.cite:hover, .cite:hover {
   min-height: 0;
   width: 0;
   flex: 0 0 0;
+  border-left-width: 0;
   transition: none 0.2s ease-out;
   box-shadow: none;
 }
 .search-panel:not(.is-closed) {
   width: var(--sidebar-width);
   flex: 0 0 var(--sidebar-width);
+  border-left: 1px solid var(--dsw-alias-border-l2);
   overflow: visible;
   transition: flex-basis 0.2s ease-out;
 }
