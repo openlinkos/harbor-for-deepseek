@@ -107,13 +107,17 @@ a { color: var(--dsw-alias-brand-text); }
 .sider-top { width: 100%; height: 48px; min-height: 48px; flex-shrink: 0; justify-content: space-between; margin-bottom: 16px; padding: 15px 0 10px 4px; box-sizing: border-box; }
 .sider-icons { display: flex; align-items: center; flex-shrink: 0; gap: 18px; margin-left: auto; }
 .sider-icons .icon-btn {
+  /* SP-UI iconLabelTertiary. Hover keeps the tertiary label. */
+  --dsl-button-text-color: var(--dsw-alias-label-tertiary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-tertiary);
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
   width: 16px;
   height: 16px;
   padding: 0;
   border-radius: 4096px;
   font-size: 14px;
   line-height: 22px;
-  color: var(--dsw-alias-label-tertiary);
+  color: var(--dsl-button-text-color);
 }
 .brand-name {
   display: flex;
@@ -153,16 +157,27 @@ a { color: var(--dsw-alias-brand-text); }
   background: transparent;
 }
 .icon-btn {
+  /* SP-UI icon and iconLabelSecondary. Transparent fill, padding 0, secondary label. */
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-padding: 0;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-secondary);
   width: 32px;
   height: 32px;
+  min-width: 0;
+  padding: 0;
   border-radius: 8px;
-  color: var(--dsw-alias-label-secondary);
+  color: var(--dsl-button-text-color);
+  background: var(--dsl-button-color);
   display: grid;
   place-items: center;
   line-height: 22px;
   transition: background-color 0.2s var(--ds-ease-out), color 0.2s var(--ds-ease-out);
 }
-.icon-btn:hover, .chat-link:hover, .chat-link:not(.active):focus-within { background: var(--dsw-specific-sidebar-nav-item-hover); }
+.icon-btn:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
+.chat-link:hover, .chat-link:not(.active):focus-within { background: var(--dsw-specific-sidebar-nav-item-hover); }
 .new-chat {
   display: flex;
   align-items: center;
@@ -885,6 +900,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity; }
 .turn.user:hover .user-actions, .turn.user:focus-within .user-actions { opacity: 1; }
 .user-actions button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4096px; background: transparent; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; display: grid; place-items: center; }
+.user-actions button:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-tertiary); }
 .settings-tabs { display: none; }
 .settings-x svg { display: block; }
 .sheet-scrim {
@@ -1370,20 +1386,28 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
 .action-row { margin-top: 0; margin-left: 0; left: -6px; width: calc(100% + 6px); padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
 .action-row button:disabled { cursor: not-allowed; }
 .action-row button {
+  /* SP-UI iconLabelTertiary. */
+  --dsl-button-text-color: var(--dsw-alias-label-tertiary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-tertiary);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-padding: 0;
+  --dsl-button-min-width: 0;
   width: 28px;
   height: 28px;
+  min-width: 0;
   padding: 0;
   border: 0;
   border-radius: 4096px;
-  background: transparent;
-  color: var(--dsw-alias-label-tertiary);
+  background: var(--dsl-button-color);
+  color: var(--dsl-button-text-color);
   font-size: 13px;
   line-height: 20px;
   display: grid;
   place-items: center;
 }
 /* Official ds-button--iconLabelTertiary: hover wash only, icon color stays tertiary. */
-.action-row button:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.action-row button:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
 .action-row button.on { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .usage, .hint { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .found-line { color: var(--dsw-alias-label-secondary); font-size: 14px; margin-bottom: 8px; }
@@ -2384,6 +2408,23 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   padding-right: 0;
 }
 .form-error { color: var(--dsw-alias-state-error-primary); }
+/* SP-UI textInheritedPrimary. The inline retry is the text control. The error sentence stays red. */
+.form-error button[data-testid="retry"] {
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-text-color-hover: var(--dsw-alias-button-primary-hover);
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  color: var(--dsl-button-text-color);
+}
+.form-error button[data-testid="retry"]:hover { color: var(--dsl-button-text-color-hover); }
 /* SP-MOD-046..049, 497..502. Toast padding, line, and shadow follow the official toast. */
 .toast-layer {
   position: fixed;
@@ -3806,6 +3847,25 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-color: var(--dsw-alias-state-error-secondary);
   --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
 }
+/* SP-UI text and borderlessNeutral. Admin and local-mode ghost buttons are the text controls. */
+button.ghost {
+  --dsl-button-ring-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-secondary);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-font-weight: 500;
+  padding: var(--dsl-button-padding);
+  min-width: var(--dsl-button-min-width);
+  height: var(--dsl-button-height);
+  background: var(--dsl-button-color);
+  color: var(--dsl-button-text-color);
+  font-weight: var(--dsl-button-font-weight);
+}
+button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
 .ds-button > .ds-button__background {
   box-sizing: border-box;
   border-radius: inherit;
