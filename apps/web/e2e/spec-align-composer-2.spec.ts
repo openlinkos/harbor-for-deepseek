@@ -26,6 +26,7 @@ test('composer fill, caret, and disclaimer follow the official field', async ({ 
   await expect(box).toHaveCSS('background-color', 'rgb(255, 255, 255)')
   await expect(box).toHaveCSS('font-size', '16px')
   await expect(page.getByTestId('toggle-thinking')).toHaveCSS('justify-content', 'center')
+  await expect(page.getByTestId('toggle-thinking')).toHaveCSS('margin-right', '10px')
   await expect(field).toHaveCSS('font-size', '16px')
   await expect(field).toHaveCSS('line-height', '24px')
   await expect(field).toHaveCSS('caret-color', 'rgb(57, 100, 254)')
