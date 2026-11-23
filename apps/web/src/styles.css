@@ -4575,12 +4575,16 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   padding-top: 13px;
   padding-bottom: 13px;
   pointer-events: none;
-  /* Desktop transcript padding is 12px and the user port origin is 25px above the turn,
-     so top:0 would clamp the margin box down 13px and move the captured checkbox.
-     The margin keeps that edge on the scrollport; the translate keeps the captured box.
-     Sticky still pins the margin edge, so a scrolled answer keeps the checkbox in view. */
-  margin-top: 13px;
-  transform: translateY(-13px);
+}
+/* Desktop transcript padding is 12px and the user port origin is 25px above the turn,
+   so top:0 would clamp the margin box down 13px and move the captured checkbox.
+   The margin keeps that edge on the scrollport; the translate keeps the captured box.
+   Phone padding does not clamp, so the same offset would drop the checkbox 12px. */
+@media (min-width: 768px) {
+  .share-sticky {
+    margin-top: 13px;
+    transform: translateY(-13px);
+  }
 }
 /* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
 .shell.share-narrow .share-sticky { z-index: 1; }
