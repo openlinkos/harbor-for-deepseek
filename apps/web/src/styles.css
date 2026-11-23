@@ -4264,9 +4264,7 @@ input.share-box.ds-checkbox:checked::after,
   }
   body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
   .turn.share-on > .share-box { left: 0; }
-  /* Padding-left 42px (SP-CV-099 / SP-SHARE-030) moves the padding edge. Pull the checkbox and halo back to the border edge. */
-  .shell.share-narrow .turn.share-on > .share-box { left: -42px; }
-  .shell.share-narrow .turn.share-on > .share-halo { left: -62px; }
+  /* SP-CV-099 / SP-SHARE-030 pad the wrapper. Absolute checkbox and halo use the padding edge, so left stays 0 and -20px. An extra -42px puts the checkbox at x=-22. */
   /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
      align-items: flex-end. Height stays the text height. The 16px inset is
      `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's

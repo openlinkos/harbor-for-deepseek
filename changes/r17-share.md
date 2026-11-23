@@ -5,3 +5,7 @@
 SP-SHARE-031 没有不可选消息节点，本轮不画 opacity .4。
 
 断言：无。
+
+后续：窄屏勾选框不再额外 left -42px。padding-left 42px 留在外壳上。绝对定位相对 padding edge，勾选框 left 保持 0，光晕 left 保持 -20px。
+
+- apps/web/e2e/spec-align-citations.spec.ts:237 选中消息上来源胶囊背景 rgb(255, 255, 255) -> rgba(0, 0, 0, 0) SP-CV-112

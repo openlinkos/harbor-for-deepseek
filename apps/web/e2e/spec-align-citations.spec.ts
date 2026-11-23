@@ -233,6 +233,7 @@ test('SP-CITE-158..174 hover icon keeps a loaded image and uses the link svg whe
     return top?.closest('[data-testid="search-results"]') == null
   })
   expect(covered).toBe(true)
-  await expect(pill).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+  // SP-CV-112. The selected message sets --search-sites-summary-bg-color to transparent, and the pill paints that variable.
+  await expect(pill).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
   await expect(page.getByTestId('search-panel')).toBeHidden()
 })
