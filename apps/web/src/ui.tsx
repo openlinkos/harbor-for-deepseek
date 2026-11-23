@@ -2071,7 +2071,7 @@ export const Shell = () => {
           <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => { const opening = !state.sidebarOpen; if (opening && !window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); state.setSidebarOpen(opening) }}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
-          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation?.title && (showDesktopTitle || (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)) ? <div className="chat-title" data-testid="chat-title">{conversation.title}</div> : null}
+          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation && (showDesktopTitle || (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)) ? <div className="chat-title" data-testid="chat-title">{conversation.title || t('untitledChat')}</div> : null}
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
