@@ -70,8 +70,8 @@ const install = async (page: Page) => {
   })
 }
 
-const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗') => {
-  await page.evaluate(async (firstUser) => {
+const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗', firstAnswer = '第一答') => {
+  await page.evaluate(async ({ firstUser, firstAnswer }) => {
     const db = await new Promise<IDBDatabase>((ok, ko) => {
       const request = indexedDB.open('deepapi')
       request.onsuccess = () => ok(request.result)
@@ -87,7 +87,7 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
       id, title: '分享样本', titleSource: 'user', model: 'deepseek-flash', thinking: false, search: false, readLink: false, effort: 'high', pinned: false, archived: false, activeLeafId: 'a2', createdAt: when, updatedAt: when, rev: 1, deletedAt: null,
     })
     tx.objectStore('messages').put(message('u1', null, 'user', firstUser, '2026-11-20T00:00:00.000Z'))
-    tx.objectStore('messages').put(message('a1', 'u1', 'assistant', '第一答', '2026-11-20T00:00:01.000Z'))
+    tx.objectStore('messages').put(message('a1', 'u1', 'assistant', firstAnswer, '2026-11-20T00:00:01.000Z'))
     tx.objectStore('messages').put(message('u2', 'a1', 'user', '第二问', '2026-11-20T00:00:02.000Z'))
     tx.objectStore('messages').put(message('a2', 'u2', 'assistant', '第二答', '2026-11-20T00:00:03.000Z'))
     const other = 'share-other'
@@ -97,7 +97,7 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
     tx.objectStore('messages').put({ id: 'ou1', conversationId: other, parentId: null, role: 'user', blocks: [{ type: 'text', text: '旁边的问题' }], status: 'complete', usage: null, errorMessage: null, createdAt: when, updatedAt: when, rev: 1, deletedAt: null })
     await new Promise((ok, ko) => { tx.oncomplete = () => ok(null); tx.onerror = () => ko(tx.error) })
     db.close()
-  }, firstUser)
+  }, { firstUser, firstAnswer })
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
   const width = page.viewportSize()?.width ?? 1440
@@ -114,7 +114,7 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
   await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
 }
 
-const boot = async (page: Page, theme: string, staged = false, firstUser?: string) => {
+const boot = async (page: Page, theme: string, staged = false, firstUser?: string, firstAnswer?: string) => {
   await install(page)
   if (staged) await page.addInitScript(SSE)
   await page.addInitScript((value) => localStorage.setItem('deepapi-theme', value), theme)
@@ -123,7 +123,7 @@ const boot = async (page: Page, theme: string, staged = false, firstUser?: strin
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await seed(page, firstUser)
+  await seed(page, firstUser, firstAnswer)
 }
 
 const paeth = (left: number, up: number, upLeft: number) => {
@@ -693,6 +693,43 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByText('旁边的问题')).toBeVisible()
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(page.getByText('已选择 0 组对话')).toHaveCount(0)
+    })
+
+    test('a long selected answer keeps its checkbox pinned in the viewport', async ({ page }) => {
+      test.setTimeout(90_000)
+      const lines = Array.from({ length: 48 }, (_, index) => `长回答第 ${index + 1} 行，滚动后中段留在列表里。`).join('\n')
+      await boot(page, theme, false, '请展开说明', lines)
+      await page.locator('.turn.assistant').first().locator('button[aria-label="分享"]').click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const box = page.locator('.turn.assistant').first().locator('.share-box')
+      await expect(box).toBeChecked()
+      const host = page.locator('.transcript')
+      const scrolled = await host.evaluate((node) => {
+        const answer = node.querySelector('.turn.assistant')
+        if (!(answer instanceof HTMLElement)) return 0
+        node.scrollTop = Math.max(0, answer.offsetTop + answer.offsetHeight / 2 - node.clientHeight / 2)
+        return node.scrollTop
+      })
+      expect(scrolled, 'the long answer actually scrolls').toBeGreaterThan(200)
+      const stuck = await box.boundingBox()
+      const transcript = await host.boundingBox()
+      const prose = await page.locator('.turn.assistant').first().locator('.prose').boundingBox()
+      expect(stuck, 'checkbox stays rendered').not.toBeNull()
+      expect(transcript, 'transcript box').not.toBeNull()
+      expect(prose, 'answer box').not.toBeNull()
+      const middle = prose!.y + prose!.height / 2
+      expect(middle, 'answer middle is inside the transcript').toBeGreaterThan(transcript!.y)
+      expect(middle, 'answer middle is inside the transcript').toBeLessThan(transcript!.y + transcript!.height)
+      expect(stuck!.y, 'checkbox stays below the transcript top').toBeGreaterThanOrEqual(transcript!.y - 20)
+      expect(stuck!.y + stuck!.height, 'checkbox stays inside the viewport').toBeLessThanOrEqual(h)
+      expect(stuck!.y, 'checkbox stays inside the viewport').toBeGreaterThanOrEqual(0)
+      expect(Math.abs(stuck!.y - middle), 'checkbox does not travel with the answer middle').toBeGreaterThan(80)
+      const pin = await page.locator('.turn.assistant').first().locator('.share-sticky').evaluate((node) => {
+        const style = getComputedStyle(node)
+        return { position: style.position, top: style.top }
+      })
+      expect(pin.position).toBe('sticky')
+      expect(pin.top).toBe('0px')
     })
   })
 }

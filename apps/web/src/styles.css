@@ -4444,15 +4444,15 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
    Its top:0 is the message-row padding edge (._9663006 / ._4f9bf79), not our .turn top.
    .share-port is that edge: same height as the turn, shifted so sticky padding-top 13px
    lands the checkbox on the 1280×800 capture (user ~3px under the grey, answer on the first line).
-   The port is also the sticky scrollport (overflow:hidden). The transcript's padding edge
-   is lower than this origin on a phone, and sticky top:0 would otherwise clamp the
-   checkbox down onto that edge. .share-origin restores the turn's left edge so the
-   column can keep left:-42px without painting outside the scrollport. */
+   SP-SHARE-035 / 109. The port must not be a scrollport. overflow:hidden made this
+   absolute box the sticky container, so the checkbox scrolled away with the answer.
+   overflow:visible lets it stick to .transcript. .share-origin restores the turn's left
+   edge so the column can keep left:-42px. */
 .share-port { display: contents; }
 .turn.user.share-on > .share-port {
   display: block;
   position: absolute;
-  overflow: hidden;
+  overflow: visible;
   top: -25px;
   bottom: 25px;
   left: -42px;
@@ -4463,7 +4463,7 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 .turn.assistant.share-on > .share-port {
   display: block;
   position: absolute;
-  overflow: hidden;
+  overflow: visible;
   top: -8px;
   bottom: 8px;
   left: -42px;
@@ -4511,6 +4511,12 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   padding-top: 13px;
   padding-bottom: 13px;
   pointer-events: none;
+  /* Desktop transcript padding is 12px and the user port origin is 25px above the turn,
+     so top:0 would clamp the margin box down 13px and move the captured checkbox.
+     The margin keeps that edge on the scrollport; the translate keeps the captured box.
+     Sticky still pins the margin edge, so a scrolled answer keeps the checkbox in view. */
+  margin-top: 13px;
+  transform: translateY(-13px);
 }
 /* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
 .shell.share-narrow .share-sticky { z-index: 1; }
