@@ -12,7 +12,7 @@
 //                                         stop / error / interrupted) → label-tertiary
 //   vertical line       ._9ecc93a        border-left 1px label-dimmed in every state (no state selector exists)
 //   no transition on dot/icon colour (transition-duration 0s): the switch is a single frame.
-// IDs: fb1721-D1 WIP dot stays known. fb1721-D2 stop/error title icon is green on this PR, so its key is gone.
+// IDs: fb1721-D1 matches the live brand pulse, so that key is gone. fb1721-D2 stop/error title icon is green on this PR, so its key is gone.
 // A fix PR deletes only its own id. FB1721_STRICT=1 ignores knownFailure.
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
@@ -23,9 +23,7 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const LIB = readFileSync(join(HERE, 'lib/fb1721-state.js'), 'utf8')
 const OFF = JSON.parse(readFileSync(join(HERE, 'fixtures/official-fb1721.json'), 'utf8')).state
 const STRICT = process.env.FB1721_STRICT === '1'
-const KNOWN: Record<string, string> = {
-  'fb1721-D1': 'fb1721-D1: 思考点永远灰色、无脉动；进行中应为品牌蓝 + 1.5s 脉动，结束后灰',
-}
+const KNOWN: Record<string, string> = {}
 const knownFailure = (id: string) => { if (!STRICT && KNOWN[id]) test.fail(true, KNOWN[id]) }
 const ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="#888"/></svg>')
 const RES = Array.from({ length: 5 }, (_, i) => ({ type: 'web_search_result', title: `来源 ${i + 1}`, url: `https://s${i + 1}.example/a`, snippet: 's', site_name: `站${i + 1}`, site_icon: ICON, page_age: '2026-11-19T00:00:00Z', encrypted_content: 'x' }))
@@ -49,19 +47,19 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
   const B = OFF.brand[theme], T = OFF.tertiary[theme], DIM = OFF.dimmed[theme]
   test.describe(`fb1721 state ${theme} ${w}`, () => {
     test.use({ viewport: { width: w, height: h }, colorScheme: theme, bypassCSP: true })
-    test('wip-thinking-dot-blue-pulsing', async ({ page }) => { knownFailure('fb1721-D1'); await start(page, theme); await push(page, E.think0); await page.waitForTimeout(400)
+    test('wip-thinking-dot-blue-pulsing', async ({ page }) => { await start(page, theme); await push(page, E.think0); await page.waitForTimeout(400)
       const a = await st(page); await page.waitForTimeout(600); const b = await st(page)
       for (const s of [a, b]) { expect(s.dots.length, 'one think dot').toBe(1); expect(s.dots[0].bg).toBe(B); expect(s.dots[0].anim).toBe(`${OFF.dot.animationDuration} ${OFF.dot.animationTimingFunction} infinite`) }
       expect(a.icon, 'title icon while WIP').toBe(B); expect(a.lines.every((c: string) => c === DIM), `line colours ${a.lines}`).toBe(true) })
     test('dot-turns-grey-when-think-ends', async ({ page }) => { await start(page, theme); await push(page, E.think0); await page.waitForTimeout(400)
-      // Sample one frame of the live brand dot before the search block replaces it. The pulse stays a known failure on the other D1 tests.
+      // Sample one frame of the live brand dot before the search block replaces it.
       await page.evaluate(() => (window as any).__sampler.start())
       await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
       await push(page, E.search); await page.waitForTimeout(500); const rec = await page.evaluate(() => (window as any).__sampler.stop())
       const seq = rec.map((r: { s?: { dots?: { bg: string }[] } }) => r.s?.dots?.[0]?.bg).filter(Boolean); const uniq = seq.filter((c: string, i: number) => c !== seq[i - 1])
       expect(uniq, 'dot colour sequence across the transition: blue then grey, no intermediate frames').toEqual([B, T])
       const s = await st(page); expect(s.dots[0].anim).toBe('none'); expect(s.icon).toBe(B) })
-    test('only-last-think-fragment-blue', async ({ page }) => { knownFailure('fb1721-D1'); await start(page, theme)
+    test('only-last-think-fragment-blue', async ({ page }) => { await start(page, theme)
       for (const p of [E.think0, E.search, E.results, E.think1]) await push(page, p); await page.waitForTimeout(500)
       const s = await st(page); expect(s.dots.map((d: { bg: string }) => d.bg)).toEqual([T, B]); expect(s.dots.map((d: { anim: string }) => d.anim)).toEqual(['none', `${OFF.dot.animationDuration} ${OFF.dot.animationTimingFunction} infinite`]) })
     test('answer-streaming-and-done-all-grey', async ({ page }) => { // green on master (guard: the fix must not leave dots blue)
