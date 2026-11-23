@@ -1367,7 +1367,20 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .ds-markdown a:not(.ds-a):not(.cite):focus-visible { box-shadow: 0 0 0 2px var(--dsw-alias-brand-text); }
 .ds-markdown hr { background: var(--dsw-alias-border-l2); border: none; height: 1px; margin: 32px 0; display: block; }
 .ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
-.ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: -18px; color: var(--dsw-alias-label-secondary); }
+.ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox {
+  /* Same checkbox role as .ds-checkbox: 16px, radius 6, 1.5px ring. */
+  --dsl-checkbox-size: 16px;
+  --dsl-checkbox-border-radius: 6px;
+  --dsl-checkbox-border-width: 1.5px;
+  --dsl-checkbox-border-color: var(--dsw-alias-border-l3);
+  margin-left: -18px;
+  color: var(--dsw-alias-label-secondary);
+  width: var(--dsl-checkbox-size);
+  height: var(--dsl-checkbox-size);
+  border-radius: var(--dsl-checkbox-border-radius);
+  border-width: var(--dsl-checkbox-border-width);
+  border-color: var(--dsl-checkbox-border-color);
+}
 .ds-markdown .ds-markdown-task-list-item > .ds-markdown-task-checkbox + .ds-markdown-paragraph { display: inline; }
 /* SP-MD-022. Think headings and paragraphs. Our think root is .ds-think-content.ds-markdown. */
 .ds-think-content.ds-markdown :is(h1, h2, h3, h4, h5, h6),
@@ -1418,12 +1431,32 @@ body[data-ds-dark-theme] .diagram-card { background: #1b1b1c; }
 .diagram-tools { gap: 8px; user-select: none; }
 /* Segmented track. Selected tab is a white pill: 图表 76×26, 代码 59×26. */
 .diagram-tabs {
-  background: #f1f3f5;
-  border-radius: 10px;
-  padding: 2px;
-  gap: 3px;
+  /* Official .ds-segmented. Button boxes stay 76×26 and 59×26 (border-box). */
+  --dsl-segmented-color: #f1f3f5;
+  --dsl-segmented-border-radius: 10px;
+  --dsl-segmented-font-size: 12px;
+  --dsl-segmented-line-height: 18px;
+  --dsl-segmented-padding: 2px;
+  --dsl-segmented-gap: 3px;
+  --dsl-segmented-button-border-radius: 8px;
+  --dsl-segmented-button-padding: 4px 14px;
+  --dsl-segmented-button-color: var(--dsw-alias-label-tertiary);
+  --dsl-segmented-button-font-weight: var(--ds-font-weight-strong);
+  --dsl-segmented-button-selected-color: var(--dsw-alias-label-primary);
+  --dsl-segmented-button-selected-bg: #fff;
+  --dsl-segmented-button-selected-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 3px 1px 0 rgba(0, 0, 0, 0.04), 0 3px 8px 0 rgba(0, 0, 0, 0.12);
+  background: var(--dsl-segmented-color);
+  border-radius: var(--dsl-segmented-border-radius);
+  font-size: var(--dsl-segmented-font-size);
+  line-height: var(--dsl-segmented-line-height);
+  padding: var(--dsl-segmented-padding);
+  gap: var(--dsl-segmented-gap);
 }
-body[data-ds-dark-theme] .diagram-tabs { background: #1b1b1c; }
+body[data-ds-dark-theme] .diagram-tabs {
+  --dsl-segmented-color: #1b1b1c;
+  --dsl-segmented-button-selected-bg: #353638;
+  background: var(--dsl-segmented-color);
+}
 /* SP-MD-1074. Official .ae809fef divider. */
 .diagram-tools .diagram-divider {
   width: 1px;
@@ -1433,17 +1466,16 @@ body[data-ds-dark-theme] .diagram-tabs { background: #1b1b1c; }
   background-color: var(--dsw-alias-border-l3);
 }
 
-.diagram-tabs button { height: 26px; border: 0; border-radius: 8px; background: transparent; color: #81858c; padding: 0 14px; font-size: 12px; line-height: 18px; }
+.diagram-tabs button { box-sizing: border-box; height: 26px; border: 0; border-radius: var(--dsl-segmented-button-border-radius); background: transparent; color: var(--dsl-segmented-button-color); padding: var(--dsl-segmented-button-padding); font-size: 12px; line-height: 18px; font-weight: var(--dsl-segmented-button-font-weight); }
 .diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
 .diagram-tabs button:first-child { width: 76px; }
 .diagram-tabs button:last-child { width: 59px; }
 .diagram-tabs button.on {
-  background: #fff;
-  color: #0f1115;
-  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 3px 1px 0 rgba(0, 0, 0, 0.04), 0 3px 8px 0 rgba(0, 0, 0, 0.12);
+  background: var(--dsl-segmented-button-selected-bg);
+  color: var(--dsl-segmented-button-selected-color);
+  box-shadow: var(--dsl-segmented-button-selected-shadow);
 }
-body[data-ds-dark-theme] .diagram-tabs button { color: #adb2b8; }
-body[data-ds-dark-theme] .diagram-tabs button.on { background: #353638; color: #f9fafb; }
+body[data-ds-dark-theme] .diagram-tabs button.on { background: var(--dsl-segmented-button-selected-bg); color: var(--dsl-segmented-button-selected-color); }
 .diagram-tools button:not(.diagram-icon) { font-size: 12px; height: 26px; }
 .diagram-tools button.diagram-icon { display: flex; width: 16px; height: 16px; padding: 0; border-radius: 50%; align-items: center; justify-content: center; user-select: none; }
 .diagram-tools button span { height: 100%; color: var(--dsw-alias-label-secondary); display: flex; align-items: center; }
