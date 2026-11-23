@@ -1690,9 +1690,10 @@ body[data-ds-dark-theme] .shell.selecting .composer-fill-alt { display: none; }
 .chips, .tool-right { display: flex; align-items: center; gap: 10px; }
 .tool-right { height: 34px; }
 .chips { flex: 1 1 0; min-width: 0; overflow: hidden; }
-/* SP-CMP-064. Official toggle margin-right is 10px, and the last toggle is 0. */
+/* SP-CMP-064. Official toggle margin-right is 10px, and the last toggle is 0. Thinking sits in .chip-wrap. */
 .composer .chips { gap: 0; }
-.composer .chips > .chip:not(:last-child) { margin-right: 10px; }
+.composer .chips > .chip:not(:last-child),
+.composer .chips > .chip-wrap:not(:last-child) > .chip { margin-right: 10px; }
 .chip { flex: none; }
 .composer .chip { padding: 10px; }
 .chip-wrap { position: relative; display: inline-flex; align-items: center; }
