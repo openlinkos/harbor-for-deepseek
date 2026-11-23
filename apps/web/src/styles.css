@@ -594,7 +594,10 @@ a.chat-link, a.chat-link:hover, a.chat-link:visited {
   line-height: 22px;
   cursor: pointer;
 }
-.chat-row > button:not(.more), .chat-row form { flex: 0 1 auto; min-width: 0; max-width: calc(100% - 36px); text-align: left; background: none; border: 0; padding: 0; font-size: 14px; line-height: 22px; cursor: pointer; color: var(--dsw-alias-label-primary); text-decoration: none; }
+.chat-row > button:not(.more), .chat-row form { min-width: 0; text-align: left; background: none; border: 0; padding: 0; font-size: 14px; cursor: pointer; color: var(--dsw-alias-label-primary); text-decoration: none; }
+/* SP-SB-056. The title text is 18px on a 22px-tall button. The row itself stays 22px. */
+.chat-row > button:not(.more) { flex: 1; height: 22px; line-height: 18px; margin: -2px 35px -2px -10px; border-radius: 11px; }
+.chat-row form { flex: 0 1 auto; max-width: calc(100% - 36px); line-height: 22px; }
 .chat-row > .more { margin-left: auto; width: 28px; height: 28px; padding: 0; border-radius: 4096px; color: rgb(129, 133, 140); font-size: 13px; line-height: 20px; }
 .chat-row > .more svg { width: 16px; height: 16px; }
 .chat-row > button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -605,8 +608,9 @@ a.chat-link, a.chat-link:hover, a.chat-link:visited {
 body[data-ds-dark-theme] .chat-link.active { background: var(--dsw-specific-sidebar-nav-item-active-accent); }
 body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--dsw-alias-brand-primary-invert); }
 .more { display: none; }
+.chat-link .more { position: absolute; top: 6px; right: 4px; z-index: 10; }
 .chat-link:hover .more, .chat-link.open .more, .chat-link:focus-within .more { display: grid; }
-.chat-link.active .more { display: grid; position: absolute; top: 6px; right: 4px; z-index: 10; width: 28px; height: 28px; border-radius: 4096px; color: rgb(129, 133, 140); }
+.chat-link.active .more { display: grid; width: 28px; height: 28px; border-radius: 4096px; color: rgb(129, 133, 140); }
 .chat-link.active .more svg { width: 16px; height: 16px; }
 @media (max-width: 767px) {
   .chat-link .more { display: grid; }
