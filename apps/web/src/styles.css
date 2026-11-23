@@ -504,6 +504,7 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
   white-space: nowrap;
   font: var(--dsw-font-xs-13);
   color: var(--dsw-alias-label-secondary);
+  margin-right: 6px;
 }
 .search-hit.active .search-hit-snippet { color: var(--dsw-alias-label-secondary); }
 .search-hit-snip { font-weight: 500; color: var(--dsw-alias-label-primary); }

@@ -1804,7 +1804,7 @@ export const Shell = () => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
-    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group30')]
+    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group7'), t('group30')]
     for (const item of state.conversations.filter((chat) => !filtering || !filter || (chat.title || t('untitledChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
@@ -1814,8 +1814,10 @@ export const Shell = () => {
           ? t('groupToday')
           : days < 2
             ? t('groupYesterday')
-            : days < 30
-              ? t('group30')
+            : days < 7
+              ? t('group7')
+              : days < 30
+                ? t('group30')
                 : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
       buckets.set(label, [...(buckets.get(label) ?? []), item])
     }

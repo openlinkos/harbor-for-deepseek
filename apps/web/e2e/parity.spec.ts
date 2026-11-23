@@ -663,7 +663,7 @@ test('date groups', async ({ page }) => {
   await age(page, 1)
   await expect(page.getByTestId('sidebar')).toContainText('昨天')
   await age(page, 3)
-  await expect(page.getByTestId('sidebar')).toContainText('30 天内')
+  await expect(page.getByTestId('sidebar')).toContainText('7 天内')
   await age(page, 12)
   await expect(page.getByTestId('sidebar')).toContainText('30 天内')
   await age(page, 40)
