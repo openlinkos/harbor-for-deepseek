@@ -97,9 +97,15 @@ test('SP-SEARCH-214..220 search panel closes on navigation and stays for delete-
 
   await page.locator('.action-row').getByRole('button', { name: '分享' }).click()
   await expect(page.locator('.share-bar')).toBeVisible()
-  await page.getByTestId('search-results').click()
+  // SP-SHARE-149. Share mode lets the turn take the pointer, so these controls are not the hit target.
+  const coveredByTurn = async (testId: string) => page.getByTestId(testId).evaluate((node, id) => {
+    const box = node.getBoundingClientRect()
+    const top = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)
+    return top?.closest(`[data-testid="${id}"]`) == null
+  }, testId)
+  expect(await coveredByTurn('search-results')).toBe(true)
   await expect(page.getByTestId('search-panel')).toBeHidden()
-  await page.getByTestId('source-favicons').click()
+  expect(await coveredByTurn('source-favicons')).toBe(true)
   await expect(page.getByTestId('search-panel')).toBeHidden()
 })
 

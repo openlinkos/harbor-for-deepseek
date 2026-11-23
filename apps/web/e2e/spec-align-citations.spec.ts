@@ -226,8 +226,13 @@ test('SP-CITE-158..174 hover icon keeps a loaded image and uses the link svg whe
   await page.getByTestId('message-assistant').getByRole('button', { name: '分享' }).click()
   await expect(pill).toHaveClass(/is-inert/)
   await expect(pill).toHaveCSS('cursor', 'default')
-  await pill.hover()
+  // SP-SHARE-149. The turn's children do not take the pointer, so hover and click never reach the pill.
+  const covered = await pill.evaluate((node) => {
+    const box = node.getBoundingClientRect()
+    const top = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)
+    return top?.closest('[data-testid="search-results"]') == null
+  })
+  expect(covered).toBe(true)
   await expect(pill).toHaveCSS('background-color', 'rgb(255, 255, 255)')
-  await pill.click()
   await expect(page.getByTestId('search-panel')).toBeHidden()
 })

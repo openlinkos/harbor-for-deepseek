@@ -4,5 +4,8 @@
 
 改过的断言：
 
-- apps/web/e2e/share-select.spec.ts:414 点击 `input.share-box` -> 点击 `.turn` SP-SHARE-149
-- apps/web/e2e/share-select.spec.ts:435 点击 `input.share-box` -> 点击 `.turn` SP-SHARE-149
+- apps/web/e2e/share-select.spec.ts:417 点击 `input.share-box` -> 点击 `.turn` SP-SHARE-149
+- apps/web/e2e/share-select.spec.ts:438 点击 `input.share-box` -> 点击 `.turn` SP-SHARE-149
+- apps/web/e2e/spec-align-citations.spec.ts:235 悬停并点击来源胶囊 -> 点击点不在胶囊上，白底保持，面板保持关闭 SP-SHARE-149
+- apps/web/e2e/spec-align-search-panel.spec.ts:106 点击 search-results -> 点击点不在按钮上，面板保持关闭 SP-SHARE-149
+- apps/web/e2e/spec-align-search-panel.spec.ts:108 点击 source-favicons -> 点击点不在按钮上，面板保持关闭 SP-SHARE-149
