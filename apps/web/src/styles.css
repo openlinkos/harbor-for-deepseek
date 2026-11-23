@@ -1018,6 +1018,22 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .think-copy li > ol { margin-top: 4px; margin-bottom: 0; }
 .think-copy li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose { font: var(--dsw-font-markdown-base); font-weight: 400; }
+/* SP-CV-287–299. Official ._9663006::before. Opacity stays 0, so the wash does not paint. */
+.prose.ds-markdown { position: relative; }
+.prose.ds-markdown::before {
+  content: "";
+  background-color: var(--dsw-alias-bg-multi-select);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s;
+  position: absolute;
+  top: -12px;
+  bottom: 10px;
+  left: -16px;
+  right: -16px;
+}
 .prose p { margin: 16px 0; font-size: 16px; font-weight: 400; line-height: 28px; }
 .prose p:first-child { margin-top: 0; }
 .prose p:last-child { margin-bottom: 0; }
@@ -1135,7 +1151,8 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   --dsl-code-block-banner-font: var(--dsw-font-xs-13);
   --dsl-code-block-content-font: var(--dsw-font-markdown-code-block);
   color: var(--dsw-alias-label-primary);
-  background: var(--dsw-alias-markdown-code-block);
+  background: var(--dsw-alias-bg-multi-select);
+  --code-bottom-color: var(--dsw-alias-bg-multi-select);
   border-radius: var(--dsl-code-block-border-radius);
   margin: 16px 0;
   overflow: hidden;

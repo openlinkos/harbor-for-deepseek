@@ -71,8 +71,10 @@ export const replyErrorCode = (error: unknown): string => {
   return REPLY_CODE[classifyApiError(error)]
 }
 
-export const replyErrorKey = (code: string | null): MessageKey | null =>
-  code && code in REPLY_KEY ? REPLY_KEY[code as keyof typeof REPLY_KEY] : null
+export const replyErrorKey = (code: string | null): MessageKey | null => {
+  if (code === 'code:wip-network') return 'completionWipNetworkErrorToast'
+  return code && code in REPLY_KEY ? REPLY_KEY[code as keyof typeof REPLY_KEY] : null
+}
 
 export type FileErrorCode = 'fileIdMissing' | 'fileDataMissing' | 'invalidFileId'
 

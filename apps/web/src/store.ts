@@ -151,18 +151,20 @@ const withLive = (conversationId: string | null, messages: Message[]): Message[]
 }
 
 /** A local refresh has no fetch left. Persisted "streaming" rows are the stopped state. */
-const stopOrphanStreams = async (store: Repository, rows: Message[]): Promise<Message[]> => {
+const stopOrphanStreams = async (store: Repository, rows: Message[]): Promise<{ rows: Message[]; orphans: number }> => {
   const next: Message[] = []
+  let orphans = 0
   for (const row of rows) {
     if (row.role === 'assistant' && row.status === 'streaming' && liveTurn?.message.id !== row.id) {
       const stopped: Message = { ...row, status: 'aborted', updatedAt: nowIso() }
       await store.saveMessage(stopped)
       next.push(stopped)
+      orphans += 1
     } else {
       next.push(row)
     }
   }
-  return next
+  return { rows: next, orphans }
 }
 
 export type ServerQuota = {
@@ -314,6 +316,9 @@ export type HarborState = {
   settingsOpen: boolean
   sidebarOpen: boolean
   notice: string | null
+  /** SP-CV-369/370/418/419. A toast key, or networkToasts for the two network sentences. */
+  statusToast: 'msgGeneratingTryLater' | 'hintLastMessageIsWIP' | 'commonNetworkErrorToast' | 'completionNetworkErrorToast' | 'completionWipNetworkErrorToast' | 'networkToasts' | null
+  dismissStatusToast: () => void
   prefs: Prefs
   drafts: DraftFile[]
   /** SP-CMP-296. Per-chat composer text for this tab. Key '' is the landing page. Not stored. */
@@ -429,6 +434,8 @@ export const useHarbor = create<HarborState>((set, get) => ({
   settingsOpen: false,
   sidebarOpen: false,
   notice: null,
+  statusToast: null,
+  dismissStatusToast: () => set({ statusToast: null }),
   prefs: withToggles(defaultPrefs()),
   drafts: [],
   textDrafts: {},
@@ -460,6 +467,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
     const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     const usages: Array<Usage | null> = []
     let messages: Message[] = []
+    let orphanStreams = 0
     let storedActive: string | null = null
     try {
       storedActive = sessionStorage.getItem(ACTIVE_KEY)
@@ -473,7 +481,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
         usages.push(row.usage)
       }
       if (conversation.id === activeId) {
-        messages = withLive(activeId, await stopOrphanStreams(store, await mergeLiveSnap(store, rows)))
+        const stopped = await stopOrphanStreams(store, await mergeLiveSnap(store, rows))
+        orphanStreams += stopped.orphans
+        messages = withLive(activeId, stopped.rows)
       }
     }
     let key: string | null = previousKey
@@ -497,6 +507,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       messages,
       totals: sumUsage(usages),
       prefs: prefsFor(conversations.find((item) => item.id === activeId), defaultPrefs()),
+      statusToast: orphanStreams > 0 ? 'hintLastMessageIsWIP' : null,
     })
     if (key) {
       void get().refreshBalance()
@@ -630,7 +641,8 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const store = await repository()
-    const messages = withLive(id, await stopOrphanStreams(store, await store.listMessages(id)))
+    const stopped = await stopOrphanStreams(store, await store.listMessages(id))
+    const messages = withLive(id, stopped.rows)
     const conversation = get().conversations.find((item) => item.id === id)
     set({
       activeId: id,
@@ -638,6 +650,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       sidebarOpen: false,
       drafts: restored,
       prefs: prefsFor(conversation, get().prefs),
+      ...(stopped.orphans ? { statusToast: 'hintLastMessageIsWIP' as const } : {}),
     })
   },
 
@@ -777,7 +790,11 @@ export const useHarbor = create<HarborState>((set, get) => ({
     }
     const trimmed = text.trim()
     const { drafts, streaming, key } = get()
-    if (streaming || !key) {
+    if (!key) {
+      return
+    }
+    if (streaming) {
+      set({ statusToast: 'msgGeneratingTryLater' })
       return
     }
     if (!trimmed && drafts.every((file) => !file.fileId)) {
@@ -1431,6 +1448,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         hintedUser = { ...user, errorMessage: HINT_NETWORK, updatedAt: nowIso() }
         await store.saveMessage(hintedUser)
       }
+      useHarbor.setState({ statusToast: 'networkToasts' })
       restoreLeaf = regenerateParent !== undefined ? (leafBefore ?? parentId) : parentId
       conversation = stamp({ ...conversation, activeLeafId: restoreLeaf })
       await store.saveConversation(conversation)
@@ -1439,7 +1457,7 @@ const runTurn = async (text: string, regenerateParent?: string | null, branchFro
         status: aborted ? 'aborted' : 'error',
         blocks,
         usage: draft.usage,
-        errorMessage: aborted ? null : replyErrorCode(error),
+        errorMessage: aborted ? null : (classifyApiError(error) === 'network' && hasStreamOutput(blocks) ? 'code:wip-network' : replyErrorCode(error)),
         thinkingSeconds: clock.seconds(),
       })
     }
@@ -1493,7 +1511,8 @@ const reloadLocal = async (set: Setter) => {
   const store = await repository()
   const conversations = (await store.listConversations()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const activeId = conversations[0]?.id ?? null
-  const messages = activeId ? withLive(activeId, await stopOrphanStreams(store, await mergeLiveSnap(store, await store.listMessages(activeId)))) : []
+  const stopped = activeId ? await stopOrphanStreams(store, await mergeLiveSnap(store, await store.listMessages(activeId))) : null
+  const messages = activeId && stopped ? withLive(activeId, stopped.rows) : []
   set({ conversations, activeId, messages, serverMode: false })
 }
 

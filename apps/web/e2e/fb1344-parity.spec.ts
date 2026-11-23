@@ -20,8 +20,7 @@ const STRICT = process.env.FB1344_STRICT === '1'
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P6 另一会话生成中再发送
-  'concurrent-send': 'fb1344-P6: 另一会话生成中时新会话的发送键是停止键，点击会中断第一条；没有「有消息正在生成，请稍后再试」',
+  // fb1344-P6 concurrent-send now shows 「有消息正在生成，请稍后再试」 and leaves the first reply running (SP-CV-370).
 }
 // Cells where master already matches (an expected failure that passes would fail the run).
 const KNOWN_PASSING_CELLS: Record<string, string[]> = {}

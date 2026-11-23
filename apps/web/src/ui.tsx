@@ -2200,6 +2200,7 @@ export const Shell = () => {
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
+      {state.statusToast ? <StatusToast code={state.statusToast} /> : null}
       {shareSoon ? (
         <div className="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="share-soon-title" data-testid="share-soon" onClick={exitShare}>
           <div className="share-soon-card" onClick={(event) => event.stopPropagation()}>
@@ -2369,8 +2370,8 @@ const Composer = () => {
   const setPrefs = useHarbor((state) => state.setPrefs)
   const send = useHarbor((state) => state.send)
   const stop = useHarbor((state) => state.stop)
-  const streaming = useHarbor((state) => state.streaming)
-  const generating = useHarbor((state) => state.streaming && state.messages.some((item) => item.status === 'streaming' && item.blocks.length > 0))
+  const streaming = useHarbor((state) => state.streaming && state.messages.some((item) => item.conversationId === state.activeId && item.status === 'streaming'))
+  const generating = useHarbor((state) => state.streaming && state.messages.some((item) => item.status === 'streaming' && item.blocks.length > 0 && item.conversationId === state.activeId))
   const drafts = useHarbor((state) => state.drafts)
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
@@ -2934,6 +2935,22 @@ const Settings = () => {
         </section>
         </div>
       </div>
+    </div>
+  )
+}
+
+const StatusToast = ({ code }: { code: 'msgGeneratingTryLater' | 'hintLastMessageIsWIP' | 'commonNetworkErrorToast' | 'completionNetworkErrorToast' | 'completionWipNetworkErrorToast' | 'networkToasts' }) => {
+  const t = useT()
+  const dismiss = useHarbor((state) => state.dismissStatusToast)
+  const text = code === 'networkToasts'
+    ? `${t('commonNetworkErrorToast')}\n${t('completionNetworkErrorToast')}`
+    : t(code)
+  return (
+    <div className="toast-layer">
+      <p className="toast" role="status" data-testid="status-toast">
+        {text}
+        <button type="button" onClick={dismiss}>{t('close')}</button>
+      </p>
     </div>
   )
 }
