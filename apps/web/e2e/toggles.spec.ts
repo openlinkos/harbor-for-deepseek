@@ -140,7 +140,7 @@ test('deep thinking stays off after new chat, the shortcut, and reload', async (
   expect(bodies.at(-1)?.thinking?.type).toBe('disabled')
 })
 
-test('smart search stays off after new chat, the shortcut, and reload', async ({ page }) => {
+test('smart search stays off after new chat and the shortcut, and resets on reload', async ({ page }) => {
   const bodies: Body[] = []
   await install(page, bodies, () => plainEvents())
   await unlock(page)
@@ -159,13 +159,13 @@ test('smart search stays off after new chat, the shortcut, and reload', async ({
 
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await expectChip(page, 'toggle-search', false)
+  await expectChip(page, 'toggle-search', true)
   await page.screenshot({ path: join(shots, 'search-off-after-reload.png') })
 
   await page.getByTestId('new-chat').click()
   await send(page, '刷新之后不搜索')
   await expect(page.getByTestId('assistant-text').last()).toContainText('好的')
-  expect(hasSearch(bodies.at(-1) ?? {})).toBe(false)
+  expect(hasSearch(bodies.at(-1) ?? {})).toBe(true)
   expect(bodies.at(-1)?.thinking?.type).toBe('enabled')
 })
 
@@ -190,11 +190,11 @@ test('landing chips are the same global toggles', async ({ page }) => {
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
   await expectChip(page, 'toggle-thinking', false)
-  await expectChip(page, 'toggle-search', false)
+  await expectChip(page, 'toggle-search', true)
   await send(page, '落地页带进来的开关')
   await expect(page.getByTestId('assistant-text')).toContainText('好的')
   expect(bodies.at(-1)?.thinking?.type).toBe('disabled')
-  expect(hasSearch(bodies.at(-1) ?? {})).toBe(false)
+  expect(hasSearch(bodies.at(-1) ?? {})).toBe(true)
 })
 
 test('a search-only answer does not render the thought shell', async ({ page }) => {

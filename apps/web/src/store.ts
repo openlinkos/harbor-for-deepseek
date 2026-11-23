@@ -216,6 +216,10 @@ const defaultPrefs = (): Prefs => ({
   readLink: false,
 })
 
+// SP-CMP-256. Search stays in this page session (New chat keeps it) and a reload resets it.
+// The on/off default stays true until the owner decides. Thinking still persists (SP-CMP-255).
+let sessionSearch = defaultPrefs().search
+
 const withFixedModel = (prefs: Prefs) => ({
   ...prefs,
   model: DEFAULT_CHAT_MODEL,
@@ -223,14 +227,14 @@ const withFixedModel = (prefs: Prefs) => ({
 })
 
 const readToggles = (): Toggles => {
-  const fallback: Toggles = { thinking: true, search: true }
+  const fallback: Toggles = { thinking: true, search: sessionSearch }
   try {
     const raw = localStorage.getItem(TOGGLE_KEY)
     if (!raw) return fallback
     const parsed = JSON.parse(raw) as Partial<Toggles>
     return {
       thinking: typeof parsed.thinking === 'boolean' ? parsed.thinking : fallback.thinking,
-      search: typeof parsed.search === 'boolean' ? parsed.search : fallback.search,
+      search: sessionSearch,
     }
   } catch {
     return fallback
@@ -238,8 +242,9 @@ const readToggles = (): Toggles => {
 }
 
 const writeToggles = (toggles: Toggles) => {
+  sessionSearch = toggles.search
   try {
-    localStorage.setItem(TOGGLE_KEY, JSON.stringify({ thinking: toggles.thinking, search: toggles.search }))
+    localStorage.setItem(TOGGLE_KEY, JSON.stringify({ thinking: toggles.thinking }))
   } catch {
     // Storage can be unavailable in private mode. The in-memory prefs still apply for this tab.
   }
