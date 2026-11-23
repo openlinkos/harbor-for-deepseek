@@ -575,6 +575,7 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   color: inherit;
   text-decoration: none;
   box-sizing: border-box;
+  user-select: none;
 }
 .item-menu [role='menuitem'] { display: flex; align-items: center; gap: 8px; width: 116px; height: 40px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; color: inherit; cursor: pointer; }
 .item-menu [role='menuitem']:hover { background: var(--dsw-alias-interactive-bg-hover); }
@@ -1772,6 +1773,8 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   padding: 20px;
   box-shadow: var(--dsw-shadow-lv3);
 }
+/* SP-MOD-466. Dialog cards use the 24px modal radius. Gate and admin cards stay 16px. */
+.modal-card, .key-card { border-radius: 24px; }
 .key-card { width: min(440px, 100%); padding: 28px 24px 22px; border: 1px solid var(--dsw-alias-border-l1); box-sizing: border-box; }
 @media (max-width: 767px) {
   [data-testid='key-dialog'] { align-items: center; padding: 16px; overflow: auto; }
@@ -2022,17 +2025,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   padding-right: 0;
 }
 .form-error { color: var(--dsw-alias-state-error-primary); }
+/* SP-MOD-046..049, 497..502. Toast padding, line, and shadow follow the official toast. */
 .toast {
   position: fixed;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--dsw-alias-toast-bg);
   color: white;
+  border: 1px solid var(--dsw-alias-border-inverted);
   border-radius: 12px;
-  padding: 8px 12px;
-  /* Above .modal (20), the phone settings layer (1100), and .share-modal (1400). */
-  z-index: 1500;
+  padding: 12px 18px;
+  line-height: 22px;
+  max-width: min(100vw - 28px, 480px);
+  text-align: center;
+  white-space: pre-wrap;
+  box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.04), 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  /* SP-MOD-045. Official toast layer is 2000, above the share mask at 1400. */
+  z-index: 2000;
 }
 .mark { width: 22px; height: 22px; display: block; flex: none; }
 .greeting .mark { width: 34px; height: 25px; }
@@ -2635,15 +2648,18 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   box-shadow: var(--dsw-shadow-lv3);
 }
 .confirm-modal { z-index: 40; }
+/* SP-MOD-010, 466, 468. Confirm card uses the modal surface, radius, and line height. */
 .confirm-card {
   width: min(400px, calc(100vw - 32px));
   background: var(--dsw-alias-bg-layer-2);
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
   padding: 22px 22px 16px;
-  box-shadow: var(--dsw-shadow-lv3);
+  line-height: 22px;
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-border-inverted), var(--dsw-shadow-lv3);
 }
-.confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 560; }
+/* SP-MOD-471, 472. Title is 16px/24px with a 28px minimum. Weight stays 500. */
+.confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 500; line-height: 24px; min-height: 28px; }
 .confirm-card .danger.outline {
   background: transparent;
   color: #f25a5a;
@@ -3056,6 +3072,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
   z-index: 5;
