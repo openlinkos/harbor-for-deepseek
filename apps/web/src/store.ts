@@ -206,6 +206,8 @@ export type StatusToastCode =
   | 'pasteTooLong'
   | 'overCharLimit'
   | 'removeBadFiles'
+  | 'sessionDeleted'
+  | 'renameFailed'
 
 const imagePreviews = new Map<string, string>()
 export const imagePreview = (fileId?: string) => (fileId ? imagePreviews.get(fileId) : undefined)
@@ -517,7 +519,20 @@ export const useHarbor = create<HarborState>((set, get) => ({
     } catch {
       storedActive = null
     }
-    const activeId = storedActive && conversations.some((item) => item.id === storedActive) ? storedActive : (conversations[0]?.id ?? null)
+    let pathId: string | null = null
+    if (typeof location !== 'undefined') {
+      const match = location.pathname.match(/^\/a\/chat\/s\/([^/]+)\/?$/)
+      if (match) {
+        try { pathId = decodeURIComponent(match[1]) } catch { pathId = match[1] }
+      }
+    }
+    const pathKnown = Boolean(pathId && conversations.some((item) => item.id === pathId))
+    const sessionMissing = Boolean(pathId && !pathKnown)
+    const activeId = pathKnown
+      ? pathId
+      : sessionMissing
+        ? null
+        : storedActive && conversations.some((item) => item.id === storedActive) ? storedActive : (conversations[0]?.id ?? null)
     for (const conversation of conversations) {
       const rows = await store.listMessages(conversation.id)
       for (const row of rows) {
@@ -550,7 +565,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
       messages,
       totals: sumUsage(usages),
       prefs: prefsFor(conversations.find((item) => item.id === activeId), defaultPrefs()),
-      statusToast: orphanStreams > 0 ? 'hintLastMessageIsWIP' : null,
+      statusToast: sessionMissing ? 'sessionDeleted' : orphanStreams > 0 ? 'hintLastMessageIsWIP' : null,
     })
     if (key) {
       void get().refreshBalance()
@@ -729,23 +744,28 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async rename(id, title) {
-    if (get().serverMode) {
-      await api(`/api/conversations/${id}`, { method: 'PATCH', body: JSON.stringify({ title }) })
-      set({
-        conversations: get().conversations.map((item) =>
-          item.id === id ? { ...item, title, titleSource: 'user' } : item,
-        ),
-      })
-      return
+    try {
+      if (get().serverMode) {
+        await api(`/api/conversations/${id}`, { method: 'PATCH', body: JSON.stringify({ title }) })
+        set({
+          conversations: get().conversations.map((item) =>
+            item.id === id ? { ...item, title, titleSource: 'user' } : item,
+          ),
+        })
+        return
+      }
+      const store = await repository()
+      const current = get().conversations.find((item) => item.id === id)
+      if (!current) {
+        set({ statusToast: 'renameFailed' })
+        return
+      }
+      const next = stamp({ ...current, title: title.trim(), titleSource: 'user' as const })
+      await store.saveConversation(next)
+      set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
+    } catch {
+      set({ statusToast: 'renameFailed' })
     }
-    const store = await repository()
-    const current = get().conversations.find((item) => item.id === id)
-    if (!current) {
-      return
-    }
-    const next = stamp({ ...current, title: title.trim(), titleSource: 'user' as const })
-    await store.saveConversation(next)
-    set({ conversations: get().conversations.map((item) => (item.id === id ? next : item)) })
   },
 
   async pin(id) {

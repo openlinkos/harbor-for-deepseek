@@ -3030,8 +3030,8 @@ body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, var(--dsl-m
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
 .settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
 /* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
-/* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
-.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; display: flex; flex: 1; min-height: 0; align-items: center; }
+/* SP-MOD-290 wins over SP-MOD-440. The title selector is more specific, so the computed min-height is 28px. */
+.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; display: flex; flex: 1; min-height: 28px; align-items: center; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
 .settings-x svg { width: 14px; height: 14px; }
 .settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 4px 0 0; }
