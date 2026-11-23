@@ -3424,7 +3424,7 @@ input.share-box.ds-checkbox:checked::after,
   white-space: nowrap;
   font-size: 14px;
   line-height: 22px;
-  color: var(--dsw-alias-label-secondary);
+  /* SP-SHARE-072. No color of its own. The count inherits label-primary. */
 }
 .share-gap { flex: 1 1 auto; min-width: 0; }
 .share-bar .ds-button { flex: 0 0 auto; }
