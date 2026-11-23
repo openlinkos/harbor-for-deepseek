@@ -1686,6 +1686,9 @@ a.cite:hover, .cite:hover {
 .sources-pill.is-inert:hover {
   --search-row-site-logo-color: var(--dsw-alias-bg-base);
 }
+/* SP-CITE-041. The pill text is 6px from the favicons. The -4px overlap stays on .favicons i. */
+.sources-pill-text { margin-left: 6px; }
+body.rtl .sources-pill-text { margin-left: 0; margin-right: 6px; }
 .search-panel {
   /* Closed shell is width 0 (SP-SEARCH-069/070/086). Open rules below restore the column. */
   /* SP-SEARCH-192: min(50vw - 4rem, 390px). html font-size is the UA 16px, so 4rem is 64px. */

@@ -976,7 +976,7 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
             <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
           ))}
         </span>
-        {t('pagesPill', { count: results.length })}
+        <span className="sources-pill-text">{t('pagesPill', { count: results.length })}</span>
       </button>
     </div>
   )
@@ -1224,7 +1224,7 @@ const AssistantTurn = ({ message }: { message: Message }) => {
       {sources.length ? (
         <button className={shareMode?.on ? 'sources-pill is-inert' : 'sources-pill'} type="button" data-testid="search-results" onClick={() => { if (!shareMode?.on) sourcesApi.show(sources) }}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
-          {t('pagesPill', { count: sources.length })}
+          <span className="sources-pill-text">{t('pagesPill', { count: sources.length })}</span>
         </button>
       ) : null}
     </>
