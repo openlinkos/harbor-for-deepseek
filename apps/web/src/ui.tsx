@@ -1248,16 +1248,17 @@ const AssistantTurn = ({ message }: { message: Message }) => {
   )
 }
 
-const BranchSwitcher = ({ ids, current, disabled, onStep }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void }) => {
+const BranchSwitcher = ({ ids, current, disabled, onStep, holdTip }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void; holdTip?: string }) => {
   if (ids.length <= 1) return null
   const index = Math.max(0, ids.indexOf(current))
+  const hold = disabled && holdTip ? holdTip : undefined
   return (
     <span className="branch" data-testid="versions">
-      <button type="button" className="branch-prev" aria-label="‹" disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
+      <button type="button" className="branch-prev" aria-label="‹" title={hold} disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
         <Glyph name="chevronRight" size={14} />
       </button>
       <span className="branch-count">{index + 1} / {ids.length}</span>
-      <button type="button" aria-label="›" disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
+      <button type="button" aria-label="›" title={hold} disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
         <Glyph name="chevronRight" size={14} />
       </button>
     </span>
@@ -1355,7 +1356,7 @@ const MessageRow = ({ message }: { message: Message }) => {
                 <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
               </button>
             </HoverTip>
-            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
+            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
           </div>
         </>
         )
@@ -1374,12 +1375,12 @@ const MessageRow = ({ message }: { message: Message }) => {
       {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
-          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
           <HoverTip text={copied ? t('copied') : t('copy')}>
             <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           </HoverTip>
-          <HoverTip text={t('regenerate')}>
-            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => { sources.close(); void regenerate(message.id) }}>
+          <HoverTip text={streaming ? t('waitUntilGenerated') : t('regenerate')}>
+            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} title={streaming ? t('waitUntilGenerated') : undefined} aria-label={t('regenerate')} disabled={streaming} onClick={() => { sources.close(); void regenerate(message.id) }}>
               <FillIcon paths={[...ACTION_ICONS.regen]} />
             </button>
           </HoverTip>
