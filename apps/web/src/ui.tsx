@@ -1124,12 +1124,28 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         <Glyph name="document" size={14} />
         <span className="browse-wrap">
           <span className="browse-count">{t('browsedPages', { count: step.items.length })}</span>
-          {step.items.map((item) => (
+          {step.items.slice(0, 5).map((item) => (
             <span key={item.url} className="browse-item">
               <a className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
               <BrowseExternalIcon />
             </span>
           ))}
+          {step.items.length > 5 ? (
+            <button
+              type="button"
+              className="browse-view-all"
+              data-testid="browse-view-all"
+              onClick={() => {
+                if (shareMode?.on) return
+                sourcesApi.toggle(step.items.map((item) => ({
+                  url: item.url,
+                  title: item.title,
+                  snippet: '',
+                  site: hostOf(item.url),
+                })))
+              }}
+            >{t('viewAll')}</button>
+          ) : null}
         </span>
       </p>
     )

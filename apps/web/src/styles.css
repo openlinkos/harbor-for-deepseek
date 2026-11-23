@@ -2762,6 +2762,15 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   overflow: hidden;
 }
 .browse-count { margin-right: 6px; }
+.browse-view-all {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-right: 6px;
+  font: var(--dsw-font-xs-13);
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+}
 .browse-item { white-space: nowrap; display: inline-flex; align-items: center; max-width: 100%; margin-right: 6px; }
 .browse-link {
   display: inline-block;
