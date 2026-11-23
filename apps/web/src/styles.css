@@ -44,31 +44,42 @@ button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: var(--dsw-alias-brand-text); }
 
-.shell { display: flex; height: 100dvh; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; position: relative; }
+.shell { display: flex; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; position: absolute; inset: 0; }
 .sidebar {
   --sider-top-slot-height: 40px;
   width: var(--sider-width);
+  max-width: var(--sider-width);
+  min-width: 0;
+  height: 100%;
   flex: 0 0 var(--sider-width);
   display: flex;
   flex-direction: column;
   position: relative;
-  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 8;
   background: var(--dsw-specific-sidebar-fill);
   border-right: 1px solid var(--dsw-alias-border-l1);
   padding: calc(6px + env(safe-area-inset-top)) 12px 0;
   min-height: 100vh;
   overflow: hidden;
-  transition: flex-basis var(--ds-transition-duration-slow) var(--ds-ease-in-out), width var(--ds-transition-duration-slow) var(--ds-ease-in-out), opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+  box-sizing: border-box;
+  transition: flex-basis var(--ds-transition-duration-slow) var(--ds-ease-in-out), width var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out), transform var(--ds-transition-duration-slow) var(--ds-ease-in-out);
 }
 .shell.sider-collapsed .sidebar {
   flex-basis: 0;
   width: 0;
+  max-width: 0;
+  left: 0;
   padding-left: 0;
   padding-right: 0;
   border-right-width: 0;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  transform: none;
 }
 .sider-top, .topbar, .composer-tools, .code-head, .action-row, .found-line, .user-row {
   display: flex;
@@ -498,7 +509,29 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
 .search-hit.active .search-hit-snippet { color: var(--dsw-alias-label-secondary); }
 .search-hit-snip { font-weight: 500; color: var(--dsw-alias-label-primary); }
 @media (max-width: 767px) {
-  .search-dialog { width: calc(100vw - 32px); left: 16px; transform: none; }
+  /* SP-GL-209/210/211. Phone search-chats card fills the viewport. The header row keeps the l1 underline. */
+  .search-dialog {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: auto;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .search-dialog::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 59px;
+    border-bottom: 1px solid var(--dsw-alias-border-l1);
+    pointer-events: none;
+  }
   .search-dialog.has-query {
     top: 0;
     left: 0;
@@ -554,6 +587,8 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
 .chat-link.active .more svg { width: 16px; height: 16px; }
 @media (max-width: 767px) {
   .chat-link .more { display: grid; }
+  /* SP-GL-191. Selected row more control is a flex row below 768. */
+  .chat-link.active .more { display: flex; align-items: center; justify-content: center; }
 }
 .menu {
   position: absolute;
@@ -728,7 +763,7 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
 .float-pill .icon-btn svg { width: 16px; height: 16px; }
 
 
-.stage { flex: 1; min-width: 0; min-height: 0; height: 100%; display: flex; flex-direction: column; position: relative; }
+.stage { flex: 1; min-width: 0; max-width: 100%; min-height: 0; height: 100%; display: flex; flex-direction: column; position: relative; }
 .top-fill { position: absolute; left: 0; top: 12px; width: min(1610px, 100%); height: 48px; background: rgb(255, 255, 255); pointer-events: none; }
 body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .topbar {
@@ -1574,10 +1609,11 @@ a.cite:hover, .cite:hover {
   body:not([data-ds-dark-theme]) .stage:not(:has(.home)) .composer {
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
+  .top-actions { z-index: 100; flex-shrink: 0; }
   .topbar .top-actions > button.icon-btn:not(.top-new) {
     width: 34px;
     height: 34px;
-    margin-top: 8px;
+    margin-top: 12px;
     margin-right: -1px;
     border-radius: 4096px;
     color: rgb(15, 17, 21);
@@ -2832,18 +2868,21 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     width: var(--sider-width, 261px);
     max-width: var(--sider-width, 261px);
     flex-basis: var(--sider-width, 261px);
+    flex-shrink: 0;
     height: 100dvh;
     min-height: 100dvh;
-    z-index: 1002;
+    z-index: 15;
     transform: translateX(calc(-1 * var(--sider-width, 261px)));
     pointer-events: none;
-    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s linear var(--ds-transition-duration-slow);
+    will-change: transform, max-width;
+    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s linear var(--ds-transition-duration-slow);
     padding-top: calc(12px + env(safe-area-inset-top));
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
   .shell.nav-open .sidebar {
     visibility: visible;
     opacity: 1;
+    z-index: 1002;
     transform: translateX(0);
     pointer-events: auto;
     width: var(--sider-width, 261px);
@@ -2851,9 +2890,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     flex-basis: var(--sider-width, 261px);
     padding-left: 12px;
     padding-right: 12px;
-    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
+    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
   }
-  .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; z-index: 1001; }
+  .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; opacity: 1; z-index: 1001; transition: opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out); }
   .menu-mobile, .top-new {
     display: grid;
     width: 44px;
@@ -3172,6 +3211,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .greeting .mark { width: 34px; height: 25px; transform: scale(0.88); transform-origin: center; }
   /* SP-CV-345. Same media: bubble max-width calc(100% - 68px). */
   .bubble { max-width: calc(100% - 68px); }
+  /* SP-GL-185. Textarea floor is line-height 24px * 1.25 + the 12px input padding. */
+  .composer textarea { min-height: calc(24px * 1.25 + 12px); }
 }
 @media (hover: none) {
   .chip:hover:not(.on), .icon-btn:hover, .chat-link:hover, .menu button:hover { background: transparent; }
