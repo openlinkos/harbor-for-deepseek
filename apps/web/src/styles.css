@@ -3799,6 +3799,13 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-ring-color: var(--dsw-alias-state-error-primary);
   --dsl-button-text-color: var(--dsw-alias-state-error-primary);
 }
+/* SP-MOD-771..774. Official ._0efab74 hover and active are #f25a5a. Resting fill stays the fixture color. */
+.ds-button.ds-button--outlined.ds-button--error:hover,
+.ds-button.ds-button--outlined.ds-button--error:active {
+  --dsl-button-border-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
+}
 .ds-button > .ds-button__background {
   box-sizing: border-box;
   border-radius: inherit;
