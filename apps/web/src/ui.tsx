@@ -2120,6 +2120,7 @@ export const Shell = () => {
               </div>
               {sharing ? null : (
                 <div className="composer-wrap">
+                  <div className="composer-back" aria-hidden="true" />
                   <Composer />
                   <p className="footnote ai-note">{t('aiNote')}</p>
                 </div>

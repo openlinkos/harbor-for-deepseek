@@ -1653,11 +1653,24 @@ a.cite:hover, .cite:hover {
   bottom: 0;
   z-index: 10;
   width: min(776px, calc(100% - 48px));
-  margin: auto 0 0;
-  padding-top: 24px;
-  background: linear-gradient(180deg, transparent 0, var(--dsw-alias-bg-base) 24px);
+  margin: auto 32px 0;
+  padding-top: 0;
+  /* SP-CMP-227/228. The 24px fade sits on .composer-back (SP-CMP-233). */
+  background: linear-gradient(to bottom, transparent 0%, transparent 30%, var(--dsw-alias-bg-base) 30%, var(--dsw-alias-bg-base) 100%);
   pointer-events: none;
 }
+.composer-back {
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--dsw-alias-bg-base) 24px);
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+body[data-ds-dark-theme] .composer-back {
+  background: linear-gradient(180deg, rgba(21, 21, 23, 0) 0%, var(--dsw-alias-bg-base) 24px);
+}
+
 .stage:not(:has(.home)) .composer-wrap > .composer,
 .stage:not(:has(.home)) .composer-wrap > .ai-note { pointer-events: auto; width: 100%; }
 @media (min-width: 768px) {
@@ -3194,11 +3207,17 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   .stage:not(:has(.home)) .chat-column { align-self: stretch; width: auto; margin: 0 20px; }
   .stage:not(:has(.home)) .composer-wrap {
     z-index: 10;
-    width: calc(100% - 32px);
+    width: auto;
+    margin-left: 16px;
+    margin-right: 16px;
     padding-top: 8px;
     background: var(--dsw-alias-bg-base);
   }
   .stage:not(:has(.home)) .composer-wrap .footnote { margin: 0; }
+  @media (max-width: 439px) {
+    .stage:not(:has(.home)) .composer-wrap { padding: 0; }
+    .composer-back { display: none; }
+  }
   .stage:not(:has(.home)) .composer {
     width: 100%;
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
