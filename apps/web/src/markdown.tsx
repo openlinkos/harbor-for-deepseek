@@ -525,7 +525,7 @@ const itemBlocks = (children: ReactNode) => {
     const text = inline.some((node) => typeof node !== 'string' || node.trim() !== '')
     if (text) {
       if (inline.length === 1 && isValidElement(inline[0]) && inline[0].type === 'p') out.push(inline[0])
-      else out.push(<p key={out.length}>{inline}</p>)
+      else out.push(<p className="ds-markdown-paragraph" key={out.length}>{inline}</p>)
     }
     inline = []
   }
@@ -541,6 +541,9 @@ const itemBlocks = (children: ReactNode) => {
 }
 
 const components = {
+  p({ children }: { children?: ReactNode }) {
+    return <p className="ds-markdown-paragraph">{children}</p>
+  },
   citation: CitationView,
   'citation-group': CitationGroupView,
   'math-inline': MathInline,
