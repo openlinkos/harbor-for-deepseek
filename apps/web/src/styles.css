@@ -516,7 +516,7 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
 .search-hit-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
 .search-hit-title {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -524,7 +524,7 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
   /* SP-SB search result title weight. */
   font-weight: 500;
 }
-.search-hit-mark { font-weight: 600; }
+.search-hit-mark { font-weight: 600; display: inline-flex; width: max-content; vertical-align: top; }
 .search-hit-time { flex: 0 0 auto; font: var(--dsw-font-xs-13); color: var(--dsw-alias-label-tertiary); }
 .search-hit.active .search-hit-time { color: var(--dsw-alias-label-tertiary); }
 .search-hit-snippet {
