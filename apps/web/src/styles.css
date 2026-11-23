@@ -1112,11 +1112,6 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 /* SP-MD-1051. A table with a fourth column is inline-block so it can grow past the column. */
 .markdown-table-wrapper:has(th:nth-child(4), td:nth-child(4)) table { display: inline-block; }
 .ds-think-content.ds-markdown, .ds-think-content .ds-markdown { font: var(--dsw-font-markdown-small); color: var(--dsw-alias-label-secondary); }
-/* Answer text stays on the pre-Inter stack. Inter on this line shifts the cite badge 1px vs the preceding glyph. Body keeps Inter. */
-.prose,
-.ds-markdown {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
 .ds-think-content.ds-markdown h1, .ds-think-content.ds-markdown h2, .ds-think-content.ds-markdown h3, .ds-think-content.ds-markdown h4, .ds-think-content.ds-markdown h5, .ds-think-content.ds-markdown h6, .ds-think-content .ds-markdown h1, .ds-think-content .ds-markdown h2, .ds-think-content .ds-markdown h3, .ds-think-content .ds-markdown h4, .ds-think-content .ds-markdown h5, .ds-think-content .ds-markdown h6 { font: var(--dsw-font-markdown-small-strong); }
 .diagram-card { border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; margin: 12px 0; overflow: hidden; background: var(--dsw-alias-bg-layer-2); }
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; }
