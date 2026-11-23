@@ -2192,7 +2192,9 @@ export const Shell = () => {
             })}
           </ol>
         </aside>
-      ) : null}
+      ) : (
+        <aside className="search-panel is-closed" data-testid="search-panel" aria-hidden="true" />
+      )}
       {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => closeRef.current()} /> : null}
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}

@@ -1451,6 +1451,7 @@ a.cite:hover, .cite:hover {
   --search-row-site-logo-color: var(--dsw-alias-bg-base);
 }
 .search-panel {
+  /* Closed shell is width 0 (SP-SEARCH-069/070/086). Open rules below restore the column. */
   /* SP-SEARCH-192: min(50vw - 4rem, 390px). html font-size is the UA 16px, so 4rem is 64px. */
   --sidebar-width: min(calc(50vw - 4rem), 390px);
   --search-view-card-title-font: 500 14px/22px var(--dsw-font-family);
@@ -1469,12 +1470,20 @@ a.cite:hover, .cite:hover {
   color: var(--dsw-alias-label-primary);
   background: var(--dsw-alias-bg-base);
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  transition: flex-basis 0.2s ease-out;
+  width: 0;
+  flex: 0 0 0;
+  transition: none 0.2s ease-out;
   box-shadow: none;
+}
+.search-panel:not(.is-closed) {
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
+  overflow: visible;
+  transition: flex-basis 0.2s ease-out;
 }
 .search-panel header {
   display: flex;
