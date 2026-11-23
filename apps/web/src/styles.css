@@ -906,11 +906,22 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
 .thinking .chev { display: inline-flex; }
-.phase-label { color: var(--dsw-alias-label-secondary); height: 100%; display: inline-block; position: relative; overflow: hidden; }
+/* ._5255ff8 declares inline-block (SP-CV-117). The same node also matches
+   ._4d41763, which wins: inline-flex and align-items center (SP-CV-156, SP-CV-158).
+   Centering keeps the 28px line inside the 34px title. */
+.phase-label {
+  color: var(--dsw-alias-label-secondary);
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
 /* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
   height: 100%;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   overflow: hidden;
 }
