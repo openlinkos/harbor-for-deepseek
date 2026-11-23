@@ -1586,18 +1586,12 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
   cursor: pointer;
 }
 .code-head button span { display: block; height: 16px; line-height: 20px; }
-/* SP-MD-401. Official .md-code-block>pre is word-break break-all. The code element stays normal. */
-.code-card pre { margin: 0 !important; padding: 16px; overflow: auto; white-space: pre-wrap; word-break: break-all; font: var(--dsl-code-block-content-font, var(--dsw-font-markdown-code-block)); }
+.code-card pre { margin: 0 !important; padding: 16px; overflow: auto; white-space: pre-wrap; word-break: normal; font: var(--dsl-code-block-content-font, var(--dsw-font-markdown-code-block)); }
 /* SP-MD-221 / SP-MD-304. Body word-break: break-word must not reach code. */
 .prose :is(pre, code),
 .ds-markdown :is(pre, code) {
   word-break: normal;
   overflow-wrap: normal;
-}
-/* SP-MD-401. This beats the pre, code reset above. The code element stays normal. */
-.ds-markdown .code-card pre,
-.prose .code-card pre {
-  word-break: break-all;
 }
 .code-card code, .code-card code span, .box-drawing, .box-drawing code {
   font: var(--dsw-font-markdown-code-block);
@@ -3410,7 +3404,8 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   border-radius: 12px;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* SP-SET-787. Official theme selector ._6c1fed6 is space-between. */
+  justify-content: space-between;
   /* SP-SET-800 / SP-SET-802 / SP-SET-803. Icon is 16px, gap above the label is 0, border uses the outlined token. */
   --dsl-button-border-color: var(--dsw-alias-border-l2);
   --dsl-button-icon-size: 16px;
