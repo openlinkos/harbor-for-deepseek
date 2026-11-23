@@ -2917,6 +2917,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   text-align: center;
   user-select: none;
 }
+.ai-note:hover { color: var(--dsw-alias-label-secondary); }
 .answer-note {
   margin: 16px 0 0;
   color: var(--dsw-alias-label-tertiary);
