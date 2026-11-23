@@ -9,6 +9,9 @@ html, body, #root { height: 100%; }
 html { height: 100dvh; }
 body { --scroll-color: rgba(0, 0, 0, 0.08); --scroll-color-hover: rgba(0, 0, 0, 0.15); }
 body[data-ds-dark-theme] { --scroll-color: rgba(255, 255, 255, 0.15); --scroll-color-hover: rgba(255, 255, 255, 0.24); }
+.transcript, .side-scroll {
+  scrollbar-gutter: stable;
+}
 .transcript, .side-scroll, .composer textarea {
   scrollbar-width: none;
 }
