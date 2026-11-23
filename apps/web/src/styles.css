@@ -162,13 +162,15 @@ a { color: var(--dsw-alias-brand-text); }
   background: transparent;
 }
 .icon-btn {
-  /* SP-UI icon and iconLabelSecondary. Transparent fill, padding 0, secondary label. */
+  /* SP-UI icon and iconLabelSecondary. Transparent fill, padding 0, secondary label.
+     SP-UI-162/163. Disabled ink is label-caption (#81858c dark, #adb2b8 light). */
   --dsl-button-color: transparent;
   --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
   --dsl-button-padding: 0;
   --dsl-button-min-width: 0;
   --dsl-button-text-color: var(--dsw-alias-label-secondary);
   --dsl-button-text-color-hover: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-disabled: var(--dsw-alias-label-caption);
   width: 32px;
   height: 32px;
   min-width: 0;
@@ -1115,16 +1117,18 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   height: 24px;
   padding: 0;
   border: 0;
-  /* Filled warning + circle. warn-primary/secondary are amber-500/400, so the painted rgb stays. */
+  /* Filled warning + circle. SP-UI-150/151/153. warn-primary/secondary are amber-500/400. */
   border-radius: 50%;
+  --dsl-button-color: var(--dsw-alias-state-warn-primary);
+  --dsl-button-color-hover: var(--dsw-alias-state-warn-secondary);
   --dsl-button-ring-color: var(--dsw-alias-state-warn-primary);
-  background: var(--dsw-alias-state-warn-primary);
+  background: var(--dsl-button-color);
   color: var(--dsw-static-neutral-bluish-00);
   font-weight: 500;
   display: grid;
   place-items: center;
 }
-.hint-retry:hover { background: var(--dsw-alias-state-warn-secondary); }
+.hint-retry:hover { background: var(--dsl-button-color-hover); }
 .user-hint {
   margin: 6px 0 0;
   color: var(--dsw-alias-label-tertiary);
