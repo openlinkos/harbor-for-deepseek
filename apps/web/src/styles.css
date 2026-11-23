@@ -3821,7 +3821,7 @@ input.share-box.ds-checkbox:checked::after,
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9;
+  z-index: 1001;
   box-sizing: border-box;
   height: 65px;
   display: flex;
@@ -3852,6 +3852,7 @@ input.share-box.ds-checkbox:checked::after,
   cursor: pointer;
   flex: none;
 }
+.share-all .ds-checkbox { margin-left: -26px; }
 .share-split {
   width: 1px;
   height: 14px;
