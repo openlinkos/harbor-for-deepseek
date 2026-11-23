@@ -2119,6 +2119,14 @@ body[data-ds-dark-theme] .composer {
   box-shadow: none;
 }
 .composer textarea {
+  /* Composer padding and type size stay on SP-CMP-095 / SP-CMP-123. These are the textarea tokens. */
+  --dsl-textarea-text-color: var(--dsw-alias-label-primary);
+  --dsl-textarea-placeholder-color: var(--dsw-alias-label-tertiary);
+  --dsl-textarea-border-radius: 10px;
+  --dsl-textarea-font-size: var(--ds-font-size-m);
+  --dsl-textarea-line-height: var(--ds-line-height-m);
+  --dsl-textarea-padding: 6px 10px;
+  --dsl-textarea-caret-color: var(--dsw-alias-brand-primary);
   width: 100%;
   border: 0;
   resize: none;
