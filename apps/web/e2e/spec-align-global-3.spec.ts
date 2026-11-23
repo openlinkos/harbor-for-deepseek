@@ -34,7 +34,8 @@ test('desktop shell fills the viewport and the sidebar stays a 261px column', as
   expect(box.ligatures).toBe('no-contextual')
   const side = page.locator('.sidebar')
   await expect(side).toHaveCSS('position', 'relative')
-  await expect(side).toHaveCSS('z-index', '1')
+  // SP-GL-129 / SP-SB-570. Desktop in-flow sider is z-index 8.
+  await expect(side).toHaveCSS('z-index', '8')
   await expect(side).toHaveCSS('max-width', '261px')
   await expect(side).toHaveCSS('min-width', '0px')
   const motion = await side.evaluate((node) => getComputedStyle(node).transitionDuration)
