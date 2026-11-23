@@ -739,7 +739,7 @@ test('dialog motion', async ({ page }) => {
 test('sidebar motion', async ({ page }) => {
   await unlock(page)
   await expect(page.locator('.sidebar')).toHaveCSS('transition-duration', /0\.3s/)
-  await page.getByRole('button', { name: '隐藏' }).click()
+  await page.getByRole('button', { name: '收起边栏' }).click()
   await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
   await expect(page.locator('.sidebar')).toHaveCSS('opacity', '0')
 })

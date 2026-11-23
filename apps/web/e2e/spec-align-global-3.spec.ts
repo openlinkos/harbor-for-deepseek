@@ -40,7 +40,7 @@ test('desktop shell fills the viewport and the sidebar stays a 261px column', as
   const motion = await side.evaluate((node) => getComputedStyle(node).transitionDuration)
   expect(motion).toContain('0.3s')
 
-  await page.getByRole('button', { name: '隐藏' }).click()
+  await page.getByRole('button', { name: '收起边栏' }).click()
   await expect(side).toHaveCSS('width', '0px')
   await expect(side).toHaveCSS('max-width', '0px')
   await expect(side).toHaveCSS('transform', 'none')

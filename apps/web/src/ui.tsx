@@ -1948,10 +1948,10 @@ export const Shell = () => {
             <Wordmark />
           </span>
           <span className="sider-icons">
-            {selecting ? null : <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
+            {selecting ? null : <button className="icon-btn" type="button" aria-label={t('searchHistory')} onClick={() => setFiltering((value) => !value)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>}
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
+            <button className="icon-btn" type="button" aria-label={t('collapseSidebar')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
           </span>
@@ -2054,13 +2054,13 @@ export const Shell = () => {
         <>
           <span className="collapsed-mark"><Mark /></span>
           <div className="float-pill">
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => { if (!window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); setCollapsed(false) }}>
+            <button className="icon-btn" type="button" aria-label={t('expandSidebar')} onClick={() => { if (!window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); setCollapsed(false) }}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
             <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
               <Icon d="M12 5v14M5 12h14" />
             </button>
-            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering(true)}>
+            <button className="icon-btn" type="button" aria-label={t('searchHistory')} onClick={() => setFiltering(true)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>
           </div>
@@ -2069,6 +2069,7 @@ export const Shell = () => {
       {filtering && searchReady ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }} /> : null}
       {filtering && searchReady ? (
         <form className={query ? 'search-dialog has-query' : 'search-dialog'} role="search" onSubmit={(event) => event.preventDefault()}>
+          <div className="search-field">
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
           <input
@@ -2111,6 +2112,7 @@ export const Shell = () => {
           <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
+          </div>
           {query ? (
             <div className={hits.length ? 'search-results' : 'search-results is-empty'} id="conversation-search-results" role="listbox" aria-label={t('searchPanel')} ref={resultsRef}>
               {hits.length ? (

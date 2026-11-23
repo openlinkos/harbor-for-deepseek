@@ -232,7 +232,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.getByRole('button', { name: '保存' }).click()
   await page.screenshot({ path: join(shots, 'm-settings.png') })
   await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
-  await page.getByTestId('sidebar').getByRole('button', { name: '隐藏' }).click()
+  await page.getByTestId('sidebar').getByRole('button', { name: '收起边栏' }).click()
   await page.getByTestId('composer').fill('3 加 5 等于几？')
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('8')
@@ -256,7 +256,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await page.getByTestId('settings-dialog').getByRole('button', { name: '关闭' }).click()
   await expect(page.locator('.wordmark')).toHaveText('DeepAPI')
   await page.screenshot({ path: join(shots, 'm-drawer-dark.png') })
-  await page.getByTestId('sidebar').getByRole('button', { name: '隐藏' }).click()
+  await page.getByTestId('sidebar').getByRole('button', { name: '收起边栏' }).click()
   await page.screenshot({ path: join(shots, 'm-dark.png') })
 })
 

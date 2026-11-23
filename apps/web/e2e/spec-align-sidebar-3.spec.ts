@@ -89,7 +89,7 @@ test('sidebar header, list, select bar, and collapsed pill match the inner piece
   await expect(danger).toHaveCSS('gap', '8px')
   await expect(danger).toHaveCSS('line-height', '22px')
 
-  await page.locator('.sidebar').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.sidebar').getByRole('button', { name: '收起边栏' }).click()
   const pill = page.locator('.float-pill')
   await expect(pill).toHaveCSS('height', '40px')
   await expect(pill).toHaveCSS('border-radius', '100px')

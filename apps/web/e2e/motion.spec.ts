@@ -178,7 +178,7 @@ for (const point of points) {
         await page.keyboard.press('Escape')
         await page.getByTestId('new-chat').click()
         await expect(page.locator('.greeting')).toBeVisible()
-        await page.getByRole('button', { name: '隐藏' }).click()
+        await page.getByRole('button', { name: '收起边栏' }).click()
         await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
         await expect(page.locator('.sidebar')).toHaveCSS('width', '0px')
       }

@@ -151,17 +151,17 @@ test('SP-SEARCH-232..249 panel width, column, sidebar and title across widths', 
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(0)
   await expect.poll(() => widthOf(page, '[data-testid=search-panel]')).toBe(336)
 
-  await page.locator('.float-pill').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.float-pill').getByRole('button', { name: '打开边栏' }).click()
   await expect(page.getByTestId('search-panel')).toBeHidden()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(261)
 
-  await page.locator('.sidebar').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.sidebar').getByRole('button', { name: '收起边栏' }).click()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(0)
   await openPanel(page)
   await page.getByTestId('search-panel').getByRole('button', { name: '关闭' }).click()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(0)
 
-  await page.locator('.float-pill').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.float-pill').getByRole('button', { name: '打开边栏' }).click()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(261)
   await openPanel(page)
   await page.setViewportSize({ width: 768, height: 900 })
@@ -207,9 +207,9 @@ test('SP-SEARCH-242..248 fresh 768, 800 and 390 coupling', async ({ page }) => {
   await openPanel(page)
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(261)
   await expect.poll(() => widthOf(page, '[data-testid=search-panel]')).toBe(390)
-  await page.locator('.sidebar').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.sidebar').getByRole('button', { name: '收起边栏' }).click()
   await expect(page.getByTestId('search-panel')).toBeVisible()
-  await page.locator('.float-pill').getByRole('button', { name: '隐藏' }).click()
+  await page.locator('.float-pill').getByRole('button', { name: '打开边栏' }).click()
   await expect(page.getByTestId('search-panel')).toBeVisible()
   await expect.poll(() => widthOf(page, '[data-testid=sidebar]')).toBe(261)
 
