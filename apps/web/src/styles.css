@@ -786,14 +786,22 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   display: grid;
   gap: 2px;
 }
+/* SP-SB-205. The bottom slot is 64px and sits at the end of the sider. */
+.sider-bottom {
+  height: 64px;
+  margin-top: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
 .user-bar {
   position: relative;
   display: flex;
   align-items: center;
   gap: 0;
-  width: 100%;
-  margin-top: auto;
-  margin-bottom: auto;
+  /* SP-SB-819. 236px wide at the 12px padding edge, 44px tall, centred in the 64px slot. */
+  width: 236px;
+  margin: 0;
   height: 44px;
   min-height: 44px;
   padding: 6px 2px 6px 6px;
@@ -2403,7 +2411,7 @@ body[data-ds-dark-theme] .lang button.on { background: #3a3b40; color: #fff; }
 .boot-bars i:nth-child(2) { width: 78%; }
 .boot-bars i:nth-child(3) { width: 54%; }
 .boot-title-bar { width: 148px; height: 18px; margin: 16px 0 0 18px; border-radius: 8px; }
-.boot-skeleton .user-bar { margin-top: auto; cursor: default; }
+.boot-skeleton .user-bar { cursor: default; }
 label { display: grid; gap: 6px; margin: 10px 0; font-size: 14px; }
 label.check { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px; }
 input[type="checkbox"] {
@@ -3346,7 +3354,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     text-decoration: none;
   }
   .download-app svg { width: 14px; height: 14px; margin-left: 1px; }
-  .user-bar { margin-top: auto; }
+  .sider-bottom { margin-top: auto; }
   .float-pill, .collapsed-mark { display: none; }
   .server-pill, .topbar .ghost { display: none; }
   .stage:has(.home) .topbar { position: absolute; left: 0; right: 0; top: 0; z-index: 2; }

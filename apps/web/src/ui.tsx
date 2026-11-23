@@ -1416,9 +1416,11 @@ export const BootSkeleton = () => {
           <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
         </div>
         <div className="boot-bars" aria-hidden="true"><i /><i /><i /></div>
-        <div className="user-bar">
-          <span className="avatar" />
-          <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+        <div className="sider-bottom">
+          <div className="user-bar">
+            <span className="avatar" />
+            <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+          </div>
         </div>
       </aside>
       <section className="stage">
@@ -2051,6 +2053,7 @@ export const Shell = () => {
             </button>
           </div>
         ) : (
+        <div className="sider-bottom">
         <div
           className="user-bar"
           data-testid="user-menu"
@@ -2088,6 +2091,7 @@ export const Shell = () => {
               <div role="menuitem" tabIndex={0} onClick={() => { setUserMenu(false); if (state.serverUser) void state.logoutServer(); else void state.clearKey() }}><UserMenuIcon name="logout" />{t('logout')}</div>
             </div>
           ) : null}
+        </div>
         </div>
         )}
       </aside>
