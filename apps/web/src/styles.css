@@ -4564,3 +4564,7 @@ input.share-box.ds-checkbox:checked::after,
   .share-bar .share-split,
   .share-bar .share-count { display: none; }
 }
+.transcript, .side-scroll, .settings-main, .search-panel ol, .search-results {
+  /* Scroll areas we render. The overlay gutter bars (.ds-scroll-area__gutters) are not in the tree. */
+  --dsl-scroll-area-gutters-disappear-delay: 1s;
+}
