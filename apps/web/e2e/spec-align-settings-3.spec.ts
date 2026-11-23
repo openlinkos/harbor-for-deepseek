@@ -117,7 +117,7 @@ test('settings select, menu, and switch match the settings skin', async ({ page 
   await sw.click()
   await expect(sw).toHaveCSS('background-color', 'rgb(129, 133, 140)')
   await sw.click()
-  await expect(sw).toHaveCSS('background-color', 'rgb(57, 100, 254)')
+  await expect(sw).toHaveCSS('background-color', 'rgb(86, 134, 254)')
   await trigger.click()
   const darkMenu = page.getByTestId('language-trigger-menu')
   await expect(darkMenu).toHaveCSS('background-color', 'rgb(53, 54, 56)')
