@@ -1601,6 +1601,7 @@ a.cite:hover, .cite:hover {
   display: flex;
   flex-direction: column;
   gap: 0;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
   margin: 0 0 6px;
   padding: 12px;
   border-radius: 12px;
