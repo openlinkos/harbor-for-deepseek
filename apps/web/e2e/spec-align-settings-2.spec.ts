@@ -36,7 +36,7 @@ test('theme cards and setting descriptions follow the official field', async ({ 
   await expect(card).toHaveCSS('padding-left', '32px')
   await expect(card).toHaveCSS('font-size', '14px')
   await expect(card).toHaveCSS('line-height', '22px')
-  await expect(card).toHaveCSS('justify-content', 'space-between')
+  await expect(card).toHaveCSS('justify-content', 'center')
   await expect(card).toHaveCSS('user-select', 'none')
   await expect(card).toHaveCSS('color', 'rgb(15, 17, 21)')
   await expect(card).toHaveCSS('background-color', 'rgb(241, 243, 245)')
