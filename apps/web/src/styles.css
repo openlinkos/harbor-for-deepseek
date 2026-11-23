@@ -878,6 +878,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   width: min(840px, calc(100% - 88px));
   max-width: 840px;
   margin: 0 auto;
+  margin-bottom: env(safe-area-inset-bottom);
   min-width: 0;
   min-height: 0;
   padding: 12px 0 24px;
@@ -926,6 +927,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   white-space: nowrap;
 }
 .turn.assistant { text-align: left; }
+.turn.assistant .prose { padding-bottom: 6px; }
 .turn header { display: flex; justify-content: flex-end; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-base); }
 .thinking + .prose { margin-top: 10px; }
@@ -944,6 +946,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   font-size: 16px;
   line-height: 28px;
   cursor: pointer;
+  pointer-events: all;
 }
 .thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
 .thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
@@ -959,6 +962,9 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   align-items: center;
   position: relative;
   overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 0;
+  transition: color 0.2s;
 }
 /* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
@@ -1264,6 +1270,7 @@ body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
 .code-card pre > code { display: block; }
 /* SP-CV-074, SP-CV-079. Width and left stay off this row: fb1344-parity.spec.ts measures the continue edge. */
 .action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
+.action-row button:disabled { cursor: not-allowed; }
 .action-row button {
   width: 28px;
   height: 28px;
