@@ -743,7 +743,16 @@ body[data-ds-dark-theme] .chat-link.active::after { --mask-base-color: 53, 54, 5
 /* SP-SB-056. The title text is 18px on a 22px-tall button. The row itself stays 22px. */
 .chat-row > button:not(.more) { flex: 1; height: 22px; line-height: 18px; margin: -2px 35px -2px -10px; border-radius: 11px; }
 .chat-row form { flex: 0 1 auto; max-width: calc(100% - 36px); line-height: 22px; }
-.chat-row form input { border-radius: 11px; }
+.chat-row form input {
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  border-radius: 11px;
+  color: var(--dsl-input-text-color);
+  caret-color: var(--dsl-input-caret-color);
+}
 .chat-row > .more { margin-left: auto; width: 28px; height: 28px; padding: 0; border-radius: 4096px; color: rgb(129, 133, 140); font-size: 13px; line-height: 20px; }
 .chat-row > .more svg { width: 16px; height: 16px; }
 .chat-row > button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
