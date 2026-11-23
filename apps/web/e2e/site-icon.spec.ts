@@ -148,7 +148,7 @@ const expectOfficialIcon = async (img: Locator, src: string, size: number) => {
   expect(Math.round(box.parentHeight)).toBe(size)
   expect(circle(box.radius, size)).toBe(true)
   expect(circle(box.parentRadius, size)).toBe(true)
-  expect(box.fit).toBe('cover')
+  expect(box.fit).toBe('contain')
   return box
 }
 
