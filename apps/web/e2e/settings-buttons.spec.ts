@@ -250,7 +250,14 @@ const problems = (buttons: Measured[], theme: 'light' | 'dark', alignColumn: boo
     if (button.fontSize !== OFF.fontSize) issues.push(`font=${button.fontSize}`)
     if (button.lineHeight !== OFF.lineHeight) issues.push(`lh=${button.lineHeight}`)
     if (button.radius !== OFF.radius) issues.push(`radius=${button.radius}`)
-    if (button.variant === 'primary') {
+    if (button.dialog === 'confirm-dialog' && button.variant === 'danger') {
+      // SP-MOD-767..770. The confirm is solid #ec1313, white text, weight 500. The Data-tab 删除 stays outlined.
+      if (button.fontWeight !== '500') issues.push(`weight=${button.fontWeight}`)
+      if (button.bg !== 'rgb(236, 19, 19)') issues.push(`bg=${button.bg}`)
+      if (button.color !== 'rgb(255, 255, 255)') issues.push(`color=${button.color}`)
+      if (button.border !== 'rgb(236, 19, 19)') issues.push(`border=${button.border}`)
+      if (button.borderWidth !== '1px') issues.push(`borderWidth=${button.borderWidth}`)
+    } else if (button.variant === 'primary') {
       if (button.fontWeight !== OFF.primaryWeight) issues.push(`weight=${button.fontWeight}`)
       if (button.bg !== OFF.primaryBg[theme]) issues.push(`bg=${button.bg}`)
       if (button.color !== OFF.primaryText) issues.push(`color=${button.color}`)

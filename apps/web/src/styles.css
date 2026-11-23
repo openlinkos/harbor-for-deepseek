@@ -3680,7 +3680,8 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  /* SP-MOD-064, SP-MOD-168. Light shadow stays none: answer-footer.spec.ts pins it. Dark keeps the shadow below. */
+  /* SP-MOD-064. The token lives on the tooltip. Light tooltips without --show-shadow stay shadow none. */
+  --dsl-tooltip-box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
   z-index: 5;
@@ -3693,8 +3694,10 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
 }
 body[data-ds-dark-theme] .ds-tooltip.ds-tooltip--s {
   --dsl-tooltip-text-color: var(--dsw-alias-label-primary);
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--dsl-tooltip-box-shadow);
 }
+/* SP-MOD-168. Only the named shadow class. Dark tooltips use the same token above. */
+.ds-tooltip.ds-tooltip--show-shadow { box-shadow: var(--dsl-tooltip-box-shadow); }
 .ds-tooltip > .ds-tooltip__arrow.ds-tooltip__arrow--sharp {
   position: absolute;
   left: 50%;
@@ -3924,6 +3927,19 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-border-color: var(--dsw-alias-state-error-secondary);
   --dsl-button-color: var(--dsw-alias-state-error-secondary);
   --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
+}
+/* SP-MOD-767..770. Delete-chat confirm is solid error. The settings Data 删除 stays outlined. */
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error {
+  --dsl-button-color: var(--dsw-static-red-600);
+  --dsl-button-border-color: var(--dsw-static-red-600);
+  --dsl-button-text-color: var(--dsw-static-neutral-bluish-00);
+  --dsl-button-font-weight: 500;
+}
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error:hover,
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error:active {
+  --dsl-button-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
+  --dsl-button-border-color: var(--dsw-alias-state-error-secondary);
 }
 /* SP-UI text and borderlessNeutral. Admin and local-mode ghost buttons are the text controls. */
 button.ghost {

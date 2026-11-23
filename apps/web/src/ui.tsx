@@ -549,7 +549,7 @@ const ConfirmDialog = ({ label, body, confirm, onCancel, onConfirm }: { label: s
         <p className="confirm-body">{body}</p>
         <div className="edit-actions">
           <DsButton type="button" onClick={onCancel}>{t('cancel')}</DsButton>
-          <DsButton type="button" variant="danger" data-testid="confirm-delete" onClick={onConfirm}>{confirm}</DsButton>
+          <DsButton type="button" variant="danger" className="ds-button--solid-error" data-testid="confirm-delete" onClick={onConfirm}>{confirm}</DsButton>
         </div>
       </div>
     </div>,
