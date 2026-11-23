@@ -1232,6 +1232,15 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; }
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }
 .diagram-tools { gap: 8px; user-select: none; }
+/* SP-MD-1074. Official .ae809fef divider. */
+.diagram-tools .diagram-divider {
+  width: 1px;
+  height: 14px;
+  margin-left: 9px;
+  margin-right: 8px;
+  background-color: var(--dsw-alias-border-l3);
+}
+
 .diagram-tabs button, .diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
 .diagram-tools button:not(.diagram-icon) { font-size: 12px; height: 26px; }
 .diagram-tools button.diagram-icon { display: flex; width: 16px; height: 16px; padding: 0; border-radius: 50%; align-items: center; justify-content: center; user-select: none; }
@@ -1311,7 +1320,15 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   height: auto;
   padding: 0;
 }
-.md-code-block-infostring { flex-shrink: 0; }
+/* SP-MD-1077..1080. Official .d813de27 is the code-fence infostring, not a mermaid zoom label. */
+.md-code-block-infostring {
+  flex-shrink: 0;
+  color: var(--dsw-alias-label-primary);
+  font-family: var(--ds-font-family-code);
+  margin-left: 8px;
+  font-size: 12px;
+  line-height: 18px;
+}
 body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
 .code-head .code-tools { display: flex; align-items: center; gap: 2px; }
 .code-head button {

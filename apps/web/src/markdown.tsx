@@ -206,6 +206,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
                   <IconSvg><circle cx="7" cy="7" r="4.2" /><path d="M10.2 10.2 13 13M7 5v4M5 7h4" /></IconSvg>
                 </button>
               </DiagramTip>
+              <span className="diagram-divider" aria-hidden="true" />
             </>
           ) : (
             <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>
