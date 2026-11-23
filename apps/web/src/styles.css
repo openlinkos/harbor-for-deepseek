@@ -2314,6 +2314,8 @@ body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
 .settings-nav button.on { background: rgba(38, 49, 72, 0.06); }
 body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
+/* SP-MOD-197. The wash is the hover, not the resting tab. .on keeps its selected fill. */
+.settings-nav button:hover:not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
 .settings-main { flex: 1 1 0%; overflow: auto; padding: 10px 24px 0; min-width: 0; min-height: 0; height: calc(100% - 54px); }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
 .settings-main button:not(.chip):not(.ds-button) {
