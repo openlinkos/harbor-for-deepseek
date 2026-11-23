@@ -14,3 +14,4 @@
 
 - apps/web/e2e/timeline.spec.ts:205 标题墨间距 21 -> 33 SP-MD-022
 - apps/web/e2e/timeline.spec.ts:207 第二步墨间距 24 -> 36 SP-MD-022
+- apps/web/e2e/fb1721-markdown.spec.ts:77 思考区嵌套列表计算 margin-top 2px -> 4px SP-MD-039

@@ -72,9 +72,9 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       expect.soft(bad, 'block gaps').toEqual([])
       expect.soft(L.liGaps, 'li gap').toEqual(ref.liGaps)
       if (where === 'think') {
-        // SP-MD-042. The declaration is margin-top 2px. The fixture nested gap is the marker line box, not this margin.
+        // SP-MD-039. This nested list follows a paragraph, so margin-top 4px beats SP-MD-042's 2px.
         const nestedTop = await c.locator('li > ul, li > ol').first().evaluate((node) => getComputedStyle(node).marginTop)
-        expect(nestedTop).toBe('2px')
+        expect(nestedTop).toBe('4px')
       } else {
         expect.soft(L.nested, 'nested list gap').toEqual(ref.nested)
       }
