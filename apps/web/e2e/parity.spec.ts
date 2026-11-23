@@ -586,6 +586,8 @@ test('errors', async ({ page }) => {
   mode = 'limited'
   await send(page, '太多')
   await expect(page.locator('.form-error').last()).toBeVisible()
+  // Wait for the 太多 turn's own 429 error before switching the mock; `.last()` above can already match the 坏钥匙 error.
+  await expect(page.locator('.form-error')).toHaveCount(2)
   mode = 'down'
   await send(page, '断网')
   await expect(page.getByTestId('user-hint').last()).toHaveText('请检查网络后重试')
