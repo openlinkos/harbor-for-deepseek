@@ -1427,8 +1427,9 @@ body[data-ds-dark-theme] .diagram-tabs button.on { background: #353638; color: #
   --dsl-code-block-banner-font: var(--dsw-font-xs-13);
   --dsl-code-block-content-font: var(--dsw-font-markdown-code-block);
   color: var(--dsw-alias-label-primary);
-  background: var(--dsw-alias-bg-multi-select);
-  --code-bottom-color: var(--dsw-alias-bg-multi-select);
+  /* SP-MD-370 / SP-MD-371. The card fill is the markdown code-block token. */
+  background: var(--dsw-alias-markdown-code-block);
+  --code-bottom-color: var(--dsw-alias-markdown-code-block);
   border-radius: var(--dsl-code-block-border-radius);
   margin: 16px 0;
   overflow: hidden;
