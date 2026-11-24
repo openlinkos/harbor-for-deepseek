@@ -1229,6 +1229,8 @@ const AssistantTurn = ({ message }: { message: Message }) => {
             <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
             <PhaseTitle text={title} live={livePhase(phase)} />
             <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
+            {/* SP-CV-182. The fade sits under the thinking title. Opacity stays 0 until a selected wash needs it. */}
+            <span className="think-fade" aria-hidden="true" />
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
             <div className="thinking-body">
