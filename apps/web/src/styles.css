@@ -1806,9 +1806,7 @@ body[data-ds-dark-theme] .favicons .site_logo_back { background: #353638; }
   flex-shrink: 0;
   text-decoration: none;
 }
-/* SP-CITE-013 / SP-CITE-113 / think-content adjacent cite: the second badge drops margin-left. */
-.cite + .cite,
-.ds-think-content .cite + .cite { margin-left: 0; }
+/* Official wraps each .ds-markdown-cite in its own anchor, so .cite + .cite never matches and the 2px margins stay. Painted gap is 4px (SP-CITE-113). */
 .cite.wide { min-width: 20px; }
 a.cite:visited { color: var(--dsw-alias-label-tertiary); text-decoration: none; }
 a.cite:hover, .cite:hover {
