@@ -4585,46 +4585,35 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   opacity: 0.4;
   cursor: default;
 }
-/* SP-SHARE-033 / 102 / 103 / 104 / 105 / 106. Official .d30139ff is the checkbox column.
-   Its top:0 is the message-row padding edge (._9663006 / ._4f9bf79), not our .turn top.
-   .share-port is that edge: same height as the turn, shifted so sticky padding-top 13px
-   lands the checkbox on the 1280×800 capture (user ~3px under the grey, answer on the first line).
-   SP-SHARE-035 / 109. The port must not be a scrollport. overflow:hidden made this
-   absolute box the sticky container, so the checkbox scrolled away with the answer.
-   overflow:visible lets it stick to .transcript. .share-origin restores the turn's left
-   edge so the column can keep left:-42px. */
-.share-port { display: contents; }
-.turn.user.share-on > .share-port {
-  display: block;
-  position: absolute;
-  overflow: visible;
-  top: -25px;
-  bottom: 25px;
-  left: -42px;
-  right: 0;
-  min-height: 44px;
-  pointer-events: none;
+/* SP-SHARE-033 / 102 / 103 / 104 / 105 / 106. Official .d30139ff (absolute, top 0,
+   bottom 40px, left -42px, right 0) sits in the message row. The row's own padding
+   is the offset: left -42px lands in that padding, so the checkbox is inside the
+   clickable border box. Sticky padding-top 13px is measured from that row top.
+   User row padding-top 25px puts the box ~3px under the selected wash. Assistant
+   padding-top 8px puts it on the first line. Negative margin keeps the text put.
+   SP-SHARE-035 / 109. The column is not a scrollport, so the box sticks to .transcript. */
+.turn.user.share-on { --share-pad-top: 25px; }
+.turn.assistant.share-on { --share-pad-top: 8px; }
+.turn.share-on {
+  --share-pad-left: 42px;
+  box-sizing: border-box;
+  padding-top: var(--share-pad-top);
+  margin-top: calc(var(--share-pad-top) * -1);
 }
-.turn.assistant.share-on > .share-port {
-  display: block;
-  position: absolute;
-  overflow: visible;
-  top: -8px;
-  bottom: 8px;
-  left: -42px;
-  right: 0;
-  min-height: 44px;
-  pointer-events: none;
+.shell:not(.share-narrow) .turn.share-on {
+  --share-shift-left: var(--share-pad-left);
+  width: calc(100% + var(--share-pad-left));
+  margin-left: calc(var(--share-pad-left) * -1);
+  padding-left: var(--share-pad-left);
 }
 .share-origin { display: contents; }
-.turn.share-on .share-port > .share-origin {
+.turn.share-on > .share-origin {
   display: block;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 42px;
+  left: var(--share-pad-left);
   right: 0;
-  pointer-events: none;
 }
 .share-col { display: contents; }
 .turn.share-on .share-col {
@@ -4641,9 +4630,10 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   left: -42px;
   right: 0;
   z-index: 2;
-  pointer-events: none;
 }
-/* SP-SHARE-034. Narrow list (panel under 800) pins the column at left 0. */
+/* SP-SHARE-034. Narrow list (panel under 800): the column's containing block is the
+   wrapper's padding edge, so left is 0 instead of -42px. */
+.shell.share-narrow .turn.share-on > .share-origin { left: 0; }
 .shell.share-narrow .turn.share-on .share-col { left: 0; }
 /* SP-SHARE-035 / 109 / 110 / 111 / 112. Sticky box around the 18px checkbox. No virtual list, so the transform vars stay 0. */
 .share-sticky {
@@ -4655,16 +4645,16 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   height: 18px;
   padding-top: 13px;
   padding-bottom: 13px;
-  pointer-events: none;
 }
 /* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
 .shell.share-narrow .share-sticky { z-index: 1; }
-.turn.share-on .share-box { position: static; pointer-events: none; }
+.turn.share-on .share-box { position: static; pointer-events: auto; }
 .turn.share-on .action-row,
 .turn.share-on .user-actions { display: none; }
 .turn.share-on { isolation: isolate; }
-.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col):not(.share-origin):not(.share-port) { position: relative; z-index: 1; }
-/* SP-SHARE-149. Official ._7729a77 > * is pointer-events none so the message wrapper receives the click. */
+.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col):not(.share-origin) { position: relative; z-index: 1; }
+/* SP-SHARE-149. Direct children pass the click through. The checkbox sets pointer-events
+   auto, so the box itself is the hit target and one click toggles once. */
 .turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }
 .share-halo {
@@ -4675,8 +4665,14 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   pointer-events: none;
   z-index: 0;
 }
-.turn > .share-halo { top: -15px; right: -15px; bottom: -15px; left: -15px; }
-.turn.assistant > .share-halo { top: -28px; }
+/* Selected wash stays on the message content. The wrapper padding above is only the column origin. */
+.turn.share-on > .share-halo {
+  top: calc(var(--share-pad-top, 0px) - 15px);
+  right: -15px;
+  bottom: -15px;
+  left: calc(var(--share-shift-left, 0px) - 15px);
+}
+.turn.assistant.share-on > .share-halo { top: calc(var(--share-pad-top, 0px) - 28px); }
 .turn.share-picked > .share-halo { display: block; }
 body[data-ds-dark-theme] .share-halo { background: var(--dsw-static-neutral-bluish-850); }
 /* SP-CV-099 / SP-SHARE-030. Padding is on the select wrapper when the message list is under 800px. */
@@ -4881,10 +4877,15 @@ input.share-box.ds-checkbox:checked::after,
   }
   .share-bar [data-testid="share-cancel"] { display: none; }
 }
+/* Chromium insets position:sticky by the scroller's padding-top. Official pins the
+   checkbox about 50px under the title (49px topbar + 13px sticky padding − 14px title).
+   The 12px gap moves onto the column so messages stay put and the box can stick to the scrollport.
+   SP-SHARE-035 / 109 / 111. */
+.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
+.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 12px; }
 @media (max-width: 767px) {
-  /* Chromium insets the sticky area by the scroller's padding, so 28.5px of transcript padding
-     clamped the question checkbox 25px low (SP-SHARE-035/109/111: sticky top 0, padding-top 13px).
-     The official list has no scroller padding, so the gap pads the inner column instead. */
+  /* The phone list keeps a taller column gap so the first question box stays at y=76.5.
+     The scroller itself stays unpadded, same as above. */
   .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
   .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 28.5px; }
   .turn.share-on > .share-halo {

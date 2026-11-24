@@ -867,3 +867,59 @@ for (const theme of ['light', 'dark'] as const) {
     })
   })
 }
+
+// SP-SHARE-033 / 102–105 / 149. The checkbox column lives in the message wrapper, so a click
+// on the checkbox itself toggles that turn. Round-4 sharegeo: once the box is pinned in the
+// middle of a long answer it sits about 50px under the title top (official), not ~56px.
+const LONG_ANSWER = Array.from({ length: 40 }, (_, index) => `第${index + 1}段，这是一段用于测试粘性复选框的较长回答文本。`).join('\n\n')
+
+for (const [w, h] of [[1440, 900], [390, 844]] as const) {
+  test.describe(`share checkbox hit ${w}`, () => {
+    test.use({ viewport: { width: w, height: h }, colorScheme: 'light', bypassCSP: true })
+    test('clicking the checkbox itself toggles the question and the answer', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, 'light')
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('input.share-box:visible')).toHaveCount(4)
+      for (const role of ['user', 'assistant'] as const) {
+        const box = page.locator(`.turn.${role}`).first().locator('input.share-box')
+        const before = await box.isChecked()
+        const rect = (await box.boundingBox())!
+        const point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 }
+        const hit = await page.evaluate(({ x, y }) => {
+          const el = document.elementFromPoint(x, y)
+          const article = el?.closest('article.turn')?.getBoundingClientRect()
+          return {
+            cls: typeof el?.className === 'string' ? el.className : '',
+            inside: Boolean(article && x >= article.left - 0.5 && x <= article.right + 0.5 && y >= article.top - 0.5 && y <= article.bottom + 0.5),
+          }
+        }, point)
+        expect(hit.cls, `${role} checkbox receives the click at ${w}`).toContain('share-box')
+        expect(hit.inside, `${role} checkbox is inside the message box at ${w}`).toBe(true)
+        await page.mouse.click(point.x, point.y)
+        expect(await box.isChecked(), `${role} toggles at ${w}`).toBe(!before)
+      }
+    })
+
+    test('a pinned checkbox sits about 50px under the title', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, 'light', false, '第一问', LONG_ANSWER)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('article.turn.assistant').first().locator('input.share-box')).toBeVisible()
+      await page.locator('.transcript').evaluate((node) => {
+        const answer = node.querySelector('article.turn.assistant')
+        if (!answer) return
+        node.scrollTop += answer.getBoundingClientRect().top + 400
+      })
+      const gap = await page.evaluate(() => {
+        const title = document.querySelector('.chat-title')!.getBoundingClientRect()
+        const box = document.querySelector('article.turn.assistant input.share-box')!.getBoundingClientRect()
+        const turn = document.querySelector('article.turn.assistant')!.getBoundingClientRect()
+        return { gap: box.top - title.top, cbTop: box.top, titleTop: title.top, turnTop: turn.top }
+      })
+      expect(gap.turnTop, `answer scrolled above the viewport ${JSON.stringify(gap)}`).toBeLessThan(0)
+      expect(gap.cbTop, `pinned checkbox stays on screen ${JSON.stringify(gap)}`).toBeGreaterThanOrEqual(0)
+      expect(Math.abs(gap.gap - 50), `pinned checkbox is about 50px under the title ${JSON.stringify(gap)}`).toBeLessThanOrEqual(4)
+    })
+  })
+}
