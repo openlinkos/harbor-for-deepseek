@@ -64,7 +64,7 @@ test('composer fill, caret, and disclaimer follow the official field', async ({ 
   await page.evaluate(() => document.body.setAttribute('data-ds-dark-theme', ''))
   await page.locator('a.chat-link', { hasText: '作曲会话' }).getByRole('button', { name: '作曲会话' }).click()
   const note = page.locator('.ai-note')
-  await expect(note).toHaveText('本回答由 AI 生成，内容仅供参考，请仔细甄别。')
+  await expect(note).toHaveText('内容由 AI 生成，请仔细甄别')
   await expect(note).toHaveCSS('font-size', '11px')
   await expect(note).toHaveCSS('line-height', '16px')
   await expect(note).toHaveCSS('color', 'rgb(173, 178, 184)')

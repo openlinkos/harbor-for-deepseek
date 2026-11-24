@@ -1378,6 +1378,7 @@ const MessageRow = ({ message }: { message: Message }) => {
         <div className="reply-dots" data-testid="reply-dots" aria-hidden="true"><i /><i /><i /></div>
       ) : null}
       {message.role === 'assistant' ? <AssistantTurn message={message} /> : null}
+      {message.role === 'assistant' && message.status !== 'streaming' && textOf ? <p className="answer-note">{t('answerNote')}</p> : null}
       {message.status === 'error' ? (
         <p className="form-error">
           {errorKey ? t(errorKey) : message.errorMessage || t('error')}
@@ -2304,7 +2305,7 @@ export const Shell = () => {
                 <div className="composer-wrap">
                   <div className="composer-back" aria-hidden="true" />
                   <Composer />
-                  <p className="footnote ai-note">{t('answerNote')}</p>
+                  <p className="footnote ai-note">{t('aiNote')}</p>
                 </div>
               )}
             </div>
