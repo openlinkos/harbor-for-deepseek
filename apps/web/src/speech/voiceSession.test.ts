@@ -2,7 +2,7 @@ import { ApiClientError } from '@deepapi/api-client'
 import { ASR_SAMPLE_RATE } from '@deepapi/types'
 import { describe, expect, it } from 'vitest'
 import { startRecording, type Recording, type RecordingHost } from './recorder.js'
-import { createVoiceInput, insertTranscript, resolveVoiceAnchor, type VoiceDeps } from './voiceSession.js'
+import { applyVoiceEdit, createVoiceInput, insertTranscript, resolveVoiceAnchor, type VoiceDeps } from './voiceSession.js'
 
 const flush = async () => {
   for (let i = 0; i < 8; i += 1) await Promise.resolve()
@@ -66,9 +66,35 @@ describe('transcript insertion', () => {
     expect(resolveVoiceAnchor('已输入', { text: '', start: 0, end: 0 })).toEqual({ start: 3, end: 3 })
     expect(resolveVoiceAnchor('啊你好大家', { text: '你好世界', start: 2, end: 4 })).toBeNull()
     expect(resolveVoiceAnchor('完全不同', { text: '你好世界', start: 2, end: 4 })).toBeNull()
+    // old="abcabc", select the first "abc", current="abcabcabc".
+    // A prepend and an append are the same string. The suffix match is not an edit location.
+    expect(resolveVoiceAnchor('abcabcabc', { text: 'abcabc', start: 0, end: 3 })).toBeNull()
+    expect(resolveVoiceAnchor('abcabcabc', { text: 'abcabc', start: 3, end: 6 })).toBeNull()
+    expect(resolveVoiceAnchor('你好世界世界', { text: '你好世界', start: 2, end: 4 })).toBeNull()
     const shifted = resolveVoiceAnchor('啊你好世界', { text: '你好世界', start: 2, end: 4 })
     expect(shifted).toEqual({ start: 3, end: 5 })
     expect(insertTranscript('啊你好世界', '转写结果', shifted!)).toEqual({ text: '啊你好转写结果', caret: 7 })
+  })
+
+  it('uses an observed caret when a repeated draft makes the string ambiguous', () => {
+    const saved = { text: 'abcabc', start: 0, end: 3 }
+    expect(applyVoiceEdit(saved, 'abcabcabc', 6, 6)).toEqual({ status: 'applied', text: 'abcabcabc', start: 0, end: 3 })
+    expect(insertTranscript('abcabcabc', '转写结果', { start: 0, end: 3 })).toEqual({ text: '转写结果abcabc', caret: 4 })
+    expect(applyVoiceEdit(saved, 'abcabcabc', 0, 0)).toEqual({ status: 'applied', text: 'abcabcabc', start: 3, end: 6 })
+    expect(insertTranscript('abcabcabc', '转写结果', { start: 3, end: 6 })).toEqual({ text: 'abc转写结果abc', caret: 7 })
+    let step = applyVoiceEdit(saved, 'abcabca', 6, 6)
+    expect(step.status).toBe('applied')
+    if (step.status !== 'applied') return
+    step = applyVoiceEdit(step, 'abcabcab', 7, 7)
+    expect(step.status).toBe('applied')
+    if (step.status !== 'applied') return
+    step = applyVoiceEdit(step, 'abcabcabc', 8, 8)
+    expect(step).toEqual({ status: 'applied', text: 'abcabcabc', start: 0, end: 3 })
+    expect(applyVoiceEdit({ text: '你好世界', start: 2, end: 4 }, '完全不同', 0, 4)).toEqual({ status: 'rejected' })
+    expect(applyVoiceEdit(saved, 'zzz', 0, 0)).toEqual({ status: 'unexplained' })
+    expect(applyVoiceEdit({ text: '你好世界', start: 4, end: 4 }, '你好世界!', 4, 4)).toEqual({ status: 'applied', text: '你好世界!', start: 4, end: 4 })
+    expect(applyVoiceEdit({ text: '你好世界', start: 2, end: 4 }, '你好世界世界', 4, 4)).toEqual({ status: 'applied', text: '你好世界世界', start: 2, end: 4 })
+    expect(applyVoiceEdit({ text: '你好世界', start: 2, end: 2 }, '你好啊世界', 2, 2)).toEqual({ status: 'applied', text: '你好啊世界', start: 3, end: 3 })
   })
 })
 

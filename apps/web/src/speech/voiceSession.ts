@@ -31,49 +31,115 @@ export const insertTranscript = (text: string, transcript: string, selection: Se
   return { text: next, caret: start + transcript.length }
 }
 
+type TextSplice = { at: number; remove: number; insert: string }
+
+export type VoiceEditResult =
+  | { status: 'applied'; text: string; start: number; end: number }
+  | { status: 'rejected' }
+  | { status: 'unexplained' }
+
+const sharedPrefix = (left: string, right: string, limit: number) => {
+  const max = Math.min(limit, left.length, right.length)
+  let index = 0
+  while (index < max && left.charCodeAt(index) === right.charCodeAt(index)) index += 1
+  return index
+}
+
+const sharedSuffix = (left: string, right: string, limit: number) => {
+  const max = Math.min(limit, left.length, right.length)
+  let index = 0
+  while (index < max && left.charCodeAt(left.length - 1 - index) === right.charCodeAt(right.length - 1 - index)) index += 1
+  return index
+}
+
+/** One contiguous explanation of how `before` became `after`. Prefix-first and suffix-first can disagree when the added text repeats. */
+const prefixFirstSplice = (before: string, after: string): TextSplice => {
+  const head = sharedPrefix(before, after, before.length)
+  const tail = sharedSuffix(before, after, Math.min(before.length - head, after.length - head))
+  return { at: head, remove: before.length - tail - head, insert: after.slice(head, after.length - tail) }
+}
+
+const suffixFirstSplice = (before: string, after: string): TextSplice => {
+  const tail = sharedSuffix(before, after, before.length)
+  const head = sharedPrefix(before, after, Math.min(before.length - tail, after.length - tail))
+  return { at: head, remove: before.length - tail - head, insert: after.slice(head, after.length - tail) }
+}
+
+const sameSplice = (left: TextSplice, right: TextSplice) => left.at === right.at && left.remove === right.remove && left.insert === right.insert
+
+/**
+ * Move a saved range across one splice whose location is already known.
+ * An edit strictly before the range shifts it. An edit strictly after it,
+ * including a suffix typed at a caret that was already at the end, leaves it.
+ * An edit inside the range grows or shrinks that range. An edit that crosses
+ * the range boundary returns null so the new user text stays.
+ */
+const mapSplice = (start: number, end: number, oldLength: number, splice: TextSplice): SelectionRange | null => {
+  const editStart = splice.at
+  const editEnd = splice.at + splice.remove
+  const delta = splice.insert.length - splice.remove
+  if (editEnd <= start) {
+    if (start === end && start === oldLength && editStart === start && splice.remove === 0) return { start, end }
+    return { start: start + delta, end: end + delta }
+  }
+  if (editStart >= end) return { start, end }
+  if (editStart >= start && editEnd <= end) return { start, end: end + delta }
+  return null
+}
+
+const normalizeRange = (text: string, start: number, end: number) => {
+  const length = text.length
+  const rawStart = Number.isFinite(start) ? start : length
+  const rawEnd = Number.isFinite(end) ? end : rawStart
+  return {
+    start: Math.max(0, Math.min(rawStart, rawEnd, length)),
+    end: Math.min(length, Math.max(rawStart, rawEnd, 0)),
+  }
+}
+
 /**
  * Map a range captured when voice input was armed onto the draft as it is now.
  * An unchanged draft keeps that range, including a collapsed caret.
- * Text inserted or removed only before the saved draft shifts the range with it.
- * A change only before the saved tail, or only after the saved head, keeps the
- * anchored span. Replacing just the selected middle keeps the text outside it.
- * A pure append after a range that already reached the end is not treated as
- * a middle edit. Anything else is ambiguous: return null so the caller leaves
- * the new draft untouched instead of applying stale indexes.
+ * An empty armed draft puts the caret after whatever the user has typed.
+ * Any other draft is mapped only when the longest common prefix and the
+ * longest common suffix describe the same single splice. A repeated token can
+ * make a prepend and an append the same string; those disagree and return null.
+ * The caller then leaves the new draft untouched instead of using a stale index.
+ * A splice that crosses the saved range also returns null.
  */
 export const resolveVoiceAnchor = (current: string, anchor: Pick<VoiceAnchor, 'text' | 'start' | 'end'>): SelectionRange | null => {
   const length = anchor.text.length
-  const rawStart = Number.isFinite(anchor.start) ? anchor.start : length
-  const rawEnd = Number.isFinite(anchor.end) ? anchor.end : rawStart
-  const start = Math.max(0, Math.min(rawStart, rawEnd, length))
-  const end = Math.min(length, Math.max(rawStart, rawEnd, 0))
-  if (current === anchor.text) return { start, end }
-  // The armed draft was empty, so every character the user added was typed at
-  // that caret. The caret now sits after that new text.
+  const range = normalizeRange(anchor.text, anchor.start, anchor.end)
+  if (current === anchor.text) return range
   if (length === 0) return { start: current.length, end: current.length }
-  const before = anchor.text.slice(0, start)
-  const selected = anchor.text.slice(start, end)
-  const after = anchor.text.slice(end)
-  const tail = `${selected}${after}`
-  const head = `${before}${selected}`
-  if (current.endsWith(anchor.text)) {
-    const delta = current.length - length
-    return { start: start + delta, end: end + delta }
-  }
-  if (tail.length > 0 && current.endsWith(tail)) {
-    const nextStart = current.length - tail.length
-    return { start: nextStart, end: nextStart + selected.length }
-  }
-  if (head.length > 0 && current.startsWith(head)) return { start, end }
-  if (start === 0 && end === 0 && after.length > 0 && current.startsWith(after)) return { start: 0, end: 0 }
-  if (after.length > 0 && current.startsWith(before) && current.endsWith(after)) {
-    const middleEnd = current.length - after.length
-    if (middleEnd >= before.length) return { start: before.length, end: middleEnd }
-  }
-  if (after.length === 0 && before.length > 0 && current.startsWith(before) && !current.startsWith(head)) {
-    return { start: before.length, end: current.length }
-  }
-  return null
+  const forward = prefixFirstSplice(anchor.text, current)
+  const backward = suffixFirstSplice(anchor.text, current)
+  if (!sameSplice(forward, backward)) return null
+  return mapSplice(range.start, range.end, length, forward)
+}
+
+/**
+ * Apply one textarea edit whose caret was observed. `editStart`/`editEnd` are
+ * the selection before the input, in the same UTF-16 indexes as the draft.
+ * `rejected` means the edit crossed the saved range. `unexplained` means that
+ * caret does not account for the new string, so the caller must not guess.
+ */
+export const applyVoiceEdit = (
+  anchor: Pick<VoiceAnchor, 'text' | 'start' | 'end'>,
+  nextText: string,
+  editStart: number,
+  editEnd: number,
+): VoiceEditResult => {
+  const range = normalizeRange(anchor.text, anchor.start, anchor.end)
+  const edit = normalizeRange(anchor.text, editStart, editEnd)
+  const removed = edit.end - edit.start
+  const insertedLen = nextText.length - (anchor.text.length - removed)
+  if (insertedLen < 0) return { status: 'unexplained' }
+  const inserted = nextText.slice(edit.start, edit.start + insertedLen)
+  if (`${anchor.text.slice(0, edit.start)}${inserted}${anchor.text.slice(edit.end)}` !== nextText) return { status: 'unexplained' }
+  const mapped = mapSplice(range.start, range.end, anchor.text.length, { at: edit.start, remove: removed, insert: inserted })
+  if (!mapped) return { status: 'rejected' }
+  return { status: 'applied', text: nextText, start: mapped.start, end: mapped.end }
 }
 
 const IDLE: VoiceSnapshot = { phase: 'idle', elapsedMs: 0, analyser: null, conversationId: null }

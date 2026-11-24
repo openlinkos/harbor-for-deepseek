@@ -19,7 +19,7 @@ import { ReadingBars } from './speech/ReadingBars.js'
 import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
-import { bindVoiceInserter, cancelVoiceInput, insertTranscript, resolveVoiceAnchor, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
+import { applyVoiceEdit, bindVoiceInserter, cancelVoiceInput, insertTranscript, resolveVoiceAnchor, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -2153,6 +2153,8 @@ const Composer = () => {
   const caretRef = useRef<number | null>(null)
   const anchorRef = useRef<VoiceAnchor | null>(null)
   const gestureRef = useRef<VoiceAnchor | null>(null)
+  const trackedRef = useRef<VoiceAnchor | null>(null)
+  const editRef = useRef<{ text: string; start: number; end: number } | null>(null)
   textRef.current = text
   activeRef.current = activeId
   const readAnchor = (): VoiceAnchor | null => {
@@ -2162,6 +2164,32 @@ const Composer = () => {
     const start = node.selectionStart ?? value.length
     const end = node.selectionEnd ?? start
     return { conversationId: activeRef.current, text: value, start, end }
+  }
+  const armAnchor = (anchor: VoiceAnchor | null) => {
+    anchorRef.current = anchor
+    trackedRef.current = anchor
+    editRef.current = null
+  }
+  const noteEdit = (before: string, editStart: number, editEnd: number, next: string) => {
+    const tracked = trackedRef.current
+    if (!tracked || tracked.text !== before || next === before) return
+    const mapped = applyVoiceEdit(tracked, next, editStart, editEnd)
+    trackedRef.current = mapped.status === 'applied'
+      ? { conversationId: tracked.conversationId, text: mapped.text, start: mapped.start, end: mapped.end }
+      : null
+  }
+  const rememberEditRange = () => {
+    const node = box.current
+    const tracked = trackedRef.current
+    if (!node || !tracked || node.value !== tracked.text) {
+      editRef.current = null
+      return
+    }
+    editRef.current = {
+      text: node.value,
+      start: node.selectionStart ?? 0,
+      end: node.selectionEnd ?? node.selectionStart ?? 0,
+    }
   }
   useEffect(() => {
     focusComposer()
@@ -2179,9 +2207,15 @@ const Composer = () => {
       const node = box.current
       if (!node?.isConnected || activeRef.current !== conversationId) return
       const anchor = anchorRef.current
+      const tracked = trackedRef.current
       anchorRef.current = null
+      trackedRef.current = null
+      editRef.current = null
       if (!anchor || anchor.conversationId !== conversationId) return
-      const range = resolveVoiceAnchor(textRef.current, anchor)
+      const byString = resolveVoiceAnchor(textRef.current, anchor)
+      const range = byString ?? (tracked && tracked.text === textRef.current && tracked.conversationId === conversationId
+        ? { start: tracked.start, end: tracked.end }
+        : null)
       if (!range) return
       const next = insertTranscript(textRef.current, transcript, range)
       caretRef.current = next.caret
@@ -2262,8 +2296,9 @@ const Composer = () => {
         rows={2}
         placeholder={t('composerPlaceholder')}
         value={text}
-        onChange={(event) => setText(event.target.value)}
+        onSelect={rememberEditRange}
         onKeyDown={(event) => {
+          rememberEditRange()
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
             event.preventDefault()
@@ -2275,11 +2310,20 @@ const Composer = () => {
           const start = node.selectionStart ?? text.length
           const end = node.selectionEnd ?? start
           const next = `${text.slice(0, start)}\n${text.slice(end)}`
+          noteEdit(text, start, end, next)
           setText(next)
           window.requestAnimationFrame(() => {
             node.selectionStart = start + 1
             node.selectionEnd = start + 1
           })
+        }}
+        onBeforeInput={rememberEditRange}
+        onChange={(event) => {
+          const next = event.target.value
+          const pending = editRef.current
+          editRef.current = null
+          if (pending) noteEdit(pending.text, pending.start, pending.end, next)
+          setText(next)
         }}
       />
       <div className="composer-tools">
@@ -2313,7 +2357,7 @@ const Composer = () => {
             onClick={(event) => {
               if (voice.phase === 'idle') {
                 const fromPointer = event.detail > 0
-                anchorRef.current = fromPointer && gestureRef.current ? gestureRef.current : readAnchor()
+                armAnchor(fromPointer && gestureRef.current ? gestureRef.current : readAnchor())
               }
               gestureRef.current = null
               toggleVoiceInput()

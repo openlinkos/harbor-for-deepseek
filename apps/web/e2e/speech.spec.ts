@@ -816,6 +816,66 @@ test('a late transcript does not land in another open conversation', async ({ pa
   expect(messagePosts(session.seen)).toHaveLength(2)
 })
 
+test('an observed append of a repeated token does not replace the unselected copy', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('abcabc')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, 3)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(6, 6)
+  })
+  await page.keyboard.type('abc')
+  await expect(composer).toHaveValue('abcabcabc')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('转写结果abcabc')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  expect(readUploadedWav(asrPosts(session.seen).at(-1)!.bytes).peak).toBeGreaterThan(0)
+})
+
+test('an observed insert of a repeated token before the saved selection shifts it', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('abcabc')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, 3)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, 0)
+  })
+  await page.keyboard.type('abc')
+  await expect(composer).toHaveValue('abcabcabc')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('abc转写结果abc')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  expect(readUploadedWav(asrPosts(session.seen).at(-1)!.bytes).peak).toBeGreaterThan(0)
+})
+
 test('reloading the app closes the playing audio context', async ({ page }) => {
   test.setTimeout(90_000)
   const pcm = await playOpen(page)
