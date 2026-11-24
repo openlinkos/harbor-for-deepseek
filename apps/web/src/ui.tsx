@@ -19,7 +19,7 @@ import { ReadingBars } from './speech/ReadingBars.js'
 import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
-import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
+import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, judgeCompositionUpdate, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
 import { bindVoiceInserter, cancelVoiceInput, currentVoiceGeneration, insertTranscript, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
@@ -2156,6 +2156,7 @@ const Composer = () => {
   const authRef = useRef<SelectionAuth | null>(null)
   const editRef = useRef<{ text: string; start: number; end: number; inputType: string } | null>(null)
   const compositionRef = useRef<{ text: string; start: number; end: number } | null>(null)
+  const compositionOpenRef = useRef(false)
   const ignoreChangeRef = useRef(false)
   const [recovery, setRecovery] = useState<{ transcript: string; conversationId: string | null; generation: number; reason: string } | null>(null)
   textRef.current = text
@@ -2172,6 +2173,7 @@ const Composer = () => {
     authRef.current = anchor ? armSelectionAuth(anchor, currentVoiceGeneration()) : null
     editRef.current = null
     compositionRef.current = null
+    compositionOpenRef.current = false
     setRecovery(null)
   }
   const applyAuthEdit = (next: string, editStart: number, editEnd: number) => {
@@ -2221,7 +2223,11 @@ const Composer = () => {
       if (!node?.isConnected || activeRef.current !== conversationId) return
       // Observed steps own the span. A terminal-string guess must not replace them
       // or revive a span the user already deleted.
-      const decision = decideDelivery(auth, textRef.current, conversationId, generation)
+      // An open composition has not been committed. Matching text must not
+      // authorize the span that was saved before those keystrokes.
+      const decision = decideDelivery(auth, textRef.current, conversationId, generation, {
+        composing: compositionOpenRef.current || compositionRef.current != null,
+      })
       if (decision.action === 'insert') {
         const next = insertTranscript(textRef.current, transcript, decision.range)
         caretRef.current = next.caret
@@ -2339,6 +2345,7 @@ const Composer = () => {
         value={text}
         onCompositionStart={(event) => {
           const node = event.currentTarget
+          compositionOpenRef.current = true
           compositionRef.current = {
             text: node.value,
             start: node.selectionStart ?? 0,
@@ -2348,6 +2355,7 @@ const Composer = () => {
         onCompositionEnd={(event) => {
           const base = compositionRef.current
           compositionRef.current = null
+          compositionOpenRef.current = false
           ignoreChangeRef.current = true
           editRef.current = null
           const auth = authRef.current
@@ -2407,7 +2415,15 @@ const Composer = () => {
             return
           }
           const composing = native instanceof InputEvent && native.isComposing
-          if (composing || compositionRef.current) {
+          if (composing) compositionOpenRef.current = true
+          // A composition stays uncommitted until compositionend. A crossing or
+          // unobserved intermediate invalidates now, so a later string that
+          // matches the armed draft cannot revive that same attempt. A still-valid
+          // intermediate is committed once, at compositionend.
+          if (composing || compositionRef.current || compositionOpenRef.current) {
+            editRef.current = null
+            const auth = authRef.current
+            if (auth) authRef.current = judgeCompositionUpdate(auth, next, compositionRef.current)
             setText(next)
             return
           }

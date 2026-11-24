@@ -1323,6 +1323,31 @@ const dispatchDraft = async (composer: Locator, next: string, inputType: string)
   await expect(composer).toHaveValue(next)
 }
 
+const dispatchComposingDraft = async (composer: Locator, next: string) => {
+  await composer.evaluate((node, value) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, box.value.length)
+    box.dispatchEvent(new InputEvent('beforeinput', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'insertCompositionText',
+      data: value,
+      isComposing: true,
+    }))
+    const proto = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')
+    proto?.set?.call(box, value)
+    box.setSelectionRange(value.length, value.length)
+    box.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      inputType: 'insertCompositionText',
+      data: value,
+      isComposing: true,
+    }))
+  }, next)
+  await expect(composer).toHaveValue(next)
+}
+
 const expectRecoveredDraft = async (page: Page, composer: Locator, value: string) => {
   await expect(composer).toHaveValue(value)
   await expect(page.getByTestId('voice-recovery')).toBeVisible()
@@ -1527,6 +1552,115 @@ test('invalidating after an in-span edit does not return to that span on undo', 
   await retypeOriginalThenUndo(composer, 'L OK R')
   session.releaseAsr()
   await expectRecoveredDraft(page, composer, 'L OK R')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a late transcript during an open composition keeps the restored draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.evaluate((node) => {
+    ;(node as HTMLTextAreaElement).dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+  })
+  await dispatchComposingDraft(composer, 'NEW-DRAFT')
+  await dispatchComposingDraft(composer, initial)
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  await expectRecoveredDraft(page, composer, initial)
+  await expect(page.getByTestId('voice-recovery')).toHaveAttribute('data-reason', 'crossed')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  await composer.evaluate((node, value) => {
+    const box = node as HTMLTextAreaElement
+    box.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: value }))
+    box.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertCompositionText', data: value }))
+  }, initial)
+  await expect(composer).toHaveValue(initial)
+  expect(await composer.inputValue()).not.toContain('转写结果')
+})
+
+test('the same whole-draft composition keeps the draft after compositionend', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.evaluate((node) => {
+    ;(node as HTMLTextAreaElement).dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+  })
+  await dispatchComposingDraft(composer, 'NEW-DRAFT')
+  await dispatchComposingDraft(composer, initial)
+  await composer.evaluate((node, value) => {
+    const box = node as HTMLTextAreaElement
+    box.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: value }))
+    box.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertCompositionText', data: value }))
+  }, initial)
+  await expect(composer).toHaveValue(initial)
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  await expectRecoveredDraft(page, composer, initial)
+  await expect(page.getByTestId('voice-recovery')).toHaveAttribute('data-reason', 'crossed')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a composing update without compositionstart still keeps the restored draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await dispatchComposingDraft(composer, 'NEW-DRAFT')
+  await dispatchComposingDraft(composer, initial)
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  await expectRecoveredDraft(page, composer, initial)
+  await expect(page.getByTestId('voice-recovery')).toHaveAttribute('data-reason', 'unobserved')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a composing update without compositionstart stays invalid after compositionend', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await dispatchComposingDraft(composer, 'NEW-DRAFT')
+  await dispatchComposingDraft(composer, initial)
+  await composer.evaluate((node, value) => {
+    const box = node as HTMLTextAreaElement
+    box.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: value }))
+    box.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertCompositionText', data: value }))
+  }, initial)
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  await expectRecoveredDraft(page, composer, initial)
+  await expect(page.getByTestId('voice-recovery')).toHaveAttribute('data-reason', 'unobserved')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a composition that ends without changing the draft still inserts', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.evaluate((node, value) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+    box.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+    box.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: value }))
+    box.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertCompositionText', data: value }))
+  }, initial)
+  await expect(composer).toHaveValue(initial)
+  session.releaseAsr()
+  await expect(composer).toHaveValue('L 转写结果 R')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
   expect(messagePosts(session.seen)).toHaveLength(0)
 })
 

@@ -6,6 +6,7 @@ import {
   armSelectionAuth,
   decideDelivery,
   historyStepText,
+  judgeCompositionUpdate,
   noteSelectionMove,
   noteUnobserved,
   recoverTranscriptAtCaret,
@@ -332,5 +333,36 @@ describe('selection authorization', () => {
     const back = applyHistory(missed, 'historyUndo', 'abcabc')
     expect(back).toBe(missed)
     expect(decideDelivery(back, 'abcabc', 'c1', 1)).toEqual({ action: 'recover', reason: 'history-mismatch' })
+  })
+
+  it('does not confirm a live span while a composition is still open', () => {
+    const initial = 'L TARGET R'
+    const auth = arm(initial, 2, 8)
+    expect(decideDelivery(auth, initial, 'c1', 1, { composing: true })).toEqual({ action: 'recover', reason: 'composing' })
+    expect(decideDelivery(auth, 'NEW-DRAFT', 'c1', 1, { composing: true })).toEqual({ action: 'recover', reason: 'composing' })
+    expect(decideDelivery(auth, initial, 'c1', 1)).toEqual({ action: 'insert', range: { start: 2, end: 8 } })
+    expect(decideDelivery(auth, initial, 'c1', 1, { composing: false })).toEqual({ action: 'insert', range: { start: 2, end: 8 } })
+    const crossed = applyObservedEdit(auth, 'NEW-DRAFT', 0, initial.length)
+    expect(decideDelivery(crossed, initial, 'c1', 1, { composing: true })).toEqual({ action: 'recover', reason: 'crossed' })
+    expect(decideDelivery(auth, initial, 'other', 1, { composing: true })).toEqual({ action: 'drop' })
+    expect(decideDelivery(auth, initial, 'c1', 2, { composing: true })).toEqual({ action: 'drop' })
+  })
+
+  it('invalidates a whole-draft composition immediately and ignores the restored literal', () => {
+    const initial = 'L TARGET R'
+    const opened = { text: initial, start: 0, end: initial.length }
+    let auth: SelectionAuth = arm(initial, 2, 8)
+    auth = judgeCompositionUpdate(auth, 'NEW-DRAFT', opened)
+    expect(auth).toMatchObject({ status: 'invalid', reason: 'crossed' })
+    const restored = judgeCompositionUpdate(auth, initial, opened)
+    expect(restored).toBe(auth)
+    expect(decideDelivery(restored, initial, 'c1', 1)).toEqual({ action: 'recover', reason: 'crossed' })
+    expect(decideDelivery(restored, initial, 'c1', 1, { composing: true })).toEqual({ action: 'recover', reason: 'crossed' })
+    const inside = judgeCompositionUpdate(arm(initial, 2, 8), 'L OK R', { text: initial, start: 2, end: 8 })
+    expect(inside).toMatchObject({ status: 'live', text: initial, start: 2, end: 8 })
+    const missed = judgeCompositionUpdate(arm(initial, 2, 8), 'NEW-DRAFT', null)
+    expect(missed).toMatchObject({ status: 'invalid', reason: 'unobserved' })
+    expect(judgeCompositionUpdate(missed, initial, null)).toBe(missed)
+    expect(judgeCompositionUpdate(arm(initial, 2, 8), initial, opened)).toMatchObject({ status: 'live', start: 2, end: 8 })
   })
 })

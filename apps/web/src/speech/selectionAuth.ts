@@ -7,6 +7,8 @@ import { applyVoiceEdit, insertTranscript, type VoiceAnchor } from './voiceSessi
  * attempt stays invalid. A later draft, including one produced by native
  * undo or redo, does not restore the span just because its text equals a
  * stored snapshot. A new attempt is a new authorization.
+ * An open composition is not a committed edit. Until compositionend, the
+ * current string does not confirm the saved span.
  */
 export type AuthStep = { text: string; start: number; end: number; extendAtEnd: boolean }
 
@@ -38,7 +40,7 @@ export type SelectionAuth = LiveAuth | InvalidAuth
 
 export type DeliveryDecision =
   | { action: 'insert'; range: { start: number; end: number } }
-  | { action: 'recover'; reason: InvalidReason | 'diverged' }
+  | { action: 'recover'; reason: InvalidReason | 'diverged' | 'composing' }
   | { action: 'drop' }
 
 let nextAuthId = 1
@@ -239,6 +241,28 @@ export const noteUnobserved = (auth: SelectionAuth, nextText: string): Selection
 }
 
 /**
+ * One intermediate string from an open composition.
+ * `opened` is the draft and selection captured at compositionstart.
+ * The edit is judged from that selection against the original live span.
+ * A crossing or unobserved change invalidates this attempt immediately.
+ * A change that would stay inside the span is not committed here; compositionend
+ * records the final string once. Returning to the armed text does not revive
+ * an invalidation this composition already caused.
+ */
+export const judgeCompositionUpdate = (
+  auth: SelectionAuth,
+  nextText: string,
+  opened: { text: string; start: number; end: number } | null,
+): SelectionAuth => {
+  if (auth.status !== 'live' || nextText === auth.text) return auth
+  if (opened && opened.text === auth.text) {
+    const judged = applyObservedEdit(auth, nextText, opened.start, opened.end)
+    return judged.status === 'invalid' ? judged : auth
+  }
+  return noteUnobserved(auth, nextText)
+}
+
+/**
  * Text of the adjacent observed step while this authorization is live.
  * An invalid draft is not a step. Null tells the caller to leave the browser's
  * undo or redo result alone. The last live snapshot is not that result, and
@@ -278,15 +302,26 @@ export const applyHistory = (
   return liveAt(auth, auth.cursor + 1)
 }
 
+/**
+ * Decide where a late transcript goes.
+ * `composing` means the textarea still has an uncommitted composition.
+ * Those keystrokes are observed at compositionend, from the selection captured
+ * when the composition opened. Until then the saved span is not confirmed,
+ * even when the draft string currently equals the armed snapshot.
+ * An already invalid attempt keeps its own reason. A conversation or
+ * generation mismatch still drops the transcript.
+ */
 export const decideDelivery = (
   auth: SelectionAuth | null,
   currentText: string,
   conversationId: string | null,
   generation: number,
+  pending: { composing?: boolean } = {},
 ): DeliveryDecision => {
   if (!auth) return { action: 'drop' }
   if (auth.conversationId !== conversationId || auth.generation !== generation) return { action: 'drop' }
   if (auth.status === 'invalid') return { action: 'recover', reason: auth.reason }
+  if (pending.composing) return { action: 'recover', reason: 'composing' }
   if (auth.text !== currentText) return { action: 'recover', reason: 'diverged' }
   return { action: 'insert', range: { start: auth.start, end: auth.end } }
 }
