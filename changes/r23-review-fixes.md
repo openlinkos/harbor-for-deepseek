@@ -12,6 +12,8 @@
 
 之后（spec-align-sidebar-row，1440 与 390，浅色与深色）：行 x=12、宽 236、高 40、圆角 12px，标题文字 x=22。激活高亮就是这一行：浅色 rgb(228, 237, 253)，深色用 accent `--dsw-static-neutral-bluish-800` = rgb(53, 54, 56)（不是 master 深色的 bluish-750）。悬停非激活行：浅色 rgb(241, 243, 245)，深色 rgb(44, 44, 46)。⋯ 相对行：x = 行右 - 4 - 28，y = 行顶 + 6，28×28；图标 16×16，居中后再进 6px。来源是 master a8df8b9 `.chat-link.active .more` 的 top 6 / right 4 / 28×28 / svg 16。手机行高仍是官方 40px，不采用 master 的 44px min-height。
 
+标题按钮改回 master 的 `flex: 0 1 auto`。`flex: 1` 会把短标题撑满整行，行尾空白被按钮盖住。`pointer.spec.ts` 在行空白处点击（x 要大于标题盒右缘）因此失败：点击点 196，标题右缘 200。旧的 `margin-right: 35px` 只是把按钮边框盒缩短，空白其实是那截 margin。去掉 margin 之后按 master 让按钮随文字收缩，文字左缘仍是 x=22。
+
 ## 2. Mermaid 全屏
 
 b5a225c 的 svg 板是整屏高：浅色宽图 1440 为 [556, 0, 329, 900]，390 为 [31, 0, 329, 844]，图没有缩进视口，色带从顶铺到底。舞台 `.diagram-modal`（SP-MOD-597）和遮罩 `.bg-mask` rgba(0,0,0,.88) + blur(2px)（SP-MOD-265/266）保留。不写死 906×965。不套 SP-MOD-521 的 slide opacity 0。Esc 仍关弹层。
