@@ -14,7 +14,7 @@ const HOVER_BG = { light: 'rgba(38, 49, 72, 0.06)', dark: 'rgba(255, 255, 255, 0
 const TIP_BG = { light: 'rgb(44, 44, 46)', dark: 'rgb(67, 69, 74)' }
 const TIP_COLOR = { light: 'rgb(255, 255, 255)', dark: 'rgb(249, 250, 251)' }
 const ACTION_LABELS = ['复制', '重新生成', '喜欢', '不喜欢', '分享']
-const USER_LABELS = ['复制', '编辑']
+const USER_LABELS = ['复制', '修改']
 
 const sse = (events: unknown[]) => events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')
 const icon = (color: string) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" rx="3" fill="${color}"/></svg>`)
@@ -65,9 +65,10 @@ const near = (actual: number, expected: number, tol: number) => {
 const pillMetrics = (page: Page) => page.getByTestId('search-results').last().evaluate((pill) => {
   const box = pill.getBoundingClientRect()
   const style = getComputedStyle(pill)
-  const textNode = [...pill.childNodes].find((node) => node.nodeType === Node.TEXT_NODE && (node.textContent || '').trim())
+  // SP-CITE-041. The label is .sources-pill-text, not a direct text node of the pill.
+  const textHost = pill.querySelector('.sources-pill-text')
   const range = document.createRange()
-  range.selectNodeContents(textNode!)
+  range.selectNodeContents(textHost!)
   const text = range.getBoundingClientRect()
   const icons = [...pill.querySelectorAll('.favicons > *')].map((icon) => {
     const rect = icon.getBoundingClientRect()

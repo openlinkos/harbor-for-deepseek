@@ -68,7 +68,8 @@ const sessionId = async (page: Page, title: string, mobile: boolean) => {
     await page.locator('.scrim').click()
     await expect(page.locator('.sidebar')).toBeHidden()
   }
-  return (href || '').replace(/^#/, '')
+  const path = (href || '').replace(/^#/, '')
+  return path.split('/').filter(Boolean).pop() || ''
 }
 
 const openSearch = async (page: Page) => {

@@ -11,13 +11,14 @@ import { loadSkin, parseSkin, saveSkin } from './skin.js'
 import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
-import { FileCard } from './file-card.js'
-import { useHarbor } from './store.js'
+import { FileCard, ImageCard } from './file-card.js'
+import { imagePreview, useHarbor, type StatusToastCode } from './store.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
 import { USER_MENU_ICONS } from './user-menu-icons.js'
 import { DsButton, DsFileButton } from './ds-button.js'
+import { failedSiteIcons, LinkMarkIcon } from './site-logo.js'
 
 const useProfile = () => {
   const [profile, setProfile] = useState<LocalProfile>(readProfile)
@@ -193,6 +194,8 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
 
 const focusComposer = () => {
   window.requestAnimationFrame(() => {
+    // SP-MOD-635. A frame queued before the search dialog opened must not take the input.
+    if (document.querySelector('.search-dialog')) return
     const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
     if (!box) return
     box.focus({ preventScroll: true })
@@ -310,14 +313,13 @@ const SOURCE_MARKS = 4
 
 const siteIconSrc = (icon?: string | null) => (typeof icon === 'string' ? icon.trim() : '')
 
-const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
+const Favicon = ({ icon }: { label: string; icon?: string | null }) => {
   const src = siteIconSrc(icon)
-  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
-  const [failed, setFailed] = useState(false)
+  const [failed, setFailed] = useState(() => !src || failedSiteIcons.has(src))
   const [ready, setReady] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
   useEffect(() => {
-    setFailed(false)
+    setFailed(!src || failedSiteIcons.has(src))
     setReady(false)
   }, [src])
   useEffect(() => {
@@ -326,17 +328,26 @@ const Favicon = ({ label, icon }: { label: string; icon?: string | null }) => {
     if (img.complete && img.naturalWidth > 0) setReady(true)
   }, [src, failed])
   if (!src || failed) {
-    return <i className="favicon" aria-hidden="true">{letter}</i>
+    return (
+      <i className="favicon site_logo_back" aria-hidden="true">
+        <span className="site_logo_fallback">
+          <LinkMarkIcon />
+        </span>
+      </i>
+    )
   }
   return (
-    <i className="favicon" aria-hidden="true">
+    <i className="favicon site_logo_back" aria-hidden="true">
       <img
         ref={imgRef}
         src={src}
         alt=""
         className={ready ? 'on' : ''}
         onLoad={() => setReady(true)}
-        onError={() => setFailed(true)}
+        onError={() => {
+          failedSiteIcons.add(src)
+          setFailed(true)
+        }}
       />
     </i>
   )
@@ -347,15 +358,123 @@ type SourcesApi = {
   open: boolean
   show: (items: SourceItem[]) => void
   toggle: (items: SourceItem[]) => void
+  close: () => void
 }
-const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined })
+const SourcesPanel = createContext<SourcesApi>({ open: false, show: () => undefined, toggle: () => undefined, close: () => undefined })
 
 const MODAL_FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
+// SP-SET-736 / SP-SET-765. The settings mask covers New chat and the chat rows.
+// A press on those controls must not switch chats and must not dismiss the dialog.
+const pointHitsChatNav = (x: number, y: number) => {
+  const nodes = document.querySelectorAll('[data-testid="new-chat"], [data-testid="top-new"], a.chat-link')
+  for (const node of nodes) {
+    const rect = node.getBoundingClientRect()
+    if (rect.width < 2 || rect.height < 2) continue
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return true
+  }
+  return false
+}
+
+// One history entry per open overlay. Close calls history.back(), which is async.
+// The next open waits for that pop before it pushState's, so the late back cannot
+// pop the new entry or restore the search field to the empty snapshot.
+let overlaySeq = 0
+let closeFlight: Promise<void> | null = null
+let suppressEmptyRestore = false
+
+const whenOverlayHistorySettled = () => closeFlight ?? Promise.resolve()
+
+const setNativeInputValue = (input: HTMLInputElement, value: string) => {
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+  setter?.call(input, value)
+}
+
+const useOverlayHistory = (open: boolean, onClose: () => void) => {
+  const closeRef = useRef(onClose)
+  closeRef.current = onClose
+  const retain = useRef(false)
+  useEffect(() => {
+    if (!open) return undefined
+    const token = ++overlaySeq
+    let pushed = false
+    let removePop: (() => void) | null = null
+    let cancel = false
+    const arm = () => {
+      if (cancel || pushed) return
+      const prior = history.state
+      const base = prior && typeof prior === 'object' ? prior : {}
+      history.pushState({ ...base, deepapiOverlay: token }, '', location.href)
+      pushed = true
+      const onPop = () => {
+        pushed = false
+        closeRef.current()
+      }
+      window.addEventListener('popstate', onPop)
+      removePop = () => window.removeEventListener('popstate', onPop)
+    }
+    const flight = closeFlight
+    if (flight) void flight.then(arm)
+    else arm()
+    return () => {
+      cancel = true
+      removePop?.()
+      const keep = retain.current
+      retain.current = false
+      if (!pushed || keep) return
+      const state = history.state
+      if (!(state && typeof state === 'object' && state.deepapiOverlay === token)) return
+      pushed = false
+      suppressEmptyRestore = true
+      let settled = false
+      let settle: () => void = () => undefined
+      const done = new Promise<void>((resolve) => {
+        settle = resolve
+      })
+      closeFlight = done
+      let timer = 0
+      const finish = () => {
+        if (settled) return
+        settled = true
+        window.clearInterval(timer)
+        window.removeEventListener('popstate', onLatePop)
+        suppressEmptyRestore = false
+        if (closeFlight === done) closeFlight = null
+        settle()
+      }
+      const onLatePop = () => finish()
+      window.addEventListener('popstate', onLatePop)
+      history.back()
+      timer = window.setInterval(() => {
+        const now = history.state
+        if (!(now && typeof now === 'object' && (now as { deepapiOverlay?: number }).deepapiOverlay === token)) finish()
+      }, 16)
+      window.setTimeout(finish, 1000)
+    }
+  }, [open])
+  return () => {
+    retain.current = true
+  }
+}
+
+const useScrollLock = (open: boolean) => {
+  useEffect(() => {
+    if (!open) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [open])
+}
+
 /** Official ds-modal defaults: mask click and Escape close, focus stays inside, then returns to the trigger. */
-const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel: () => void; onConfirm: () => void }) => {
+const ConfirmDialog = ({ label, body, confirm, onCancel, onConfirm }: { label: string; body: string; confirm: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
   const panel = useRef<HTMLDivElement>(null)
+  // Back closes the confirm. Escape cancels too (昊辰 fb1132-5). SP-MOD-572's capture has no Esc-cancel; that conflict stays open.
+  useOverlayHistory(true, () => onCancel())
+  useScrollLock(true)
   const onCancelRef = useRef(onCancel)
   onCancelRef.current = onCancel
   const previousFocus = useRef<HTMLElement | null>(null)
@@ -372,6 +491,7 @@ const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel
     const nodes = focusables()
     nodes[0]?.focus()
     const onKey = (event: KeyboardEvent) => {
+      // Escape cancels (昊辰 fb1132-5). Mask click and Back still close it. SP-MOD-572's capture does not, and that conflict stays open.
       if (event.key === 'Escape') {
         event.stopPropagation()
         onCancelRef.current()
@@ -428,9 +548,10 @@ const ConfirmDialog = ({ label, onCancel, onConfirm }: { label: string; onCancel
     >
       <div className="confirm-card">
         <h2>{label}</h2>
+        <p className="confirm-body">{body}</p>
         <div className="edit-actions">
           <DsButton type="button" onClick={onCancel}>{t('cancel')}</DsButton>
-          <DsButton type="button" variant="danger" data-testid="confirm-delete" onClick={onConfirm}>{t('delete')}</DsButton>
+          <DsButton type="button" variant="danger" className="ds-button--solid-error" data-testid="confirm-delete" onClick={onConfirm}>{confirm}</DsButton>
         </div>
       </div>
     </div>,
@@ -468,8 +589,21 @@ type ShareModeValue = {
   on: boolean
   groupOf: (messageId: string) => string | null
   selected: ReadonlySet<string>
+  /** SP-SHARE-006. OK (complete) and INCOMPLETE (aborted) can be selected. Error, refused, and streaming cannot. */
+  locked: (messageId: string) => boolean
   toggle: (groupId: string) => void
+  reject: (messageId: string) => void
   enter: (messageId: string) => void
+}
+
+const shareableStatus = (status: Message['status']) => status === 'complete' || status === 'aborted'
+
+const selectableGroupIds = (groups: TurnGroup[], rows: Message[]) => {
+  const byId = new Map(rows.map((message) => [message.id, message]))
+  return groups.filter((group) => group.messageIds.every((id) => {
+    const message = byId.get(id)
+    return Boolean(message && shareableStatus(message.status))
+  })).map((group) => group.id)
 }
 
 const ShareMode = createContext<ShareModeValue | null>(null)
@@ -728,7 +862,7 @@ const AnchoredMenu = ({ label, options, selected, onPick, testId, dividerAfter, 
     <div className="pill-menu">
       <div ref={trigger} data-testid={testId} aria-expanded={open} tabIndex={0} onClick={show} onKeyDown={(event) => { if (event.key === 'Enter') show() }}>{label}<span className="pill-gap" /><Icon d="M6 9l6 6 6-6" /></div>
       {open ? createPortal(
-        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" data-testid={testId ? `${testId}-menu` : undefined} style={{ top: box.top, right: box.right, maxHeight: box.maxHeight, maxWidth: 'calc(100vw - 16px)', overflowY: 'auto', minHeight: menuClass === 'lang-menu' ? Math.min(240, box.maxHeight) : undefined }}>
+        <div ref={menuRef} className={`anchored-menu ${menuClass ?? ''}`} role="listbox" data-testid={testId ? `${testId}-menu` : undefined} style={{ top: box.top, right: box.right, maxHeight: Math.min(box.maxHeight, 28 * 8.5), maxWidth: 'min(280px, calc(100vw - 16px))', overflowY: 'auto' }}>
           {options.map((option, index) => (
             <div key={option}>
               {dividerAfter === index - 1 ? <hr /> : null}
@@ -766,7 +900,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
       ? `${block.text.trimEnd()}${block.citations.map((_, index) => `[citation:${index + 1}]`).join('')}`
       : block.text
     return (
-      <div className="prose" data-testid={testId}>
+      <div className="prose ds-markdown" data-testid={testId}>
         <Markdown text={marked} citations={block.citations} />
       </div>
     )
@@ -792,7 +926,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
   }
   if (block.type === 'web_fetch_tool_result') {
     if (block.content.type === 'web_fetch_tool_result_error') {
-      return <p className="tool-line">{block.content.error_code}</p>
+      return <p className="tool-line" data-testid="browse-status">{t('browseFailed')}</p>
     }
     const title = block.content.content?.title
     return (
@@ -804,6 +938,9 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
     )
   }
   if (block.type === 'file_ref') {
+    if (block.media === 'image') {
+      return <ImageCard name={block.filename} src={imagePreview(block.fileId)} />
+    }
     return <FileCard name={block.filename} bytes={block.bytes} status="done" />
   }
   return null
@@ -812,6 +949,7 @@ const BlockView = ({ block, testId }: { block: ContentBlock; testId?: string }) 
 const SourceMarks = ({ items }: { items: SourceItem[] }) => {
   const t = useT()
   const sources = useContext(SourcesPanel)
+  const share = useContext(ShareMode)
   if (!items.length) return null
   return (
     <button
@@ -820,7 +958,7 @@ const SourceMarks = ({ items }: { items: SourceItem[] }) => {
       data-testid="source-favicons"
       aria-expanded={sources.open}
       aria-label={t('foundPages', { count: items.length })}
-      onClick={() => sources.toggle(items)}
+      onClick={() => { if (!share?.on) sources.toggle(items) }}
     >
       {items.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}
     </button>
@@ -830,9 +968,11 @@ const SourceMarks = ({ items }: { items: SourceItem[] }) => {
 const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_search_tool_result' }> }) => {
   const t = useT()
   const sources = useContext(SourcesPanel)
+  const share = useContext(ShareMode)
+  const failed = block.content.some((item) => item.type === 'web_search_tool_result_error')
   const results = block.content.filter((item) => item.type === 'web_search_result')
   if (!results.length) {
-    return null
+    return <p className="tool-line" data-testid="search-status">{failed ? t('searchUnavailable') : t('searchEmpty')}</p>
   }
   const items = results.map((result) => ({
     url: result.url,
@@ -849,13 +989,13 @@ const SearchResults = ({ block }: { block: Extract<ContentBlock, { type: 'web_se
         {t('foundPages', { count: results.length })}
         <SourceMarks items={items} />
       </p>
-      <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sources.show(items)}>
+      <button className={share?.on ? 'sources-pill is-inert' : 'sources-pill'} type="button" data-testid="search-results" onClick={() => { if (!share?.on) sources.show(items) }}>
         <span className="favicons">
           {results.slice(0, SOURCE_MARKS).map((result) => (
             <Favicon key={result.url} label={result.site_name || result.title} icon={result.site_icon} />
           ))}
         </span>
-        {t('pagesPill', { count: results.length })}
+        <span className="sources-pill-text">{t('pagesPill', { count: results.length })}</span>
       </button>
     </div>
   )
@@ -905,8 +1045,10 @@ const Thinking = ({ text }: { text: string }) => {
         <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
         <PhaseTitle text={streaming ? t('phaseThinking') : t('thoughtFor', { seconds: 1 })} live={streaming} />
         <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
+        {/* SP-CV-182. Official fade sits under the title. Opacity 0 keeps the ink unchanged. */}
+        <span className="think-fade" aria-hidden="true" />
       </button>
-      {open ? <div className="thinking-body think-copy"><Markdown text={text} streaming={streaming} /></div> : null}
+      {open ? <div className="thinking-body think-copy ds-think-content ds-markdown"><Markdown text={text} streaming={streaming} /></div> : null}
     </section>
   )
 }
@@ -955,6 +1097,7 @@ const BrowseExternalIcon = () => (
 const AssistantTurn = ({ message }: { message: Message }) => {
   const t = useT()
   const sourcesApi = useContext(SourcesPanel)
+  const shareMode = useContext(ShareMode)
   const [open, setOpen] = useState(true)
   const steps: Array<
     | { type: 'think'; text: string }
@@ -1020,10 +1163,11 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
       return (
-        <div key={index} className={`timeline-step timeline-think think-copy ${last}`}>
+        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ${last}${phase === 'thinking' && last ? ' is-live' : ''}`}>
           <span className="timeline-dot" aria-hidden="true" />
           <span className="timeline-line" aria-hidden="true" />
-          <Markdown text={step.text} streaming={answerStreaming} />
+          {/* The paragraph must be :first-child of .ds-markdown so margin-top resets to 0. */}
+          <div className="ds-markdown"><Markdown text={step.text} streaming={answerStreaming} /></div>
         </div>
       )
     }
@@ -1052,12 +1196,28 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         <Glyph name="document" size={14} />
         <span className="browse-wrap">
           <span className="browse-count">{t('browsedPages', { count: step.items.length })}</span>
-          {step.items.map((item) => (
+          {step.items.slice(0, 5).map((item) => (
             <span key={item.url} className="browse-item">
               <a className="browse-link" href={item.url} target="_blank" rel="noreferrer noopener">{item.title}</a>
               <BrowseExternalIcon />
             </span>
           ))}
+          {step.items.length > 5 ? (
+            <button
+              type="button"
+              className="browse-view-all"
+              data-testid="browse-view-all"
+              onClick={() => {
+                if (shareMode?.on) return
+                sourcesApi.toggle(step.items.map((item) => ({
+                  url: item.url,
+                  title: item.title,
+                  snippet: '',
+                  site: hostOf(item.url),
+                })))
+              }}
+            >{t('viewAll')}</button>
+          ) : null}
         </span>
       </p>
     )
@@ -1070,6 +1230,8 @@ const AssistantTurn = ({ message }: { message: Message }) => {
             <FillIcon paths={GLYPHS.thinking.paths} viewBox={GLYPHS.thinking.vb} size={16} fillRule="evenodd" />
             <PhaseTitle text={title} live={livePhase(phase)} />
             <span className="chev"><Glyph name={open ? 'chevron' : 'chevronRight'} size={14} /></span>
+            {/* SP-CV-182. The fade sits under the thinking title. Opacity stays 0 until a selected wash needs it. */}
+            <span className="think-fade" aria-hidden="true" />
           </button>
           <div className={`thinking-collapse ${open ? 'open' : ''}`}>
             <div className="thinking-body">
@@ -1079,30 +1241,31 @@ const AssistantTurn = ({ message }: { message: Message }) => {
         </section>
       ) : steps.map(renderStep)}
       {article.text.trim() ? (
-        <div className="prose" data-testid="assistant-text">
+        <div className="prose ds-markdown" data-testid="assistant-text">
           <Markdown text={article.text} citations={article.citations} cards={article.cards} streaming={answerStreaming} />
         </div>
       ) : null}
       {sources.length ? (
-        <button className="sources-pill" type="button" data-testid="search-results" onClick={() => sourcesApi.show(sources)}>
+        <button className={shareMode?.on ? 'sources-pill is-inert' : 'sources-pill'} type="button" data-testid="search-results" onClick={() => { if (!shareMode?.on) sourcesApi.show(sources) }}>
           <span className="favicons">{sources.slice(0, SOURCE_MARKS).map((item) => <Favicon key={item.url} label={item.site} icon={item.icon} />)}</span>
-          {t('pagesPill', { count: sources.length })}
+          <span className="sources-pill-text">{t('pagesPill', { count: sources.length })}</span>
         </button>
       ) : null}
     </>
   )
 }
 
-const BranchSwitcher = ({ ids, current, disabled, onStep }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void }) => {
+const BranchSwitcher = ({ ids, current, disabled, onStep, holdTip }: { ids: string[]; current: string; disabled?: boolean; onStep: (dir: -1 | 1) => void; holdTip?: string }) => {
   if (ids.length <= 1) return null
   const index = Math.max(0, ids.indexOf(current))
+  const hold = disabled && holdTip ? holdTip : undefined
   return (
     <span className="branch" data-testid="versions">
-      <button type="button" className="branch-prev" aria-label="‹" disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
+      <button type="button" className="branch-prev" aria-label="‹" title={hold} disabled={disabled || index <= 0} onClick={() => onStep(-1)}>
         <Glyph name="chevronRight" size={14} />
       </button>
       <span className="branch-count">{index + 1} / {ids.length}</span>
-      <button type="button" aria-label="›" disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
+      <button type="button" aria-label="›" title={hold} disabled={disabled || index >= ids.length - 1} onClick={() => onStep(1)}>
         <Glyph name="chevronRight" size={14} />
       </button>
     </span>
@@ -1113,8 +1276,10 @@ const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
   const groupId = share?.groupOf(message.id) ?? null
-  const picked = Boolean(groupId && share?.selected.has(groupId))
+  const locked = Boolean(share?.on && share.locked(message.id))
+  const picked = Boolean(groupId && share?.selected.has(groupId) && !locked)
   const messages = useHarbor((state) => state.messages)
+  const sources = useContext(SourcesPanel)
   const selectSibling = useHarbor((state) => state.selectSibling)
   const regenerate = useHarbor((state) => state.regenerate)
   const resend = useHarbor((state) => state.resend)
@@ -1124,6 +1289,10 @@ const MessageRow = ({ message }: { message: Message }) => {
     state.messages.some((item) => item.conversationId === message.conversationId && item.status === 'streaming'),
   )
   const siblings = siblingIds(messages, message.id)
+  const userIds = messages.filter((item) => item.conversationId === message.conversationId && item.role === 'user').map((item) => item.id)
+  const isFirstUser = message.role === 'user' && userIds[0] === message.id
+  const onSharePage = typeof window !== 'undefined' && window.location.pathname.startsWith('/share')
+  const isLastUser = message.role === 'user' && userIds[userIds.length - 1] === message.id && !onSharePage
   const textOf = message.blocks.filter((block) => block.type === 'text').map((block) => (block.type === 'text' ? block.text : '')).join('\n')
   const fileBlocks = message.blocks.flatMap((block) => (block.type === 'file_ref' ? [block] : []))
   const errorKey = replyErrorKey(message.errorMessage)
@@ -1145,77 +1314,94 @@ const MessageRow = ({ message }: { message: Message }) => {
   const stepVersion = (dir: -1 | 1) => {
     const index = siblings.indexOf(message.id)
     const next = siblings[index + dir]
-    if (next) void selectSibling(message.id, next)
+    if (next) {
+      sources.close()
+      void selectSibling(message.id, next)
+    }
   }
   return (
-    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${share?.on ? 'share-on' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'}>
-      <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={!share?.on} checked={picked} aria-label={textOf || t('share')} onChange={() => { if (groupId && share) share.toggle(groupId) }} />
-      <div className="share-halo" aria-hidden="true" />
-      {message.role === 'user' && fileBlocks.length ? (
-        <div className="message-files" data-testid="message-files">
-          {fileBlocks.map((block, blockIndex) => (
-            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
-          ))}
+    <article className={`turn ${message.role} ${message.status === 'streaming' ? 'streaming' : ''} ${isFirstUser ? 'is-first' : ''} ${isLastUser ? 'is-last-user' : ''} ${share?.on ? 'share-on' : ''} ${locked ? 'share-locked' : ''} ${share?.on && picked ? 'share-picked' : ''}`} data-testid={`message-${message.role}`} data-follow-id={message.id} aria-busy={message.status === 'streaming'} onClick={() => { if (!share?.on || !groupId) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }}>
+      {/* Official mB returns null outside share mode. An empty sticky is 44px in flow. */}
+      {share?.on ? (
+        <span className="share-col">
+          <span className="share-sticky">
+            <input className="share-box ds-checkbox ds-checkbox--l" type="checkbox" hidden={locked} checked={picked} aria-label={textOf || t('share')} onClick={(event) => event.stopPropagation()} onChange={() => { if (!groupId || !share) return; if (locked) { share.reject(message.id); return }; share.toggle(groupId) }} />
+          </span>
+        </span>
+      ) : null}
+      {/* Assistant wash is a sibling of .prose so article > .prose stays direct. It is sized to the body, not the action row. */}
+      {message.role === 'assistant' && share?.on ? <div className="share-halo" aria-hidden="true" /> : null}
+      {message.role === 'user' ? (
+        <div className="message-body">
+          {share?.on ? <div className="share-halo" aria-hidden="true" /> : null}
+          {fileBlocks.length ? (
+            <div className="message-files" data-testid="message-files">
+              {fileBlocks.map((block, blockIndex) => (
+                <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
+              ))}
+            </div>
+          ) : null}
+          {editing ? (
+            <form className="edit-card" onSubmit={(event) => { event.preventDefault(); sources.close(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
+              <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
+              <div className="edit-actions">
+                <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
+                <button className="primary" type="submit">{t('send')}</button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <div className={`bubble${fileBlocks.length ? ' has-files' : ''}`}>
+                {textOf}
+                {message.errorMessage === HINT_NETWORK ? (
+                  <HoverTip text={t('retry')}>
+                    <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
+                      <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
+                    </button>
+                  </HoverTip>
+                ) : null}
+              </div>
+              {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
+            </>
+          )}
         </div>
       ) : null}
-      {message.role === 'user' ? (
-        editing ? (
-          <form className="edit-card" onSubmit={(event) => { event.preventDefault(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
-            <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
-            <div className="edit-actions">
-              <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
-              <button className="primary" type="submit">{t('send')}</button>
-            </div>
-          </form>
-        ) : (
-        <>
-          <div className="bubble">
-            {textOf}
-            {message.errorMessage === HINT_NETWORK ? (
-              <HoverTip text={t('retry')}>
-                <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
-                  <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
-                </button>
-              </HoverTip>
-            ) : null}
-          </div>
-          {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
-          <div className="user-actions">
-            <HoverTip text={t('copy')}>
-              <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
-                <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
-              </button>
-            </HoverTip>
-            <HoverTip text={t('edit')}>
-              <button type="button" data-tip={t('edit')} aria-label={t('edit')} onClick={() => { setDraft(textOf); setEditing(true) }}>
-                <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
-              </button>
-            </HoverTip>
-            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
-          </div>
-        </>
-        )
+      {message.role === 'user' && !editing ? (
+        <div className="user-actions">
+          <HoverTip text={t('copy')}>
+            <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
+              <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+            </button>
+          </HoverTip>
+          <HoverTip text={t('editMessageTooltip')}>
+            <button type="button" data-tip={t('editMessageTooltip')} aria-label={t('editMessageTooltip')} onClick={() => { setDraft(textOf); setEditing(true) }}>
+              <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+            </button>
+          </HoverTip>
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
+        </div>
       ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
       {message.role === 'assistant' && message.status === 'streaming' && phaseOf(message) === 'pending' ? (
         <div className="reply-dots" data-testid="reply-dots" aria-hidden="true"><i /><i /><i /></div>
       ) : null}
       {message.role === 'assistant' ? <AssistantTurn message={message} /> : null}
+      {message.role === 'assistant' && message.status !== 'streaming' && textOf ? <p className="answer-note">{t('answerNote')}</p> : null}
       {message.status === 'error' ? (
         <p className="form-error">
           {errorKey ? t(errorKey) : message.errorMessage || t('error')}
-          <button type="button" data-testid="retry" onClick={() => void regenerate(message.id)}>{t('retry')}</button>
+          <button type="button" data-testid="retry" onClick={() => { sources.close(); void regenerate(message.id) }}>{t('retry')}</button>
         </p>
       ) : null}
       {message.status === 'aborted' && !stoppedInTitle(message) ? <p className="hint">{t('stopped')}</p> : null}
       {message.role === 'assistant' && message.status !== 'streaming' ? (
         <div className="action-row">
-          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} onStep={stepVersion} />
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
           <HoverTip text={copied ? t('copied') : t('copy')}>
             <button type="button" data-tip={copied ? t('copied') : t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200) })}>{copied ? '✓' : <FillIcon paths={[...ACTION_ICONS.copy]} />}</button>
           </HoverTip>
-          <HoverTip text={t('regenerate')}>
-            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} aria-label={t('regenerate')} disabled={streaming} onClick={() => void regenerate(message.id)}>
+          <HoverTip text={streaming ? t('waitUntilGenerated') : t('regenerate')}>
+            <button type="button" data-testid="regenerate" data-tip={t('regenerate')} title={streaming ? t('waitUntilGenerated') : undefined} aria-label={t('regenerate')} disabled={streaming} onClick={() => { sources.close(); void regenerate(message.id) }}>
               <FillIcon paths={[...ACTION_ICONS.regen]} />
             </button>
           </HoverTip>
@@ -1225,8 +1411,8 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('dislike')}>
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
-          <HoverTip text={t('share')}>
-            <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
+          <HoverTip text={message.status === 'complete' ? t('share') : t('shareUnsupported')}>
+            <button type="button" data-tip={message.status === 'complete' ? t('share') : t('shareUnsupported')} aria-label={t('share')} disabled={message.status !== 'complete' && message.status !== 'aborted'} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
           {message.status === 'aborted' && !generatingHere && childIds(messages, message.id).length === 0 ? (
             <button type="button" className="continue-gen" data-testid="continue" onClick={() => void useHarbor.getState().continueReply(message.id)}>{t('continueGenerating')}</button>
@@ -1259,6 +1445,7 @@ export const BootSkeleton = () => {
   return (
     <div className="shell boot-skeleton" data-testid="boot-skeleton">
       <aside className="sidebar">
+        <div className="sider-surface">
         <div className="sider-top">
           <span className="brand-name"><Mark /><Wordmark /></span>
           <span className="sider-icons" aria-hidden="true">
@@ -1270,9 +1457,12 @@ export const BootSkeleton = () => {
           <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
         </div>
         <div className="boot-bars" aria-hidden="true"><i /><i /><i /></div>
-        <div className="user-bar">
-          <span className="avatar" />
-          <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+        <div className="sider-bottom">
+          <div className="user-bar">
+            <span className="avatar" />
+            <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
+          </div>
+        </div>
         </div>
       </aside>
       <section className="stage">
@@ -1302,6 +1492,7 @@ export const Shell = () => {
   const [sharePrimed, setSharePrimed] = useState(false)
   const [shareSoon, setShareSoon] = useState(false)
   const [shareAll, setShareAll] = useState(true)
+  const [shareToast, setShareToast] = useState<null | 'shareSelectBlocked' | 'shareSelectLater'>(null)
   const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 799px)').matches)
   const sharing = shareIds !== null
   useEffect(() => {
@@ -1320,6 +1511,8 @@ export const Shell = () => {
   }
   const enterShare = (id: string | null) => {
     if (!id) return
+    // The phone drawer scrim covers the top-bar cancel, and share mode hides the menu button.
+    state.setSidebarOpen(false)
     setShareSoon(false)
     setShareAll(true)
     setShareConv(id)
@@ -1329,11 +1522,12 @@ export const Shell = () => {
       void state.openChat(id)
       return
     }
-    setShareIds(turns.map((group) => group.id))
+    setShareIds(selectableGroupIds(turns, path))
     setSharePrimed(true)
   }
   const enterGroup = (messageId: string) => {
     if (!conversation?.id) return
+    state.setSidebarOpen(false)
     const group = turns.find((item) => item.messageIds.includes(messageId))
     setShareSoon(false)
     setShareAll(false)
@@ -1348,9 +1542,11 @@ export const Shell = () => {
       setSharePrimed(true)
       return
     }
-    setShareIds(shareAll ? turns.map((group) => group.id) : [turns[turns.length - 1].id])
+    const selectable = selectableGroupIds(turns, path)
+    const lastId = turns[turns.length - 1]?.id
+    setShareIds(shareAll ? selectable : selectable.filter((id) => id === lastId))
     setSharePrimed(true)
-  }, [shareConv, sharePrimed, shareAll, conversation?.id, turns])
+  }, [shareConv, sharePrimed, shareAll, conversation?.id, turns, path])
   const shareConvRef = useRef(shareConv)
   useEffect(() => {
     const previous = shareConvRef.current
@@ -1358,30 +1554,52 @@ export const Shell = () => {
     if (!sharing || !previous) return
     if (shareConv === previous && conversation?.id !== previous) exitShare()
   }, [sharing, shareConv, conversation?.id])
-  useEffect(() => {
-    if (!sharing) return undefined
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.isComposing) return
-      event.preventDefault()
-      exitShare()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [sharing])
+  // SP-SHARE-147. Escape stays in select mode. Cancel is the exit.
+  const selectableIds = selectableGroupIds(turns, path)
   const shareValue: ShareModeValue = {
     on: sharing,
     groupOf: (messageId) => turns.find((group) => group.messageIds.includes(messageId))?.id ?? null,
     selected: new Set(shareIds ?? []),
+    locked: (messageId) => {
+      const group = turns.find((item) => item.messageIds.includes(messageId))
+      return !group || !selectableIds.includes(group.id)
+    },
     toggle: (groupId) => setShareIds((current) => {
+      if (!selectableIds.includes(groupId)) return current ?? []
       const ids = current ?? []
       return ids.includes(groupId) ? ids.filter((item) => item !== groupId) : [...ids, groupId]
     }),
+    reject: (messageId) => {
+      const group = turns.find((item) => item.messageIds.includes(messageId))
+      if (!group) return
+      const byId = new Map(path.map((message) => [message.id, message]))
+      const refused = group.messageIds.some((id) => byId.get(id)?.status === 'refused')
+      setShareToast(refused ? 'shareSelectBlocked' : 'shareSelectLater')
+    },
     enter: (messageId) => enterGroup(messageId),
   }
-  const selectedCount = turns.filter((group) => (shareIds ?? []).includes(group.id)).length
-  const allTurns = turns.length > 0 && selectedCount === turns.length
+  const selectedCount = selectableIds.filter((id) => (shareIds ?? []).includes(id)).length
+  const allTurns = selectableIds.length > 0 && selectedCount === selectableIds.length
   const endRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const [shareNarrow, setShareNarrow] = useState(false)
+  useLayoutEffect(() => {
+    const list = listRef.current
+    if (!sharing || !list) {
+      setShareNarrow(false)
+      return
+    }
+    const apply = () => {
+      const width = list.offsetWidth
+      list.style.setProperty('--panel-width', `${width}px`)
+      const next = width < 800
+      setShareNarrow((current) => (current === next ? current : next))
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [sharing, path.length])
   const stick = useRef(true)
   const consumed = useRef<string | null>(null)
   const seenChat = useRef<string | null | undefined>(undefined)
@@ -1469,9 +1687,32 @@ export const Shell = () => {
   }, [])
 
   const profile = useProfile()
-  const [collapsed, setCollapsed] = useState(false)
+  // SP-SB-631. Below 1024 the official sider starts collapsed. Phone uses the drawer (sidebarOpen), not the in-flow width-0 class. At 1024 and above the stored flag wins, and the default is expanded.
+  const [collapsed, setCollapsedState] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const phone = !window.matchMedia('(min-width: 768px)').matches
+    if (phone) return false
+    if (!window.matchMedia('(min-width: 1024px)').matches) return true
+    try {
+      return localStorage.getItem('deepapi-sider-collapsed') === '1'
+    } catch {
+      return false
+    }
+  })
+  const setCollapsed = (value: boolean) => {
+    setCollapsedState(value)
+    try {
+      if (window.matchMedia('(min-width: 1024px)').matches) localStorage.setItem('deepapi-sider-collapsed', value ? '1' : '0')
+    } catch {
+      /* private mode */
+    }
+  }
   const [filtering, setFiltering] = useState(false)
   const [filter, setFilter] = useState('')
+  const filterInputRef = useRef<HTMLInputElement>(null)
+  // Survives the unmount of the field. A history restore must not replace it with ''.
+  const preservedQuery = useRef('')
+  const [searchReady, setSearchReady] = useState(false)
   const [corpus, setCorpus] = useState<Record<string, string>>({})
   const [activeHit, setActiveHit] = useState(-1)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -1482,7 +1723,7 @@ export const Shell = () => {
     const includes = (value: string) => value.toLowerCase().includes(needle)
     const rows = state.conversations.flatMap((chat) => {
       if (chat.deletedAt) return []
-      const title = chat.title || t('newChat')
+      const title = chat.title || t('untitledChat')
       const snippet = snippetAround(corpus[chat.id] || '', query)
       if (!includes(title) && !snippet) return []
       return [{ id: chat.id, title, updatedAt: chat.updatedAt, snippet }]
@@ -1506,6 +1747,70 @@ export const Shell = () => {
       live = false
     }
   }, [filtering, state.conversations, state.messages])
+  // Mount the field only after the previous close's history.back() has popped.
+  // The input is not in the document during that pop, so the browser cannot restore it to ''.
+  useEffect(() => {
+    if (!filtering) {
+      setSearchReady(false)
+      return undefined
+    }
+    let cancel = false
+    void whenOverlayHistorySettled().then(() => {
+      if (!cancel) setSearchReady(true)
+    })
+    return () => {
+      cancel = true
+    }
+  }, [filtering])
+  // SP-SB-647: reopening the dialog selects the preserved query.
+  // Focus after the opening key event. Selecting during Ctrl+K lets that key replace the text.
+  useEffect(() => {
+    if (!filtering || !searchReady) return undefined
+    const id = window.setTimeout(() => {
+      const input = filterInputRef.current
+      if (!input) return
+      const saved = preservedQuery.current
+      if (saved && input.value !== saved) {
+        setNativeInputValue(input, saved)
+        setFilter(saved)
+      }
+      input.focus()
+      const len = (saved || input.value).length
+      input.setSelectionRange(0, len)
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [filtering, searchReady])
+  // SP-MOD-635. Back closes the search dialog. Tab stays in the card. The page does not scroll behind it.
+  const retainSearchHistory = useOverlayHistory(filtering, () => setFiltering(false))
+  useScrollLock(filtering)
+  useEffect(() => {
+    if (!filtering) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const root = document.querySelector('.search-dialog')
+      if (!(root instanceof HTMLElement)) return
+      const list = [...root.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE)].filter((node) => !node.hasAttribute('disabled') && node.getClientRects().length > 0)
+      if (!list.length) {
+        event.preventDefault()
+        return
+      }
+      const first = list[0]
+      const last = list[list.length - 1]
+      const current = document.activeElement
+      const inside = current instanceof Node && root.contains(current)
+      if (event.shiftKey) {
+        if (!inside || current === first) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || current === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [filtering])
   useEffect(() => {
     const list = resultsRef.current
     if (!list || activeHit < 0) return
@@ -1516,8 +1821,11 @@ export const Shell = () => {
     else if (delta + item.offsetHeight > list.clientHeight) list.scrollTop += delta + item.offsetHeight - list.clientHeight
   }, [activeHit, hitKey])
   const openSearched = (id: string) => {
-    window.history.pushState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
+    // The overlay entry is current. Replace it so closing does not history.back() over the chat URL.
+    retainSearchHistory()
+    window.history.replaceState(null, '', `/a/chat/s/${encodeURIComponent(id)}`)
     setFiltering(false)
+    preservedQuery.current = ''
     setFilter('')
     void state.openChat(id)
     focusComposer()
@@ -1525,6 +1833,104 @@ export const Shell = () => {
   const [userMenu, setUserMenu] = useState(false)
   const userBarRef = useRef<HTMLDivElement>(null)
   const [panel, setPanel] = useState<SourceItem[] | null>(null)
+  const [showDesktopTitle, setShowDesktopTitle] = useState(true)
+  const panelRef = useRef<SourceItem[] | null>(null)
+  const coupledExpand = useRef(false)
+  const collapsedRef = useRef(collapsed)
+  collapsedRef.current = collapsed
+  panelRef.current = panel
+  const below1024 = () => !window.matchMedia('(min-width: 1024px)').matches
+  const below768 = () => !window.matchMedia('(min-width: 768px)').matches
+  // SP-SEARCH-242 / 244 / 247. matchMedia min-width, not innerWidth.
+  const collapseForCoupling = () => {
+    if (!below1024()) return
+    if (below768()) {
+      if (useHarbor.getState().sidebarOpen) {
+        coupledExpand.current = true
+        useHarbor.getState().setSidebarOpen(false)
+      }
+      return
+    }
+    if (!collapsedRef.current) {
+      coupledExpand.current = true
+      setCollapsed(true)
+    }
+  }
+  const restoreCoupled = () => {
+    if (!coupledExpand.current) return
+    coupledExpand.current = false
+    setCollapsed(false)
+    if (below768()) useHarbor.getState().setSidebarOpen(true)
+    else useHarbor.getState().setSidebarOpen(false)
+  }
+  const closeSearchPanel = () => {
+    panelRef.current = null
+    setPanel(null)
+    setShowDesktopTitle(true)
+    restoreCoupled()
+  }
+  const openSearchPanel = (items: SourceItem[]) => {
+    panelRef.current = items
+    setPanel(items)
+    collapseForCoupling()
+  }
+  const closeRef = useRef(closeSearchPanel)
+  const openRef = useRef(openSearchPanel)
+  closeRef.current = closeSearchPanel
+  openRef.current = openSearchPanel
+  const activeLoc = state.activeId ?? ''
+  const locRef = useRef(activeLoc)
+  useEffect(() => {
+    if (locRef.current === activeLoc) return
+    locRef.current = activeLoc
+    closeRef.current()
+  }, [activeLoc])
+  useEffect(() => {
+    const q1024 = window.matchMedia('(min-width: 1024px)')
+    const q768 = window.matchMedia('(min-width: 768px)')
+    const q1920 = window.matchMedia('(min-width: 1920px)')
+    let narrowDesktop = !q1024.matches
+    let phoneLayout = !q768.matches
+    let below1920 = !q1920.matches
+    const onChange = () => {
+      const nextNarrow = !q1024.matches
+      const nextPhone = !q768.matches
+      const nextBelow1920 = !q1920.matches
+      if (nextNarrow === narrowDesktop && nextPhone === phoneLayout && nextBelow1920 === below1920) return
+      narrowDesktop = nextNarrow
+      phoneLayout = nextPhone
+      below1920 = nextBelow1920
+      // SP-SEARCH-245 / 247. Opening search alone does not run this effect.
+      if (nextNarrow) {
+        if (nextPhone) {
+          // SP-SEARCH-248: below 768 the sider is a fixed drawer. Do not add sider-collapsed (width 0).
+          if (!collapsedRef.current || useHarbor.getState().sidebarOpen) {
+            coupledExpand.current = true
+            if (useHarbor.getState().sidebarOpen) useHarbor.getState().setSidebarOpen(false)
+          }
+        } else if (!collapsedRef.current) {
+          coupledExpand.current = true
+          setCollapsed(true)
+        }
+        if (panelRef.current) setShowDesktopTitle(false)
+      } else {
+        setShowDesktopTitle(true)
+        if (coupledExpand.current) {
+          coupledExpand.current = false
+          setCollapsed(false)
+          useHarbor.getState().setSidebarOpen(false)
+        }
+      }
+    }
+    q1024.addEventListener('change', onChange)
+    q768.addEventListener('change', onChange)
+    q1920.addEventListener('change', onChange)
+    return () => {
+      q1024.removeEventListener('change', onChange)
+      q768.removeEventListener('change', onChange)
+      q1920.removeEventListener('change', onChange)
+    }
+  }, [])
   const [selecting, setSelecting] = useState(false)
   const [picked, setPicked] = useState<string[]>([])
   useEffect(() => {
@@ -1535,16 +1941,20 @@ export const Shell = () => {
       const inComposer = target?.dataset.testid === 'composer'
       if (meta && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        setFiltering(true)
+        // SP-SB-635: ignore the shortcut while multi-select is on. A second press closes.
+        // closeSearch preserves the query (SP-SB-647 reopens it selected).
+        if (selecting) return
+        setFiltering((open) => !open)
       } else if (meta && event.key.toLowerCase() === 'j' && (!typing || inComposer)) {
         event.preventDefault()
         void state.newChat()
         focusComposer()
       } else if (event.key === 'Escape') {
-        setPanel(null)
+        // SP-MOD-601. An IME composition Escape stays in the field.
+        if (event.isComposing) return
+        closeRef.current()
         setUserMenu(false)
         setFiltering(false)
-        setFilter('')
         if (state.settingsOpen) {
           state.setSettingsOpen(false)
         }
@@ -1553,7 +1963,7 @@ export const Shell = () => {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [state])
+  }, [state, selecting])
   useEffect(() => {
     if (!userMenu) return undefined
     const onPointerDown = (event: PointerEvent) => {
@@ -1564,12 +1974,18 @@ export const Shell = () => {
     document.addEventListener('pointerdown', onPointerDown, true)
     return () => document.removeEventListener('pointerdown', onPointerDown, true)
   }, [userMenu])
+  // SP-SB-669: a history pop closes the user menu. Reload already drops it.
+  useEffect(() => {
+    const onPop = () => setUserMenu(false)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   const groups = useMemo(() => {
     const buckets = new Map<string, typeof state.conversations>()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
-    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group30')]
-    for (const item of state.conversations.filter((chat) => !filter || (chat.title || t('newChat')).includes(filter))) {
+    const order = [t('groupPinned'), t('groupToday'), t('groupYesterday'), t('group7'), t('group30')]
+    for (const item of state.conversations.filter((chat) => !filtering || !filter || (chat.title || t('untitledChat')).includes(filter))) {
       const when = new Date(item.updatedAt)
       const days = (startOfDay.getTime() - new Date(when.getFullYear(), when.getMonth(), when.getDate()).getTime()) / 86_400_000
       const label = item.pinned
@@ -1578,8 +1994,10 @@ export const Shell = () => {
           ? t('groupToday')
           : days < 2
             ? t('groupYesterday')
-            : days < 30
-              ? t('group30')
+            : days < 7
+              ? t('group7')
+              : days < 30
+                ? t('group30')
                 : `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, '0')}`
       buckets.set(label, [...(buckets.get(label) ?? []), item])
     }
@@ -1591,23 +2009,30 @@ export const Shell = () => {
       }
       return a[0] < b[0] ? 1 : -1
     })
-  }, [state.conversations, filter, t])
+  }, [state.conversations, filter, filtering, t])
   const serverName = state.serverUser?.username
-  const who = serverName || profile.nickname || t('product')
+  const who = serverName || profile.nickname || t('profileLabel')
   const initial = serverName ? serverName.slice(0, 1).toUpperCase() : profile.initial
   const narrow = () => window.matchMedia('(max-width: 767px)').matches
   const sourcesApi = useMemo<SourcesApi>(() => ({
     open: panel !== null,
-    show: (items) => setPanel(items),
-    toggle: (items) => setPanel((current) => (current ? null : items)),
+    show: (items) => openRef.current(items),
+    toggle: (items) => {
+      const current = panelRef.current
+      const same = !!current && current.length === items.length && current.every((item, index) => item.url === items[index]?.url)
+      if (same) closeRef.current()
+      else openRef.current(items)
+    },
+    close: () => closeRef.current(),
   }), [panel])
 
   return (
     <SourcesPanel.Provider value={sourcesApi}>
     <ShareMode.Provider value={shareValue}>
-    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''} ${sharing ? 'sharing' : ''}`}>
+    <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''} ${sharing ? 'sharing' : ''} ${shareNarrow ? 'share-narrow' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
+        <div className="sider-surface">
         <div className="sider-top">
           <span
             className="brand-name"
@@ -1625,10 +2050,10 @@ export const Shell = () => {
             <Wordmark />
           </span>
           <span className="sider-icons">
-            {selecting ? null : <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering((value) => !value)}>
+            {selecting ? null : <button className="icon-btn" type="button" aria-label={t('searchHistory')} onClick={() => setFiltering((value) => !value)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>}
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
+            <button className="icon-btn" type="button" aria-label={t('collapseSidebar')} onClick={() => (narrow() ? state.setSidebarOpen(false) : setCollapsed(true))}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
           </span>
@@ -1645,6 +2070,7 @@ export const Shell = () => {
             <span className="new-chat-label"><Icon d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 8v8M8 12h8" /><span>{t('newChat')}</span></span>
           </div>
         )}
+        <div className="side-scroll-wrap">
         <div className="side-scroll">
           {state.conversations.length === 0 ? <p className="hint">{t('noConversations')}</p> : null}
           {groups.map(([label, items], index) => (
@@ -1673,18 +2099,20 @@ export const Shell = () => {
             </div>
           ))}
         </div>
+        </div>
         {selecting ? (
           <div className="select-foot">
-            <button type="button" aria-disabled={!picked.length} className={picked.length ? '' : 'off'} onClick={() => { if (picked.length) void state.pinMany(picked) }}>
+            <button type="button" disabled={!picked.length} aria-disabled={!picked.length} className={picked.length ? '' : 'off'} onClick={() => { if (picked.length) void state.pinMany(picked) }}>
               <Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />
               <span>{t('pin')}</span>
             </button>
-            <button type="button" aria-disabled={!picked.length} className={picked.length ? 'danger' : 'off'} onClick={() => { if (!picked.length) return; for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>
+            <button type="button" disabled={!picked.length} aria-disabled={!picked.length} className={picked.length ? 'danger' : 'off'} onClick={() => { if (!picked.length) return; for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>
               <Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />
               <span>{t('delete')}</span>
             </button>
           </div>
         ) : (
+        <div className="sider-bottom">
         <div
           className="user-bar"
           data-testid="user-menu"
@@ -1705,6 +2133,7 @@ export const Shell = () => {
           onBlur={() => setUserMenu(false)}
         >
           <span className="avatar" aria-hidden="true">
+            <img className="profile-photo" alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
             {initial || 'D'}
           </span>
           <span className="user-copy">
@@ -1722,38 +2151,50 @@ export const Shell = () => {
             </div>
           ) : null}
         </div>
+        </div>
         )}
+        </div>
       </aside>
       {collapsed ? (
         <>
           <span className="collapsed-mark"><Mark /></span>
           <div className="float-pill">
-            <button className="icon-btn" type="button" aria-label={t('hide')} onClick={() => setCollapsed(false)}>
+            <button className="icon-btn" type="button" aria-label={t('expandSidebar')} onClick={() => { if (!window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); setCollapsed(false) }}>
               <Icon d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM9 3v18" />
             </button>
             <button className="icon-btn" type="button" aria-label={t('newChat')} onClick={() => { void state.newChat(); focusComposer() }}>
               <Icon d="M12 5v14M5 12h14" />
             </button>
-            <button className="icon-btn" type="button" aria-label={t('search')} onClick={() => setFiltering(true)}>
+            <button className="icon-btn" type="button" aria-label={t('searchHistory')} onClick={() => setFiltering(true)}>
               <Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" />
             </button>
           </div>
         </>
       ) : null}
-      {filtering ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }} /> : null}
-      {filtering ? (
+      {filtering && searchReady ? <button className="search-scrim" type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }} /> : null}
+      {filtering && searchReady ? (
         <form className={query ? 'search-dialog has-query' : 'search-dialog'} role="search" onSubmit={(event) => event.preventDefault()}>
+          <div className="search-field">
           <span className="search-glyph"><Icon d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm10 2-4.3-4.3" /></span>
           <span className="search-rule" />
           <input
+            ref={filterInputRef}
             className="side-filter"
-            autoFocus
             placeholder={t('searchChats')}
             value={filter}
             aria-label={t('search')}
             aria-controls={query ? 'conversation-search-results' : undefined}
             aria-activedescendant={query && activeHit >= 0 ? `conversation-search-result-${activeHit}` : undefined}
-            onChange={(event) => setFilter(event.target.value)}
+            onChange={(event) => {
+              const next = event.target.value
+              if (suppressEmptyRestore && next === '' && preservedQuery.current) {
+                setNativeInputValue(event.target, preservedQuery.current)
+                setFilter(preservedQuery.current)
+                return
+              }
+              preservedQuery.current = next
+              setFilter(next)
+            }}
             onKeyDown={(event) => {
               if (event.nativeEvent.isComposing || !query) return
               if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -1773,9 +2214,10 @@ export const Shell = () => {
               }
             }}
           />
-          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); setFilter(''); focusComposer() }}>
+          <button type="button" aria-label={t('close')} onClick={() => { setFiltering(false); focusComposer() }}>
             <Icon d="M6 6l12 12M18 6 6 18" />
           </button>
+          </div>
           {query ? (
             <div className={hits.length ? 'search-results' : 'search-results is-empty'} id="conversation-search-results" role="listbox" aria-label={t('searchPanel')} ref={resultsRef}>
               {hits.length ? (
@@ -1821,10 +2263,10 @@ export const Shell = () => {
       <section className="stage">
         {path.length > 0 ? <div className="top-fill" aria-hidden="true" /> : null}
         <header className="topbar">
-          <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => state.setSidebarOpen(!state.sidebarOpen)}>
+          <button className="icon-btn menu-mobile" data-testid="menu" type="button" onClick={() => { const opening = !state.sidebarOpen; if (opening && !window.matchMedia('(min-width: 1024px)').matches) closeRef.current(); state.setSidebarOpen(opening) }}>
             <Icon size={24} d="M3 9h13M3 16h18" />
           </button>
-          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation?.title ? <div className="chat-title">{conversation.title}</div> : null}
+          {sharing && phone ? <div className="chat-title" data-testid="share-title">{t('sharePickTitle')}</div> : conversation && (showDesktopTitle || (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)) ? <div className="chat-title" data-testid="chat-title">{conversation.title || t('untitledChat')}</div> : null}
           {state.serverMode ? <span className="server-pill" data-testid="server-mode">{t('serverChat')}</span> : null}
           {state.serverUser?.role === 'admin' ? (
             <button className="ghost" data-testid="open-admin" type="button" onClick={() => state.openAdmin(true)}>{t('adminTitle')}</button>
@@ -1842,7 +2284,7 @@ export const Shell = () => {
                   <Icon size={24} d="M5 7h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H8l-3 2v-2H5a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3zM8 12h6M11 9v6" />
                 </button>
                 {path.length > 0 ? (
-                  <button className="icon-btn" type="button" aria-label="share" onClick={() => enterShare(conversation?.id ?? null)}>
+                  <button className="icon-btn" type="button" aria-label={t('share')} onClick={() => enterShare(conversation?.id ?? null)}>
                     <Icon size={16} d="M14 5h5v5M19 5l-8 8M9 7H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
                   </button>
                 ) : null}
@@ -1873,6 +2315,7 @@ export const Shell = () => {
               </div>
               {sharing ? null : (
                 <div className="composer-wrap">
+                  <div className="composer-back" aria-hidden="true" />
                   <Composer />
                   <p className="footnote ai-note">{t('aiNote')}</p>
                 </div>
@@ -1887,12 +2330,12 @@ export const Shell = () => {
                       data-testid="share-all"
                       type="checkbox"
                       checked={allTurns}
-                      onChange={() => setShareIds(allTurns ? [] : turns.map((group) => group.id))}
+                      onChange={() => setShareIds(allTurns ? [] : selectableIds)}
                     />
                     <span>{t('shareSelectAll')}</span>
                   </label>
                   <span className="share-split" aria-hidden="true" />
-                  <span className="share-count" data-testid="share-count">{t('shareSelected', { count: selectedCount })}</span>
+                  <span className="share-count" data-testid="share-count">{path.length === 0 ? t('shareNone') : t('shareSelected', { count: selectedCount })}</span>
                   <span className="share-gap" />
                   <DsButton data-testid="share-cancel" onClick={exitShare}>{t('cancel')}</DsButton>
                   <DsButton data-testid="share-create" variant="primary" disabled={selectedCount === 0} onClick={() => setShareSoon(true)}>
@@ -1913,33 +2356,54 @@ export const Shell = () => {
       {panel ? (
         <aside className="search-panel" data-testid="search-panel">
           <header>
-            <strong>{t('searchPanel')}</strong>
-            <button className="icon-btn panel-close" type="button" aria-label={t('close')} onClick={() => setPanel(null)}>
-              <Icon d="M6 6l12 12M18 6 6 18" />
+            <div role="heading">{t('searchPanel')}</div>
+            <button className="icon-btn panel-close" type="button" aria-label={t('close')} onClick={() => closeRef.current()}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M14.1871 13.1265L13.1265 14.1872L1.81275 2.87347L2.87341 1.81281L14.1871 13.1265Z" fill="currentColor" />
+                <path d="M13.1265 1.81282L14.1871 2.87348L2.8734 14.1872L1.81274 13.1265L13.1265 1.81282Z" fill="currentColor" />
+              </svg>
             </button>
           </header>
           <ol>
-            {panel.map((item, index) => (
-              <li key={item.url}>
-                <a className="source-card" href={item.url} target="_blank" rel="noreferrer noopener">
-                  <span className="source-meta">
-                    <Favicon label={item.site} icon={item.icon} />
-                    <span className="source-site">{item.site}</span>
-                    {item.date ? <span>{item.date}</span> : null}
-                    <span className="source-index">{index + 1}</span>
-                  </span>
-                  <strong>{item.title}</strong>
-                  {item.snippet ? <p>{item.snippet}</p> : null}
-                </a>
-              </li>
-            ))}
+            {panel.map((item, index) => {
+              const site = item.site && item.site !== item.url ? item.site : (() => {
+                const host = hostOf(item.url)
+                return host && host !== item.url ? host : ''
+              })()
+              return (
+                <li key={item.url}>
+                  <a className="source-card" href={item.url} target="_blank" rel="noreferrer">
+                    <span className="source-meta">
+                      <Favicon label={site || item.title} icon={item.icon} />
+                      {site ? <span className="source-site">{site}</span> : null}
+                      {site && item.date ? <span className="source-divider" aria-hidden="true" /> : null}
+                      {item.date ? <span className="source-date">{item.date}</span> : null}
+                      <span className="source-index ds-markdown-cite">{index + 1}</span>
+                    </span>
+                    <span className="search-view-card__title">{item.title}</span>
+                    {item.snippet ? <span className="search-view-card__snippet">{item.snippet}</span> : null}
+                  </a>
+                </li>
+              )
+            })}
           </ol>
         </aside>
-      ) : null}
-      {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => setPanel(null)} /> : null}
+      ) : (
+        <aside className="search-panel is-closed" data-testid="search-panel" aria-hidden="true" />
+      )}
+      {panel ? <button className="sheet-scrim" type="button" aria-label={t('close')} onClick={() => closeRef.current()} /> : null}
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
+      {state.statusToast ? <StatusToast code={state.statusToast} /> : null}
+      {shareToast ? (
+        <div className="toast-layer">
+          <p className="toast" role="status" data-testid="share-select-toast">
+            {t(shareToast)}
+            <button type="button" onClick={() => setShareToast(null)}>{t('close')}</button>
+          </p>
+        </div>
+      ) : null}
       {shareSoon ? (
         <div className="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="share-soon-title" data-testid="share-soon" onClick={exitShare}>
           <div className="share-soon-card" onClick={(event) => event.stopPropagation()}>
@@ -1972,12 +2436,31 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
   const [confirming, setConfirming] = useState(false)
   const moreRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const cancelEdit = useRef(false)
+  const editingRef = useRef(false)
+  const titleRef = useRef(title)
+  editingRef.current = editing
+  titleRef.current = title
   usePopoverDismiss(open, () => setOpen(false), moreRef, menuRef)
+  // SP-SB-668: Back closes the row menu. A pop while renaming commits (SP-SB-670).
+  useEffect(() => {
+    const onPop = () => {
+      setOpen(false)
+      if (!editingRef.current || cancelEdit.current) return
+      const next = titleRef.current.trim()
+      if (next && next !== conversation.title) void rename(conversation.id, next)
+      cancelEdit.current = true
+      setEditing(false)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [conversation.id, conversation.title, rename])
   return (
     <a
       className={`chat-link ${active ? 'active' : ''} ${open ? 'open' : ''} ${picking ? 'picking' : ''}`}
-      href={`#${conversation.id}`}
+      href={`/a/chat/s/${encodeURIComponent(conversation.id)}`}
       onClick={(event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
         event.preventDefault()
         const target = event.target
         // Menu rows and the phone scrim are portaled to document.body, so a click there is not a hit on this row.
@@ -1994,25 +2477,46 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
     >
       <div className="chat-row">
       {picking ? (
-        <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('newChat')}>
+        <span className={`pick ${picked ? 'on' : ''}`} role="checkbox" aria-checked={!!picked} aria-label={conversation.title || t('untitledChat')}>
           {picked ? <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.1 11.3 2.7 7.9l1.4-1.4 2 2 5.2-5.2 1.4 1.4z" /></svg> : null}
         </span>
       ) : null}
       {editing ? (
         <form
-          onSubmit={(event) => { event.preventDefault(); void rename(conversation.id, title); setEditing(false) }}
+          onSubmit={(event) => {
+            event.preventDefault()
+            const next = title.trim()
+            if (next && next !== conversation.title) void rename(conversation.id, next)
+            setEditing(false)
+          }}
           onKeyDown={(event) => {
             if (event.key !== 'Escape' || event.nativeEvent.isComposing) return
             event.preventDefault()
             event.stopPropagation()
+            // Set before unmount so the blur that follows does not commit the typed title.
+            cancelEdit.current = true
             setTitle(conversation.title)
             setEditing(false)
           }}
         >
-          <input autoFocus aria-label={t('renameTitle')} value={title} onChange={(event) => setTitle(event.target.value)} />
+          <input
+            autoFocus
+            aria-label={t('renameTitle')}
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            onBlur={(event) => {
+              // SP-SB-670: commit when focus moves to another control (New chat, another row).
+              // A reload blur has no element target, so the uncommitted title is not stored.
+              if (cancelEdit.current) return
+              if (!(event.relatedTarget instanceof Element)) return
+              const next = title.trim()
+              if (next && next !== conversation.title) void rename(conversation.id, next)
+              setEditing(false)
+            }}
+          />
         </form>
       ) : (
-        <button type="button">{conversation.title || t('newChat')}</button>
+        <button type="button">{conversation.title || t('untitledChat')}</button>
       )}
       {picking ? null : <button ref={moreRef} className="icon-btn more" type="button" aria-label={t('menu')} onClick={(event) => {
         const rect = event.currentTarget.getBoundingClientRect()
@@ -2024,7 +2528,7 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
         <>
         {window.matchMedia('(max-width: 767px)').matches ? <button className="item-menu-scrim" type="button" aria-label={t('close')} onClick={() => setOpen(false)} /> : null}
         <div ref={menuRef} className={`menu item-menu ${window.matchMedia('(max-width: 767px)').matches ? 'sheet' : ''}`} role="menu" data-testid="chat-item-menu" style={window.matchMedia('(max-width: 767px)').matches ? undefined : { top: menuBox.top, left: menuBox.left }}>
-          <div role="menuitem" tabIndex={0} onClick={() => { setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
+          <div role="menuitem" tabIndex={0} onClick={() => { cancelEdit.current = false; setTitle(conversation.title); setEditing(true); setOpen(false) }}><Icon d="M4 20h4L18 10l-4-4L4 16v4zM13 7l4 4" /><span>{t('rename')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); void pin(conversation.id) }}><Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" /><span>{conversation.pinned ? t('unpin') : t('pin')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onShare?.() }}><Icon d="M4 12v8h16v-8M12 16V4M8 8l4-4 4 4" /><span>{t('share')}</span></div>
           <div role="menuitem" tabIndex={0} onClick={() => { setOpen(false); onMulti?.() }}><Icon d="M9 6h11M9 12h11M9 18h11M4 6l1.2 1.2L7.5 5M4 12l1.2 1.2L7.5 11M4 18l1.2 1.2L7.5 17" /><span>{t('multiSelect')}</span></div>
@@ -2035,7 +2539,9 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
       ) : null}
       {confirming ? (
         <ConfirmDialog
-          label={t('deleteConfirm')}
+          label={t('deleteChatTitle')}
+          body={t('deleteChatBody')}
+          confirm={t('deleteChatConfirm')}
           onCancel={() => setConfirming(false)}
           onConfirm={() => { setConfirming(false); void removeChat(conversation.id) }}
         />
@@ -2046,16 +2552,26 @@ const ChatLink = ({ conversation, active, picking, picked, onPick, onMulti, onSh
 
 const Empty = () => {
   const t = useT()
+  const locale = useHarbor((state) => state.settings.locale)
   const hasHistory = useHarbor((state) => state.conversations.length > 0)
   const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
   // Official home-with-history text: 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
   const wide = typeof window !== 'undefined' && window.matchMedia('(min-width: 1600px)').matches
   // Official home-with-history text, by the capture for that viewport:
   // 1920 dark 「你好，我能帮什么忙吗？」, 1440 「欢迎回来，想从哪里开始？」, 390 「欢迎回来，随时开始吧」.
-  const line = t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
+  // SP-TB-318/319/320. Time of day and locale pick the fresh greeting. A fresh Chinese
+  // landing outside 05:00–12:00 keeps the catalog fallback. Returning Chinese lines stay the viewport set.
+  const hour = new Date().getHours()
+  const line = locale === 'en'
+    ? (narrow ? t('greetingBegin') : t('greetingMind'))
+    : !hasHistory && hour >= 5 && hour < 12
+      ? t('greetingMorning')
+      : t(hasHistory ? (narrow ? 'welcomeBack' : wide ? 'welcomeHello' : 'welcomeAlt') : 'welcomeMessage')
   return (
     <div className="home">
-      <h2 className="greeting"><Mark /><span>{line}</span></h2>
+      <div className="home-header">
+        <h2 className="greeting"><Mark /><span>{line}</span></h2>
+      </div>
       <Composer />
     </div>
   )
@@ -2067,17 +2583,22 @@ const Composer = () => {
   const setPrefs = useHarbor((state) => state.setPrefs)
   const send = useHarbor((state) => state.send)
   const stop = useHarbor((state) => state.stop)
-  const streaming = useHarbor((state) => state.streaming)
-  const generating = useHarbor((state) => state.streaming && state.messages.some((item) => item.status === 'streaming' && item.blocks.length > 0))
+  const streaming = useHarbor((state) => state.streaming && state.messages.some((item) => item.conversationId === state.activeId && item.status === 'streaming'))
+  const generating = useHarbor((state) => state.streaming && state.messages.some((item) => item.status === 'streaming' && item.blocks.length > 0 && item.conversationId === state.activeId))
   const drafts = useHarbor((state) => state.drafts)
   const addFiles = useHarbor((state) => state.addFiles)
   const removeDraft = useHarbor((state) => state.removeDraft)
-  const [text, setText] = useState('')
+  const activeId = useHarbor((state) => state.activeId)
+  const text = useHarbor((state) => state.textDrafts[activeId ?? ''] ?? '')
+  const setComposerText = useHarbor((state) => state.setComposerText)
+  const setText = (value: string) => setComposerText(activeId, value)
   const [iconOnly, setIconOnly] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const [dropKind, setDropKind] = useState<'any' | 'text'>('any')
   const chips = useRef<HTMLDivElement>(null)
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
-  const activeId = useHarbor((state) => state.activeId)
+  const dragDepth = useRef(0)
   useEffect(() => {
     focusComposer()
   }, [activeId])
@@ -2110,7 +2631,8 @@ const Composer = () => {
   }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
-      setText((event as CustomEvent<string>).detail)
+      const state = useHarbor.getState()
+      state.setComposerText(state.activeId, (event as CustomEvent<string>).detail)
       box.current?.focus()
     }
     window.addEventListener('deepapi-prefill', onPrefill)
@@ -2120,7 +2642,20 @@ const Composer = () => {
   const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
   const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
   const canSend = !filesBlocking && (trimmed.length > 0 || hasFile)
+  const sendTip = drafts.some((file) => file.error) ? t('removeBadFiles') : !trimmed && !hasFile ? t('emptyQuestion') : text.length > 100_000 ? t('overCharLimit') : ''
   const submit = () => {
+    if (!trimmed && !hasFile) {
+      useHarbor.setState({ statusToast: 'emptyQuestion' })
+      return
+    }
+    if (text.length > 100_000) {
+      useHarbor.setState({ statusToast: 'overCharLimit' })
+      return
+    }
+    if (drafts.some((file) => file.error)) {
+      useHarbor.setState({ statusToast: 'removeBadFiles' })
+      return
+    }
     if (!canSend) return
     const value = text
     setText('')
@@ -2128,23 +2663,79 @@ const Composer = () => {
     focusComposer()
   }
   return (
-    <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
+    <div
+      className={`composer ${iconOnly ? 'icon-only' : ''} ${dragOver ? 'is-dragover' : ''}`}
+      onDragEnter={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+        const kinds = [...event.dataTransfer.items].map((item) => item.type).filter(Boolean)
+        const hasImage = kinds.some((kind) => kind.startsWith('image/'))
+        setDropKind(hasImage || kinds.length === 0 ? 'any' : 'text')
+        dragDepth.current += 1
+        setDragOver(true)
+      }}
+      onDragOver={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+      }}
+      onDragLeave={() => {
+        dragDepth.current = Math.max(0, dragDepth.current - 1)
+        if (dragDepth.current === 0) setDragOver(false)
+      }}
+      onDrop={(event) => {
+        if (!event.dataTransfer.types.includes('Files')) return
+        event.preventDefault()
+        dragDepth.current = 0
+        setDragOver(false)
+        const list = [...event.dataTransfer.files]
+        if (list.length) void addFiles(list)
+      }}
+    >
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
+      {dragOver ? (
+        <div className="drop-overlay" aria-hidden="true">
+          <div className="drop-overlay-copy">
+            <p className="drop-overlay-title">{dropKind === 'any' ? t('dropFilesAndImages') : t('dropFilesTextOnly')}</p>
+          </div>
+        </div>
+      ) : null}
+      {dragOver ? createPortal(
+        <div className="drop-mask" data-testid="drop-overlay">
+          <div className="drop-mask-copy">
+            <p className="drop-mask-title">{dropKind === 'any' ? t('dropFilesAndImages') : t('dropFilesTextOnly')}</p>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
       {drafts.length ? (
         <div className="drafts" data-testid="draft-files">
           {drafts.map((file) => (
-            <FileCard
-              key={file.localId}
-              name={file.filename}
-              bytes={file.bytes}
-              status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
-              error={file.error}
-              onRemove={() => removeDraft(file.localId)}
-            />
+            file.media === 'image' ? (
+              <ImageCard
+                key={file.localId}
+                name={file.filename}
+                src={file.previewUrl}
+                failed={Boolean(file.error)}
+                onRemove={() => removeDraft(file.localId)}
+              />
+            ) : (
+              <FileCard
+                key={file.localId}
+                name={file.filename}
+                bytes={file.bytes}
+                status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
+                error={file.error}
+                pasteText={file.pasteText}
+                onPasteBack={file.pasteText ? () => { setText(file.pasteText ?? ''); removeDraft(file.localId) } : undefined}
+                onRemove={() => removeDraft(file.localId)}
+              />
+            )
           ))}
         </div>
       ) : null}
+      <div className="composer-field ds-textarea">
+      <div className="composer-mirror ds-textarea__mirror" aria-hidden="true">{text ? `${text}\n` : ''}</div>
       <textarea
         ref={box}
         data-testid="composer"
@@ -2152,6 +2743,20 @@ const Composer = () => {
         placeholder={t('composerPlaceholder')}
         value={text}
         onChange={(event) => setText(event.target.value)}
+        onPaste={(event) => {
+          const data = event.clipboardData.getData('text/plain')
+          if (data.length > 100_000) {
+            event.preventDefault()
+            useHarbor.setState({ statusToast: 'pasteTooLong' })
+            return
+          }
+          if (data.length >= 8_000) {
+            event.preventDefault()
+            const file = new File([data], `${t('pastedText')}.txt`, { type: 'text/plain' })
+            Object.assign(file, { pasteText: data })
+            void addFiles([file])
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
@@ -2171,23 +2776,30 @@ const Composer = () => {
           })
         }}
       />
+      </div>
       <div className="composer-tools">
         <div className="chips" ref={chips}>
           <span className="chip-wrap">
-            <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
-              <Glyph name="thinking" size={14} />
-              <span className="chip-label">{t('thinking')}</span>
-            </button>
+            <HoverTip text={t('thinkTip')}>
+              <button type="button" data-testid="toggle-thinking" className={prefs.thinking ? 'chip on' : 'chip'} aria-pressed={prefs.thinking} onClick={() => void setPrefs({ thinking: !prefs.thinking })}>
+                <Glyph name="thinking" size={14} />
+                <span className="chip-label">{t('thinking')}</span>
+              </button>
+            </HoverTip>
           </span>
-          <button type="button" data-testid="toggle-search" className={prefs.search ? 'chip on' : 'chip'} aria-pressed={prefs.search} onClick={() => void setPrefs({ search: !prefs.search })}>
-            <Glyph name="search" size={14} />
-            <span className="chip-label">{t('search')}</span>
-          </button>
+          <HoverTip text={hasFile ? t('searchNeedsNoFiles') : t('searchTip')}>
+            <button type="button" data-testid="toggle-search" className={`ds-toggle-button ${prefs.search ? 'chip on' : 'chip'}`} aria-pressed={prefs.search} aria-disabled={hasFile} onClick={() => { if (hasFile) return; void setPrefs({ search: !prefs.search }) }}>
+              <Glyph name="search" size={14} />
+              <span className="chip-label">{t('search')}</span>
+            </button>
+          </HoverTip>
         </div>
         <div className="tool-right">
-          <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
-            <Glyph name="attach" size={16} />
-          </button>
+          <HoverTip text={prefs.search ? t('filesNeedNoSearch') : t('attachTip')}>
+            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => { if (prefs.search) return; fileRef.current?.click() }}>
+              <Glyph name="attach" size={16} />
+            </button>
+          </HoverTip>
           <input ref={fileRef} data-testid="file-input" type="file" hidden onChange={(event) => { const list = event.target.files ? [...event.target.files] : []; event.target.value = ''; void addFiles(list) }} />
           {streaming ? (
             generating ? (
@@ -2204,7 +2816,7 @@ const Composer = () => {
               </button>
             )
           ) : (
-            <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
+            <button className={`send ${canSend ? 'ready' : ''}`} data-testid="send" type="button" disabled={!canSend} title={sendTip || undefined} onClick={submit}><Icon size={20} stroke={2.2} d="M12 19V5M6 11l6-6 6 6" /></button>
           )}
         </div>
       </div>
@@ -2258,14 +2870,58 @@ const Settings = () => {
   const [exporting, setExporting] = useState(false)
   const [sharedNote, setSharedNote] = useState(false)
   const [confirmAll, setConfirmAll] = useState(false)
+  const [deletedOk, setDeletedOk] = useState(false)
   const profile = useProfile()
   const [nickname, setNickname] = useState(profile.nickname)
   const [initial, setInitial] = useState(profile.initial)
   const saveKey = useHarbor((state) => state.saveKey)
   const cost = estimateCost(totals, new Date())
+  const shellRef = useRef<HTMLDivElement>(null)
+  // SP-SET-765: Back closes and the URL stays. Reload unmounts this dialog. Reopen starts on General.
+  useOverlayHistory(true, () => setSettingsOpen(false))
+  useScrollLock(true)
+  useEffect(() => {
+    const root = shellRef.current
+    if (!root) return
+    root.focus()
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const list = [...root.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE)].filter((node) => !node.hasAttribute('disabled') && node.getClientRects().length > 0)
+      if (!list.length) {
+        event.preventDefault()
+        return
+      }
+      const first = list[0]
+      const last = list[list.length - 1]
+      const current = document.activeElement
+      const inside = current instanceof Node && root.contains(current)
+      if (event.shiftKey) {
+        if (!inside || current === first || current === root) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || current === last || current === root) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    root.addEventListener('keydown', onKey)
+    return () => root.removeEventListener('keydown', onKey)
+  }, [])
   return (
-    <div className="modal settings-modal" role="dialog" aria-modal="true" data-testid="settings-dialog">
-      <div className="settings-shell" data-tab={tab}>
+    <div
+      className="modal settings-modal ds-fade-in ds-modal-focus-lock"
+      role="dialog"
+      aria-modal="true"
+      data-testid="settings-dialog"
+      onClick={(event) => {
+        if (event.target !== event.currentTarget) return
+        // SP-MOD-636 mask click closes. A press over New chat or a chat row does not (SP-SET-736).
+        if (pointHitsChatNav(event.clientX, event.clientY)) return
+        setSettingsOpen(false)
+      }}
+    >
+      <div className="settings-shell" data-tab={tab} ref={shellRef} tabIndex={-1}>
         <header className="settings-head">
           <h2>{t('systemSettings')}</h2>
           <button type="button" className="settings-x" data-testid="settings-close" aria-label={t('close')} onClick={() => {
@@ -2409,15 +3065,19 @@ const Settings = () => {
             <DsButton type="button" variant="danger" onClick={() => setConfirmAll(true)}>{t('delete')}</DsButton>
             {confirmAll ? (
               <ConfirmDialog
-                label={t('deleteConfirm')}
+                label={t('deleteAllTitle')}
+                body={t('deleteAllBody')}
+                confirm={t('deleteAllConfirm')}
                 onCancel={() => setConfirmAll(false)}
                 onConfirm={() => {
                   setConfirmAll(false)
                   const { conversations: rows, removeChat: drop } = useHarbor.getState()
                   for (const item of rows) void drop(item.id)
+                  setDeletedOk(true)
                 }}
               />
             ) : null}
+            {deletedOk ? createPortal(<div className="toast-layer"><p className="toast" role="status" data-testid="delete-all-toast">{t('deleteAllOk')}</p></div>, document.body) : null}
           </div>
         </section>
         <section className="settings-data">
@@ -2585,16 +3245,34 @@ const Settings = () => {
   )
 }
 
+const StatusToast = ({ code }: { code: StatusToastCode }) => {
+  const t = useT()
+  const dismiss = useHarbor((state) => state.dismissStatusToast)
+  const text = code === 'networkToasts'
+    ? `${t('commonNetworkErrorToast')}\n${t('completionNetworkErrorToast')}`
+    : t(code)
+  return (
+    <div className="toast-layer">
+      <p className="toast" role="status" data-testid="status-toast">
+        {text}
+        <button type="button" onClick={dismiss}>{t('close')}</button>
+      </p>
+    </div>
+  )
+}
+
 const ImportToast = ({ notice }: { notice: string }) => {
   const t = useT()
   const dismiss = useHarbor((state) => state.dismissNotice)
   const [added, skipped] = notice.split(':')
   return (
+    <div className="toast-layer">
     <p className="toast" data-testid="import-toast" role="status">
       {t('imported', { added: added ?? '0', skipped: skipped ?? '0' })}
       <button type="button" onClick={dismiss}>
         {t('close')}
       </button>
     </p>
+    </div>
   )
 }

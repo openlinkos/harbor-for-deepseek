@@ -1,0 +1,77 @@
+// Computed settings styles. Dark theme cards use the primary label color.
+// The centred phone dialog stays (mobile-settings.spec.ts). The training row stays absent.
+import { expect, test, type Page, type Route } from '@playwright/test'
+
+const install = async (page: Page) => {
+  await page.route('https://api.deepseek.com/**', async (route: Route) => {
+    const url = route.request().url()
+    if (url.endsWith('/user/balance')) return route.fulfill({ json: { is_available: true, balance_infos: [{ currency: 'CNY', total_balance: '1', granted_balance: '0', topped_up_balance: '1' }] } })
+    if (url.endsWith('/models')) return route.fulfill({ json: { data: [{ id: 'deepseek-flash' }] } })
+    return route.fulfill({ status: 404, json: {} })
+  })
+}
+
+test('theme cards and setting descriptions follow the official field', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await install(page)
+  await page.goto('/')
+  await page.getByTestId('landing-send').click()
+  await page.getByTestId('key-input').fill('demo-local-key')
+  await page.getByTestId('key-save').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await expect(page.getByTestId('settings-dialog')).toBeVisible()
+
+  const row = page.locator('.theme-cards')
+  const card = row.locator('button.chip', { hasText: '浅色' })
+  const idle = row.locator('button.chip', { hasText: '深色' })
+  await card.click()
+  await expect(row).toHaveCSS('display', 'flex')
+  await expect(row).toHaveCSS('flex-wrap', 'wrap')
+  await expect(row).toHaveCSS('gap', '12px')
+  await expect(row).toHaveCSS('justify-content', 'stretch')
+  await expect(card).toHaveCSS('height', '82px')
+  await expect(card).toHaveCSS('min-width', '128px')
+  await expect(card).toHaveCSS('padding-top', '21px')
+  await expect(card).toHaveCSS('padding-left', '32px')
+  await expect(card).toHaveCSS('font-size', '14px')
+  await expect(card).toHaveCSS('line-height', '22px')
+  // SP-SET-787. Official theme selector is space-between.
+  await expect(card).toHaveCSS('justify-content', 'space-between')
+  await expect(card).toHaveCSS('user-select', 'none')
+  await expect(card).toHaveCSS('color', 'rgb(15, 17, 21)')
+  await expect(card).toHaveCSS('background-color', 'rgb(241, 243, 245)')
+  await idle.hover()
+  await expect(idle).toHaveCSS('background-color', 'rgb(241, 243, 245)')
+
+  await page.getByRole('button', { name: '深色' }).click()
+  await expect(page.locator('body')).toHaveAttribute('data-ds-dark-theme', '')
+  const darkCard = row.locator('button.chip.on')
+  await expect(darkCard).toHaveCSS('color', 'rgb(249, 250, 251)')
+  await expect(darkCard).toHaveCSS('background-color', 'rgb(67, 69, 74)')
+  const darkIdle = row.locator('button.chip', { hasText: '浅色' })
+  await darkIdle.hover()
+  await expect(darkIdle).toHaveCSS('background-color', 'rgb(67, 69, 74)')
+  await expect(darkIdle).toHaveCSS('color', 'rgb(249, 250, 251)')
+
+  await page.getByTestId('settings-nav-data').click()
+  await expect(page.getByText('数据用于优化体验')).toHaveCount(0)
+  await expect(page.getByText('下载链接的有效期为 7 天')).toHaveCount(0)
+  const hint = page.locator('.settings-line.stack', { hasText: '导出所有历史对话' }).locator('.settings-copy .hint')
+  await expect(hint).toHaveCSS('font-size', '12px')
+  await expect(hint).toHaveCSS('line-height', '18px')
+  await expect(hint).toHaveCSS('color', 'rgb(207, 211, 214)')
+  await page.evaluate(() => document.body.removeAttribute('data-ds-dark-theme'))
+  await expect(hint).toHaveCSS('color', 'rgb(97, 102, 107)')
+
+  await page.getByTestId('settings-nav-general').click()
+  await page.getByRole('button', { name: '深色' }).click()
+  await page.setViewportSize({ width: 390, height: 844 })
+  const phone = page.locator('.theme-cards button.chip.on')
+  await expect(phone).toHaveCSS('height', '82px')
+  await expect(phone).toHaveCSS('min-width', '128px')
+  await expect(phone).toHaveCSS('padding-top', '21px')
+  await expect(phone).toHaveCSS('padding-left', '32px')
+  await expect(phone).toHaveCSS('color', 'rgb(249, 250, 251)')
+  await expect(page.locator('.settings-shell')).toHaveCSS('border-bottom-left-radius', '0px')
+})

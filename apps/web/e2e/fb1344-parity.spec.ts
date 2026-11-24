@@ -20,8 +20,7 @@ const STRICT = process.env.FB1344_STRICT === '1'
 // fb1344-P6 并发生成：concurrent-send。
 // fb1344-P7 分享选择模式不在本文件。interaction-gate.spec.ts 里已有分享 knownFailure，本 PR 不改那个 spec。
 const KNOWN: Record<string, string> = {
-  // fb1344-P6 另一会话生成中再发送
-  'concurrent-send': 'fb1344-P6: 另一会话生成中时新会话的发送键是停止键，点击会中断第一条；没有「有消息正在生成，请稍后再试」',
+  // fb1344-P6 concurrent-send now shows 「有消息正在生成，请稍后再试」 and leaves the first reply running (SP-CV-370).
 }
 // Cells where master already matches (an expected failure that passes would fail the run).
 const KNOWN_PASSING_CELLS: Record<string, string[]> = {}
@@ -60,7 +59,7 @@ const boot = async (page: Page, theme: string, staged = false) => {
   await expect(page.getByTestId('composer')).toBeVisible()
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
 }
-const chip = async (page: Page, id: string, on: boolean) => { const c = (await page.getByTestId(id).getAttribute('class')) || ''; if (c.includes('on') !== on) await page.getByTestId(id).click() }
+const chip = async (page: Page, id: string, on: boolean) => { if ((await page.getByTestId(id).evaluate((node) => node.classList.contains('on'))) !== on) await page.getByTestId(id).click() }
 const ask = async (page: Page) => { await chip(page, 'toggle-thinking', true); await chip(page, 'toggle-search', true); await page.getByTestId('composer').fill('[筑衡测试] 上海天气'); await page.getByTestId('send').click(); await page.getByTestId('assistant-text').last().waitFor(); await page.waitForTimeout(300) }
 const comp = async (page: Page) => { await page.evaluate(LIB); return page.evaluate(() => (window as any).__comp('ours')) }
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768
@@ -150,6 +149,8 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
     test('phase-live', async ({ page }) => {
       const lead = cell.thinkLeadFill
       const label = cell.thinkLabelColor
+      // SP-CV-407 / SP-CV-408. Loading dots only. The think-head lead after stop stays the timeline tertiary color (SP-TH-010 / SP-TH-011).
+      const loadingDot = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(225, 229, 238)'
       const dot = theme === 'dark' ? 'rgb(173, 178, 184)' : 'rgb(129, 133, 140)'
       const stopBg = theme === 'dark' ? 'rgb(86, 134, 254)' : 'rgb(57, 100, 254)'
       const capsule = theme === 'dark' ? 'rgb(67, 69, 74)' : 'rgb(255, 255, 255)'
@@ -158,7 +159,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       const bar = async () => head(page).locator('.phase-shimmer-bar').evaluate((e) => getComputedStyle(e).backgroundImage)
       await staged(page)
       await expect(page.getByTestId('reply-dots').locator('i')).toHaveCount(3)
-      await expect(page.getByTestId('reply-dots').locator('i').first()).toHaveCSS('background-color', dot)
+      await expect(page.getByTestId('reply-dots').locator('i').first()).toHaveCSS('background-color', loadingDot)
       await expect(page.getByTestId('stop').locator('.send-spinner')).toBeVisible()
       await expect(page.getByTestId('stop').locator('.stop-square')).toHaveCount(0)
       await expect(page.getByTestId('thinking')).toHaveCount(0)

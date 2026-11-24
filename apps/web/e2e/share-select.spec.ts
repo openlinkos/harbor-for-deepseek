@@ -70,8 +70,8 @@ const install = async (page: Page) => {
   })
 }
 
-const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗') => {
-  await page.evaluate(async (firstUser) => {
+const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人事变动\n用中文分条回答\n每条用「人名」\n与「职位」加粗', firstAnswer = '第一答') => {
+  await page.evaluate(async ({ firstUser, firstAnswer }) => {
     const db = await new Promise<IDBDatabase>((ok, ko) => {
       const request = indexedDB.open('deepapi')
       request.onsuccess = () => ok(request.result)
@@ -87,7 +87,7 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
       id, title: '分享样本', titleSource: 'user', model: 'deepseek-flash', thinking: false, search: false, readLink: false, effort: 'high', pinned: false, archived: false, activeLeafId: 'a2', createdAt: when, updatedAt: when, rev: 1, deletedAt: null,
     })
     tx.objectStore('messages').put(message('u1', null, 'user', firstUser, '2026-11-20T00:00:00.000Z'))
-    tx.objectStore('messages').put(message('a1', 'u1', 'assistant', '第一答', '2026-11-20T00:00:01.000Z'))
+    tx.objectStore('messages').put(message('a1', 'u1', 'assistant', firstAnswer, '2026-11-20T00:00:01.000Z'))
     tx.objectStore('messages').put(message('u2', 'a1', 'user', '第二问', '2026-11-20T00:00:02.000Z'))
     tx.objectStore('messages').put(message('a2', 'u2', 'assistant', '第二答', '2026-11-20T00:00:03.000Z'))
     const other = 'share-other'
@@ -97,13 +97,16 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
     tx.objectStore('messages').put({ id: 'ou1', conversationId: other, parentId: null, role: 'user', blocks: [{ type: 'text', text: '旁边的问题' }], status: 'complete', usage: null, errorMessage: null, createdAt: when, updatedAt: when, rev: 1, deletedAt: null })
     await new Promise((ok, ko) => { tx.oncomplete = () => ok(null); tx.onerror = () => ko(tx.error) })
     db.close()
-  }, firstUser)
+  }, { firstUser, firstAnswer })
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
-  const narrow = (page.viewportSize()?.width ?? 1440) < 768
-  if (narrow) {
+  const width = page.viewportSize()?.width ?? 1440
+  if (width < 768) {
     await page.getByTestId('menu').click()
     await page.waitForTimeout(400)
+  } else if (width < 1024) {
+    // SP-SB-631. The in-flow sider starts collapsed from 768 through 1023.
+    await page.getByRole('button', { name: '打开边栏' }).click()
   }
   await page.locator('.chat-link', { hasText: '分享样本' }).click()
   await expect(page.getByText('第二答')).toBeVisible()
@@ -111,7 +114,7 @@ const seed = async (page: Page, firstUser = '请联网搜索混元\n大模型人
   await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
 }
 
-const boot = async (page: Page, theme: string, staged = false, firstUser?: string) => {
+const boot = async (page: Page, theme: string, staged = false, firstUser?: string, firstAnswer?: string) => {
   await install(page)
   if (staged) await page.addInitScript(SSE)
   await page.addInitScript((value) => localStorage.setItem('deepapi-theme', value), theme)
@@ -120,7 +123,7 @@ const boot = async (page: Page, theme: string, staged = false, firstUser?: strin
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await seed(page, firstUser)
+  await seed(page, firstUser, firstAnswer)
 }
 
 const paeth = (left: number, up: number, upLeft: number) => {
@@ -293,7 +296,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(proseAfter.width, 308, 'answer text area width')
         near(proseAfter.x + proseAfter.width, 370, 'answer text area right')
         near(bubbleAfter.height, bubbleBefore.height, 'question bubble height follows its text')
-        near(bubbleAfter.x + bubbleAfter.width, 354, 'question bubble right')
+        // changes/r22b-assertion-rulings.md ruling 1: official wrapper align-items:flex-end puts the bubble right at 370.
+        near(bubbleAfter.x + bubbleAfter.width, 370, 'question bubble right')
       }
       await expect(page.locator('.action-row:visible')).toHaveCount(0)
       await expect(page.locator('.user-actions:visible')).toHaveCount(0)
@@ -358,8 +362,10 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(label.x, 66, 'select-all label left')
         const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
-        near(firstQuestion.y, 76.5, 'question checkbox y')
-        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 60, 'answer checkbox follows the question bubble')
+        // changes/r22-share-rulings.md. No official 390 select capture. Topbar 60 + sticky pad 13.
+        near(firstQuestion.y, 73, 'question checkbox y')
+        // changes/r22b-assertion-rulings.md r22c: row 50 + sticky pad 13 = +63. CSS-derived, no official 390 select-mode capture; re-pin if one is captured.
+        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 63, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
           return { margin: style.margin, padding: style.padding }
@@ -380,17 +386,29 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(overlaps(answerCheck, answerGrey), 'answer checkbox stays outside its grey block').toBe(false)
       } else {
         expect(Math.abs(userGrey.x - 0), 'selected fill left').toBeLessThanOrEqual(1)
-        expect(Math.abs(userGrey.x + userGrey.width - 371), 'selected fill right').toBeLessThanOrEqual(1)
+        // changes/r22-share-rulings.md. --panel-width is the panel offsetWidth (SP-CV-102).
+        expect(Math.abs(userGrey.x + userGrey.width - 390), 'selected fill right').toBeLessThanOrEqual(1)
         expect(Math.abs(answerGrey.x - 0), 'answer fill left').toBeLessThanOrEqual(1)
-        expect(Math.abs(answerGrey.x + answerGrey.width - 371), 'answer fill right').toBeLessThanOrEqual(1)
+        // changes/r22-share-rulings.md. Same panel width as the question fill.
+        expect(Math.abs(answerGrey.x + answerGrey.width - 390), 'answer fill right').toBeLessThanOrEqual(1)
         expect(contained(userCheck, userGrey), 'user checkbox sits inside the selected fill').toBe(true)
         expect(contained(answerCheck, answerGrey), 'answer checkbox sits inside the selected fill').toBe(true)
       }
-      expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 12), 'grey blocks in one pair are 12px apart').toBeLessThanOrEqual(1)
+      // changes/r22-share-rulings.md. h1_01 is 1920×1200 and 1 CSS px, but it has no question/answer wash pair
+      // (0 exact rgb(245,246,247) pixels in the center band). h1_03 is 1280×800, so image px × 1.5.
+      // At x=500,550,600,700,750 the rows match: y161 (245,246,247) L1 0, y162 (244,246,247) L1 1,
+      // y163 (252,252,252) L1 18, y164–169 (255,255,255) L1 27, y170 (249,249,250) L1 10, y171 L1 0.
+      // Half of wash-to-white (13.5) at pixel centers: 163.2353 and 170.2941. Gap 7.0588 × 1.5 = 10.5882.
+      // Diagnostic-derived value inside the existing ±1, to be re-pinned with a true 1440 capture.
+      expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 10.5882), 'grey blocks in one pair match the official capture').toBeLessThanOrEqual(1)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(32)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)
-      expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)), 'answer checkbox aligns with the first line').toBeLessThanOrEqual(2)
-      expect(Math.abs(userCheck.y - userGrey.y - 3), 'user checkbox is about 3px from the grey top').toBeLessThanOrEqual(1)
+      // changes/r22-share-rulings.md. Official offset is 8–10; the checkbox centre is lower than the first line.
+      const lineDelta = (answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)
+      expect(lineDelta, 'answer checkbox centre is 8–10px below the first line').toBeGreaterThanOrEqual(8)
+      expect(lineDelta, 'answer checkbox centre is 8–10px below the first line').toBeLessThanOrEqual(10)
+      // changes/r22-share-rulings.md. 3px was the pinned measurement. This turn is not pinned.
+      expect(Math.abs(userCheck.y - userGrey.y - 33), 'user checkbox is about 33px from the grey top').toBeLessThanOrEqual(1)
       if (w === 390) {
         near(text!.x, 62, 'answer first line left')
         expect(overlaps(answerCheck, text!), 'checkbox must not cover the answer first line').toBe(false)
@@ -411,7 +429,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(hit, `${id} center`).toBe(id)
       }
 
-      await boxes.nth(0).click()
+      await page.locator('.turn').first().click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-all')).toBeChecked()
@@ -432,7 +450,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await page.getByTestId('share-all').click()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
       await expect(page.getByTestId('share-create')).toBeEnabled()
-      await boxes.nth(0).click()
+      await page.locator('.turn').first().click()
       await expect(page.getByTestId('share-count')).toHaveText('已选择 1 组对话')
       await expect(page.getByTestId('share-all')).not.toBeChecked()
 
@@ -462,8 +480,11 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         const style = getComputedStyle(node)
         return { bg: style.backgroundColor, radius: style.borderTopLeftRadius }
       })
-      expect(block.bg).toBe(w < 768 && theme === 'light' ? 'rgb(236, 242, 249)' : tone.block)
-      expect(block.radius).toBe('18px')
+      // changes/r22-share-rulings.md. Phone wash is the alias, not rgb(236,242,249) / tone.block.
+      // changes/r22b-assertion-rulings.md ruling 2: desktop dark uses the same alias token neutral-850 #212123.
+      expect(block.bg).toBe(w < 768 || theme === 'dark' ? (theme === 'light' ? 'rgb(245, 246, 247)' : 'rgb(33, 33, 35)') : tone.block)
+      // changes/r22-share-rulings.md. Desktop radius is 12px (SP-CV-093). Narrow stays 0 (SP-SHARE-099).
+      expect(block.radius).toBe(w < 800 ? '0px' : '12px')
 
       const create = page.getByTestId('share-create')
       const cancel = page.getByTestId('share-cancel')
@@ -537,7 +558,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByTestId('composer')).toBeVisible()
       await expect(page.locator('.chat-title')).toHaveText('分享样本')
 
-      await page.locator('.topbar button[aria-label="share"]').click()
+      await page.locator('.topbar button[aria-label="分享"]').click()
       for (let index = 0; index < 4; index += 1) await expect(boxes.nth(index)).toBeChecked()
       await expect(page.getByTestId('share-all')).toBeChecked()
       if (w >= 768) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
@@ -615,9 +636,11 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.getByTestId('share-soon')).toHaveCount(0)
       await expect(page.locator('.share-bar')).toHaveCount(0)
 
-      await page.locator('.topbar button[aria-label="share"]').click()
+      await page.locator('.topbar button[aria-label="分享"]').click()
       await expect(page.locator('.share-bar')).toBeVisible()
       await page.keyboard.press('Escape')
+      await expect(page.locator('.share-bar')).toBeVisible()
+      await page.getByTestId(w < 800 ? 'share-top-cancel' : 'share-cancel').click()
       await expect(page.locator('.share-bar')).toHaveCount(0)
 
       await page.locator('.action-row button[aria-label="分享"]').first().click()
@@ -689,6 +712,43 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       await expect(page.locator('.share-bar')).toHaveCount(0)
       await expect(page.getByText('已选择 0 组对话')).toHaveCount(0)
     })
+
+    test('a long selected answer keeps its checkbox pinned in the viewport', async ({ page }) => {
+      test.setTimeout(90_000)
+      const lines = Array.from({ length: 48 }, (_, index) => `长回答第 ${index + 1} 行，滚动后中段留在列表里。`).join('\n')
+      await boot(page, theme, false, '请展开说明', lines)
+      await page.locator('.turn.assistant').first().locator('button[aria-label="分享"]').click()
+      await expect(page.locator('.share-bar')).toBeVisible()
+      const box = page.locator('.turn.assistant').first().locator('.share-box')
+      await expect(box).toBeChecked()
+      const host = page.locator('.transcript')
+      const scrolled = await host.evaluate((node) => {
+        const answer = node.querySelector('.turn.assistant')
+        if (!(answer instanceof HTMLElement)) return 0
+        node.scrollTop = Math.max(0, answer.offsetTop + answer.offsetHeight / 2 - node.clientHeight / 2)
+        return node.scrollTop
+      })
+      expect(scrolled, 'the long answer actually scrolls').toBeGreaterThan(200)
+      const stuck = await box.boundingBox()
+      const transcript = await host.boundingBox()
+      const prose = await page.locator('.turn.assistant').first().locator('.prose').boundingBox()
+      expect(stuck, 'checkbox stays rendered').not.toBeNull()
+      expect(transcript, 'transcript box').not.toBeNull()
+      expect(prose, 'answer box').not.toBeNull()
+      const middle = prose!.y + prose!.height / 2
+      expect(middle, 'answer middle is inside the transcript').toBeGreaterThan(transcript!.y)
+      expect(middle, 'answer middle is inside the transcript').toBeLessThan(transcript!.y + transcript!.height)
+      expect(stuck!.y, 'checkbox stays below the transcript top').toBeGreaterThanOrEqual(transcript!.y - 20)
+      expect(stuck!.y + stuck!.height, 'checkbox stays inside the viewport').toBeLessThanOrEqual(h)
+      expect(stuck!.y, 'checkbox stays inside the viewport').toBeGreaterThanOrEqual(0)
+      expect(Math.abs(stuck!.y - middle), 'checkbox does not travel with the answer middle').toBeGreaterThan(80)
+      const pin = await page.locator('.turn.assistant').first().locator('.share-sticky').evaluate((node) => {
+        const style = getComputedStyle(node)
+        return { position: style.position, top: style.top }
+      })
+      expect(pin.position).toBe('sticky')
+      expect(pin.top).toBe('0px')
+    })
   })
 }
 
@@ -740,7 +800,8 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(page.locator('.share-bar')).toBeVisible()
       const bubble = (await page.locator('.turn.user', { hasText: '第二问' }).locator('.bubble').boundingBox())!
       expect(bubble.width, `short bubble width ${bubble.width}`).toBeLessThan(208)
-      near(bubble.x + bubble.width, 354, 'short bubble right')
+      // changes/r22b-assertion-rulings.md ruling 1: official wrapper align-items:flex-end puts the bubble right at 370.
+      near(bubble.x + bubble.width, 370, 'short bubble right')
     })
     test('create button and select-all label use natural width', async ({ page }) => {
       test.setTimeout(90_000)
@@ -822,6 +883,63 @@ for (const theme of ['light', 'dark'] as const) {
       expect(label.width, 'select-all label width').toBe('auto')
       expect(label.minWidth, 'select-all label min-width').toBe('auto')
       near(label.box, label.text, 'select-all label matches its text')
+    })
+  })
+}
+
+// SP-SHARE-033 / 102–105 / 149. The checkbox column lives in the message wrapper, so a click
+// on the checkbox itself toggles that turn. Round-4 sharegeo: once the box is pinned in the
+// middle of a long answer it sits about 50px under the title top (official), not ~56px.
+const LONG_ANSWER = Array.from({ length: 40 }, (_, index) => `第${index + 1}段，这是一段用于测试粘性复选框的较长回答文本。`).join('\n\n')
+
+for (const [w, h] of [[1440, 900], [390, 844]] as const) {
+  test.describe(`share checkbox hit ${w}`, () => {
+    test.use({ viewport: { width: w, height: h }, colorScheme: 'light', bypassCSP: true })
+    test('clicking the checkbox itself toggles the question and the answer', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, 'light')
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('input.share-box:visible')).toHaveCount(4)
+      for (const role of ['user', 'assistant'] as const) {
+        const box = page.locator(`.turn.${role}`).first().locator('input.share-box')
+        const before = await box.isChecked()
+        const rect = (await box.boundingBox())!
+        const point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 }
+        const hit = await page.evaluate(({ x, y }) => {
+          const el = document.elementFromPoint(x, y)
+          const article = el?.closest('article.turn')?.getBoundingClientRect()
+          return {
+            cls: typeof el?.className === 'string' ? el.className : '',
+            inside: Boolean(article && x >= article.left - 0.5 && x <= article.right + 0.5 && y >= article.top - 0.5 && y <= article.bottom + 0.5),
+          }
+        }, point)
+        expect(hit.cls, `${role} checkbox receives the click at ${w}`).toContain('share-box')
+        // changes/r22-share-rulings.md. At 1440, official mB left:-42px is outside the row border.
+        if (w !== 1440) expect(hit.inside, `${role} checkbox is inside the message box at ${w}`).toBe(true)
+        await page.mouse.click(point.x, point.y)
+        expect(await box.isChecked(), `${role} toggles at ${w}`).toBe(!before)
+      }
+    })
+
+    test('a pinned checkbox sits about 50px under the title', async ({ page }) => {
+      test.setTimeout(90_000)
+      await boot(page, 'light', false, '第一问', LONG_ANSWER)
+      await page.locator('.action-row button[aria-label="分享"]').last().click()
+      await expect(page.locator('article.turn.assistant').first().locator('input.share-box')).toBeVisible()
+      await page.locator('.transcript').evaluate((node) => {
+        const answer = node.querySelector('article.turn.assistant')
+        if (!answer) return
+        node.scrollTop += answer.getBoundingClientRect().top + 400
+      })
+      const gap = await page.evaluate(() => {
+        const title = document.querySelector('.chat-title')!.getBoundingClientRect()
+        const box = document.querySelector('article.turn.assistant input.share-box')!.getBoundingClientRect()
+        const turn = document.querySelector('article.turn.assistant')!.getBoundingClientRect()
+        return { gap: box.top - title.top, cbTop: box.top, titleTop: title.top, turnTop: turn.top }
+      })
+      expect(gap.turnTop, `answer scrolled above the viewport ${JSON.stringify(gap)}`).toBeLessThan(0)
+      expect(gap.cbTop, `pinned checkbox stays on screen ${JSON.stringify(gap)}`).toBeGreaterThanOrEqual(0)
+      expect(Math.abs(gap.gap - 50), `pinned checkbox is about 50px under the title ${JSON.stringify(gap)}`).toBeLessThanOrEqual(4)
     })
   })
 }

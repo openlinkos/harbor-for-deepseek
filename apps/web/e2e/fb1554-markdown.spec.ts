@@ -6,7 +6,7 @@
 // sha256 b32ab0665cec907d32b99fc2bd1489ac7a65f4444d289447936f00a9f36b5442.
 // Staged SSE reuses e2e/lib/fb1344-sse.js. The route mock matches fb1344 (balance, models, messages).
 // 34 cases = 4 cells × 7 + 1440 × 3 × 2. Red cases on master are test.fail() via knownFailure().
-// IDs still open: fb1554-M2. fb1554-M1 is fixed. 390 的 cite-inline 已同行，不要再标 M4。T1 已随阶段标题删掉。A fix PR deletes only its own id.
+// IDs still open: none. fb1554-M1 and fb1554-M2 are fixed. 390 的 cite-inline 已同行，不要再标 M4。T1 已随阶段标题删掉。A fix PR deletes only its own id.
 // An unexpected pass fails the run. FB1554_STRICT=1 ignores knownFailure.
 // FB1344_STRICT does not open this file: that switch is the fb1344 baseline.
 import { expect, test, type Page } from '@playwright/test'
@@ -19,14 +19,12 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // 语料按真实接口形状把正文在引用处切成多个 text block。规则在冻结官方 DOM 上全绿。
 // 已知失败用 knownFailure(id)。FB1554_STRICT=1 时全部按真失败跑。修好一项就删掉对应 id，过期的 id 会让 test.fail 变红。
 // fb1554-M1 已修：一条回答一个 .prose。corpus-structure 不再标失败。
-// fb1554-M2 中文标点旁的 ** 不渲染：cjk-strong-single-block，以及 corpus-no-literal 里剩下的 **「…」**
+// fb1554-M2 已修：中文标点旁的 ** 会加粗。corpus-no-literal 与 cjk-strong-single-block 不再标失败。
 // cite-inline-same-line 在 1440 和 390 都已同行，不要标失败，否则意外通过会让 CI 变红。cite-style 已对齐。
 // fb1554-M5 已删：搜索行 favicon 重叠 4px（.thinking > button 不再漏到 button.favicons）。
 // fb1554-T1 「用时 N 秒」已随阶段标题落地：秒数来自思考片段，正文阶段和刷新都不再按墙钟涨。key 已删，thought-seconds-* 必须真过。
 const STRICT = process.env.FB1554_STRICT === '1'
-const KNOWN: Record<string, string> = {
-  'fb1554-M2': 'fb1554-M2: **「…」** 原样显示',
-}
+const KNOWN: Record<string, string> = {}
 // Same shape as fb1344-parity.spec.ts. FB1344_STRICT is intentionally not read here.
 const KNOWN_PASSING_CELLS: Record<string, string[]> = {}
 const knownFailure = (id: string) => {
@@ -53,7 +51,7 @@ const boot = async (page: Page, theme: string, opts: { split?: boolean; staged?:
   await page.getByTestId('landing-send').click(); await page.getByTestId('key-input').fill('demo-local-key'); await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
-  for (const id of ['toggle-thinking', 'toggle-search']) { const c = (await page.getByTestId(id).getAttribute('class')) || ''; if (!c.includes('on')) await page.getByTestId(id).click() }
+  for (const id of ['toggle-thinking', 'toggle-search']) { if (!(await page.getByTestId(id).evaluate((node) => node.classList.contains('on')))) await page.getByTestId(id).click() }
 }
 const ask = async (page: Page, text = '[筑衡测试] 长回答语料') => { await page.getByTestId('composer').fill(text); await page.getByTestId('send').click(); await page.getByTestId('assistant-text').first().waitFor(); await page.waitForTimeout(500) }
 const md = async (page: Page, expectAll = true) => { await page.evaluate(LIB); return page.evaluate((x) => (window as any).__md('ours', x), expectAll ? EXPECT : null) }
@@ -65,8 +63,8 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
     test.use({ viewport: { width: w, height: h }, colorScheme: theme as 'light' | 'dark', bypassCSP: true })
     test('corpus-structure', async ({ page }) => { await boot(page, theme); await ask(page); const r = await md(page)
       expect(rules(r).filter((x) => ['one-markdown-root', 'count-topLevelP', 'count-li', 'count-table', 'count-tableRows', 'count-katex', 'cite-numbers', 'kinsoku-line-start'].includes(x))).toEqual([]) })
-    test('corpus-no-literal', async ({ page }) => { knownFailure('fb1554-M2'); await boot(page, theme); await ask(page); expect((await md(page)).metrics.literal).toEqual([]) })
-    test('cjk-strong-single-block', async ({ page }) => { knownFailure('fb1554-M2'); await boot(page, theme, { split: false }); await ask(page); const r = await md(page, false)
+    test('corpus-no-literal', async ({ page }) => { await boot(page, theme); await ask(page); expect((await md(page)).metrics.literal).toEqual([]) })
+    test('cjk-strong-single-block', async ({ page }) => { await boot(page, theme, { split: false }); await ask(page); const r = await md(page, false)
       expect(r.metrics.counts.strong).toEqual(EXPECT.strong); expect(r.metrics.literal).toEqual([]) })
     test('cite-inline-same-line', async ({ page }) => { await boot(page, theme); await ask(page); const r = await md(page)
       expect(r.fails.filter((f: { rule: string }) => f.rule === 'cite-inline-same-line')).toEqual([]) })
@@ -123,7 +121,7 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
   })
 }
 
-// 一行收成一组。组内相邻角标间距 4px：每个 .cite 的水平 margin 是 2px，组内不再被 .cite + .cite 清掉左间距。
+// 一行收成一组。组内相邻角标间距 4px：每个 .cite 的水平 margin 是 2px，官方每个角标包在自己的 <a> 里，.cite + .cite 对不上（SP-CITE-113）。
 const cite = (url: string) => ({ type: 'web_search_result_location', url, title: 't', cited_text: '', encrypted_index: '' })
 const groupEvents = () => {
   const results = [1, 2].map((n) => ({ type: 'web_search_result', title: `来源${n}`, url: `https://site${n}.example/g`, snippet: 's', site_name: `站${n}`, site_icon: null, page_age: null, encrypted_content: 'x' }))

@@ -1,7 +1,7 @@
 :root {
   --sider-width: 261px;
   color-scheme: light;
-  --font: Inter, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+  --font: var(--dsw-font-family);
 }
 html[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
@@ -9,6 +9,13 @@ html, body, #root { height: 100%; }
 html { height: 100dvh; }
 body { --scroll-color: rgba(0, 0, 0, 0.08); --scroll-color-hover: rgba(0, 0, 0, 0.15); }
 body[data-ds-dark-theme] { --scroll-color: rgba(255, 255, 255, 0.15); --scroll-color-hover: rgba(255, 255, 255, 0.24); }
+.transcript, .side-scroll, .settings-main, .search-panel ol, .search-results {
+  /* Scroll areas we render. The overlay gutter bars (.ds-scroll-area__gutters) are not in the tree. */
+  --dsl-scroll-area-gutters-disappear-delay: 1s;
+}
+.transcript, .side-scroll {
+  scrollbar-gutter: stable;
+}
 .transcript, .side-scroll, .composer textarea {
   scrollbar-width: none;
 }
@@ -27,55 +34,107 @@ body[data-ds-dark-theme] { --scroll-color: rgba(255, 255, 255, 0.15); --scroll-c
 }
 body {
   margin: 0;
-  font-family: var(--font);
-  font-size: 16px;
-  line-height: 1.7;
+  /* SP-GL-017, 021, 023, 024, 026, 031 set the label token. SP-GL-029's later body rule wins. */
+  font-family: var(--dsw-font-family);
+  font-size: var(--ds-font-size-m);
   color: var(--dsw-alias-label-primary);
+  color: purple;
   background: var(--dsw-alias-bg-base);
+  overflow: hidden;
+  word-break: break-word;
+  font-feature-settings: 'kern';
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent;
 }
-button, input, textarea, select { font: inherit; color: inherit; }
+button, input, textarea, select { font: inherit; color: var(--dsw-alias-label-primary); }
 button { cursor: pointer; }
 a { color: var(--dsw-alias-brand-text); }
 
-.shell { display: flex; height: 100dvh; min-height: 0; background: var(--dsw-alias-bg-base); overflow: hidden; }
+/* SP-GL-068. Official .c3ecdb44 is align-items: stretch. The initial normal is not that string. */
+.shell { display: flex; align-items: stretch; min-height: 0; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); overflow: hidden; position: absolute; inset: 0; }
+/* SP-GL-091/092/093. Official .cb86951c inset. env() is 0px in desktop Chromium, so the composer and transcript edges stay put. */
+@supports (top: env(safe-area-inset-top)) {
+  .shell {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
 .sidebar {
+  --sider-top-slot-height: 40px;
   width: var(--sider-width);
+  max-width: var(--sider-width);
+  min-width: 0;
+  height: 100%;
   flex: 0 0 var(--sider-width);
   display: flex;
   flex-direction: column;
+  position: relative;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* SP-GL-129 / SP-SB-570. The shell at min-width 768px is z-index 8. Phone overrides below. */
+  z-index: 8;
   background: var(--dsw-specific-sidebar-fill);
   border-right: 1px solid var(--dsw-alias-border-l1);
-  padding: calc(6px + env(safe-area-inset-top)) 12px 0;
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Later shorthand wins, same order as .b8812f16. Used padding is 6px 12px 0. */
+  padding: 6px 12px 0;
   min-height: 100vh;
   overflow: hidden;
-  transition: flex-basis var(--ds-transition-duration-slow) var(--ds-ease-in-out), width var(--ds-transition-duration-slow) var(--ds-ease-in-out), opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+  box-sizing: border-box;
+  will-change: transform, max-width;
+  transition: box-shadow .3s, flex-basis var(--ds-transition-duration-slow) var(--ds-ease-in-out), width var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), opacity .2s var(--ds-ease-in-out), transform var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+}
+/* SP-GL-110. .b8812f16 is the inner surface, z-index 1. The shell above stays 8. */
+.sider-surface {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
 }
 .shell.sider-collapsed .sidebar {
   flex-basis: 0;
   width: 0;
+  max-width: 0;
+  left: 0;
   padding-left: 0;
   padding-right: 0;
   border-right-width: 0;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  transform: none;
 }
 .sider-top, .topbar, .composer-tools, .code-head, .action-row, .found-line, .user-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.sider-top { height: 48px; min-height: 48px; justify-content: space-between; padding: 5px 0 0; box-sizing: border-box; }
-.sider-icons { display: flex; align-items: center; gap: 18px; }
+.sider-top { width: 100%; height: 48px; min-height: 48px; flex-shrink: 0; justify-content: space-between; margin-bottom: 16px; padding: 15px 0 10px 4px; box-sizing: border-box; }
+.sider-icons { display: flex; align-items: center; flex-shrink: 0; gap: 18px; margin-left: auto; }
 .sider-icons .icon-btn {
+  /* SP-UI iconLabelTertiary. Hover keeps the tertiary label. */
+  --dsl-button-text-color: var(--dsw-alias-label-tertiary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-tertiary);
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
   width: 16px;
   height: 16px;
   padding: 0;
   border-radius: 4096px;
   font-size: 14px;
   line-height: 22px;
-  color: var(--dsw-alias-label-tertiary);
+  color: var(--dsl-button-text-color);
 }
 .brand-name {
   display: flex;
@@ -115,22 +174,37 @@ a { color: var(--dsw-alias-brand-text); }
   background: transparent;
 }
 .icon-btn {
+  /* SP-UI icon and iconLabelSecondary. Transparent fill, padding 0, secondary label.
+     SP-UI-162/163. Disabled ink is label-caption (#81858c dark, #adb2b8 light). */
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-padding: 0;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-disabled: var(--dsw-alias-label-caption);
   width: 32px;
   height: 32px;
+  min-width: 0;
+  padding: 0;
+  gap: 0;
   border-radius: 8px;
-  color: var(--dsw-alias-label-secondary);
+  color: var(--dsl-button-text-color);
+  background: var(--dsl-button-color);
   display: grid;
   place-items: center;
   line-height: 22px;
   transition: background-color 0.2s var(--ds-ease-out), color 0.2s var(--ds-ease-out);
 }
-.icon-btn:hover, .chat-link:hover { background: var(--dsw-specific-sidebar-nav-item-hover); }
+.icon-btn:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
+.chat-link:hover, .chat-link:not(.active):focus-within { background: var(--dsw-specific-sidebar-nav-item-hover); }
 .new-chat {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   position: relative;
-  margin-top: 16px;
+  margin-top: 0;
   padding: 0 16px;
   gap: 8px;
   width: 100%;
@@ -141,13 +215,25 @@ a { color: var(--dsw-alias-brand-text); }
   color: var(--dsw-alias-label-primary);
   font-size: 14px;
   font-weight: 500;
+  user-select: none;
+  outline: none;
   box-shadow: rgba(72, 104, 178, 0.04) 0 -2px 2px 0, rgba(106, 111, 117, 0.09) 0 2px 2px 0, rgba(72, 104, 178, 0.08) 0 1px 2px 0;
-  transition: background-color 0.2s var(--ds-ease-out), box-shadow 0.2s var(--ds-ease-out);
+  /* SP-SB-426. Official ._5a8ac7a transition is box-shadow .3s. */
+  transition: box-shadow .3s;
 }
+/* SP-SB-431. Light hover raises the elevated shadow. The duration is the .3s above. */
+.new-chat:hover {
+  box-shadow: 0 4px 4px rgba(72, 104, 178, 0.04), 0 -3px 4px rgba(72, 104, 178, 0.04), 0 6px 6px rgba(106, 111, 117, 0.1);
+}
+/* SP-SB-406. Dark label is the primary color. The shadow matches the dark elevated button. */
 body[data-ds-dark-theme] .new-chat {
   background: #43454a;
-  color: #f5f6f7;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.28);
+  color: var(--dsw-alias-label-primary);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(106, 111, 117, 0.08);
+}
+body[data-ds-dark-theme] .new-chat:hover {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 2px 4px rgba(106, 111, 117, 0.08);
 }
 .new-chat, .new-chat-label, .new-chat span { line-height: normal; }
 .new-chat-label { display: inline-flex; align-items: center; gap: 6px; position: absolute; left: 71px; top: 9px; }
@@ -168,25 +254,74 @@ body[data-ds-dark-theme] .new-chat {
 }
 .new-chat.shortcut-win::after { content: "Ctrl + J"; }
 .new-chat:hover::after { opacity: 1; }
-.select-head { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-top: 16px; padding-left: 10px; font-size: 16px; font-weight: 500; line-height: 24px; color: var(--dsw-alias-label-primary); }
-.select-close { width: 28px; height: 28px; border: 0; border-radius: 50%; background: #fff; color: var(--dsw-alias-label-primary); display: grid; place-items: center; padding: 0; }
+.select-head { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 40px; flex-shrink: 0; box-sizing: border-box; margin-top: 0; padding: 0 0 0 10px; font-size: 16px; font-weight: 500; line-height: 24px; color: var(--dsw-alias-label-primary); }
+.select-head > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: none; }
+.select-close { width: 28px; height: 28px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 50%; background: var(--dsw-alias-button-floating-fill); color: var(--dsw-alias-label-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; padding: 0; outline: none; cursor: pointer; box-sizing: border-box; }
+.select-close:hover { background: var(--dsw-alias-button-floating-hover); }
 .select-close svg { width: 12px; height: 12px; }
-body[data-ds-dark-theme] .select-close { background: rgb(44, 44, 46); color: rgb(207, 211, 214); }
-.select-foot { display: flex; align-items: stretch; height: 61px; margin: 0 -12px; border-top: 1px solid var(--dsw-alias-border-l1); }
-.select-foot button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; font-size: 14px; font-weight: 500; color: var(--dsw-alias-label-primary); }
-.select-foot button + button { box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.04); }
-.select-foot button.off { color: rgb(173, 178, 184); }
-.select-foot button.danger { color: rgb(236, 19, 19); }
+.select-foot { display: flex; align-items: center; height: 62px; margin: 0 -12px; border-top: 1px solid var(--dsw-alias-border-l1); box-sizing: border-box; }
+.select-foot button { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; padding: 0; outline: none; position: relative; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); cursor: pointer; }
+.select-foot button + button { box-shadow: inset 1px 0 0 var(--dsw-alias-border-l1); }
+.select-foot button.off,
+.select-foot button:disabled { color: var(--dsw-alias-label-caption); cursor: default; opacity: 1; }
+.select-foot button.danger { color: var(--dsw-alias-state-error-primary); }
 .select-foot svg { width: 16px; height: 16px; }
-body[data-ds-dark-theme] .select-foot button.off { color: rgb(129, 133, 140); }
 .chat-link .pick { width: 20px; height: 20px; margin: 0 10px 0 0; border: 0; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.12); display: grid; place-items: center; flex: none; color: #fff; padding: 0; }
 .chat-link .pick.on { background: #3964fe; box-shadow: none; }
 body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.16); }
 .chat-row > button:not(.more) { max-width: calc(100% - 30px); }
-.edit-card { width: min(100%, 640px); margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 16px; padding: 10px 12px; background: var(--dsw-specific-bubble); }
-.edit-card textarea { width: 100%; min-height: 72px; border: 0; background: transparent; resize: vertical; }
-.edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.branch { display: inline-flex; align-items: center; gap: 2px; height: 28px; flex: none; }
+.edit-card { width: 100%; margin-top: 10px; margin-left: auto; border: 1px solid var(--dsw-alias-brand-primary); border-radius: 22px; padding: 10px 12px; background: var(--dsw-specific-bubble); display: flex; flex-direction: column; justify-content: flex-end; position: relative; max-height: 268px; overflow: hidden; }
+body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base); }
+.edit-card textarea {
+  --dsl-textarea-padding: 6px 10px;
+  --dsl-textarea-border-radius: 10px;
+  --dsl-textarea-caret-color: var(--dsw-alias-brand-primary);
+  --dsl-textarea-text-color: var(--dsw-alias-label-primary);
+  width: 100%;
+  min-height: 0;
+  max-height: 202px;
+  border: 0;
+  background: transparent;
+  resize: vertical;
+  touch-action: pan-y;
+  overflow: hidden;
+  padding: var(--dsl-textarea-padding);
+  border-radius: var(--dsl-textarea-border-radius);
+  caret-color: var(--dsl-textarea-caret-color);
+  color: var(--dsl-textarea-text-color);
+}
+.feedback textarea {
+  --dsl-textarea-padding: 6px 10px;
+  --dsl-textarea-border-radius: 10px;
+  --dsl-textarea-text-color: var(--dsw-alias-label-primary);
+  padding: var(--dsl-textarea-padding);
+  border-radius: var(--dsl-textarea-border-radius);
+  color: var(--dsl-textarea-text-color);
+}
+/* SP-MOD-016/482. Official button-group children use margin-right 8px, not a gap. */
+.edit-actions { display: flex; justify-content: flex-end; flex-shrink: 0; margin: 6px 10px 10px; }
+.edit-actions > :not(:last-child) { margin-right: 8px; }
+/* Text button. Official ds-button--text: no padding, auto height, no min width. Cancel in the edit card is this role. */
+.edit-actions > button:not(.primary):not(.ds-button) {
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color-disabled: var(--dsw-alias-label-caption);
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+.edit-actions > button:not(.primary):not(.ds-button):disabled {
+  color: var(--dsl-button-text-color-disabled);
+}
+/* SP-CV-006..009. Official ._17e14c5 is a flex row, not inline-flex. */
+.branch { display: flex; align-items: center; gap: 2px; height: 28px; flex: none; }
+/* SP-CV-318..320. The switcher on a user message sits 10px off the edit button, 1px down. */
+.turn.user .branch { margin-left: 10px; position: relative; top: 1px; }
 .branch-count { color: var(--dsw-alias-label-tertiary); font-size: 15px; line-height: 18px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; user-select: none; }
 .branch-prev svg { transform: rotate(180deg); }
 .action-row .branch button, .user-actions .branch button { width: 28px; height: 28px; padding: 0; color: var(--dsw-alias-label-tertiary); }
@@ -195,23 +330,59 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
 .action-row .branch button:hover:disabled, .user-actions .branch button:hover:disabled { background: transparent; }
 .feedback-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .diagram-tools { position: relative; display: flex; align-items: center; gap: 4px; }
-.diagram-tools button { display: inline-flex; align-items: center; gap: 4px; }
-.diagram-tools button.diagram-icon { width: 28px; padding: 0; justify-content: center; }
-.diagram-tools svg { width: 16px; height: 16px; flex: none; }
-.diagram-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 56px;
-  background: rgba(15, 17, 21, 0.62);
+.diagram-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 5;
+  min-width: 100px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--dsw-specific-menu);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 0, 0, 0.02), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
+.diagram-menu [role='menuitem'] {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  padding: 0 8px;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.diagram-tools button { display: inline-flex; align-items: center; gap: 4px; }
+.diagram-tools svg { width: 16px; height: 16px; flex: none; }
+/* SP-MOD-597. .ds-fancy-box is the fullscreen stage: 100% by 100%, absolute, top 0, left 0. */
+.diagram-modal {
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+/* SP-MOD-265 / SP-MOD-266. The mask is translucent black plus a 2px blur, so the page shows through. */
+.diagram-modal .bg-mask {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.88);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+/* SP-MOD-141 / SP-MOD-348 / SP-MOD-349. Close sits with the top toolbar. */
 .diagram-modal-close {
   position: absolute;
-  top: 16px;
-  right: 20px;
+  top: 12px;
+  right: 12px;
+  z-index: 2001;
   width: 32px;
   height: 32px;
   padding: 0;
@@ -222,24 +393,101 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   display: grid;
   place-items: center;
 }
+/* SP-MOD-520 / SP-MOD-071. The slide fills the fancy box and centers the plate. It is not the plate. */
+.diagram-modal-slide {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Master a8df8b9 .diagram-modal padding. The plate sits inside this inset. */
+  padding: 48px 56px;
+  background: transparent;
+}
+/* The plate wraps the diagram. Master a8df8b9 card padding 28px 24px and radius 8px. No 906×965 size. */
 .diagram-modal-card {
   width: fit-content;
-  max-height: calc(100vh - 96px);
-  overflow: auto;
-  background: var(--dsw-alias-bg-base);
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--dsw-static-neutral-bluish-50);
   border-radius: 8px;
   padding: 28px 24px;
 }
-.diagram-modal-card .mermaid svg { max-width: 100%; height: auto; }
+body[data-ds-dark-theme] .diagram-modal-card { background-color: var(--dsw-static-neutral-bluish-850); }
+.diagram-modal-card .mermaid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+/* SP-MOD-074 / SP-MOD-178. The svg keeps the theme plate colour and scales down to the slide inset minus the card padding (56+24 horizontal, 48+28 vertical).
+   Flowchart useMaxWidth writes an inline max-width of the intrinsic size and width="100%". The caps need !important or that inline max-width blocks the fit. */
+.diagram-modal-card .mermaid svg {
+  display: block;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: calc(100vw - 160px) !important;
+  max-height: calc(100dvh - 152px) !important;
+  background-color: var(--dsw-static-neutral-bluish-50);
+}
+body[data-ds-dark-theme] .diagram-modal-card .mermaid svg { background-color: var(--dsw-static-neutral-bluish-850); }
 .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: ds-spin 0.6s linear infinite; }
 @keyframes ds-spin { to { transform: rotate(360deg); } }
-.side-scroll {
+.side-scroll-wrap {
   flex: 1;
-  overflow: auto;
-  margin-top: 24px;
+  position: relative;
   min-height: 0;
-  -webkit-mask-image: linear-gradient(#000 0, #000 calc(100% - 28px), transparent);
-  mask-image: linear-gradient(#000 0, #000 calc(100% - 28px), transparent);
+  margin-top: 24px;
+  overflow: visible;
+}
+.side-scroll {
+  height: 100%;
+  /* SP-SB-301's sheet says margin 0 -2px. On this 261px sider (padding 12px, 1px border) that margin paints the row at x=10, width 240. Frozen captures answer-1440, home-with-history-1440, mobile-drawer-390, and answer-dark-1920, and master a8df8b9, measure the row at x=12, width 236: the padding edge, with no horizontal margin. */
+  margin: 0;
+  overflow: auto;
+  overflow-anchor: none;
+}
+/* SP-SB-362 / SP-SB-363 / SP-SB-370. The fade is the wrapper's bottom overlay, not a mask on the scroller. */
+.side-scroll-wrap::after {
+  content: "";
+  pointer-events: none;
+  width: 100%;
+  height: 72px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--dsw-specific-sidebar-fill) 80.65%);
+}
+body[data-ds-dark-theme] .side-scroll-wrap::after {
+  background: linear-gradient(180deg, transparent 0%, var(--dsw-specific-sidebar-fill) 80.65%);
+}
+.side-scroll:not(:has(.group)) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.side-scroll > .hint {
+  margin: 0;
+  padding-bottom: 16px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  text-align: center;
 }
 .group {
   margin-top: 16px;
@@ -261,7 +509,8 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   height: 22px;
   min-height: 22px;
   padding: 2px 10px;
-  box-shadow: rgb(249, 250, 251) 4px 0 0 0;
+  /* SP-SB history group. The shadow uses the sidebar fill so dark is #1b1b1c. */
+  box-shadow: 4px 0 0 var(--dsw-specific-sidebar-fill);
   background: var(--dsw-specific-sidebar-fill);
   font-size: 12px;
   font-weight: 500;
@@ -270,8 +519,15 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* SP-SB-297. Official history group row is position: relative. */
+  position: relative;
+  user-select: none;
 }
 .group-label .icon-btn {
+  position: absolute;
+  top: 11px;
+  right: 10px;
+  z-index: 21;
   width: 12px;
   height: 12px;
   padding: 0;
@@ -281,6 +537,7 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
+  transform: translateY(-50%);
 }
 .group-label .icon-btn svg { width: 12px; height: 12px; }
 .sider-icons { display: flex; }
@@ -294,8 +551,9 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   display: flex;
   align-items: center;
   gap: 0;
-  width: 660px;
+  width: min(660px, calc(100vw - 24px));
   height: 60px;
+  min-height: 60px;
   padding: 0;
   border: 0;
   border-radius: 20px;
@@ -304,9 +562,32 @@ body[data-ds-dark-theme] .chat-link .pick:not(.on) { box-shadow: inset 0 0 0 1.5
   box-shadow: rgba(0, 0, 0, 0.04) 0 2px 4px 0, rgba(0, 0, 0, 0.02) 0 4px 10px 0;
 }
 body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-bluish-850); }
-.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; display: grid; place-items: center; }
+/* SP-MOD-527/528. Official ._47da3ff is the field row: flex, padding 12px 12px 12px 8px.
+   Absolute children are positioned against this row's padding edge, which lines up with the dialog, so their offsets stay the pre-wrap dialog values. */
+.search-field {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 12px 12px 12px 8px;
+}
+/* SP-MOD-253/254/256. The icon box is flex, centered, and does not shrink. */
+.search-glyph { position: absolute; left: 8px; top: 12px; width: 36px; height: 36px; border-radius: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .search-glyph svg { width: 16px; height: 16px; }
 .search-dialog input.side-filter:not([type='hidden']):not([type='file']) {
+  /* ds-input tokens. Used height 24, padding 0, radius 0, and font 16 stay on the search-dialog rows. */
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-placeholder-color: var(--dsw-alias-label-caption);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-padding: 0 10px;
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-line-height: var(--ds-line-height-m);
   flex: 1;
   width: auto;
   min-height: 24px;
@@ -331,7 +612,7 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   border: 0;
   background: transparent;
   color: var(--dsw-alias-label-tertiary);
-  width: 32px;
+  width: 28px;
   height: 28px;
   border-radius: 28px;
   padding: 0;
@@ -347,14 +628,14 @@ body[data-ds-dark-theme] .search-dialog { background: var(--dsw-static-neutral-b
   top: 20px;
   width: 1px;
   height: 20px;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--dsw-alias-border-l1);
 }
 .search-dialog.has-query {
   box-sizing: border-box;
   align-items: stretch;
   flex-direction: column;
-  height: min(72vh, calc(100vh - 24px));
-  max-height: min(72vh, calc(100vh - 24px));
+  height: 72vh;
+  max-height: calc(var(--app-height, 100vh) - 24px);
   padding-top: 60px;
   overflow: hidden;
 }
@@ -429,14 +710,15 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
 .search-hit-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
 .search-hit-title {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font: var(--dsw-font-markdown-table);
-  font-weight: 400;
+  /* SP-SB search result title weight. */
+  font-weight: 500;
 }
-.search-hit-mark { font-weight: 600; }
+.search-hit-mark { font-weight: 600; display: inline-flex; width: max-content; vertical-align: top; }
 .search-hit-time { flex: 0 0 auto; font: var(--dsw-font-xs-13); color: var(--dsw-alias-label-tertiary); }
 .search-hit.active .search-hit-time { color: var(--dsw-alias-label-tertiary); }
 .search-hit-snippet {
@@ -446,16 +728,39 @@ body[data-ds-dark-theme] .search-hit.active { background: var(--dsw-static-neutr
   white-space: nowrap;
   font: var(--dsw-font-xs-13);
   color: var(--dsw-alias-label-secondary);
+  margin-right: 6px;
 }
 .search-hit.active .search-hit-snippet { color: var(--dsw-alias-label-secondary); }
 .search-hit-snip { font-weight: 500; color: var(--dsw-alias-label-primary); }
 @media (max-width: 767px) {
-  .search-dialog { width: calc(100vw - 32px); left: 16px; transform: none; }
+  /* SP-GL-209/210/211. Phone search-chats card fills the viewport. The header row keeps the l1 underline. */
+  .search-dialog {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    max-height: none;
+    margin: auto;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .search-dialog::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 59px;
+    border-bottom: 1px solid var(--dsw-alias-border-l1);
+    pointer-events: none;
+  }
   .search-dialog.has-query {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 100%;
     max-height: none;
     transform: none;
     border-radius: 0;
@@ -470,15 +775,41 @@ a.chat-link, a.chat-link:hover, a.chat-link:visited {
   position: relative;
   display: flex;
   align-items: center;
+  /* SP-SB-063. Official ._546d736.d377ebc7 is justify-content: flex-start. normal is not that string. */
+  justify-content: flex-start;
   width: 100%;
   height: 40px;
   min-height: 0;
   border-radius: 12px;
   padding: 0;
+  outline: none;
 }
+/* SP-SB-090..100. Official ._254829d edge fade. The more button stays at z-index 10, above this mask. */
+.chat-link::after {
+  --mask-base-color: 241, 243, 245;
+  --mask-angle: 90deg;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(var(--mask-angle), rgba(var(--mask-base-color), 0) 0%, rgba(var(--mask-base-color), 0.5) 20.23%, rgb(var(--mask-base-color)) 40.62%);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  width: 56px;
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+.chat-link:hover::after,
+.chat-link:focus-within::after { display: flex; }
+.chat-link.active::after { --mask-base-color: 228, 237, 253; display: flex; }
+body[data-ds-dark-theme] .chat-link::after { --mask-base-color: 44, 44, 46; }
+body[data-ds-dark-theme] .chat-link.active::after { --mask-base-color: 53, 54, 56; }
 .chat-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   height: 40px;
   box-sizing: border-box;
@@ -488,21 +819,39 @@ a.chat-link, a.chat-link:hover, a.chat-link:visited {
   line-height: 22px;
   cursor: pointer;
 }
-.chat-row > button:not(.more), .chat-row form { flex: 0 1 auto; min-width: 0; max-width: calc(100% - 36px); text-align: left; background: none; border: 0; padding: 0; font-size: 14px; line-height: 22px; cursor: pointer; color: var(--dsw-alias-label-primary); text-decoration: none; }
+.chat-row > button:not(.more), .chat-row form { min-width: 0; text-align: left; background: none; border: 0; padding: 0; font-size: 14px; cursor: pointer; color: var(--dsw-alias-label-primary); text-decoration: none; }
+/* SP-SB-056. Official ._546d736 .c08e6e93 is line-height 18px and has no margin. The old margin -2px 35px -2px -10px cancelled the row's 10px padding, so the title started on the highlight edge.
+   Master a8df8b9 uses flex 0 1 auto here. flex 1 grew the button over the row, and the old 35px right margin only faked a click gap. */
+.chat-row > button:not(.more) { flex: 0 1 auto; height: 22px; line-height: 18px; border-radius: 11px; }
+.chat-row form { flex: 0 1 auto; max-width: calc(100% - 36px); line-height: 22px; }
+.chat-row form input {
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  border-radius: 11px;
+  color: var(--dsl-input-text-color);
+  caret-color: var(--dsl-input-caret-color);
+}
 .chat-row > .more { margin-left: auto; width: 28px; height: 28px; padding: 0; border-radius: 4096px; color: rgb(129, 133, 140); font-size: 13px; line-height: 20px; }
 .chat-row > .more svg { width: 16px; height: 16px; }
 .chat-row > button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chat-link:hover { background: var(--dsw-specific-sidebar-nav-item-hover); }
-.chat-link.active { background: var(--dsw-specific-sidebar-nav-item-active-accent); }
+.chat-link.active { background: var(--dsw-specific-sidebar-nav-item-active-accent); color: var(--dsw-alias-brand-primary-invert); }
 .chat-link.active > .chat-row > button { color: var(--dsw-alias-brand-primary); }
-body[data-ds-dark-theme] .chat-link.active { background: var(--dsw-specific-sidebar-nav-item-active); }
-body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--dsw-alias-label-primary); }
+/* SP-SB active row. Dark fill is the accent token (#353638). The title is brand-primary-invert (#fff). */
+body[data-ds-dark-theme] .chat-link.active { background: var(--dsw-specific-sidebar-nav-item-active-accent); }
+body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--dsw-alias-brand-primary-invert); }
 .more { display: none; }
+.chat-link .more { position: absolute; top: 6px; right: 4px; z-index: 10; }
 .chat-link:hover .more, .chat-link.open .more, .chat-link:focus-within .more { display: grid; }
-.chat-link.active .more { display: grid; position: absolute; top: 6px; right: 4px; width: 28px; height: 28px; border-radius: 4096px; color: rgb(129, 133, 140); }
+.chat-link.active .more { display: grid; width: 28px; height: 28px; border-radius: 4096px; color: rgb(129, 133, 140); }
 .chat-link.active .more svg { width: 16px; height: 16px; }
 @media (max-width: 767px) {
   .chat-link .more { display: grid; }
+  /* SP-GL-191. Selected row more control is a flex row below 768. */
+  .chat-link.active .more { display: flex; align-items: center; justify-content: center; }
 }
 .menu {
   position: absolute;
@@ -530,11 +879,14 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 0, 0, 0.02), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 .item-menu button { height: 40px; padding: 8px 10px; border-radius: 8px; line-height: 24px; font-size: 14px; font-weight: 400; }
-.item-menu svg { flex: none; width: 16px; height: 16px; }
+/* SP-MOD-041. Option icon size is calc(var(--ds-font-size-m) + 2px), which is 16px. */
+.item-menu svg { flex: none; width: 16px; height: 16px; font-size: calc(var(--ds-font-size-m) + 2px); }
 .item-menu .danger { color: var(--dsw-alias-state-error-primary); }
 .menu button, .menu a, .menu [role='menuitem'], .menu-item {
   display: flex;
   align-items: center;
+  min-height: 24px;
+  cursor: pointer;
   gap: 8px;
   width: 100%;
   text-align: left;
@@ -547,8 +899,9 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   color: inherit;
   text-decoration: none;
   box-sizing: border-box;
+  user-select: none;
 }
-.item-menu [role='menuitem'] { display: flex; align-items: center; gap: 8px; width: 116px; height: 40px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; color: inherit; cursor: pointer; }
+.item-menu [role='menuitem'] { display: flex; align-items: center; gap: 8px; width: 116px; min-height: 24px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; color: inherit; cursor: pointer; }
 .item-menu [role='menuitem']:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .item-menu .danger:hover { background: var(--dsw-alias-interactive-bg-hover-danger); }
 .menu.item-menu button { height: 40px; padding: 8px 10px; line-height: 24px; font-weight: 400; }
@@ -561,12 +914,22 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   display: grid;
   gap: 2px;
 }
+/* SP-SB-205. The bottom slot is 64px and sits at the end of the sider. */
+.sider-bottom {
+  height: 64px;
+  margin-top: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
 .user-bar {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 0;
+  /* SP-SB-819. 236px wide at the 12px padding edge, 44px tall, centred in the 64px slot. */
+  width: 236px;
+  margin: 0;
   height: 44px;
   min-height: 44px;
   padding: 6px 2px 6px 6px;
@@ -582,9 +945,9 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
 }
 .user-bar:hover { background: var(--dsw-specific-sidebar-nav-item-hover); }
 .user-bar:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: -2px; }
-.user-copy { flex: 1; min-width: 0; display: grid; }
+.user-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .user-copy small { color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.user-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.user-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: none; flex-shrink: 1; min-width: 0; margin-left: 8px; font-size: 14px; color: var(--dsw-alias-label-secondary); }
 .user-more { margin-left: auto; margin-right: 8px; color: var(--dsw-alias-label-tertiary); display: grid; flex: none; }
 .user-more svg { width: 16px; height: 16px; }
 .menu.user-menu {
@@ -619,13 +982,30 @@ body[data-ds-dark-theme] .chat-link.active > .chat-row > button { color: var(--d
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  cursor: pointer;
+  background: var(--dsw-alias-bg-skeleton);
   color: var(--dsw-alias-label-tertiary);
   font-size: 16px;
   font-weight: 500;
   line-height: normal;
+}
+/* SP-SB-807. Official profile photo (.fdf01f38) is display:none. The letter mark stays. */
+.profile-photo {
+  display: none;
+  object-fit: cover;
+  box-sizing: border-box;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  min-height: 32px;
 }
 body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
 .user-row small { display: block; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
@@ -633,17 +1013,17 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
   position: fixed;
   left: 16px;
   top: 20px;
-  z-index: 6;
+  z-index: 10000;
   width: 27px;
   height: 24px;
   display: grid;
 }
-.collapsed-mark svg { width: 27px; height: 24px; }
+.collapsed-mark svg { width: 100%; height: 100%; }
 .float-pill {
   position: fixed;
   top: 12px;
   left: 59px;
-  z-index: 6;
+  z-index: 10000;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -651,9 +1031,10 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
   height: 40px;
   padding: 0 3px 0 0;
   border-radius: 100px;
-  background: #fff;
+  background: var(--dsw-alias-bg-layer-3);
   box-shadow: rgba(0, 0, 0, 0.04) 0 4px 12px 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsw-alias-border-l2);
+  box-sizing: border-box;
 }
 .float-pill .icon-btn:first-child { margin-left: 3px; }
 .float-pill .icon-btn {
@@ -665,9 +1046,9 @@ body[data-ds-dark-theme] .avatar { background: rgba(255, 255, 255, 0.08); }
   font-size: 14px;
 }
 .float-pill .icon-btn svg { width: 16px; height: 16px; }
-body[data-ds-dark-theme] .float-pill { background: var(--dsw-static-neutral-bluish-800); }
 
-.stage { flex: 1; min-width: 0; min-height: 0; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+.stage { flex: 1; min-width: 0; max-width: 100%; min-height: 0; height: 100%; display: flex; flex-direction: column; position: relative; }
 .top-fill { position: absolute; left: 0; top: 12px; width: min(1610px, 100%); height: 48px; background: rgb(255, 255, 255); pointer-events: none; }
 body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .topbar {
@@ -676,25 +1057,50 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   justify-content: space-between;
 }
 .topbar h2 { margin: 0; font-size: 16px; font-weight: 560; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.stage:not(:has(.home)) .topbar { height: 49px; }
-.stage:not(:has(.home)) .topbar { position: relative; z-index: 7; }
+/* SP-TB-071. Conversation header ._1aa2651.df9f32da padding is 2px 16px 0. */
+.stage:not(:has(.home)) .topbar { height: 49px; padding: calc(2px + env(safe-area-inset-top)) 16px 0; }
+/* SP-TB-108/109. Chat header paints the page background. Home stays transparent. */
+.stage:not(:has(.home)) .topbar { position: relative; z-index: 7; background: var(--dsw-alias-bg-base); }
 .stage:not(:has(.home)) .topbar > :not(.chat-title) { position: relative; z-index: 1; }
 .menu-mobile, .top-actions { position: relative; z-index: 1; }
-.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 1; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; align-items: center; height: 22px; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; }
-body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: #f2f3f5; }
+/* SP-TB-016..018, SP-TB-035..042, SP-TB-003, SP-TB-034. Static title, not the editable chip. */
+/* SP-TB-001 / 004–008. Header title column. margin-left 174px stays off: the stage sits beside the sider, not under it. */
+.stage:not(:has(.home)) .topbar > .chat-title { position: absolute; left: 18px; top: 14px; z-index: 12; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; display: flex; flex: 1; flex-direction: column; align-content: center; justify-content: center; align-items: center; height: 22px; max-width: min(480px, calc(100% - 140px)); overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); white-space: nowrap; pointer-events: none; transition: margin-left var(--ds-transition-duration-slow) var(--ds-ease-in-out); }
 @media (max-width: 767px) {
-  .stage:not(:has(.home)) .topbar > .chat-title { left: 54px; }
+  .stage:not(:has(.home)) .topbar > .chat-title { left: 54px; max-width: 60vw; }
 }
-.top-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+/* SP-TB-047. Share and the other actions do not shrink. */
+.top-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.top-actions .icon-btn,
+.top-actions .download-app,
+.top-actions .share-top-cancel,
+.top-actions .ds-button { flex-shrink: 0; }
 .top-new, .download-app { display: none; }
 .found-line { display: flex; }
-.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 1; }
-.turn.user:hover .user-actions, .turn.user:focus-within .user-actions { opacity: 1; }
+/* SP-CV-306 / SP-CV-312. Earlier user messages stay hidden until hover or focus. The last user message on a chat page stays visible. Assistant .action-row is not this row. */
+.user-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; opacity: 0; transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity; }
+.turn.user:hover .user-actions,
+.turn.user:focus-within .user-actions,
+.turn.user.is-last-user .user-actions { opacity: 1; }
 .user-actions button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4096px; background: transparent; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; display: grid; place-items: center; }
+.user-actions button:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-tertiary); }
 .settings-tabs { display: none; }
 .settings-x svg { display: block; }
-.sheet-scrim { display: none; }
+.sheet-scrim {
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.24);
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 0;
+  padding: 0;
+}
 .jump-end {
+  --halo-color: var(--dsw-alias-brand-primary);
+  --halo-ring-width: 1.5px;
   display: grid;
   place-items: center;
   position: absolute;
@@ -712,14 +1118,34 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
   z-index: 3;
   animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out);
 }
+.jump-end::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  border-radius: 50%;
+  padding: var(--halo-ring-width);
+  pointer-events: none;
+  background: radial-gradient(circle 0.75px at 50% 0.75px, var(--halo-color) 0.65px, transparent 0.8px);
+  background-size: 3px 3px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: jump-halo 2s linear infinite;
+}
+@keyframes jump-halo { to { transform: rotate(1turn); } }
 .menu-mobile { display: none; }
 .transcript {
+  position: relative;
   flex: 1;
   overflow: auto;
   overflow-x: hidden;
   width: min(840px, calc(100% - 88px));
   max-width: 840px;
   margin: 0 auto;
+  margin-bottom: env(safe-area-inset-bottom);
   min-width: 0;
   min-height: 0;
   padding: 12px 0 24px;
@@ -730,18 +1156,44 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
 .turn { flex: none; content-visibility: auto; contain-intrinsic-size: auto 140px; }
 .turn.streaming, .turn:last-of-type, .turn:has(.modal) { content-visibility: visible; }
 .turn.streaming { content-visibility: visible; }
-.turn.user { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 16px; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
+/* SP-CV-279. User message block padding-bottom is 16px. The 16px gap stays margin-bottom as well. */
+.turn.user { display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 16px; padding-bottom: 16px; position: relative; z-index: 0; animation: harbor-fade var(--ds-transition-duration) var(--ds-ease-out); }
+/* SP-CV-284. First user row (._9663006._2c189bc) padding-top is 34px. */
+.turn.user.is-first { padding-top: 34px; }
+/* SP-CV-283. The editing user row (._9663006._3111eee) padding-bottom is 10px. */
+.turn.user:has(.edit-card) { padding-bottom: 10px; }
+/* SP-CV-285 / SP-CV-300. Highlight wash on the user message. Opacity stays 0 until .is-highlight. The first user message's wash starts at top 22px. */
+.turn.user::before {
+  content: "";
+  background-color: var(--dsw-alias-bg-multi-select);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s;
+  position: absolute;
+  top: -12px;
+  bottom: 10px;
+  left: -16px;
+  right: -16px;
+}
+.turn.user.is-first::before { top: 22px; }
+.turn.user.is-highlight::before { opacity: 1; }
 .bubble {
+  /* ._8271fc3 / SP-CV-340. margin-top 10px only when the bubble follows attachments. */
+  margin-top: 0;
   max-width: calc(100% - 88px);
   background: var(--dsw-specific-bubble);
   border-radius: 22px;
   padding: 10px 16px;
   font-size: 16px;
   line-height: 24px;
+  color: var(--dsw-alias-label-primary);
   white-space: pre-wrap;
   word-break: break-word;
   transition: background 0.3s;
 }
+.bubble.has-files { margin-top: 10px; }
 .hint-retry {
   position: absolute;
   bottom: 10px;
@@ -750,45 +1202,154 @@ body[data-ds-dark-theme] .stage:not(:has(.home)) .topbar > .chat-title { color: 
   height: 24px;
   padding: 0;
   border: 0;
+  /* Filled warning + circle. SP-UI-150/151/153. warn-primary/secondary are amber-500/400. */
   border-radius: 50%;
-  background: var(--dsw-static-amber-500);
+  --dsl-button-color: var(--dsw-alias-state-warn-primary);
+  --dsl-button-color-hover: var(--dsw-alias-state-warn-secondary);
+  --dsl-button-ring-color: var(--dsw-alias-state-warn-primary);
+  background: var(--dsl-button-color);
   color: var(--dsw-static-neutral-bluish-00);
+  font-weight: 500;
   display: grid;
   place-items: center;
 }
-.hint-retry:hover { background: var(--dsw-static-amber-400); }
+.hint-retry:hover { background: var(--dsl-button-color-hover); }
+/* SP-CV-549..555. The network hint is a right-aligned column under the bubble. */
 .user-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   margin: 6px 0 0;
   color: var(--dsw-alias-label-tertiary);
   font: 14px/22px var(--font);
   white-space: nowrap;
 }
-.turn.assistant { text-align: left; }
+.turn.assistant { text-align: left; position: relative; }
+/* SP-CV-038..054. Official assistant wash. Opacity stays 0 until the message is selected. */
+.turn.assistant::before {
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --padding-horizontal: 16px;
+  content: "";
+  height: calc(100% + var(--padding-top) + var(--padding-bottom) - 50px);
+  background-color: var(--dsw-alias-bg-multi-select);
+  z-index: -1;
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s;
+  position: absolute;
+  top: calc(50% - 25px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.turn.assistant .prose { padding-bottom: 6px; }
 .turn header { display: flex; justify-content: flex-end; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
-.thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); }
+.thinking { margin: 4px 0 10px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-base); }
+.thinking + .prose { margin-top: 10px; }
 .thinking > button {
+  --collapsible-area-title-height: 34px;
+  --group-title-sticky-base-top: 0px;
+  --group-title-sticky-top: var(--group-title-sticky-base-top);
   background: none;
   border: 0;
   color: var(--dsw-alias-label-secondary);
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
   box-sizing: border-box;
-  height: 34px;
-  max-height: 34px;
+  height: var(--collapsible-area-title-height);
+  max-height: var(--collapsible-area-title-height);
   margin-bottom: 2px;
   font-size: 16px;
   line-height: 28px;
+  cursor: pointer;
+  pointer-events: all;
+  user-select: none;
+  /* SP-CV-125/126/130/131. Official ._245c867 is sticky, top var(--group-title-sticky-top), z-index 7.
+     Base top is 0 in a normal chat (6px is the share-link page only). Our list scrolls natively, so the
+     virtual-list transform terms stay 0. The scrollport starts under .chat-title, so top 0 does not cover it.
+     Width stays shrink-to-fit; 100% would stretch the title. Gap is 0 because the icon and the label each
+     carry margin-right 6px (SP-CV-157); a 6px gap on top of that margin would double the ink space. */
+  gap: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--group-title-sticky-top);
+  z-index: 7;
 }
-.thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; }
+.thinking > button::before {
+  content: "";
+  top: calc(-1 * var(--group-title-sticky-base-top) - 1px);
+  width: 100%;
+  height: calc(var(--group-title-sticky-base-top) + 1px);
+  background-color: var(--dsw-alias-bg-base);
+  position: absolute;
+  /* SP-CV-132. Selected-header wash fades in. */
+  transition: background-color 0.3s;
+}
+.thinking > button::after {
+  content: "";
+  background-color: var(--dsw-alias-bg-base);
+  z-index: -1;
+  height: calc(100% + 1px);
+  position: absolute;
+  top: -1px;
+  right: 0;
+  pointer-events: none;
+  width: calc(100% + 10px);
+}
+/* SP-CV-182. Official .c99b79f8 fade under the thinking title. */
+/* SP-CV-182..192. The fade under the thinking title. Mask keeps the wash from painting a hard edge. */
+.think-fade {
+  background-color: var(--dsw-alias-bg-base);
+  opacity: 0;
+  height: 24px;
+  position: absolute;
+  top: calc(100% - 1px);
+  right: 0;
+  transform: translateZ(0);
+  pointer-events: none;
+  width: calc(100% + 10px);
+  transition: background-color 0.3s;
+  mask-image: linear-gradient(#000 0%, transparent 100%);
+  mask-size: 100% 100%;
+  mask-repeat: repeat-x;
+}
+[dir='rtl'] .think-fade { left: 0; right: auto; }
+.turn.share-picked .thinking > button::before,
+.turn.share-picked .thinking > button::after,
+.turn.share-picked .think-fade {
+  background-color: var(--dsw-alias-bg-multi-select);
+}
+.thinking > button > svg { color: var(--dsw-alias-brand-primary); flex: none; margin-right: 6px; }
+.thinking > button .chev { color: var(--dsw-alias-label-tertiary); }
+/* SP-CV-153 / SP-CV-154. Hovering the thinking title uses the primary label. */
+.thinking > button:hover .phase-label { color: var(--dsw-alias-label-primary); }
 .thinking.is-stopped > button > svg { color: var(--dsw-alias-label-tertiary); }
 .thinking .chev { display: inline-flex; }
-.phase-label { color: var(--dsw-alias-label-secondary); }
+/* ._5255ff8 declares inline-block (SP-CV-117). The same node also matches
+   ._4d41763, which wins: inline-flex and align-items center (SP-CV-156, SP-CV-158).
+   Centering keeps the 28px line inside the 34px title. */
+.phase-label {
+  color: var(--dsw-alias-label-secondary);
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  /* SP-CV-157. Official ._4d41763 margin-right is 6px. The button gap is 0 so this is the whole gap before the chevron. */
+  margin-right: 6px;
+}
+[dir='rtl'] .phase-label { margin-right: 0; margin-left: 6px; }
+[dir='rtl'] .thinking > button > svg { margin-right: 0; margin-left: 6px; }
 /* Official gX: ._5255ff8 / .e4b3a110 / .cac31b5e / .c53e25fd and keyframes _5a7d2fc. */
 .phase-shimmer {
   height: 100%;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   overflow: hidden;
 }
@@ -820,13 +1381,23 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   0% { transform: translateX(calc(var(--shimmer-direction) * -100%)); }
   90%, 100% { transform: translateX(calc(var(--shimmer-direction) * 100%)); }
 }
-.reply-dots { display: flex; align-items: center; gap: 6px; height: 24px; margin: 2px 0 8px; }
+/* SP-CV-067..069, SP-CV-402..403. The _821570d padding-top 0 variant is not a class we render. */
+.reply-dots { display: flex; align-items: center; justify-content: flex-start; gap: 6px; height: 34px; padding-top: 10px; box-sizing: border-box; margin: 0; }
+@keyframes _3f11678 {
+  0%, 80%, 100% { opacity: 0.35; }
+  40% { opacity: 1; }
+}
 .reply-dots i {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--dsw-alias-label-tertiary);
+  /* SP-CV-407 / SP-CV-408. Loading dots only. The timeline reply dot stays label-tertiary. */
+  background: var(--dsw-alias-label-dimmed);
+  /* SP-CV-409..412. The three dots pulse a tenth of a second apart. */
+  animation: 0.9s linear infinite _3f11678;
 }
+.reply-dots i:nth-child(2) { animation-delay: 0.1s; }
+.reply-dots i:nth-child(3) { animation-delay: 0.2s; }
 .thinking .chev svg { width: 14px; height: 14px; }
 .thinking-collapse {
   display: grid;
@@ -857,17 +1428,47 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .think-copy li { font: var(--dsw-font-markdown-small); height: auto; }
 .think-copy ul,
 .think-copy ol { margin: 12px 0; padding-left: 18px; }
+/* SP-MD-039. A think paragraph's following list keeps margin-top 4px. */
 .think-copy p + ol { margin-top: 4px; }
 .think-copy li { color: var(--dsw-alias-label-secondary); }
 .think-copy li + li { margin-top: 2px; }
-/* Marker line-height is 28px on a 24px line and absorbs 2px of margin, so 4px measures as the official 6px gap. */
+/* SP-MD-042. Think nested list margin-top is 2px. */
 .think-copy li > ul,
-.think-copy li > ol { margin-top: 4px; margin-bottom: 0; }
+.think-copy li > ol { margin-top: 2px; margin-bottom: 0; }
 .think-copy li::marker { color: var(--dsw-alias-label-secondary); line-height: 28px; }
 .prose { font: var(--dsw-font-markdown-base); font-weight: 400; }
+/* SP-CV-287–299. Official ._9663006::before. Opacity stays 0, so the wash does not paint. */
+.prose.ds-markdown { position: relative; }
+.prose.ds-markdown::before {
+  content: "";
+  background-color: var(--dsw-alias-bg-multi-select);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s;
+  position: absolute;
+  top: -12px;
+  bottom: 10px;
+  left: -16px;
+  right: -16px;
+}
 .prose p { margin: 16px 0; font-size: 16px; font-weight: 400; line-height: 28px; }
 .prose p:first-child { margin-top: 0; }
 .prose p:last-child { margin-bottom: 0; }
+.ds-markdown > * .ds-markdown-math,
+.ds-markdown > .ds-markdown-math { margin: 16px 0; }
+.ds-markdown > * .ds-markdown-math:first-child,
+.ds-markdown > .ds-markdown-math:first-child { margin-top: 0; }
+.ds-markdown > * .ds-markdown-math:last-child,
+.ds-markdown > .ds-markdown-math:last-child { margin-bottom: 0; }
+.ds-think-content.ds-markdown code { font: var(--dsw-font-markdown-code-block); }
+.ds-think-content.ds-markdown code.inline-code { font-size: 13px !important; line-height: 22px; }
+.ds-think-content.ds-markdown hr { margin: 28px 0; }
+.ds-think-content.ds-markdown blockquote { margin: 12px 0 0; }
+.ds-think-content.ds-markdown th { font: var(--dsw-font-markdown-small-strong); text-align: left; }
+.ds-think-content.ds-markdown td { font: var(--dsw-font-markdown-small); }
+.ds-think-content.ds-markdown li > :first-child { margin-top: 0; }
 .prose ol, .prose ul { margin: 16px 0; padding-left: 18px; }
 .prose li { height: auto; font-size: 16px; line-height: 28px; }
 .prose li + li { margin-top: 6px; }
@@ -883,36 +1484,173 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
 .prose h1, .prose h2, .prose h3 { margin: 32px 0 16px; }
 .prose h1:first-child, .prose h2:first-child, .prose h3:first-child { margin-top: 0; }
 .prose li > p { margin: 8px 0; }
-.prose table { width: 100%; border-collapse: collapse; font: var(--dsw-font-markdown-table); margin: 8px 0; }
-.prose th, .prose td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
-.prose th { color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-table-head); background: var(--dsw-alias-bg-skeleton); }
-.prose blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); }
+.prose table { border-collapse: collapse; width: max-content; max-width: max-content; font: var(--dsw-font-markdown-table); margin: 8px 0; }
+.prose th, .prose td { text-align: left; padding: 10px 16px; max-width: min(30vw, 320px); min-width: 100px; }
+.ds-markdown th:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) { text-align: right; }
+.prose th { font: var(--dsw-font-markdown-table-head); border-top: none; border-bottom: 1px solid var(--dsw-alias-border-l3); }
+.prose td { font: var(--dsw-font-markdown-table); border-bottom: 1px solid var(--dsw-alias-border-l2); }
+.prose th:first-child, .prose td:first-child { padding-left: 0; }
+.prose td:last-child { padding-right: 0; }
+.prose blockquote { margin: 16px 0 0; padding-left: 14px; border-left: 2px solid var(--dsw-alias-label-caption); color: inherit; }
 .prose .md-img { max-width: 100%; border-radius: 12px; }
 .ds-markdown-math.katex-display { text-align: center; max-width: 100%; padding: 4px; display: block; overflow-x: auto; overflow-y: hidden; }
-.diagram-card { border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; margin: 12px 0; overflow: hidden; background: var(--dsw-alias-bg-layer-2); }
-.diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; }
+.ds-markdown { font: var(--dsw-font-markdown-base); color: var(--dsw-alias-label-primary); }
+.ds-markdown > :first-child { margin-top: 0 !important; }
+.ds-markdown > :last-child { margin-bottom: 0 !important; }
+.ds-markdown img { max-width: 100%; }
+.ds-markdown h4 { font: var(--dsw-font-markdown-h4); margin: 16px 0; }
+.ds-markdown h5, .ds-markdown h6 { font: var(--dsw-font-markdown-base-strong); margin: 16px 0; }
+.ds-markdown h1 strong, .ds-markdown h2 strong, .ds-markdown h3 strong, .ds-markdown h4 strong, .ds-markdown h5 strong, .ds-markdown h6 strong { font-weight: inherit; }
+.ds-markdown :is(h1, h2, h3, h4, h5, h6) code.inline-code { font: inherit; font-family: var(--ds-font-family-code); font-size: inherit !important; }
+.ds-markdown table code.inline-code, .prose table code.inline-code { font-size: 13px !important; }
+.ds-markdown h4 + ul, .ds-markdown h5 + ul, .ds-markdown h6 + ul, .ds-markdown h4 + ol, .ds-markdown h5 + ol, .ds-markdown h6 + ol { margin-top: 8px; }
+.ds-markdown h4:has(+ ul), .ds-markdown h4:has(+ ol), .ds-markdown h5:has(+ ul), .ds-markdown h5:has(+ ol), .ds-markdown h6:has(+ ul), .ds-markdown h6:has(+ ol) { margin-bottom: 8px; }
+.ds-markdown a:not(.ds-a):not(.cite) { color: var(--dsw-alias-brand-text); transition: box-shadow var(--ds-transition-duration) var(--ds-ease-in-out); border: 2px solid transparent; border-width: 2px 3px; margin-left: -3px; margin-right: -3px; text-decoration: none; position: relative; }
+.ds-markdown a:not(.ds-a):not(.cite):hover, .ds-markdown a:not(.ds-a):not(.cite):focus { text-decoration: underline var(--dsw-alias-brand-text); outline: none; }
+.ds-markdown a:not(.ds-a):not(.cite):focus-visible { box-shadow: 0 0 0 2px var(--dsw-alias-brand-text); }
+.ds-markdown hr { background: var(--dsw-alias-border-l2); border: none; height: 1px; margin: 32px 0; display: block; }
+.ds-markdown ul > .ds-markdown-task-list-item { list-style: none; }
+.ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox {
+  /* Same checkbox role as .ds-checkbox: 16px, radius 6, 1.5px ring. */
+  --dsl-checkbox-size: 16px;
+  --dsl-checkbox-border-radius: 6px;
+  --dsl-checkbox-border-width: 1.5px;
+  --dsl-checkbox-border-color: var(--dsw-alias-border-l3);
+  margin-left: -18px;
+  color: var(--dsw-alias-label-secondary);
+  width: var(--dsl-checkbox-size);
+  height: var(--dsl-checkbox-size);
+  border-radius: var(--dsl-checkbox-border-radius);
+  border-width: var(--dsl-checkbox-border-width);
+  border-color: var(--dsl-checkbox-border-color);
+}
+.ds-markdown .ds-markdown-task-list-item > .ds-markdown-task-checkbox + .ds-markdown-paragraph { display: inline; }
+/* SP-MD-022. Think headings and paragraphs. Our think root is .ds-think-content.ds-markdown. */
+.ds-think-content.ds-markdown :is(h1, h2, h3, h4, h5, h6),
+.ds-think-content .ds-markdown :is(h1, h2, h3, h4, h5, h6),
+.ds-think-content.ds-markdown .ds-markdown-paragraph,
+.ds-think-content .ds-markdown .ds-markdown-paragraph { margin: 12px 0; }
+/* SP-MD-039. The list after a think paragraph is margin-top 4px. Paragraph margin-bottom 12 still wins the collapse, except before an ol. */
+.ds-think-content.ds-markdown .ds-markdown-paragraph + ul,
+.ds-think-content.ds-markdown .ds-markdown-paragraph + ol,
+.ds-think-content .ds-markdown .ds-markdown-paragraph + ul,
+.ds-think-content .ds-markdown .ds-markdown-paragraph + ol { margin-top: 4px; }
+/* SP-MD-040 / SP-MD-041. A paragraph directly before an ol uses margin-bottom 4px. */
+.ds-think-content.ds-markdown .ds-markdown-paragraph:has(+ ol),
+.ds-think-content .ds-markdown .ds-markdown-paragraph:has(+ ol) { margin-bottom: 4px; }
+/* SP-MD-031..038. Headings before a list use margin-bottom 4px, and that list uses margin-top 4px. */
+.ds-think-content.ds-markdown :is(h3, h4, h5, h6):is(:has(+ ul), :has(+ ol)),
+.ds-think-content .ds-markdown :is(h3, h4, h5, h6):is(:has(+ ul), :has(+ ol)) { margin-bottom: 4px; }
+.ds-think-content.ds-markdown :is(h3, h4, h5, h6) + :is(ul, ol),
+.ds-think-content .ds-markdown :is(h3, h4, h5, h6) + :is(ul, ol) { margin-top: 4px; }
+/* SP-MD-043. Think list paragraph. Wins over the 12px rule inside a list item. */
+.ds-think-content.ds-markdown li > .ds-markdown-paragraph,
+.ds-think-content .ds-markdown li > .ds-markdown-paragraph { margin: 2px 0; }
+/* SP-MD-103 / SP-MD-104. Nested ol under ul or ol. */
+.ds-markdown ul ol,
+.ds-markdown ol ol { padding-left: 0; list-style-position: inside; }
+/* SP-MD-105. Nested list paragraph is inline. */
+.ds-markdown ul ol li p,
+.ds-markdown ol ol li p { display: inline; }
+/* SP-MD-192 / SP-MD-193. */
+.ds-markdown li > :first-child { margin-top: 0; }
+.ds-markdown li > :last-child:not(.md-code-block) { margin-bottom: 0; }
+body.rtl .ds-markdown ul > .ds-markdown-task-list-item > .ds-markdown-task-checkbox { margin-left: 0; margin-right: -18px; }
+.markdown-table-wrapper { overflow-x: auto; max-width: 100%; }
+/* SP-MD-1051. A table with a fourth column is inline-block so it can grow past the column. */
+.markdown-table-wrapper:has(th:nth-child(4), td:nth-child(4)) table { display: inline-block; }
+.ds-think-content.ds-markdown, .ds-think-content .ds-markdown { font: var(--dsw-font-markdown-small); color: var(--dsw-alias-label-secondary); }
+/* Answer text stays on the pre-Inter stack. Inter on this line shifts the cite badge 1px vs the preceding glyph. Body keeps Inter. */
+.prose,
+.ds-markdown {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.ds-think-content.ds-markdown h1, .ds-think-content.ds-markdown h2, .ds-think-content.ds-markdown h3, .ds-think-content.ds-markdown h4, .ds-think-content.ds-markdown h5, .ds-think-content.ds-markdown h6, .ds-think-content .ds-markdown h1, .ds-think-content .ds-markdown h2, .ds-think-content .ds-markdown h3, .ds-think-content .ds-markdown h4, .ds-think-content .ds-markdown h5, .ds-think-content .ds-markdown h6 { font: var(--dsw-font-markdown-small-strong); }
+/* SP-MD-981. Whole card #f9fafb, no visible border. Header plus the 360px diagram area is 402px at 1440. */
+.diagram-card { border: 0; border-radius: 12px; margin: 12px 0; overflow: hidden; background: #f9fafb; width: 100%; max-width: 752px; }
+body[data-ds-dark-theme] .diagram-card { background: #1b1b1c; }
+.diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 42px; padding: 0 8px; box-sizing: border-box; }
 .diagram-tabs, .diagram-tools { display: flex; align-items: center; gap: 4px; }
-.diagram-tabs button, .diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
-.diagram-tabs button.on { background: var(--dsw-alias-button-ghost-active-fill); color: var(--dsw-alias-brand-text); }
-.diagram-view { overflow: auto; min-height: 120px; display: grid; place-items: center; padding: 12px; max-width: 100%; }
+.diagram-tools { gap: 8px; user-select: none; }
+/* Segmented track. Tab width follows the label (SP-SET-217 padding), not a fixed 76/59. */
+.diagram-tabs {
+  /* Official .ds-segmented. */
+  --dsl-segmented-color: #f1f3f5;
+  --dsl-segmented-border-radius: 10px;
+  --dsl-segmented-font-size: 12px;
+  --dsl-segmented-line-height: 18px;
+  --dsl-segmented-padding: 2px;
+  --dsl-segmented-gap: 3px;
+  --dsl-segmented-button-border-radius: 8px;
+  --dsl-segmented-button-padding: 4px 14px;
+  --dsl-segmented-button-color: var(--dsw-alias-label-tertiary);
+  --dsl-segmented-button-font-weight: var(--ds-font-weight-strong);
+  --dsl-segmented-button-selected-color: var(--dsw-alias-label-primary);
+  --dsl-segmented-button-selected-bg: #fff;
+  --dsl-segmented-button-selected-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 3px 1px 0 rgba(0, 0, 0, 0.04), 0 3px 8px 0 rgba(0, 0, 0, 0.12);
+  background: var(--dsl-segmented-color);
+  border-radius: var(--dsl-segmented-border-radius);
+  font-size: var(--dsl-segmented-font-size);
+  line-height: var(--dsl-segmented-line-height);
+  padding: var(--dsl-segmented-padding);
+  gap: var(--dsl-segmented-gap);
+}
+body[data-ds-dark-theme] .diagram-tabs {
+  --dsl-segmented-color: #1b1b1c;
+  --dsl-segmented-button-selected-bg: #353638;
+  background: var(--dsl-segmented-color);
+}
+/* SP-MD-1074. Official .ae809fef divider. */
+.diagram-tools .diagram-divider {
+  width: 1px;
+  height: 14px;
+  margin-left: 9px;
+  margin-right: 8px;
+  background-color: var(--dsw-alias-border-l3);
+}
+
+.diagram-tabs button { box-sizing: border-box; width: auto; height: 26px; border: 0; border-radius: var(--dsl-segmented-button-border-radius); background: transparent; color: var(--dsl-segmented-button-color); padding: var(--dsl-segmented-button-padding); font-size: 12px; line-height: 18px; font-weight: var(--dsl-segmented-button-font-weight); white-space: nowrap; }
+.diagram-tools button { height: 28px; border: 0; border-radius: 999px; background: transparent; color: inherit; padding: 0 10px; font-size: 13px; }
+.diagram-tabs button.on {
+  background: var(--dsl-segmented-button-selected-bg);
+  color: var(--dsl-segmented-button-selected-color);
+  box-shadow: var(--dsl-segmented-button-selected-shadow);
+}
+body[data-ds-dark-theme] .diagram-tabs button.on { background: var(--dsl-segmented-button-selected-bg); color: var(--dsl-segmented-button-selected-color); }
+.diagram-tools button:not(.diagram-icon) { font-size: 12px; height: 26px; }
+.diagram-tools button.diagram-icon { display: flex; width: 16px; height: 16px; padding: 0; border-radius: 50%; align-items: center; justify-content: center; user-select: none; }
+.diagram-tools button span { height: 100%; color: var(--dsw-alias-label-secondary); display: flex; align-items: center; }
+.diagram-view { overflow: auto; height: 360px; display: grid; place-items: center; padding: 12px; max-width: 100%; box-sizing: border-box; }
+.diagram-status { margin: 0; padding: 48px 16px; text-align: center; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 22px; }
 .diagram-view[hidden], .diagram-source[hidden] { display: none; }
 .diagram-view .mermaid { transform-origin: center top; transition: transform 0.2s var(--ds-ease-out); max-width: 100%; }
 .diagram-view .mermaid svg { max-width: 100%; height: auto; }
 .diagram-source { margin: 0; padding: 12px 14px; overflow: auto; }
 .diagram-source code { font: var(--dsw-font-markdown-code-block); letter-spacing: 0; white-space: pre; }
 .inline-code {
+  box-sizing: border-box;
   background: var(--dsw-alias-markdown-inline-code);
   border-radius: 6px;
-  padding: 0 4px;
+  padding: 0 5px;
+  font: var(--dsw-font-markdown-code);
   font-family: var(--ds-font-family-code);
-  font-size: 14px;
-  line-height: 22px;
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.875em !important;
 }
+.ds-markdown pre:not(:last-child) > .code-card { margin-bottom: 11px; }
 .code-card {
   position: relative;
-  background: var(--dsw-alias-bg-skeleton);
-  border-radius: 12px;
-  margin: 0;
+  --dsl-code-block-border-radius: 12px;
+  --dsl-code-block-banner-background-color: var(--dsw-alias-markdown-code-block-banner);
+  --dsl-code-block-banner-font: var(--dsw-font-xs-13);
+  --dsl-code-block-content-font: var(--dsw-font-markdown-code-block);
+  color: var(--dsw-alias-label-primary);
+  /* SP-MD-370 / SP-MD-371. The card fill is the markdown code-block token. */
+  background: var(--dsw-alias-markdown-code-block);
+  --code-bottom-color: var(--dsw-alias-markdown-code-block);
+  border-radius: var(--dsl-code-block-border-radius);
+  margin: 16px 0;
   overflow: hidden;
   width: 100%;
 }
@@ -922,60 +1660,85 @@ body[data-ds-dark-theme] .phase-shimmer-bar {
   bottom: 0;
   width: 12px;
   height: 12px;
-  color: #fff;
+  color: var(--code-bottom-color, var(--dsw-alias-bg-base));
   pointer-events: none;
+  z-index: 6;
+  transition: color 0.3s;
 }
-.code-corner.end { left: auto; right: 0; }
+.code-corner.end { left: auto; right: 0; transform: rotate(270deg); }
 .code-sticky {
   position: sticky;
   top: 0;
-  z-index: 1;
-  height: 40px;
+  z-index: 6;
+  height: auto;
   background: var(--dsw-alias-bg-base);
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--dsl-code-block-border-radius) var(--dsl-code-block-border-radius) 0 0;
 }
+.ds-think-content .code-sticky { position: static; }
 .code-head {
-  height: 40px;
+  height: auto;
   width: 100%;
   box-sizing: border-box;
-  padding: 0;
-  background: rgb(249, 250, 251);
-  border-radius: 12px 12px 0 0;
-  color: rgb(15, 17, 21);
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 20px;
+  padding: 9px 14px;
+  background: var(--dsl-code-block-banner-background-color, var(--dsw-alias-markdown-code-block-banner));
+  border-radius: var(--dsl-code-block-border-radius) var(--dsl-code-block-border-radius) 0 0;
+  color: var(--dsw-alias-label-primary);
+  font: var(--dsl-code-block-banner-font, var(--dsw-font-xs-13));
+  justify-content: space-between;
+  user-select: none;
 }
 .code-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-sizing: content-box;
-  width: calc(100% - 12px);
-  height: 28px;
-  padding: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  padding: 0;
+}
+/* SP-MD-1077..1080. Official .d813de27 is the code-fence infostring, not a mermaid zoom label. */
+.md-code-block-infostring {
+  flex-shrink: 0;
+  color: var(--dsw-alias-label-primary);
+  font-family: var(--ds-font-family-code);
+  margin-left: 8px;
+  font-size: 12px;
+  line-height: 18px;
 }
 body[data-ds-dark-theme] .code-sticky { background: var(--dsw-alias-bg-base); }
-body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
-.code-head .code-tools { display: inline-flex; align-items: center; gap: 2px; }
+.code-head .code-tools { display: flex; align-items: center; gap: 2px; }
 .code-head button {
-  height: 28px;
-  min-width: 63px;
-  padding: 0 10px;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
   gap: 3px;
   border: 0;
   border-radius: 4096px;
   background: transparent;
-  color: rgb(97, 102, 107);
+  color: inherit;
   font-size: 13px;
   font-weight: 500;
   line-height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 .code-head button span { display: block; height: 16px; line-height: 20px; }
-.code-card pre { margin: 0; padding: 16px 14px; overflow: auto; white-space: pre; }
+/* SP-MD-401. Official .md-code-block>pre is word-break break-all. The code element stays normal. */
+.code-card pre { margin: 0 !important; padding: 16px; overflow: auto; white-space: pre-wrap; word-break: break-all; font: var(--dsl-code-block-content-font, var(--dsw-font-markdown-code-block)); }
+/* SP-MD-221 / SP-MD-304. Body word-break: break-word must not reach code. */
+.prose :is(pre, code),
+.ds-markdown :is(pre, code) {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+/* SP-MD-401. This beats the pre, code reset above. The code element stays normal. */
+.ds-markdown .code-card pre,
+.prose .code-card pre {
+  word-break: break-all;
+}
 .code-card code, .code-card code span, .box-drawing, .box-drawing code {
   font: var(--dsw-font-markdown-code-block);
   letter-spacing: 0px;
@@ -984,23 +1747,41 @@ body[data-ds-dark-theme] .code-head { background: var(--dsw-alias-bg-layer-2); }
   line-height: 22px;
   white-space: pre;
 }
+/* SP-MD-401. Untagged and ```text blocks have no language-* class, so they wrap with the pre. */
+.code-card code.is-plain,
+.code-card code.is-plain span {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
 .code-card pre > code { display: block; }
-.action-row { margin-top: 0; margin-left: -6px; padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); }
+/* SP-CV-076/080. Official ._0a3d93b width and left. The continue inset is measured inside the row (fb1344-parity.spec.ts:216). */
+.action-row { margin-top: 0; margin-left: 0; left: -6px; width: calc(100% + 6px); padding: 12px 0 10px; box-sizing: border-box; min-height: 50px; gap: 10px; color: var(--dsw-alias-label-tertiary); flex-wrap: wrap; position: relative; }
+.action-row button:disabled { cursor: not-allowed; }
+/* SP-CV-791 / SP-CV-792. Regenerate fades while a reply is still running. */
+.action-row button[data-testid="regenerate"]:disabled { opacity: 0.45; }
 .action-row button {
+  /* SP-UI iconLabelTertiary. */
+  --dsl-button-text-color: var(--dsw-alias-label-tertiary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-tertiary);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-padding: 0;
+  --dsl-button-min-width: 0;
   width: 28px;
   height: 28px;
+  min-width: 0;
   padding: 0;
   border: 0;
   border-radius: 4096px;
-  background: transparent;
-  color: var(--dsw-alias-label-tertiary);
+  background: var(--dsl-button-color);
+  color: var(--dsl-button-text-color);
   font-size: 13px;
   line-height: 20px;
   display: grid;
   place-items: center;
 }
 /* Official ds-button--iconLabelTertiary: hover wash only, icon color stays tertiary. */
-.action-row button:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.action-row button:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
 .action-row button.on { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .usage, .hint { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .found-line { color: var(--dsw-alias-label-secondary); font-size: 14px; margin-bottom: 8px; }
@@ -1029,12 +1810,28 @@ button.chip { appearance: none; margin: 0; }
   inset: 0;
   width: 100%;
   height: 100%;
+  /* SP-CITE-002. Official .site_logo_img is cover. contain is only .ds-markdown-cite-brand-icon-img. */
   object-fit: cover;
   display: none;
   border-radius: 50%;
 }
 .favicon img.on { display: block; }
-.favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); }
+/* SP-CITE-158: card and stacked fallbacks keep the official 14px link svg. */
+.favicon .site_logo_fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dsw-alias-label-tertiary);
+}
+.favicon .site_logo_fallback svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  display: block;
+}
+.favicons i { margin-left: -4px; box-shadow: 0 0 0 1px var(--search-row-site-logo-color, var(--dsw-alias-bg-base)), 0 0 0 1px var(--dsw-alias-bg-base); transition: box-shadow .2s; }
+/* SP-CITE-134. Pill icons are .site_logo_back. Dark fill is the citation token, not the light #eceef1. */
+body[data-ds-dark-theme] .favicons .site_logo_back { background: #353638; }
 .favicons i:first-child { margin-left: 0; }
 .source-meta .favicon {
   width: 18px;
@@ -1050,6 +1847,7 @@ button.chip { appearance: none; margin: 0; }
   min-width: 14px;
   height: 14px;
   margin: 0 2px;
+  /* SP-CITE-109. Official .ds-markdown-cite padding is 0 4px. */
   padding: 0 4px;
   top: -5px;
   box-sizing: border-box;
@@ -1064,8 +1862,10 @@ button.chip { appearance: none; margin: 0; }
   user-select: none;
   cursor: pointer;
   position: relative;
+  flex-shrink: 0;
   text-decoration: none;
 }
+/* Official wraps each .ds-markdown-cite in its own anchor, so .cite + .cite never matches and the 2px margins stay. Painted gap is 4px (SP-CITE-113). */
 .cite.wide { min-width: 20px; }
 a.cite:visited { color: var(--dsw-alias-label-tertiary); text-decoration: none; }
 a.cite:hover, .cite:hover {
@@ -1120,6 +1920,26 @@ a.cite:hover, .cite:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+.search-view-card__icon .site_logo_loading {
+  position: absolute;
+  inset: 0;
+  background-color: var(--dsw-alias-markdown-citation);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.search-view-card__icon .site_logo_fallback {
+  color: var(--dsw-alias-label-tertiary);
+  background-color: var(--dsw-alias-markdown-citation);
+}
+.search-view-card__icon .site_logo_fallback svg {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 .search-view-card__site {
   min-width: 0;
@@ -1155,6 +1975,8 @@ a.cite:hover, .cite:hover {
 /* Official .f93f59e4: 34px = 24px line + 8px padding + 2px border, padding 4px 10px 4px 4px, radius 100px, bg-base. */
 .sources-pill {
   box-sizing: border-box;
+  /* SP-CITE-065. The pill row centers its contents. */
+  justify-content: center;
   height: 34px;
   margin: 16px 0 0;
   border: 1px solid var(--dsw-alias-border-l2);
@@ -1164,9 +1986,9 @@ a.cite:hover, .cite:hover {
   width: fit-content;
   font-size: 14px;
   line-height: 24px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: var(--dsw-alias-label-primary);
   cursor: pointer;
   user-select: none;
@@ -1176,57 +1998,175 @@ a.cite:hover, .cite:hover {
   background-color: var(--dsw-alias-interactive-bg-hover);
   --search-row-site-logo-color: var(--dsw-alias-interactive-bg-hover);
 }
-.search-panel {
-  width: 380px;
-  flex: 0 0 380px;
-  border-left: 1px solid var(--dsw-alias-border-l1);
-  background: var(--dsw-alias-bg-base);
-  padding: 12px 16px;
-  overflow: auto;
+/* SP-CITE-071/155: share-select makes the pill not clickable. */
+.sources-pill.is-inert,
+.sources-pill.is-inert:hover {
+  cursor: default;
+  background-color: var(--search-sites-summary-bg-color, var(--dsw-alias-bg-base));
 }
-.search-panel header { display: flex; justify-content: space-between; align-items: center; min-height: 40px; }
-.search-panel .panel-close { flex: 0 0 32px; }
-.search-panel ol { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 0; }
-.search-panel li { border-bottom: 1px solid var(--dsw-alias-border-l2); }
-.source-card {
+.sources-pill.is-inert:hover {
+  --search-row-site-logo-color: var(--dsw-alias-bg-base);
+}
+/* SP-CITE-041. The pill text is 6px from the favicons. The -4px overlap stays on .favicons i. */
+.sources-pill-text { margin-left: 6px; }
+body.rtl .sources-pill-text { margin-left: 0; margin-right: 6px; }
+.search-panel {
+  /* Closed shell is width 0 (SP-SEARCH-069/070/086). Open rules below restore the column. */
+  /* SP-SEARCH-192: min(50vw - 4rem, 390px). html font-size is the UA 16px, so 4rem is 64px. */
+  --sidebar-width: min(calc(50vw - 4rem), 390px);
+  --search-view-card-title-font: 500 14px/22px var(--dsw-font-family);
+  --search-view-card-meta-font: 13px/20px var(--dsw-font-family);
+  --search-view-card-meta-padding-top: 2px;
+  --search-view-card-secondary-color: var(--dsw-alias-label-tertiary);
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  max-width: 390px;
+  flex: 0 0 var(--sidebar-width);
+  margin-left: auto;
+  z-index: 10;
+  position: relative;
+  height: 100%;
+  border-left: 1px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-bg-base);
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 0;
+  flex: 0 0 0;
+  border-left-width: 0;
+  transition: none 0.2s ease-out;
+  box-shadow: none;
+}
+.search-panel:not(.is-closed) {
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
+  border-left: 1px solid var(--dsw-alias-border-l2);
+  overflow: visible;
+  transition: flex-basis 0.2s ease-out;
+}
+.search-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  height: 60px;
+  min-height: 60px;
+  padding: 0 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+.search-panel header [role="heading"] {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.search-panel .panel-close {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  padding: 0;
   display: grid;
-  gap: 4px;
-  padding: 14px 0;
+  place-items: center;
+}
+.search-panel ol {
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  position: relative;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-color) transparent;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+.search-panel:hover ol { scrollbar-color: var(--scroll-color-hover) transparent; }
+.search-panel li { border: 0; }
+.source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
+  margin: 0 0 6px;
+  padding: 12px;
+  border-radius: 12px;
   text-decoration: none;
   color: var(--dsw-alias-label-primary);
+  cursor: pointer;
 }
+.source-card:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .source-meta {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
-  color: #8b9096;
-  font-size: 12px;
+  padding-top: var(--search-view-card-meta-padding-top, 0);
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+  font: var(--search-view-card-meta-font, 500 12px/17px var(--dsw-font-family));
 }
-.source-site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.source-index { margin-left: auto; }
-.source-card strong {
-  display: block;
-  color: var(--dsw-alias-label-primary);
-  font-weight: 650;
-  font-size: 15px;
-  line-height: 1.4;
-  text-decoration: none;
-}
-.source-card p {
-  margin: 0;
-  color: #8b9096;
-  font-size: 13px;
-  line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.source-meta .favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
   overflow: hidden;
+}
+.source-site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.source-divider {
+  width: 1px;
+  height: 12px;
+  margin: 0 3px;
+  background: var(--dsw-alias-border-l3);
+  flex-shrink: 0;
+}
+.source-date { flex-shrink: 0; font-weight: 400; }
+.source-index {
+  margin-left: auto;
+  top: unset;
+  flex-shrink: 0;
+  font-family: var(--ds-font-family-code);
+  font-weight: 400;
+  pointer-events: none;
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+}
+.search-panel .search-view-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin-top: 6px;
+  font: var(--search-view-card-title-font, 500 16px/25px var(--dsw-font-family));
+  color: var(--dsw-alias-label-primary);
+}
+.search-panel .search-view-card__snippet {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 6px 0 0;
+  color: var(--search-view-card-secondary-color, var(--dsw-alias-label-secondary));
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .transcript:has(.home) { justify-content: center; padding: 0; gap: 0; }
 @media (min-width: 768px) {
   .stage:has(.home) .topbar { position: absolute; inset: 0 0 auto 0; z-index: 2; }
+  /* SP-GL-083 / SP-GL-213 / SP-SEARCH-154. Stage floor is 384px from 768 up. */
+  .stage { min-width: 384px; }
 }
 .home {
   margin: 0 auto;
@@ -1236,6 +2176,11 @@ a.cite:hover, .cite:hover {
   min-height: 247px;
   padding-bottom: 64px;
 }
+/* SP-TB-243. Official header padding-bottom is 48px. The column below stays 64px. */
+.home-header { padding-bottom: 48px; }
+/* SP-TB-301. Dark colour sits on the header container. SP-TB-249 keeps the greeting on label-primary. */
+body[data-ds-dark-theme] .home-header { color: #fff; }
+/* SP-TB-248/249, SP-TB-255..257. */
 .greeting {
   display: flex;
   align-items: center;
@@ -1244,10 +2189,13 @@ a.cite:hover, .cite:hover {
   width: max-content;
   max-width: 100%;
   margin: 0 auto 27px;
+  color: var(--dsw-alias-label-primary);
   font-size: 24px;
   font-weight: 600;
   line-height: 32px;
 }
+/* SP-TB-290 / SP-TB-291. The mark is brand. SP-TB-249. Dark greeting text is label-primary (#f9fafb), not the wrapper's #fff. */
+.greeting .mark { color: var(--dsw-alias-brand-primary); }
 .composer-wrap { width: min(840px, calc(100% - 88px)); max-width: 840px; margin: 0 auto calc(8px + var(--keyboard-inset, 0px)); padding-bottom: env(safe-area-inset-bottom); }
 .stage:not(:has(.home)) { overflow: hidden; min-height: 0; }
 .stage:not(:has(.home)) .transcript.chat-scroll {
@@ -1267,27 +2215,43 @@ a.cite:hover, .cite:hover {
 }
 .chat-scroll .code-fold,
 .chat-scroll .action-row { scroll-margin-bottom: 240px; }
-.chat-column { width: min(752px, calc(100% - 88px)); margin-top: 33px; }
+/* SP-CV-391. Official column margin-top is 0. The 44px side inset is the width. */
+.chat-column { width: min(752px, calc(100% - 88px)); max-width: var(--message-list-max-width); margin-top: 0; }
 .stage:not(:has(.home)) .composer-wrap {
   position: sticky;
   bottom: 0;
-  z-index: 8;
+  z-index: 10;
   width: min(776px, calc(100% - 48px));
-  margin: auto 0 0;
-  padding-top: 24px;
-  background: linear-gradient(180deg, transparent 0, var(--dsw-alias-bg-base) 24px);
+  margin: auto 32px 0;
+  padding-top: 0;
+  /* SP-CMP-227/228. The 24px fade sits on .composer-back (SP-CMP-233). */
+  background: linear-gradient(to bottom, transparent 0%, transparent 30%, var(--dsw-alias-bg-base) 30%, var(--dsw-alias-bg-base) 100%);
   pointer-events: none;
 }
+.composer-back {
+  pointer-events: none;
+  z-index: -1;
+  align-self: flex-end;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--dsw-alias-bg-base) 24px);
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+body[data-ds-dark-theme] .composer-back {
+  background: linear-gradient(180deg, rgba(21, 21, 23, 0) 0%, var(--dsw-alias-bg-base) 24px);
+}
+
 .stage:not(:has(.home)) .composer-wrap > .composer,
 .stage:not(:has(.home)) .composer-wrap > .ai-note { pointer-events: auto; width: 100%; }
 @media (min-width: 768px) {
-  .stage:not(:has(.home)) .composer {
+  body:not([data-ds-dark-theme]) .stage:not(:has(.home)) .composer {
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
+  .top-actions { z-index: 100; flex-shrink: 0; }
   .topbar .top-actions > button.icon-btn:not(.top-new) {
     width: 34px;
     height: 34px;
-    margin-top: 8px;
+    margin-top: 12px;
     margin-right: -1px;
     border-radius: 4096px;
     color: rgb(15, 17, 21);
@@ -1305,27 +2269,151 @@ a.cite:hover, .cite:hover {
   padding: 0;
   display: flex;
   flex-direction: column;
+  font-size: 16px;
+  cursor: text;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
 }
+/* SP-CMP input wrapper. Dark border is the thin white line. Home shadow stays none. */
 body[data-ds-dark-theme] .composer {
-  border-color: var(--dsw-static-neutral-bluish-800);
+  border-color: rgba(255, 255, 255, 0.06);
   box-shadow: none;
 }
-.composer textarea {
+/* SP-CMP-110. Chat wrapper keeps the short shadow in dark. Home stays none. */
+body[data-ds-dark-theme] .stage:not(:has(.home)) .composer {
+  box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
+}
+.composer-field {
+  position: relative;
+  margin-top: 4px;
+  z-index: 1;
+}
+/* SP-CMP-186. Hidden mirror grows with the text and stops at 336px. The textarea fills it. */
+.composer-mirror {
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-height: 336px;
+  overflow: hidden;
+  min-height: 60px;
+  margin: 0;
+  padding: 12px 12px 0 16px;
+  font-size: 16px;
+  line-height: 24px;
+  box-sizing: border-box;
   width: 100%;
+}
+.composer textarea {
+  /* Composer padding and type size stay on SP-CMP-095 / SP-CMP-123. These are the textarea tokens. */
+  --dsl-textarea-text-color: var(--dsw-alias-label-primary);
+  --dsl-textarea-placeholder-color: var(--dsw-alias-label-tertiary);
+  --dsl-textarea-border-radius: 10px;
+  --dsl-textarea-font-size: var(--ds-font-size-m);
+  --dsl-textarea-line-height: var(--ds-line-height-m);
+  --dsl-textarea-padding: 6px 10px;
+  --dsl-textarea-caret-color: var(--dsw-alias-brand-primary);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
   resize: none;
   outline: none;
   background: transparent;
+  caret-color: var(--dsw-alias-brand-text);
   min-height: 60px;
-  margin-top: 4px;
+  margin: 0;
   padding: 12px 12px 0 16px;
   font-size: 16px;
   line-height: 24px;
+  /* SP-CMP-160 */
+  overscroll-behavior: contain;
+  overflow: auto;
+  display: block;
+  touch-action: pan-y;
 }
 .composer textarea:focus { outline: none; box-shadow: none; }
-.composer textarea::placeholder { color: var(--dsw-alias-label-caption, #c2c3c4); }
+.composer textarea::placeholder { color: var(--dsw-alias-label-caption, #c2c3c4); user-select: none; }
 .composer { position: relative; }
+/* SP-CMP-109. Official ._77cefa5._4039df9 drag-over border. The dark resting border is more specific, so the drag rule repeats it. */
+.composer.is-dragover,
+body[data-ds-dark-theme] .composer.is-dragover {
+  border-style: dashed;
+  border-color: var(--dsw-alias-brand-primary);
+}
+/* SP-CMP-278/279. Page mask plus the composer wash. Both copy strings are real UI. */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  border-radius: 24px;
+  display: flex;
+  pointer-events: none;
+  background: transparent;
+  backdrop-filter: blur(8px);
+}
+.drop-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #d3e2ff;
+  opacity: 0.6;
+}
+body[data-ds-dark-theme] .drop-overlay::before { background: #43454a; }
+.drop-overlay-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  gap: 4px;
+  text-align: center;
+}
+.drop-overlay-title {
+  margin: 0;
+  color: var(--dsw-alias-label-primary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.drop-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  pointer-events: none;
+  cursor: copy;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+}
+body[data-ds-dark-theme] .drop-mask { background: rgba(39, 39, 48, 0.7); }
+.drop-mask-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: -3%;
+  padding: 0 40px;
+  text-align: center;
+  color: var(--dsw-alias-label-primary);
+}
+.drop-mask-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  white-space: normal;
+}
 .composer-fill, .composer-fill-alt { display: none; position: absolute; left: 11.5px; top: 30px; width: 752px; height: 40px; background: rgb(255, 255, 255); pointer-events: none; }
 @media (min-width: 1600px) {
   .shell.selecting .composer-fill, .shell.selecting .composer-fill-alt { display: block; }
@@ -1339,6 +2427,10 @@ body[data-ds-dark-theme] .shell.selecting .composer-fill-alt { display: none; }
 .chips, .tool-right { display: flex; align-items: center; gap: 10px; }
 .tool-right { height: 34px; }
 .chips { flex: 1 1 0; min-width: 0; overflow: hidden; }
+/* SP-CMP-064. Official toggle margin-right is 10px, and the last toggle is 0. Thinking sits in .chip-wrap. */
+.composer .chips { gap: 0; }
+.composer .chips > .chip:not(:last-child),
+.composer .chips > .chip-wrap:not(:last-child) > .chip { margin-right: 10px; }
 .chip { flex: none; }
 .composer .chip { padding: 10px; }
 .chip-wrap { position: relative; display: inline-flex; align-items: center; }
@@ -1356,10 +2448,17 @@ body[data-ds-dark-theme] .shell.selecting .composer-fill-alt { display: none; }
   font-weight: 500;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  user-select: none;
+  /* SP-CMP-047. Official transition-property is border, background. */
+  transition-property: border, background;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
-.chip:hover:not(:disabled):not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
+.chip:hover:not(:disabled):not(.on),
+body[data-ds-dark-theme] .composer .chip:not(.on):hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
 .composer .chip:not(.on) {
   background: #fff;
   border: 1px solid var(--dsw-alias-border-l2);
@@ -1395,20 +2494,28 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   gap: 0;
 }
 .composer.icon-only .chip svg { width: 14px; height: 14px; }
-.chip:disabled { opacity: 0.45; }
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
 .send, .tool-right .icon-btn { width: 34px; height: 34px; padding: 0; }
 .tool-right .icon-btn { border-radius: 4096px; color: var(--dsw-alias-label-primary); }
 .tool-right .icon-btn svg, .send svg { width: 16px; height: 16px; }
+/* SP-CMP send. Fill follows the primary button token, so dark is #5686fe. */
 .send {
   border-radius: 50%;
-  background: #3964fe;
+  background: var(--dsw-alias-button-primary-fill);
   color: #fff;
   opacity: 0.4;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
   line-height: 22px;
+  white-space: nowrap;
+  margin-top: auto;
+  transition: background 0.2s;
 }
-.send.ready { background: #3964fe; color: #fff; opacity: 1; }
+.send.ready { background: var(--dsw-alias-button-primary-fill); color: #fff; opacity: 1; }
+.send.ready:hover { background: var(--dsw-alias-button-primary-hover); }
 .send.stop {
   background: var(--dsw-alias-button-primary-fill);
   color: var(--dsw-alias-label-primary-foreground);
@@ -1470,6 +2577,8 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   border: 1px solid var(--dsw-alias-border-l2);
   background: var(--dsw-specific-input-major);
   cursor: default;
+  outline: none;
+  transition: background-color 0.3s;
 }
 .file-card.is-editable { padding-right: 24px; }
 .file-card.is-failed { border-color: var(--dsw-alias-state-error-primary); }
@@ -1494,12 +2603,12 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   animation: file-card-spin 0.8s linear infinite;
 }
 @keyframes file-card-spin { to { transform: rotate(360deg); } }
-.file-card-body { flex: 1; min-width: 0; padding: 10px 0; user-select: none; }
+.file-card-body { flex: 1; min-width: 0; padding: 8px 0; overflow: hidden; user-select: none; }
+.file-card-paste { display: block; margin-top: 2px; padding: 0; border: 0; background: transparent; color: var(--dsw-alias-brand-primary); font-size: 12px; line-height: 18px; cursor: pointer; text-align: left; }
 .file-card-name {
   overflow: hidden;
-  font-size: 14px;
-  line-height: 22px;
-  font-weight: 400;
+  font: 500 14px/22px var(--dsw-font-family);
+  min-height: 20px;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--dsw-alias-label-primary);
@@ -1507,16 +2616,102 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 .file-card-meta {
   overflow: hidden;
   font-size: 12px;
-  line-height: 18px;
+  line-height: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--dsw-alias-label-tertiary);
 }
-.file-card:hover .file-card-remove { opacity: 1; }
+.file-card:hover .file-card-remove,
+.file-card-remove:focus { opacity: 1; }
 .file-card-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-bottom: auto;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--dsw-alias-label-primary-inverted);
+  background: var(--dsw-alias-button-contrast-fill);
+  cursor: pointer;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 0.2s ease-in-out;
+}
+body.rtl .file-card-remove { left: 6px; right: auto; }
+.file-card-remove.is-invalid {
+  opacity: 1;
+  color: var(--dsw-alias-label-primary-foreground);
+  background: var(--dsw-alias-state-error-primary);
+}
+/* Upload and sent image cards. 64×64, radius 16, filename on the mask. */
+.image-card {
+  --border-radius: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  min-height: 64px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: default;
+  outline: none;
+  user-select: none;
+  background: #f5f6f7;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+body[data-ds-dark-theme] .image-card {
+  background: #2c2c2e;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.image-card img,
+.image-card-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-card-fallback { background: #f5f6f7; }
+/* SP-CV-854 / SP-CV-858 / SP-CV-859 / SP-CV-862. Filename mask on the sent image. */
+.image-card-shade {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 16px;
+  background: var(--dsw-alias-bg-mask-3);
+  pointer-events: none;
+}
+.image-card-name {
+  margin: 0 8px 8px;
+  overflow: hidden;
+  color: var(--dsw-static-neutral-00);
+  font: 500 11px/14px var(--dsw-font-family);
+  text-align: center;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.image-card-remove {
   position: absolute;
   top: 4px;
   right: 4px;
+  z-index: 1;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1525,20 +2720,27 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   padding: 0;
   border: 0;
   border-radius: 50%;
-  color: var(--dsw-alias-label-primary-inverted);
-  background: var(--dsw-alias-button-contrast-fill);
+  background: #61666b;
+  color: #fff;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
-.file-card-remove.is-invalid {
-  opacity: 1;
-  color: var(--dsw-alias-label-primary-foreground);
-  background: var(--dsw-alias-state-error-primary);
+body[data-ds-dark-theme] .image-card-remove {
+  background: #f9fafb;
+  color: #353638;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 8px rgba(0, 0, 0, 0.16);
 }
+body.rtl .image-card-remove { left: 4px; right: auto; }
+.image-card:hover .image-card-remove,
+.image-card-remove:focus,
+.image-card.is-failed .image-card-remove { opacity: 1; }
+.image-card.is-failed .image-card-shade { box-shadow: inset 0 0 0 1px var(--dsw-alias-state-error-primary); }
+.image-card.is-failed .image-card-remove { background: var(--dsw-alias-state-error-primary); color: #fff; }
 
 .scrim { display: none; }
-.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 8; padding: 20px; }
+/* Search shell is z-index 10 (SP-SEARCH-067). A dialog has to sit above that panel. Menus stay at 30. */
+.modal { --dsl-modal-content-width: 525px; position: fixed; inset: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); display: grid; place-items: center; z-index: 1024; padding: 20px; color: var(--dsw-alias-label-primary); }
 .modal-card, .gate-card, .admin-card, .key-card {
   width: min(720px, 100%);
   max-height: min(88vh, 900px);
@@ -1549,6 +2751,8 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   padding: 20px;
   box-shadow: var(--dsw-shadow-lv3);
 }
+/* SP-MOD-466. Dialog cards use the 24px modal radius. Gate and admin cards stay 16px. */
+.modal-card, .key-card { border-radius: 24px; }
 .key-card { width: min(440px, 100%); padding: 28px 24px 22px; border: 1px solid var(--dsw-alias-border-l1); box-sizing: border-box; }
 @media (max-width: 767px) {
   [data-testid='key-dialog'] { align-items: center; padding: 16px; overflow: auto; }
@@ -1558,7 +2762,26 @@ body[data-ds-dark-theme] .key-card { background: #2a2b2f; border-color: #3a3b40;
 .key-card h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
 .key-lead { margin: 0 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 1.6; }
 .key-field { position: relative; display: block; }
-.key-field input { width: 100%; padding-right: 44px; box-sizing: border-box; height: 44px; }
+.key-field input {
+  /* Official .ds-input--m. Extra right padding keeps the eye button off the text. */
+  --dsl-input-text-color: var(--dsw-alias-label-primary);
+  --dsl-input-placeholder-color: var(--dsw-alias-label-caption);
+  --dsl-input-border-radius: 10px;
+  --dsl-input-height: var(--ds-control-height-m);
+  --dsl-input-padding: 0 10px;
+  --dsl-input-font-size: var(--ds-font-size-m);
+  --dsl-input-line-height: var(--ds-line-height-m);
+  --dsl-input-caret-color: var(--dsw-alias-brand-primary);
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--dsl-input-height);
+  border-radius: var(--dsl-input-border-radius);
+  padding: 0 44px 0 10px;
+  font-size: var(--dsl-input-font-size);
+  line-height: var(--dsl-input-line-height);
+  color: var(--dsl-input-text-color);
+  caret-color: var(--dsl-input-caret-color);
+}
 .eye {
   position: absolute;
   right: 6px;
@@ -1653,7 +2876,7 @@ body[data-ds-dark-theme] .landing::before { display: block; }
   color: #1e3a5f;
 }
 .landing-title, body[data-ds-dark-theme] .landing-title { color: #24324a; letter-spacing: 0.14em; font-weight: 500; }
-.landing-composer .send { background: #3964fe; color: #fff; }
+.landing-composer .send { background: var(--dsw-alias-button-primary-fill); color: #fff; }
 .landing-composer { width: min(720px, 100%); background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); }
 .landing-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
 .landing-pill {
@@ -1713,7 +2936,7 @@ body[data-ds-dark-theme] .lang button.on { background: #3a3b40; color: #fff; }
 .boot-bars i:nth-child(2) { width: 78%; }
 .boot-bars i:nth-child(3) { width: 54%; }
 .boot-title-bar { width: 148px; height: 18px; margin: 16px 0 0 18px; border-radius: 8px; }
-.boot-skeleton .user-bar { margin-top: auto; cursor: default; }
+.boot-skeleton .user-bar { cursor: default; }
 label { display: grid; gap: 6px; margin: 10px 0; font-size: 14px; }
 label.check { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px; }
 input[type="checkbox"] {
@@ -1799,16 +3022,59 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   padding-right: 0;
 }
 .form-error { color: var(--dsw-alias-state-error-primary); }
-.toast {
+/* SP-UI textInheritedPrimary. The inline retry is the text control. The error sentence stays red. */
+.form-error button[data-testid="retry"] {
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-text-color-hover: var(--dsw-alias-button-primary-hover);
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  color: var(--dsl-button-text-color);
+}
+.form-error button[data-testid="retry"]:hover { color: var(--dsl-button-text-color-hover); }
+/* SP-MOD-046..049, 497..502. Toast padding, line, and shadow follow the official toast. */
+.toast-layer {
   position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  z-index: 2000;
+  pointer-events: none;
+  top: calc(40px + env(safe-area-inset-top));
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  left: calc(40px + env(safe-area-inset-left));
+  right: calc(40px + env(safe-area-inset-right));
+}
+.toast {
+  position: relative;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  width: fit-content;
+  max-width: min(100%, 480px);
+  margin-right: auto;
+  margin-left: auto;
+  pointer-events: auto;
+  transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--dsw-alias-toast-bg);
   color: white;
+  border: 1px solid var(--dsw-alias-border-inverted);
   border-radius: 12px;
-  padding: 8px 12px;
-  z-index: 9;
+  padding: 12px 18px;
+  line-height: 22px;
+  max-width: min(100vw - 28px, 480px);
+  text-align: center;
+  white-space: pre-wrap;
+  box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.04), 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  /* SP-MOD-045. Official toast layer is 2000, above the share mask at 1400. */
+  z-index: 2000;
 }
 .mark { width: 22px; height: 22px; display: block; flex: none; }
 .greeting .mark { width: 34px; height: 25px; }
@@ -1817,43 +3083,98 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .mark .accent { fill: var(--dsw-alias-brand-primary); }
 .legal { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .refused { color: var(--dsw-alias-state-error-primary); }
-.hljs-keyword, .hljs-selector-tag { color: #cf222e; }
-.hljs-string { color: #0a3069; }
-.hljs-comment { color: #6e7781; }
-.hljs-number, .hljs-literal { color: #0550ae; }
-.hljs-title, .hljs-function { color: #8250df; }
-body[data-ds-dark-theme] .hljs-keyword { color: #ff7b72; }
-body[data-ds-dark-theme] .hljs-string { color: #a5d6ff; }
-body[data-ds-dark-theme] .hljs-comment { color: #8b949e; }
-body[data-ds-dark-theme] .hljs-title { color: #d2a8ff; }
-body[data-ds-dark-theme] .code-card code { color: #e6edf3; }
+/* SP-MD-300..360 light and SP-MD-217..297 dark. One Light / One Dark roles on highlight.js classes. */
+.code-card.md-code-block-light code { color: #383a42; }
+body[data-ds-dark-theme] .code-card code,
+.code-card.md-code-block-dark code { color: #e3eaf2; }
+.hljs-comment, .hljs-quote { color: #a0a1a7; }
+.hljs-punctuation, .hljs-operator { color: #383a42; }
+.hljs-keyword, .hljs-selector-tag, .hljs-meta .hljs-keyword { color: #a626a4; }
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-built_in { color: #50a14f; }
+.hljs-number, .hljs-literal, .hljs-attr, .hljs-attribute, .hljs-type, .hljs-title.class_ { color: #b76b01; }
+.hljs-title, .hljs-title.function_, .hljs-function, .hljs-variable, .hljs-template-variable { color: #4078f2; }
+.hljs-symbol, .hljs-bullet, .hljs-deletion, .hljs-property, .hljs-tag { color: #e45649; }
+.hljs-link { color: #0184bc; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+body[data-ds-dark-theme] .hljs-comment,
+body[data-ds-dark-theme] .hljs-quote,
+.md-code-block-dark .hljs-comment,
+.md-code-block-dark .hljs-quote { color: #8da1b9; }
+body[data-ds-dark-theme] .hljs-punctuation,
+.md-code-block-dark .hljs-punctuation { color: #e3eaf2; }
+body[data-ds-dark-theme] .hljs-keyword,
+body[data-ds-dark-theme] .hljs-selector-tag,
+body[data-ds-dark-theme] .hljs-operator,
+.md-code-block-dark .hljs-keyword,
+.md-code-block-dark .hljs-selector-tag,
+.md-code-block-dark .hljs-operator { color: #e9ae7e; }
+body[data-ds-dark-theme] .hljs-string,
+body[data-ds-dark-theme] .hljs-addition,
+.md-code-block-dark .hljs-string,
+.md-code-block-dark .hljs-addition { color: #91d076; }
+body[data-ds-dark-theme] .hljs-number,
+body[data-ds-dark-theme] .hljs-literal,
+body[data-ds-dark-theme] .hljs-attr,
+body[data-ds-dark-theme] .hljs-attribute,
+body[data-ds-dark-theme] .hljs-type,
+.md-code-block-dark .hljs-number,
+.md-code-block-dark .hljs-literal,
+.md-code-block-dark .hljs-attr { color: #e6d37a; }
+body[data-ds-dark-theme] .hljs-title.class_,
+body[data-ds-dark-theme] .hljs-variable,
+body[data-ds-dark-theme] .hljs-property,
+.md-code-block-dark .hljs-title.class_,
+.md-code-block-dark .hljs-variable { color: #6cb8e6; }
+body[data-ds-dark-theme] .hljs-built_in,
+body[data-ds-dark-theme] .hljs-regexp,
+.md-code-block-dark .hljs-built_in,
+.md-code-block-dark .hljs-regexp { color: #f4adf4; }
+body[data-ds-dark-theme] .hljs-title,
+body[data-ds-dark-theme] .hljs-title.function_,
+body[data-ds-dark-theme] .hljs-function,
+.md-code-block-dark .hljs-title,
+.md-code-block-dark .hljs-function { color: #c699e3; }
+body[data-ds-dark-theme] .hljs-deletion,
+.md-code-block-dark .hljs-deletion { color: #cd6660; }
+body[data-ds-dark-theme] .hljs-tag,
+.md-code-block-dark .hljs-tag { color: #6cc; }
+.code-card.md-code-block-light pre ::selection { color: inherit; background: #e5e5e6; }
+body[data-ds-dark-theme] .code-card pre ::selection,
+.code-card.md-code-block-dark pre ::selection { background: #3c526d; }
 
 .settings-modal { align-items: center; padding: 24px; background: rgba(0, 0, 0, 0.36); }
-body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, 0.62); }
+/* SP-MOD-002. Dark overlay is the token 0.6, not a hardcoded 0.62. */
+body[data-ds-dark-theme] .settings-modal { background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
 .settings-shell {
   width: min(760px, calc(100vw - 48px));
   height: 500px;
   max-height: min(500px, calc(100vh - 48px));
-  display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-content: stretch;
   background: #fff;
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0) 0 0 0 1px inset, rgba(0, 0, 0, 0.2) 0 0 1px 0, rgba(0, 0, 0, 0.02) 0 0 4px 0, rgba(0, 0, 0, 0.08) 0 12px 32px 0;
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-border-inverted), 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 4px 0 rgba(0, 0, 0, 0.02), 0 12px 32px 0 rgba(0, 0, 0, 0.08);
 }
 body[data-ds-dark-theme] .settings-shell { background: var(--dsw-static-neutral-bluish-850); color: var(--dsw-alias-label-primary); }
-.settings-head { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
-.settings-head h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 24px; }
+.settings-head { flex: 1 0 100%; display: flex; align-items: center; justify-content: space-between; padding: 19px 14px 0 24px; min-height: 54px; }
+/* SP-MOD-440/442/443. Official .f2ff50b5 is the title: flex 1, min-height 0, display flex. */
+/* SP-MOD-290 wins over SP-MOD-440. The title selector is more specific, so the computed min-height is 28px. */
+.settings-head h2 { margin: 8px 0 10px; font-size: 16px; font-weight: 600; line-height: 24px; display: flex; flex: 1; min-height: 28px; align-items: center; }
 .settings-x { width: 28px; height: 28px; margin-top: -6.13px; border: 0; border-radius: 4096px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
 .settings-x svg { width: 14px; height: 14px; }
-.settings-nav { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 10px 0 0; }
-.settings-nav button { display: flex; align-items: center; gap: 8px; width: 164px; height: 40px; margin-left: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
+.settings-nav { flex: 0 0 196px; display: flex; flex-direction: column; gap: 4px; width: 172px; margin-left: 12px; padding: 4px 0 0; }
+/* SP-MOD-185/187. min-height 40px and justify-content flex-start. The max-width 767 rule still sets center. */
+.settings-nav button { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 164px; height: 40px; min-height: 40px; margin-left: 4px; margin-right: 4px; padding: 9px 10px 9px 8px; border: 0; border-radius: 12px; background: transparent; color: inherit; font-size: 14px; font-weight: 400; line-height: 22px; text-align: left; transition: background-color 0.2s var(--ds-ease-out); }
 .settings-nav button svg { width: 16px; height: 16px; flex: none; }
-.settings-nav button.on { background: rgba(38, 49, 72, 0.06); }
-body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-static-neutral-bluish-800); }
-.settings-main { grid-column: 2; grid-row: 2; overflow: auto; padding: 10px 24px 0; min-width: 0; }
+.settings-nav button.on,
+body[data-ds-dark-theme] .settings-nav button.on { background: var(--dsw-alias-interactive-bg-hover); }
+/* SP-MOD-197. The wash is the hover, not the resting tab. .on keeps its selected fill. */
+.settings-nav button:hover:not(.on) { background: var(--dsw-alias-interactive-bg-hover); }
+.settings-main { flex: 1 1 0%; overflow: auto; padding: 10px 24px 0; margin-top: 6px; margin-left: -12px; margin-right: 12px; min-width: 0; min-height: 0; height: calc(100% - 54px); }
 .settings-main h3 { margin: 0 0 8px; font-size: 14px; font-weight: 400; line-height: 22px; }
 .settings-main button:not(.chip):not(.ds-button) {
   height: 36px;
@@ -1881,7 +3202,7 @@ body[data-ds-dark-theme] .settings-main button:not(.chip):not(.ds-button) { back
   border: 0;
 }
 .settings-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: auto; min-height: 60px; padding: 12px 0; border: 0; font-size: 14px; font-weight: 400; line-height: 22px; box-shadow: none; }
-.settings-line > span:first-child { flex-shrink: 0; white-space: nowrap; }
+.settings-line > span:first-child { flex: 1; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
 @media (max-width: 767px) {
   .settings-line > span:first-child { flex: 1 1 auto; min-width: 0; white-space: normal; }
   .settings-line.balance-line > span:first-child { flex: 0 0 auto; white-space: nowrap; }
@@ -2007,12 +3328,53 @@ body[data-ds-dark-theme] .settings-main .settings-line .account-danger {
 .settings-main .settings-line.account-nickname input.account-value.short:not([type='hidden']):not([type='file']) { flex: 0 0 36px; width: 36px; min-width: 36px; }
 .settings-main .settings-line .account-action { color: var(--dsw-alias-brand-text); }
 .settings-main .settings-line .account-danger { color: rgb(236, 19, 19); }
-.settings-line .pill-menu button, .settings-line .pill-menu > div { position: relative; display: inline-flex; align-items: center; min-width: 90px; height: 36px; padding: 0 26px 0 14px; border-radius: 18px; background: rgb(241, 243, 245); cursor: pointer; }
-.settings-line .pill-menu > div svg { position: absolute; right: 8px; top: 11px; width: 14px; height: 14px; color: rgb(97, 102, 107); }
+/* Language and safety. Settings skin e311289c keeps radius 18px, height 36px, min-width 90px.
+   The single trigger uses the inner select padding so the 14px arrow stays clear of the label. */
+.settings-line .pill-menu button,
+.settings-line .pill-menu > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto;
+  min-width: 90px;
+  height: 36px;
+  padding: 0 28px 0 10px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--dsw-specific-selector);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out), color var(--ds-transition-duration) var(--ds-ease-in-out), box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
+}
 body[data-ds-dark-theme] .settings-line .pill-menu > div,
-body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67, 69, 74); }
-.settings-line .pill-gap { width: 10px; flex: none; }
-.settings-line .pill-menu button svg { position: absolute; right: 14px; top: 11px; width: 14px; height: 14px; margin: 0; }
+body[data-ds-dark-theme] .settings-line .pill-menu > button { background: var(--dsw-specific-selector); }
+.settings-line .pill-menu > div:hover,
+.settings-line .pill-menu button:hover,
+body[data-ds-dark-theme] .settings-line .pill-menu > div:hover,
+body[data-ds-dark-theme] .settings-line .pill-menu > button:hover {
+  background: var(--dsw-alias-interactive-bg-hover-accent);
+}
+.settings-line .pill-menu > div[aria-expanded='true'],
+.settings-line .pill-menu button[aria-expanded='true'] { color: var(--dsw-alias-label-tertiary); }
+.settings-line .pill-menu > div svg,
+.settings-line .pill-menu button svg {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.settings-line .pill-gap { width: 0; flex: none; }
 .settings-line + .settings-line,
 .settings-data + .settings-data > .settings-line:first-child { box-shadow: var(--dsw-alias-border-l2-darkmode-thin) 0 1px 0 0 inset; }
 .settings-line strong { font-weight: 560; }
@@ -2020,47 +3382,57 @@ body[data-ds-dark-theme] .settings-line .pill-menu > button { background: rgb(67
 .settings-line.stack { height: auto; min-height: 86px; align-items: center; }
 .settings-copy { width: auto; max-width: 100%; flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .settings-copy.wide { width: auto; max-width: 100%; }
-.settings-copy > span { display: block; width: 100%; height: auto; min-height: 22px; font-size: 14px; font-weight: 400; line-height: 22px; }
-.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; font-size: 12px; font-weight: 400; line-height: 18px; color: rgb(129, 133, 140); }
+.settings-copy > span { display: block; width: 100%; height: auto; min-height: 22px; font-size: 14px; font-weight: 400; line-height: 22px; color: var(--dsw-alias-label-secondary); }
+/* SP-SET-454. Row descriptions are 12px/18px tertiary in both themes. spec-align-settings-2 pins that color. */
+.settings-copy .hint { margin: 4px 0 0; max-width: none; width: 100%; height: auto; min-height: 22px; padding: 2px; box-sizing: border-box; font-size: 12px; font-weight: 400; line-height: 18px; color: var(--dsw-alias-label-secondary); transition: color var(--ds-transition-duration) var(--ds-ease-in-out); }
 .settings-main .settings-line a.account-quiet { display: inline-flex; align-items: center; justify-content: center; width: 72px; text-decoration: none; }
 .settings-main .settings-line a.account-quiet span { display: block; height: 22px; line-height: 22px; font-size: 14px; font-weight: 400; }
-.settings-main button.switch,
+.settings-main button.switch:not(.ds-button),
 .switch {
   width: 40px;
   height: 24px;
   padding: 1px 6px;
   border: 0;
   border-radius: 4096px;
-  background: #43454a;
+  background: var(--dsw-alias-label-caption);
   position: relative;
   flex: none;
   font-size: 13.3333px;
   line-height: normal;
   color: rgb(0, 0, 0);
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
+.switch:focus { outline: none; }
 .switch::after {
   content: '';
   position: absolute;
   top: -2px;
+  right: -2px;
+  bottom: -2px;
   left: -2px;
-  width: 44px;
-  height: 28px;
   border-radius: 4096px;
   background: transparent;
+  transition: box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
 }
+.switch:focus-visible::after { box-shadow: 0 0 0 2px var(--dsw-alias-brand-primary); }
 .switch .knob {
   position: absolute;
-  top: 3px;
+  top: 50%;
   left: 3px;
   width: 18px;
   height: 18px;
   border-radius: 4096px;
   background: #fff;
+  transform: translateY(-50%);
+  transition: left var(--ds-transition-duration) var(--ds-ease-in-out);
 }
-.settings-main button.switch.on,
+.settings-main button.switch.on:not(.ds-button),
 .switch.on { background: #3964fe; }
-body[data-ds-dark-theme] .settings-main button.switch { background: #43454a; }
-body[data-ds-dark-theme] .settings-main button.switch.on { background: rgb(57, 100, 254); }
+body[data-ds-dark-theme] .settings-main button.switch:not(.on) { background: var(--dsw-alias-label-caption); }
+/* SP-SET-390 / SP-SET-418 / SP-SET-444. Dark checked switch is #5686fe, not the light brand. */
+body[data-ds-dark-theme] .settings-main button.switch.on { background: #5686fe; }
 .switch.on .knob { left: 19px; }
 .settings-main button.danger.outline,
 .settings-line button.danger {
@@ -2070,6 +3442,15 @@ body[data-ds-dark-theme] .settings-main button.switch.on { background: rgb(57, 1
 }
 .pill-menu { position: relative; }
 .pill-menu > button, .pill-menu > div { height: 32px; border: 0; border-radius: 999px; background: var(--dsw-static-neutral-bluish-75); color: inherit; padding: 0 12px 0 14px; }
+/* Language trigger is the settings select. Used radius stays 18px (SP-SET-659). */
+[data-testid='language-trigger'] {
+  --dsl-select-height: var(--ds-control-height-m);
+  --dsl-select-border-radius: 10px;
+  --dsl-select-padding: 0 28px 0 10px;
+  --dsl-select-font-size: var(--ds-font-size-m);
+  --dsl-select-line-height: var(--ds-line-height-m);
+  --dsl-select-text-color: var(--dsw-alias-label-primary);
+}
 body[data-ds-dark-theme] .pill-menu > button, body[data-ds-dark-theme] .pill-menu > div { background: var(--dsw-static-neutral-bluish-800); }
 .pill-menu > button::after {
   content: '';
@@ -2082,32 +3463,46 @@ body[data-ds-dark-theme] .pill-menu > button, body[data-ds-dark-theme] .pill-men
 }
 .anchored-menu {
   position: fixed;
-  z-index: 30;
-  min-width: 196px;
-  padding: 6px;
+  /* Portaled to document.body, so it has to sit above the dialog stack at 1024. Phone media raises it again to 1200. */
+  z-index: 1100;
+  box-sizing: border-box;
+  min-width: 124px;
+  max-width: 280px;
+  max-height: calc(28px * 8.5);
+  padding: 4px;
+  overflow: auto;
   border-radius: 12px;
-  background: #fff;
-  color: #1b1b1c;
+  background: var(--dsw-specific-menu);
+  color: var(--dsw-alias-label-primary);
   box-shadow: var(--dsw-shadow-lv3);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--dsw-alias-border-inverted);
 }
-body[data-ds-dark-theme] .anchored-menu { background: rgb(53, 54, 56); color: #f5f6f7; border: 0; }
 .anchored-menu button {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  box-sizing: border-box;
   width: 100%;
-  height: 36px;
-  padding: 0 10px;
+  min-height: 24px;
+  padding: 8px 10px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: transparent;
-  color: inherit;
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+  line-height: 24px;
   text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out), color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
-.anchored-menu button:hover { background: rgba(127, 127, 127, 0.12); }
-.anchored-menu hr { border: 0; border-top: 1px solid rgba(127, 127, 127, 0.25); margin: 4px 6px; }
+.anchored-menu button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anchored-menu button:hover,
+.anchored-menu button[aria-selected='true']:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.anchored-menu button[aria-selected='true'] { color: var(--dsw-alias-label-primary); background: transparent; }
+.anchored-menu hr { border: 0; height: 0; border-top: 1px solid var(--dsw-alias-border-l2); margin: 4px 0; }
 .lang-menu { width: 200px; min-width: 200px; max-height: none; }
 .lang { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--dsw-static-neutral-bluish-75); }
 body[data-ds-dark-theme] .lang { background: var(--dsw-static-neutral-bluish-800); }
@@ -2218,22 +3613,33 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
 body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.account-value.short:not([type='hidden']):not([type='file'])::placeholder {
   color: rgb(185, 188, 194);
 }
-.theme-cards { display: grid; grid-template-columns: repeat(3, 164px); gap: 12px; margin: 0 0 10px; justify-content: start; }
+/* SP-SET-770..773. Theme choices wrap in a row with a 12px gap. */
+.theme-cards { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; justify-content: stretch; }
 .settings-shell .theme-cards button.chip {
   position: relative;
-  width: 164px;
+  flex: 1;
+  min-width: 128px;
+  width: auto;
   height: 82px;
   border-radius: 12px;
   flex-direction: column;
-  justify-content: center;
-  gap: 2px;
+  align-items: center;
+  /* SP-SET-787. Official theme selector ._6c1fed6 is space-between. */
+  justify-content: space-between;
+  /* SP-SET-800 / SP-SET-802 / SP-SET-803. Icon is 16px, gap above the label is 0, border uses the outlined token. */
+  --dsl-button-border-color: var(--dsw-alias-border-l2);
+  --dsl-button-icon-size: 16px;
+  --dsl-button-icon-gap: 0;
+  gap: 0;
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
   color: rgb(15, 17, 21);
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
   padding: 21px 32px;
+  text-align: center;
+  user-select: none;
 }
 .settings-shell .theme-cards button.chip .theme-face {
   position: absolute;
@@ -2249,21 +3655,29 @@ body[data-ds-dark-theme] .settings-main .settings-line.account-nickname input.ac
   position: relative;
   z-index: 1;
 }
+.settings-shell .theme-cards button.chip > svg { width: 16px; height: 16px; }
 .settings-shell .theme-cards button.chip.on {
   background: rgb(241, 243, 245);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
   color: rgb(15, 17, 21);
   font-weight: 400;
 }
+/* SP-SET-779. Dark theme-card ink is the primary label color. */
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip,
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f5f6f7;
+  /* SP-SET-801. Dark outlined border is rgba(255,255,255,.12). */
+  border: 1px solid var(--dsl-button-border-color);
+  color: var(--dsw-alias-label-primary);
 }
 body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   background: rgb(67, 69, 74);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dsl-button-border-color);
+}
+/* SP-SET-794/795. Hover fills an unselected theme card with the selector color. */
+.settings-shell .theme-cards button.chip:hover:not(.on),
+body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on) {
+  background: var(--dsw-specific-selector);
 }
 .timeline-step { margin: 0; padding: 5px 0 5px 22px; position: relative; }
 .thinking-body .timeline-step + .timeline-step { margin-top: 4px; }
@@ -2287,6 +3701,18 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   border-radius: 50%;
   background: var(--dsw-alias-label-tertiary);
 }
+/* SP-TH-004/005. Brand only while this think step is the live phase. Answer streaming stays tertiary (fb1721 answer-streaming-and-done-all-grey). */
+/* SP-TH-009. The live dot scales 1 → 1.3. Settled dots stay still. */
+.timeline-step.timeline-think.is-live .timeline-dot::before {
+  background: var(--dsw-alias-brand-primary);
+  animation: 1.5s linear infinite timeline-dot-pulse;
+}
+@keyframes timeline-dot-pulse {
+  0% { animation-timing-function: ease-out; transform: scale(1); }
+  40% { animation-timing-function: linear; transform: scale(1.3); }
+  60% { animation-timing-function: ease-out; transform: scale(1.3); }
+  to { transform: scale(1); }
+}
 .timeline-line {
   position: absolute;
   top: 31px;
@@ -2303,7 +3729,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   box-sizing: border-box;
   color: var(--dsw-alias-label-secondary);
   font: var(--dsw-font-markdown-small);
+  transform: translateZ(0);
+  /* SP-TH-180. The search query stays on one line. */
+  white-space: nowrap;
 }
+.timeline-search:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .timeline-search.is-last .timeline-line { display: none; }
 .timeline-search > svg,
 .timeline-browse > svg:first-of-type {
@@ -2312,6 +3742,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   flex: none;
   display: block;
 }
+/* SP-CV-218. Search-step glyph sits 6px off the label. SP-CV-219's 1px padding belongs to the official
+   div.ds-icon wrapper around the glyph; padding the svg itself grew the 14px glyph box to 16px. */
+.timeline-search > svg { margin-right: 6px; }
 .timeline-browse { padding: 5px 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-small); }
 .timeline-browse.is-last { padding-bottom: 0; }
 .timeline-browse > svg:first-of-type { margin-top: 4px; margin-right: 6px; }
@@ -2325,9 +3758,20 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   overflow: hidden;
 }
 .browse-count { margin-right: 6px; }
+.browse-view-all {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-right: 6px;
+  font: var(--dsw-font-xs-13);
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+}
 .browse-item { white-space: nowrap; display: inline-flex; align-items: center; max-width: 100%; margin-right: 6px; }
 .browse-link {
   display: inline-block;
+  /* SP-CV-236. The link color eases, including the dotted underline. */
+  transition: color 0.2s;
   font: var(--dsw-font-xs-13);
   color: var(--dsw-alias-label-secondary);
   text-decoration-line: underline;
@@ -2363,10 +3807,13 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   font-size: 11px;
   font-weight: 400;
   line-height: 16px;
-  color: rgb(129, 133, 140);
+  /* SP-CMP disclaimer. Light stays #81858c. Dark follows tertiary #adb2b8. */
+  color: var(--dsw-alias-label-tertiary);
   background: var(--dsw-alias-bg-base);
   text-align: center;
+  user-select: none;
 }
+.ai-note:hover { color: var(--dsw-alias-label-secondary); }
 .answer-note {
   margin: 16px 0 0;
   color: var(--dsw-alias-label-tertiary);
@@ -2393,16 +3840,26 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   font-size: 14px;
   box-shadow: var(--dsw-shadow-lv3);
 }
-.confirm-modal { z-index: 40; }
+.confirm-modal { z-index: 1024; }
+/* SP-MOD-010, 466, 468. Confirm card uses the modal surface, radius, and line height. */
 .confirm-card {
-  width: min(400px, calc(100vw - 32px));
+  /* SP-MOD-006 base token is 525px. SP-MOD-007 dialog width is 380px. */
+  --dsl-modal-content-width: 380px;
+  width: min(var(--dsl-modal-content-width), calc(100vw - 32px));
   background: var(--dsw-alias-bg-layer-2);
   color: var(--dsw-alias-label-primary);
   border-radius: 24px;
   padding: 22px 22px 16px;
-  box-shadow: var(--dsw-shadow-lv3);
+  line-height: 22px;
+  /* SP-MOD-469. Official .ds-modal-content is a column. The title stays content-sized. */
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-border-inverted), var(--dsw-shadow-lv3);
 }
-.confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 560; }
+/* SP-MOD-471, 472. Title is 16px/24px with a 28px minimum. Weight stays 500. */
+.confirm-card h2 { margin: 0 0 16px; font-size: 16px; font-weight: 500; line-height: 24px; min-height: 28px; }
+.confirm-card .edit-actions { margin-top: 20px; }
+.confirm-card .confirm-body { margin: -8px 0 16px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 22px; }
 .confirm-card .danger.outline {
   background: transparent;
   color: #f25a5a;
@@ -2441,22 +3898,31 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     width: var(--sider-width, 261px);
     max-width: var(--sider-width, 261px);
     flex-basis: var(--sider-width, 261px);
+    flex-shrink: 0;
     height: 100dvh;
     min-height: 100dvh;
-    z-index: 1002;
+    z-index: 15;
     transform: translateX(calc(-1 * var(--sider-width, 261px)));
     pointer-events: none;
-    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s linear var(--ds-transition-duration-slow);
+    will-change: transform, max-width;
+    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s linear var(--ds-transition-duration-slow);
     padding-top: calc(12px + env(safe-area-inset-top));
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
   .shell.nav-open .sidebar {
     visibility: visible;
+    opacity: 1;
+    z-index: 1002;
     transform: translateX(0);
     pointer-events: auto;
-    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
+    width: var(--sider-width, 261px);
+    max-width: var(--sider-width, 261px);
+    flex-basis: var(--sider-width, 261px);
+    padding-left: 12px;
+    padding-right: 12px;
+    transition: transform var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), visibility 0s;
   }
-  .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; z-index: 1001; }
+  .shell.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); border: 0; opacity: 1; z-index: 1001; transition: opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out); }
   .menu-mobile, .top-new {
     display: grid;
     width: 44px;
@@ -2492,14 +3958,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     text-decoration: none;
   }
   .download-app svg { width: 14px; height: 14px; margin-left: 1px; }
-  .new-chat {
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(15, 17, 21, 0.04);
-  }
-  body[data-ds-dark-theme] .new-chat { background: var(--dsw-static-neutral-bluish-800); }
-  .chat-link { min-height: 44px; }
-  .chat-row > button { font-size: 16px; }
-  .user-bar { margin-top: auto; }
+  .sider-bottom { margin-top: auto; }
   .float-pill, .collapsed-mark { display: none; }
   .server-pill, .topbar .ghost { display: none; }
   .stage:has(.home) .topbar { position: absolute; left: 0; right: 0; top: 0; z-index: 2; }
@@ -2540,7 +3999,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     padding: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(72, 104, 178, 0.01), 0 30px 60px rgba(72, 104, 178, 0.03);
   }
-  .composer textarea { height: 42px; min-height: 42px; margin-top: 4px; padding: 12px 12px 0 16px; }
+  body[data-ds-dark-theme] .composer { box-shadow: none; border-color: rgba(255, 255, 255, 0.06); }
+  .composer-mirror { min-height: 42px; padding: 12px 12px 0 16px; }
+  .composer textarea { height: 100%; min-height: 42px; margin: 0; padding: 12px 12px 0 16px; }
   .greeting .mark { width: 30px; height: 22px; margin-top: -1px; }
   .send, .tool-right .icon-btn { width: 34px; height: 34px; }
   .tool-right .icon-btn svg, .send svg { width: 16px; height: 16px; }
@@ -2575,16 +4036,29 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     margin: 2px auto 10px;
   }
   .settings-shell {
-    width: min(760px, calc(100vw - 32px));
-    height: min(500px, calc(100dvh - 48px));
-    max-height: min(500px, calc(100dvh - 48px));
-    border-radius: 24px;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100vw;
+    height: calc(100vh - 64px);
+    max-height: 800px;
+    margin: 0;
+    border-radius: 24px 24px 0 0;
+    align-self: flex-end;
+    justify-self: stretch;
+    flex-direction: column;
+    flex-wrap: nowrap;
   }
-  .settings-nav { grid-column: 1; grid-row: 2; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 0 8px; }
-  .settings-nav button { flex: none; width: auto; margin-left: 0; }
-  .settings-main { grid-column: 1; grid-row: 3; position: relative; z-index: 1; }
+  .settings-nav { flex: none; flex-direction: row; overflow-x: auto; position: relative; z-index: 2; width: auto; margin-left: 0; padding: 4px 0; }
+  .settings-nav button { flex: 1 1 auto; width: auto; margin-left: 0; white-space: nowrap; justify-content: center; min-width: 108px; }
+  .settings-nav button:last-child { margin-right: 4px; }
+  /* The desktop head uses flex-basis 100% to wrap a row. In this column that basis is height and flex-shrink 0, so the head ate the sheet and the main collapsed to its padding. */
+  .settings-head { flex: 0 0 auto; }
+  /* SP-MOD-444. Below 768 the title is flex-direction column. */
+  .settings-head h2 { flex-direction: column; }
+  .settings-main { flex: 1 1 0%; min-height: 0; height: auto; overflow: auto; position: relative; z-index: 1; margin: 6px -4px; }
   .footnote { margin: 28px 0 calc(8px + env(safe-area-inset-bottom)); font-size: 11px; }
   .turn.user { flex-direction: column; align-items: flex-end; }
   .turn.assistant { display: flex; flex-direction: column; }
@@ -2595,13 +4069,11 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .action-row { order: 3; }
   .action-row button, .user-actions button { width: 28px; height: 28px; }
   .action-row svg, .user-actions svg { width: 16px; height: 16px; }
-  .code-head button { width: auto; min-height: 28px; height: 28px; font-size: 13px; padding: 0 10px; }
-  .user-actions { display: flex; justify-content: flex-end; gap: 10px; opacity: 1; }
+  .code-head button { width: auto; min-height: 0; height: auto; font-size: 13px; padding: 0; }
+  /* SP-CV-306. Earlier user actions stay opacity 0 until hover or focus. The base rule does that; do not force 1 here. */
+  .user-actions { display: flex; justify-content: flex-end; gap: 10px; }
   .user-actions button { border: 0; background: transparent; color: rgb(129, 133, 140); display: grid; place-items: center; }
   .thinking > button {
-    position: sticky;
-    top: 0;
-    z-index: 2;
     height: 34px;
     box-sizing: border-box;
     background: var(--dsw-alias-bg-base);
@@ -2636,7 +4108,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     z-index: 3;
   }
   .jump-end svg { width: 14px; height: 14px; }
-  .stage:not(:has(.home)) .topbar { height: 60px; padding: 0 10px; }
+  .stage:not(:has(.home)) .topbar { height: 60px; padding: calc(2px + env(safe-area-inset-top)) 16px 0; }
   .stage:not(:has(.home)) .topbar > .chat-title {
     left: 66px;
     top: 22px;
@@ -2661,21 +4133,28 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     color: rgb(15, 17, 21);
   }
   .stage:not(:has(.home)) .topbar .top-actions > button.icon-btn svg { width: 20px; height: 20px; }
-  .stage:not(:has(.home)) .chat-column { width: calc(100% - 40px); margin-top: 0; }
+  /* SP-CV-355. margin 0 20px. stretch keeps the column from shrink-wrapping. */
+  .stage:not(:has(.home)) .chat-column { align-self: stretch; width: auto; margin: 0 20px; }
   .stage:not(:has(.home)) .composer-wrap {
-    z-index: 8;
-    width: calc(100% - 32px);
+    z-index: 10;
+    width: auto;
+    margin-left: 16px;
+    margin-right: 16px;
     padding-top: 8px;
     background: var(--dsw-alias-bg-base);
   }
   .stage:not(:has(.home)) .composer-wrap .footnote { margin: 0; }
+  @media (max-width: 439px) {
+    .stage:not(:has(.home)) .composer-wrap { padding: 0; }
+    .composer-back { display: none; }
+  }
   .stage:not(:has(.home)) .composer {
     width: 100%;
     box-shadow: rgba(0, 0, 0, 0.02) 0 4px 10px 0, rgba(0, 0, 0, 0.04) 0 2px 4px 0;
   }
   .prose { overflow-x: auto; }
   .diagram-card { max-width: 100%; }
-  .diagram-tools button span {
+  .diagram-tools > button span {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -2687,37 +4166,54 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     border: 0;
   }
   .diagram-tools button:not(.diagram-icon) { width: 28px; padding: 0; justify-content: center; }
-  .diagram-modal { padding: 40px 12px 16px; }
-  .prose table { display: block; overflow-x: auto; }
-  .search-panel { display: none; }
-  .sheet-scrim { display: block; position: fixed; inset: 0; border: 0; background: rgba(15, 17, 21, 0.45); z-index: 8; }
+  .diagram-modal { padding: 0; }
+  /* Master a8df8b9 phone .diagram-modal padding 40px 12px 16px. Svg cap is that inset minus the 28px 24px card padding. */
+  .diagram-modal-slide { padding: 40px 12px 16px; }
+  .diagram-modal-card .mermaid svg {
+    max-width: calc(100vw - 72px) !important;
+    max-height: calc(100dvh - 112px) !important;
+  }
+  .markdown-table-wrapper { max-width: 100%; }
+  /* SP-SEARCH-121. Closed phone sheet sits 36px below its open position. */
+  .search-panel { display: none; transform: translateY(36px); }
+  .sheet-scrim { display: block; }
   .shell.panel-open .search-panel {
+    /* SP-SEARCH-193 / SP-SEARCH-248 */
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
+    top: 20px;
     bottom: 0;
-    top: auto;
-    width: auto;
-    height: 94dvh;
-    max-height: 94dvh;
+    width: 100vw;
+    max-width: unset;
+    height: auto;
+    max-height: none;
+    flex: none;
+    margin: 0;
+    border: none;
     border-radius: 24px 24px 0 0;
-    z-index: 9;
-    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    padding: 0;
     background: var(--dsw-alias-bg-base);
-    box-shadow: var(--dsw-shadow-lv3);
+    box-shadow: none;
+    --sidebar-width: 100vw;
+    /* SP-SEARCH-122 / SP-SEARCH-123 / SP-SEARCH-124. Open phone sheet. Desktop panels stay transform none. */
+    transform: translateY(0);
+    transition-property: transform;
   }
-  .search-panel ol { overflow: auto; }
+  .search-panel ol { overflow: auto; max-width: unset !important; }
   .search-panel p {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .modal { align-items: end; padding: 0; background: rgba(15, 17, 21, 0.45); }
-  .modal.settings-modal { align-items: center; padding: 16px; background: rgba(0, 0, 0, 0.36); }
-  body[data-ds-dark-theme] .modal.settings-modal { background: rgba(0, 0, 0, 0.62); }
+  .modal { align-items: end; padding: 0; background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
+  /* The shell is one auto row. Pack that row to the end so the sheet sits on the bottom edge. */
+  .modal.settings-modal { display: grid; align-items: flex-end; align-content: flex-end; justify-items: stretch; padding: 0; background: rgba(0, 0, 0, 0.36); }
+  body[data-ds-dark-theme] .modal.settings-modal { background: rgba(0, 0, 0, var(--dsl-modal-overlay-opacity)); }
   .modal-card {
     width: 100%;
     height: 93dvh;
@@ -2738,36 +4234,45 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .settings-close-word { display: none; }
   .settings-x { width: 32px; height: 32px; display: grid; place-items: center; padding: 0; }
   .settings-x svg { display: block; }
-  .settings-shell .theme-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  /* SP-SET-789/790. The sheet is full width, so the official card size applies here too. */
+  .settings-shell .theme-cards { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
   .settings-shell .theme-cards button.chip {
-    width: 100%;
-    min-width: 0;
-    height: 84px;
-    padding: 12px 4px;
-    border-radius: 14px;
+    width: auto;
+    flex: 1 1 0;
+    min-width: 128px;
+    height: 82px;
+    padding: 21px 32px;
+    /* SP-SET-798. Radius stays 12px on the phone sheet too. */
+    border-radius: 12px;
   }
   .settings-shell .theme-cards button.chip.on {
     background: var(--dsw-specific-selector);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--dsl-button-border-color);
     color: var(--dsw-alias-label-primary);
   }
   body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
     background: rgb(67, 69, 74);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #f5f6f7;
+    border: 1px solid var(--dsl-button-border-color);
+    color: var(--dsw-alias-label-primary);
   }
 }
 
 @media (max-width: 440px) {
-  .greeting { font-size: 20px; font-weight: 600; line-height: 28px; }
-  .greeting .mark { width: 30px; height: 22px; transform: none; }
   .offline-banner { width: calc(100vw - 32px); text-align: center; box-sizing: border-box; }
-  .bubble { max-width: calc(100% - 68px); }
   body:not([data-ds-dark-theme]) .composer .chip:not(.on) {
     background: #fff;
     border: 1px solid var(--dsw-alias-border-l2);
     color: var(--dsw-alias-label-primary);
   }
+}
+@media (max-width: 439px) {
+  /* SP-TB-295..298. Official media is not-all and (min-width: 440px). */
+  .greeting { font-size: 20px; font-weight: 500; line-height: 28px; }
+  .greeting .mark { width: 34px; height: 25px; transform: scale(0.88); transform-origin: center; }
+  /* SP-CV-345. Same media: bubble max-width calc(100% - 68px). */
+  .bubble { max-width: calc(100% - 68px); }
+  /* SP-GL-185. Textarea floor is line-height 24px * 1.25 + the 12px input padding. */
+  .composer textarea { min-height: calc(24px * 1.25 + 12px); }
 }
 @media (hover: none) {
   .chip:hover:not(.on), .icon-btn:hover, .chat-link:hover, .menu button:hover { background: transparent; }
@@ -2776,7 +4281,12 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 @keyframes harbor-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes harbor-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 .modal { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in); backdrop-filter: blur(2px); }
-.settings-shell, .modal-card, .menu, .search-panel { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in); }
+.settings-shell, .modal-card, .menu { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in); }
+@media (max-width: 439px) {
+  .search-panel .search-view-card__title { -webkit-line-clamp: 1; line-clamp: 1; }
+  .search-panel ol { padding: 0 6px; }
+  .search-panel .source-card { margin-bottom: 4px; }
+}
 .settings-modal.closing { animation: harbor-fade var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .settings-modal.closing .settings-shell { animation: harbor-pop var(--ds-transition-duration-fast) var(--ds-ease-in) reverse forwards; }
 .action-row button, .user-actions button { position: relative; }
@@ -2797,11 +4307,13 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  /* SP-MOD-064. The token lives on the tooltip. Light tooltips without --show-shadow stay shadow none. */
+  --dsl-tooltip-box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
   transition: opacity var(--ds-transition-duration-fast) var(--ds-ease-out);
   transition-delay: 0s;
   z-index: 5;
 }
-.ds-tooltip.ds-tooltip--s.is-above-composer { z-index: 9; }
+.ds-tooltip.ds-tooltip--s.is-above-composer { z-index: 11; }
 .ds-tooltip.ds-tooltip--s.is-open {
   opacity: 1;
   pointer-events: auto;
@@ -2809,8 +4321,10 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
 }
 body[data-ds-dark-theme] .ds-tooltip.ds-tooltip--s {
   --dsl-tooltip-text-color: var(--dsw-alias-label-primary);
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--dsl-tooltip-box-shadow);
 }
+/* SP-MOD-168. Only the named shadow class. Dark tooltips use the same token above. */
+.ds-tooltip.ds-tooltip--show-shadow { box-shadow: var(--dsl-tooltip-box-shadow); }
 .ds-tooltip > .ds-tooltip__arrow.ds-tooltip__arrow--sharp {
   position: absolute;
   left: 50%;
@@ -2889,7 +4403,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 }
 .send:disabled {
   color: #fff;
-  background: #3964fe;
+  background: var(--dsw-alias-button-primary-fill);
   opacity: 0.4;
 }
 .send:disabled,
@@ -2897,6 +4411,9 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   cursor: not-allowed;
 }
 .action-row .continue-gen {
+  /* SP-CV-435 / SP-CV-436. The icon-button grid rule loses to this control. */
+  display: flex;
+  align-items: center;
   width: auto;
   height: 32px;
   margin-left: auto;
@@ -2904,16 +4421,18 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   border-radius: 999px;
   border: 1px solid var(--dsw-alias-border-l2);
   background: var(--dsw-alias-button-elevated-fill);
-  color: var(--dsw-alias-label-primary);
+  /* SP-CV-440..442. */
+  color: var(--dsw-alias-label-secondary);
   font-size: 14px;
   line-height: 22px;
+  text-align: right;
   white-space: nowrap;
 }
 .action-row .continue-gen::after { content: none; }
 .action-row .continue-gen:hover,
 .action-row .continue-gen:focus-visible {
   background: var(--dsw-alias-button-elevated-fill);
-  color: var(--dsw-alias-label-primary);
+  color: var(--dsw-alias-label-secondary);
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -2933,6 +4452,11 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-border-color: transparent;
   --dsl-button-text-color: var(--dsw-alias-label-primary);
   --dsl-button-font-weight: 400;
+  --dsl-button-opacity-disabled: .45;
+  --dsl-button-ring-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-text-color-disabled: var(--dsl-button-text-color);
+  --dsl-button-text-color-hover: var(--dsl-button-text-color);
+  --dsl-button-text-color-loading: var(--dsl-button-text-color);
   --dsl-button-height: var(--ds-control-height-m);
   --dsl-button-font-size: 14px;
   --dsl-button-line-height: 22px;
@@ -2964,12 +4488,15 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   border: 0;
   flex-shrink: 0;
   vertical-align: middle;
+  transition: opacity var(--ds-transition-duration) var(--ds-ease-in-out), color var(--ds-transition-duration-slow) var(--ds-ease-in-out), text-decoration-color var(--ds-transition-duration-slow) var(--ds-ease-in-out);
 }
+.ds-button:hover:not(:disabled) { color: var(--dsl-button-text-color-hover); }
 .ds-button.ds-button--min-width { min-width: var(--dsl-button-min-width); }
 .ds-button.ds-button--xl {
   --dsl-button-height: var(--ds-control-height-xl);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 6px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
   --dsl-button-font-weight: 500;
 }
@@ -2977,6 +4504,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-height: var(--ds-control-height-l);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 6px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
 }
 .ds-button.ds-button--m {
@@ -2985,12 +4513,14 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-line-height: 22px;
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 4px;
+  --dsl-button-icon-size: 16px;
   --dsl-button-min-width: 72px;
 }
 .ds-button.ds-button--s {
   --dsl-button-height: var(--ds-control-height-s);
   --dsl-button-padding: 0 14px;
   --dsl-button-icon-gap: 4px;
+  --dsl-button-icon-size: 14px;
   --dsl-button-min-width: 58px;
 }
 .ds-button.ds-button--xs {
@@ -2999,6 +4529,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-line-height: 20px;
   --dsl-button-padding: 0 10px;
   --dsl-button-icon-gap: 3px;
+  --dsl-button-icon-size: 14px;
   --dsl-button-min-width: 58px;
 }
 .ds-button.ds-button--filled.ds-button--primary {
@@ -3017,8 +4548,48 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   --dsl-button-border-color: var(--dsw-alias-state-error-primary);
   --dsl-button-color: transparent;
   --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover-danger);
+  --dsl-button-ring-color: var(--dsw-alias-state-error-primary);
   --dsl-button-text-color: var(--dsw-alias-state-error-primary);
 }
+/* SP-MOD-771..774. Official ._0efab74 hover and active are #f25a5a. Resting fill stays the fixture color. */
+.ds-button.ds-button--outlined.ds-button--error:hover,
+.ds-button.ds-button--outlined.ds-button--error:active {
+  --dsl-button-border-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
+}
+/* SP-MOD-767..770. Delete-chat confirm is solid error. The settings Data 删除 stays outlined. */
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error {
+  --dsl-button-color: var(--dsw-static-red-600);
+  --dsl-button-border-color: var(--dsw-static-red-600);
+  --dsl-button-text-color: var(--dsw-static-neutral-bluish-00);
+  --dsl-button-font-weight: 500;
+}
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error:hover,
+.ds-button.ds-button--outlined.ds-button--error.ds-button--solid-error:active {
+  --dsl-button-color: var(--dsw-alias-state-error-secondary);
+  --dsl-button-color-hover: var(--dsw-alias-state-error-secondary);
+  --dsl-button-border-color: var(--dsw-alias-state-error-secondary);
+}
+/* SP-UI text and borderlessNeutral. Admin and local-mode ghost buttons are the text controls. */
+button.ghost {
+  --dsl-button-ring-color: var(--dsw-alias-button-primary-fill);
+  --dsl-button-padding: 0;
+  --dsl-button-height: auto;
+  --dsl-button-min-width: 0;
+  --dsl-button-text-color: var(--dsw-alias-label-secondary);
+  --dsl-button-text-color-hover: var(--dsw-alias-label-secondary);
+  --dsl-button-color: transparent;
+  --dsl-button-color-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsl-button-font-weight: 500;
+  padding: var(--dsl-button-padding);
+  min-width: var(--dsl-button-min-width);
+  height: var(--dsl-button-height);
+  background: var(--dsl-button-color);
+  color: var(--dsl-button-text-color);
+  font-weight: var(--dsl-button-font-weight);
+}
+button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl-button-text-color-hover); }
 .ds-button > .ds-button__background {
   box-sizing: border-box;
   border-radius: inherit;
@@ -3026,6 +4597,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   position: absolute;
   inset: 0;
   pointer-events: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button > .ds-button__background::after {
   content: "";
@@ -3033,9 +4605,10 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   pointer-events: none;
   position: absolute;
   inset: -2px;
+  transition: box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button:hover:not(:disabled) > .ds-button__background { background-color: var(--dsl-button-color-hover); }
-.ds-button:focus-visible > .ds-button__background::after { box-shadow: 0 0 0 2px var(--dsw-alias-button-primary-fill); }
+.ds-button:focus-visible > .ds-button__background::after { box-shadow: 0 0 0 2px var(--dsl-button-ring-color); }
 .ds-button.ds-button--outlined > .ds-button__border {
   box-sizing: border-box;
   border: 1px solid var(--dsl-button-border-color);
@@ -3043,6 +4616,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   pointer-events: none;
   position: absolute;
   inset: 0;
+  transition: border-color var(--ds-transition-duration) var(--ds-ease-in-out);
 }
 .ds-button > .ds-button__content {
   position: relative;
@@ -3050,7 +4624,7 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
   align-items: center;
   justify-content: center;
 }
-.ds-button:disabled { opacity: 0.45; cursor: not-allowed; }
+.ds-button:disabled { opacity: var(--dsl-button-opacity-disabled); color: var(--dsl-button-text-color-disabled); cursor: not-allowed; }
 .ds-file { position: relative; display: inline-flex; flex: none; }
 .ds-file-input {
   position: absolute;
@@ -3069,37 +4643,140 @@ body[data-ds-dark-theme] .landing .lang button.on { background: #fff; }
 .turn.share-on {
   position: relative;
   content-visibility: visible;
-  margin-bottom: 55px;
+  /* SP-CV-084. A selectable share row is a click target. Locked rows override this. */
+  cursor: pointer;
 }
-.turn.share-on > .share-box {
+/* Official screen rows add no margin under the question. Normal mode keeps the 16px
+   margin on .turn.user (SP-CV-279). The fitted 55px margin is not an official value. */
+.turn.user.share-on { margin-bottom: 0; }
+/* SP-SHARE-031 / SP-SHARE-101 / SP-CV-108 / SP-CV-109. Error, refused, and streaming turns are not selectable. */
+.turn.share-on.share-locked {
+  opacity: 0.4;
+  cursor: default;
+}
+/* SP-SHARE-033 / 102–106. .d30139ff is a direct child of the message row, sibling of
+   the select wrapper: absolute, top 0, bottom 40px, left -42px, right 0, display flex.
+   Desktop left -42px is outside the row border (the padding edge is the containing
+   block). No negative margin and no extra row padding on desktop. */
+.share-col { display: contents; }
+.turn.share-on > .share-col {
+  --dsl-virtual-list-transform-y: 0px;
+  --dsl-virtual-list-ios-compensation-y: 0px;
   position: absolute;
-  left: -41px;
+  display: flex;
+  align-items: flex-start;
+  top: 0;
+  bottom: 40px;
+  left: -42px;
+  right: 0;
   z-index: 2;
 }
-.turn.user.share-on > .share-box { top: -12px; }
-.turn.assistant.share-on > .share-box { top: 5px; }
+/* SP-SHARE-034. Panel under 800px: left is 0, so the box sits in the wrapper padding. */
+.shell.share-narrow .turn.share-on > .share-col { left: 0; }
+/* SP-SHARE-035 / 108–112. Sticky box. No virtual list, so the transform vars stay 0. */
+.share-sticky {
+  position: sticky;
+  top: calc(0px - var(--dsl-virtual-list-transform-y) + var(--dsl-virtual-list-ios-compensation-y));
+  display: flex;
+  align-items: flex-start;
+  box-sizing: content-box;
+  height: 18px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+/* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
+.shell.share-narrow .share-sticky { z-index: 1; }
+.turn.share-on .share-box { position: static; pointer-events: auto; }
+/* Official .fa1bcf13. Share mode keeps the action row's box and hides it. */
 .turn.share-on .action-row,
-.turn.share-on .user-actions { display: none; }
+.turn.share-on .user-actions { visibility: hidden; }
 .turn.share-on { isolation: isolate; }
-.turn.share-on > :not(.share-box):not(.share-halo) { position: relative; z-index: 1; }
+.turn.share-on > :not(.share-box):not(.share-halo):not(.share-col) { position: relative; z-index: 1; }
+/* SP-SHARE-149. Direct children pass the click through. The checkbox is the hit
+   target (pointer-events auto), matching the official sibling input, so one click toggles once. */
+.turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }
+/* Official hj / ._7729a77. The wash is this box, so the row's 34px padding-top and
+   16px padding-bottom stay outside it. Width 100% keeps the box on the row, not the bubble. */
+.turn.user > .message-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* SP-CV-088–097 / SP-SHARE-028 / SP-SHARE-029. Selected wash matches ._7729a77:before.
+   Radius is the official 12px (SP-CV-093). Fill is --dsw-alias-bg-multi-select.
+   z-index -1 stays under the body text inside the row's stacking context. */
 .share-halo {
   display: none;
   position: absolute;
-  border-radius: 18px;
-  background: var(--dsw-static-neutral-bluish-60);
+  --padding-vertical: 20px;
+  --padding-horizontal: 16px;
+  width: calc(100% + 2 * var(--padding-horizontal));
+  height: calc(100% + 2 * var(--padding-vertical));
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-multi-select);
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-.turn > .share-halo { top: -15px; right: -15px; bottom: -15px; left: -15px; }
-.turn.assistant > .share-halo { top: -28px; }
-.turn.share-picked > .share-halo { display: block; }
-body[data-ds-dark-theme] .share-halo { background: var(--dsw-static-neutral-bluish-850); }
+/* The assistant wash is a sibling of .prose (article > .prose stays direct). The row
+   also holds the 50px action row (padding 12px 0 10px, 28px button). The wash covers
+   the body and overhangs 20px, so its bottom is 50px − 20px above the row bottom. */
+.turn.assistant.share-on > .share-halo {
+  top: calc(-1 * var(--padding-vertical));
+  bottom: calc(50px - var(--padding-vertical));
+  height: auto;
+  transform: translateX(-50%);
+}
+/* SP-CV-102 / SP-SHARE-099. Narrow select wash uses the panel width and no radius. */
+.shell.share-narrow .share-halo { width: var(--panel-width); border-radius: 0; }
+.turn.share-picked .share-halo { display: block; }
+/* SP-CV-098 / SP-CV-099 / SP-SHARE-030. Padding-left 42px only while the panel is under 800px.
+   --share-pad-left is that same 42px. Desktop rows do not take this padding.
+   The user wash is centered on the row border box, so the 42px lives on .message-body
+   (border-box, width 100%). The article itself stays unpadded and the checkbox left: 0
+   stays on the column edge. The assistant keeps the padding on the article. */
+.shell.share-narrow .turn.share-on {
+  --share-pad-left: 42px;
+  box-sizing: border-box;
+  padding-left: var(--share-pad-left);
+}
+.shell.share-narrow .turn.user.share-on { padding-left: 0; }
+.shell.share-narrow .turn.user.share-on > .message-body { padding-left: var(--share-pad-left); }
+/* SP-SHARE-100 / SP-CV-100 / SP-CV-101. rtl padding moves to the right. */
+body.rtl .shell.share-narrow .turn.share-on { padding-left: 0; padding-right: var(--share-pad-left, 42px); }
+body.rtl .shell.share-narrow .turn.user.share-on { padding-right: 0; }
+body.rtl .shell.share-narrow .turn.user.share-on > .message-body { padding-left: 0; padding-right: var(--share-pad-left, 42px); }
+/* SP-CV-112 / SP-CV-113. Selected message tokens inherit into the code block and sources pill. */
+.turn.share-picked {
+  --search-sites-summary-bg-color: transparent;
+  --search-sites-summary-bg-transition-duration: 0;
+  /* SP-CV-114 / SP-CV-115. The selected message hands the multi-select wash to its code block. */
+  --code-bottom-color: var(--dsw-alias-bg-multi-select);
+}
+/* The code card sets its own bottom color, so the selected wash has to win on the card itself. */
+.turn.share-picked .code-card { --code-bottom-color: var(--dsw-alias-bg-multi-select); }
+/* SP-CV-110 / SP-CV-111. Selected message code banner uses the same wash. */
+.turn.share-picked .code-head { background-color: var(--dsw-alias-bg-multi-select); }
+/* The selection wash is .share-halo (official hj :before), not the row highlight ::before. */
+.turn.share-on::before,
+.shell.share-narrow .turn.share-on::before { content: none; }
 input.share-box.ds-checkbox,
 .share-bar input.ds-checkbox {
+  /* Official .ds-checkbox tokens. The checked fill stays #5686fe below. */
   --dsl-checkbox-size: 16px;
   --dsl-checkbox-border-radius: 6px;
   --dsl-checkbox-border-width: 1.5px;
+  --dsl-checkbox-color: transparent;
+  --dsl-checkbox-hover-color: transparent;
+  --dsl-checkbox-border-color: var(--dsw-alias-border-l3);
+  --dsl-checkbox-hover-border-color: var(--dsw-alias-brand-primary);
+  --dsl-checkbox-ring-color: var(--dsw-alias-brand-primary);
   --dsl-checkbox-icon-color: var(--dsw-alias-label-primary-inverted);
   appearance: none;
   width: var(--dsl-checkbox-size);
@@ -3108,11 +4785,20 @@ input.share-box.ds-checkbox,
   flex: none;
   border: 0;
   border-radius: var(--dsl-checkbox-border-radius);
-  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsw-alias-border-l3);
-  background: transparent;
+  /* SP-SET-357. Checked fill stays #5686fe in the :checked rule. */
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsl-checkbox-border-color);
+  background: var(--dsl-checkbox-color);
   display: grid;
   place-content: center;
   cursor: pointer;
+  outline: none;
+  transition: background-color var(--ds-transition-duration) var(--ds-ease-in-out), box-shadow var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+/* SP-SET-358 / SP-SET-359. Hover ring uses the hover border token. Checked fill is unchanged. */
+input.share-box.ds-checkbox:hover:not(:checked),
+.share-bar input.ds-checkbox:hover:not(:checked) {
+  background-color: var(--dsl-checkbox-hover-color);
+  box-shadow: inset 0 0 0 var(--dsl-checkbox-border-width) var(--dsl-checkbox-hover-border-color);
 }
 input.share-box[hidden] { display: none; }
 input.share-box.ds-checkbox.ds-checkbox--l,
@@ -3129,6 +4815,8 @@ input.share-box.ds-checkbox::after,
 }
 input.share-box.ds-checkbox:checked,
 .share-bar input.ds-checkbox:checked {
+  /* SP-SHARE-037/038. Official --dsl-checkbox-color. The painted fill stays #5686fe; share-select.spec.ts:459 reads background, not this variable. */
+  --dsl-checkbox-color: var(--dsw-alias-button-primary-fill);
   background: #5686fe;
   box-shadow: none;
 }
@@ -3139,7 +4827,7 @@ input.share-box.ds-checkbox:checked::after,
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9;
+  z-index: 1001;
   box-sizing: border-box;
   height: 65px;
   display: flex;
@@ -3147,13 +4835,16 @@ input.share-box.ds-checkbox:checked::after,
   align-items: center;
   border-top: 1px solid var(--dsw-alias-border-l2);
   background: var(--dsw-alias-bg-base);
+  font: var(--dsw-font-s-14);
 }
 .share-bar-inner {
   box-sizing: border-box;
   flex: 0 0 auto;
   width: calc(min(752px, calc(100% - 88px)) + 56px);
-  height: 100%;
+  height: 65px;
   margin-left: calc((100% - min(752px, calc(100% - 88px))) / 2 - 41px);
+  /* Pairs with .share-all margin-left -26px so the checkbox stays on the message column. */
+  padding-left: 26px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -3162,7 +4853,8 @@ input.share-box.ds-checkbox:checked::after,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0;
+  /* SP-SHARE-015. Official ._692accd is the whole select-all control, not the input. */
+  margin: 0 0 0 -26px;
   font-size: 14px;
   line-height: 22px;
   color: var(--dsw-alias-label-primary);
@@ -3183,7 +4875,7 @@ input.share-box.ds-checkbox:checked::after,
   white-space: nowrap;
   font-size: 14px;
   line-height: 22px;
-  color: var(--dsw-alias-label-secondary);
+  /* SP-SHARE-072. No color of its own. The count inherits label-primary. */
 }
 .share-gap { flex: 1 1 auto; min-width: 0; }
 .share-bar .ds-button { flex: 0 0 auto; }
@@ -3246,26 +4938,13 @@ input.share-box.ds-checkbox:checked::after,
   }
   .share-bar [data-testid="share-cancel"] { display: none; }
 }
+/* Chromium insets position:sticky by the scroller's padding-top. Official list
+   padding-top is 0 (SP-SHARE-035 / 109 / 111). The checkbox then sticks at the
+   scrollport: desktop topbar 49 + sticky pad 13 is about 48px under the title
+   top (14), inside the 50±4 pin. Phone topbar 60 + pad 13 is y=73. The a1dbee0
+   12px column gap and the 28.5px phone gap are not official row values. */
+.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
 @media (max-width: 767px) {
-  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 28.5px; }
-  .turn.share-on > .share-halo {
-    left: -20px;
-    right: -1px;
-    background: rgb(236, 242, 249);
-  }
-  body[data-ds-dark-theme] .turn.share-on > .share-halo { background: var(--dsw-static-neutral-bluish-850); }
-  .turn.share-on > .share-box { left: 0; }
-  /* Official `._7729a77._63c77b1` (selection, width < 800): padding-left 42px.
-     The column starts at x=20, so the answer text starts at x=62. */
-  .turn.assistant.share-on > :not(.share-box):not(.share-halo) {
-    margin-left: 42px;
-    width: calc(100% - 42px);
-  }
-  /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
-     align-items: flex-end. Height stays the text height. The 16px inset is
-     `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's
-     right edge at column right 370 − 16 = 354. */
-  .turn.user.share-on > .bubble { margin-right: 16px; }
   /* Official `._9f86274` padding is `0 calc(var(--message-list-padding-horizontal) - 16px)`.
      Below 1024px that variable is 36px, so the right padding is 20px and the
      create button's right edge is 370. The button is `.ds-button.ds-button--m`
@@ -3275,10 +4954,12 @@ input.share-box.ds-checkbox:checked::after,
   .share-bar-inner {
     width: 100%;
     margin-left: 0;
-    padding-left: 36px;
+    /* Official padding is calc(36px - 16px). Margin 16px then lands the box at x=36. */
+    padding-left: 20px;
     padding-right: 20px;
   }
-  .share-all { gap: 12px; }
+  /* Below 800px official ._117e7c4 ._692accd is margin-left 16px, not -26px. */
+  .share-all { gap: 12px; margin-left: 16px; }
 }
 @media (max-width: 639px) {
   .share-bar .share-split,

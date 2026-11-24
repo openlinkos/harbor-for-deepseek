@@ -215,4 +215,12 @@ describe('citation markdown', () => {
     expect(markup).toMatch(/卸任。<span[^>]*data-citation-group/)
     expect(markup).not.toMatch(/<li[^>]*>。/)
   })
+
+  it('badges a reference number and leaves the -404 fallback as text', () => {
+    const markup = html('见 [reference:1] [reference:-404] [citation:9]。', one)
+    expect(markup).toContain('[reference:-404]')
+    expect(markup).toContain('[citation:9]')
+    expect(markup).not.toContain('[reference:1]')
+    expect(badgeCount(markup, '1')).toBe(1)
+  })
 })

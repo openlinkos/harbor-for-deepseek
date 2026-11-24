@@ -51,10 +51,8 @@ const current = (page: Page) => page.getByTestId('message-list')
 
 // 在 master e903ed1 上会失败的用例。修掉对应问题后删掉这条，否则意外通过会让 CI 失败。
 // fb1132-4 搜索弹窗结果列表与切换；fb1132-5 删除确认 Esc/遮罩与重命名 Esc。
-// fb1132-5 明确不改「设置点遮罩」和「重命名点外部」（待确认），这两项仍失败。
+// fb1132-5 重命名点外部仍失败。设置遮罩点击已按 SP-MOD-636 关闭，对应 knownFailure 已删除，断言仍在。
 const knownFailure = (width: number, title: string): string | null => {
-  // fb1132-5 待确认，不在该修复范围：.settings-modal 没有遮罩点击关闭。Esc 已能关。
-  if (title === 'settings dialog cancels on outside') return 'fb1132-5 待确认: 设置弹窗点遮罩关不掉（该修复项明确不改这一点）'
   // fb1132-5 待确认，不在该修复范围。1440 输入框保持可见；390 点抽屉遮罩会先收起侧栏，编辑态仍在，行文变成草稿。
   if (title === 'rename edit cancels on outside') return 'fb1132-5 待确认: 重命名点外部不会取消编辑（该修复项明确不改这一点）'
   // 390 上 ⋯ 是底部 sheet，.item-menu-scrim 挡住触发器。Esc 与点遮罩在同视口已通过。不得 skip。
@@ -118,9 +116,8 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         if (name === 'rename edit') await t.fill('改了一半')
         if (way === 'esc') await page.keyboard.press('Escape')
         else if (way === 'outside') await page.mouse.click(vp.width - 8, vp.height / 2) // 弹层/对话框外的遮罩或页面
-        // 390 上遮罩会一直挡住 ⋯，不设上限时 click 拖到整例 60s 测试超时。
-        // 那种 timedOut 不会被 test.fail 当成预期失败。5s 动作超时仍是失败，断言未改。
         else await page.locator('.chat-link .more').first().click({ timeout: 5_000 })
+        // 昊辰 fb1132-5. Escape cancels the delete confirm again. SP-MOD-572's capture has no Esc-cancel; that conflict stays open.
         await expect(t, `${name} 必须能用 ${way} 取消`).toBeHidden()
         await sidebar(page)
         for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)
@@ -136,7 +133,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
       await page.getByTestId('composer').fill('hi'); await page.getByTestId('send').click()
       await expect(page.getByText('好的。')).toBeVisible()
       const entries: [string, () => Promise<void>][] = [
-        ['topbar', () => page.locator('.topbar button[aria-label="share"]').click()],
+        ['topbar', () => page.locator('.topbar button[aria-label="分享"]').click()],
         ['action row', () => page.locator('[data-tip="分享"]').last().click()],
         ['chat ⋯ menu', async () => { await sidebar(page); await row(page, TITLES[0]).hover(); await row(page, TITLES[0]).locator('.more').click(); await page.getByRole('menuitem', { name: /分享|Share/ }).click() }],
       ]
@@ -158,7 +155,11 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
           if (vp.width >= 640) await expect(page.getByTestId('share-count')).toHaveText('已选择 2 组对话')
         }
         if (vp.width < 640) await expect(page.getByTestId('share-count')).toBeHidden()
+        // SP-SHARE-147. Escape stays in select mode. Cancel leaves it.
         await page.keyboard.press('Escape')
+        await expect(page.locator('.share-bar'), `${name} 按 Esc 仍停留在选择模式`).toBeVisible()
+        await page.getByTestId(vp.width < 800 ? 'share-top-cancel' : 'share-cancel').click()
+        await expect(page.locator('.share-bar')).toHaveCount(0)
       }
     })
   })

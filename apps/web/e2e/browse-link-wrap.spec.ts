@@ -71,7 +71,7 @@ const boot = async (page: Page, theme: string) => {
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
   for (const id of ['toggle-thinking', 'toggle-search']) {
     const c = (await page.getByTestId(id).getAttribute('class')) || ''
-    if (!c.includes('on')) await page.getByTestId(id).click()
+    if (!(await page.getByTestId(id).evaluate((node) => node.classList.contains('on')))) await page.getByTestId(id).click()
   }
   await page.getByTestId('composer').fill('[筑衡测试] 浏览链接换行')
   await page.getByTestId('send').click()
@@ -161,7 +161,7 @@ for (const theme of ['light', 'dark'] as const) {
         await shot(page, `${theme}-${w}`)
         const m = await measure(page)
         expect(m, JSON.stringify(m, null, 2)).not.toHaveProperty('error')
-        expect(m.n, JSON.stringify(m, null, 2)).toBe(PAGES.length)
+        expect(m.n, JSON.stringify(m, null, 2)).toBe(Math.min(PAGES.length, 5))
         expect(m.violations, JSON.stringify(m, null, 2)).toEqual([])
       })
     })

@@ -81,7 +81,7 @@ test('mobile drawer', async ({ page }) => {
   await page.getByTestId('user-menu').click()
   await page.getByTestId('settings-open').click()
   await expect(page.locator('.settings-shell')).toHaveCSS('border-top-left-radius', '24px')
-  await expect(page.locator('.settings-shell')).toHaveCSS('border-bottom-left-radius', '24px')
+  await expect(page.locator('.settings-shell')).toHaveCSS('border-bottom-left-radius', '0px')
 })
 
 test('offline banner', async ({ page }) => {
@@ -208,6 +208,7 @@ for (const viewport of [
     await page.keyboard.press('Shift+Tab')
     await expect(page.getByRole('button', { name: '取消' })).toBeFocused()
     await page.keyboard.press('Escape')
+    // 昊辰 fb1132-5. Escape cancels. Master's gaps.spec.ts expects the dialog to hide. SP-MOD-572's capture does not; that conflict stays open.
     await expect(dialog).toBeHidden()
     await chatStillNamed(page, '对照', '不该保存的名字')
 

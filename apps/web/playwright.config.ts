@@ -14,6 +14,9 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1280, height: 820 },
+    // Greeting tests pin a +08:00 clock and then read getHours(). CI browsers
+    // default to UTC, so the same clock reads as the previous evening.
+    timezoneId: 'Asia/Shanghai',
   },
   webServer: {
     command: `pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,

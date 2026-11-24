@@ -7,6 +7,8 @@ export default defineConfig({
   use: {
     ...devices['Pixel 5'],
     baseURL: 'http://127.0.0.1:4174',
+    // Same clock as the web suite: greeting hours follow Asia/Shanghai, not CI's UTC.
+    timezoneId: 'Asia/Shanghai',
   },
   webServer: {
     command: 'node ../../scripts/serve-static.mjs ../mobile/www 4174',

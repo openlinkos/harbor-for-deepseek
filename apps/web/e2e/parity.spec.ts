@@ -186,7 +186,7 @@ test('edit and copy', async ({ page }) => {
   await unlock(page)
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await send(page, '要改的句子')
-  await page.getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('button', { name: '修改' }).click()
   await expect(page.locator('.edit-card textarea')).toHaveValue('要改的句子')
   await page.getByRole('button', { name: '取消' }).click()
   const copy = page.locator('.action-row').getByRole('button', { name: '复制' })
@@ -206,15 +206,15 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
-test('tools default on', async ({ page }) => {
+test('tools default off', async ({ page }) => {
   await unlock(page)
-  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
-  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-thinking').evaluate((node) => node.classList.contains('on'))).toBe(false)
+  await expect.poll(() => page.getByTestId('toggle-search').evaluate((node) => node.classList.contains('on'))).toBe(false)
   await expect(page.getByTestId('toggle-search')).toContainText('智能搜索')
   await page.getByTestId('toggle-thinking').click()
-  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-thinking').evaluate((node) => node.classList.contains('on'))).toBe(true)
   await page.getByTestId('toggle-search').click()
-  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-search').evaluate((node) => node.classList.contains('on'))).toBe(true)
 })
 
 test('search citations', async ({ page }) => {
@@ -586,6 +586,8 @@ test('errors', async ({ page }) => {
   mode = 'limited'
   await send(page, '太多')
   await expect(page.locator('.form-error').last()).toBeVisible()
+  // Wait for the 太多 turn's own 429 error before switching the mock; `.last()` above can already match the 坏钥匙 error.
+  await expect(page.locator('.form-error')).toHaveCount(2)
   mode = 'down'
   await send(page, '断网')
   await expect(page.getByTestId('user-hint').last()).toHaveText('请检查网络后重试')
@@ -663,7 +665,7 @@ test('date groups', async ({ page }) => {
   await age(page, 1)
   await expect(page.getByTestId('sidebar')).toContainText('昨天')
   await age(page, 3)
-  await expect(page.getByTestId('sidebar')).toContainText('30 天内')
+  await expect(page.getByTestId('sidebar')).toContainText('7 天内')
   await age(page, 12)
   await expect(page.getByTestId('sidebar')).toContainText('30 天内')
   await age(page, 40)
@@ -739,7 +741,7 @@ test('dialog motion', async ({ page }) => {
 test('sidebar motion', async ({ page }) => {
   await unlock(page)
   await expect(page.locator('.sidebar')).toHaveCSS('transition-duration', /0\.3s/)
-  await page.getByRole('button', { name: '隐藏' }).click()
+  await page.getByRole('button', { name: '收起边栏' }).click()
   await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
   await expect(page.locator('.sidebar')).toHaveCSS('opacity', '0')
 })
@@ -762,6 +764,7 @@ test('disclaimer', async ({ page }) => {
   await expect(page.locator('.ai-note')).toHaveCount(0)
   await send(page, '声明')
   await expect(page.locator('.ai-note')).toHaveText('内容由 AI 生成，请仔细甄别')
+  await expect(page.locator('.answer-note')).toHaveText('本回答由 AI 生成，内容仅供参考，请仔细甄别。')
 })
 
 test('official states', async ({ page }) => {
@@ -863,7 +866,17 @@ test('welcome back', async ({ page }) => {
   await send(page, '回来')
   await page.getByTestId('new-chat').click()
   await page.mouse.move(0, 0)
-  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByTestId('menu').click()
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByTestId('language-trigger').scrollIntoViewIfNeeded()
+  await page.getByTestId('language-trigger').click()
+  await page.getByRole('option', { name: 'English', exact: true }).click()
+  await page.getByTestId('settings-close').click()
+  await expect(page.locator('.greeting')).toContainText('Where would you like to begin?')
+  await page.setViewportSize({ width: 1280, height: 820 })
+  await expect(page.getByTestId('new-chat')).toBeVisible()
   const shortcut = await page.locator('.new-chat').evaluate((node) => {
     const style = getComputedStyle(node, '::after')
     const windows = navigator.userAgent.toLowerCase().includes('windows')
@@ -876,15 +889,15 @@ test('welcome back', async ({ page }) => {
   await expect.poll(() => page.locator('.new-chat').evaluate((node) => getComputedStyle(node, '::after').opacity)).toBe('1')
   await expect(page.locator('.new-chat')).toHaveCSS('justify-content', 'center')
   const on = page.getByTestId('toggle-thinking')
+  await expect(on).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+  await expect(on).toHaveCSS('color', 'rgb(15, 17, 21)')
+  await expect(on).toHaveCSS('border-top-width', '1px')
+  await on.click()
+  await page.mouse.move(0, 0)
   await expect(on).toHaveCSS('background-color', 'rgb(237, 243, 254)')
   await expect(on).toHaveCSS('color', 'rgb(57, 100, 254)')
   await expect(on).toHaveCSS('border-top-width', '1px')
   await expect(on).toHaveCSS('border-top-color', 'rgb(183, 200, 254)')
-  await on.click()
-  await page.mouse.move(0, 0)
-  await expect(on).toHaveCSS('background-color', 'rgb(255, 255, 255)')
-  await expect(on).toHaveCSS('color', 'rgb(15, 17, 21)')
-  await expect(on).toHaveCSS('border-top-width', '1px')
 })
 
 test('reduced motion', async ({ page }) => {
