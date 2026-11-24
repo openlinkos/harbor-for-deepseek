@@ -114,7 +114,7 @@ test('SP-CITE-158..174 hover icon keeps a loaded image and uses the link svg whe
   await expect(stack.nth(0)).toHaveCSS('overflow', 'hidden')
   await expect(pill.locator('.favicons')).toHaveCSS('display', 'flex')
   await expect(pill.locator('.favicons')).toHaveCSS('align-items', 'center')
-  await expect(stack.nth(0).locator('img')).toHaveCSS('object-fit', 'contain')
+  await expect(stack.nth(0).locator('img')).toHaveCSS('object-fit', 'cover')
   await expect(stack.nth(0)).toHaveCSS('transition-property', 'box-shadow')
   await expect(stack.nth(0)).toHaveCSS('transition-duration', '0.2s')
   const pillWidth = await pill.evaluate((el) => el.getBoundingClientRect().width)

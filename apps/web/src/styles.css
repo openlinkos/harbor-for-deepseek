@@ -1752,7 +1752,8 @@ button.chip { appearance: none; margin: 0; }
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  /* SP-CITE-002. Official .site_logo_img is cover. contain is only .ds-markdown-cite-brand-icon-img. */
+  object-fit: cover;
   display: none;
   border-radius: 50%;
 }
