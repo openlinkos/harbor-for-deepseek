@@ -88,6 +88,7 @@ test('mobile states at 390x844', async ({ page }) => {
     }
   })
   await page.route('https://api.deepseek.com/**', fulfill)
+  await page.clock.install({ time: new Date('2026-11-23T15:00:00+08:00') })
   await page.goto('/')
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-input').fill('demo-local-key')

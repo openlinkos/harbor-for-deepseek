@@ -172,8 +172,8 @@ test('thinking and search chips use a pointer on the label and icon', async ({ p
 
 test('sidebar search and collapse icons use a pointer', async ({ page }) => {
   await unlock(page)
-  const search = page.locator('.sider-icons').getByRole('button', { name: '智能搜索' })
-  const collapse = page.locator('.sider-icons').getByRole('button', { name: '隐藏' })
+  const search = page.locator('.sider-icons').getByRole('button', { name: '搜索' })
+  const collapse = page.locator('.sider-icons').getByRole('button', { name: '收起边栏' })
   const searchReport = await expectPointer(search, '侧栏搜索')
   const collapseReport = await expectPointer(collapse, '侧栏收起')
   expect(searchReport.svgCursor).not.toBeNull()

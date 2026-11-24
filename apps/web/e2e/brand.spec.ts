@@ -66,6 +66,7 @@ const openConversation = async (page: Page) => {
 }
 
 test('sidebar brand cursor is pointer and returns an open chat to the new-chat home', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-11-23T08:00:00+08:00') })
   const errors = await unlock(page)
   const brand = page.getByTestId('brand')
   await expect(brand).toBeVisible()
@@ -75,7 +76,7 @@ test('sidebar brand cursor is pointer and returns an open chat to the new-chat h
 
   await brand.click()
   expect(errors).toEqual([])
-  await expect(page.locator('.greeting')).toContainText('今天有什么可以帮到你？')
+  await expect(page.locator('.greeting')).toContainText('早上好，今天想做点什么？')
   await expect(page.locator('.chat-link.active')).toHaveCount(0)
   expect(rootPath(page)).toEqual({ pathname: '/', search: '', hash: '' })
 
@@ -84,7 +85,12 @@ test('sidebar brand cursor is pointer and returns an open chat to the new-chat h
   expect(rootPath(page)).toEqual({ pathname: '/a/chat/s/existing', search: '?from=session', hash: '#keep' })
   await page.screenshot({ path: join(shots, 'brand-desktop-chat.png') })
   await brand.click()
-  await expect(page.locator('.greeting')).toContainText(/欢迎回来，(想从哪里开始？|随时开始吧)|你好，我能帮什么忙吗？/)
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByTestId('language-trigger').click()
+  await page.getByRole('option', { name: 'English', exact: true }).click()
+  await page.getByTestId('settings-close').click()
+  await expect(page.locator('.greeting')).toContainText("Hi! What's on your mind today?")
   await expect(page.locator('.chat-link.active')).toHaveCount(0)
   await expect(page.getByTestId('sidebar')).toContainText('加法')
   expect(rootPath(page)).toEqual({ pathname: '/', search: '', hash: '' })

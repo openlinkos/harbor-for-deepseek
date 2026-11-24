@@ -137,6 +137,8 @@ test('attachment cards show uploading then the official size, and the sent messa
   releaseStream()
   await expect(page.getByTestId('assistant-text')).toContainText('这两个附件是一组测试文件。')
   await expect(sent).toContainText('zhuheng-test.pdf')
+  // changes/r22b-assertion-rulings.md ruling 3: the bubble after files keeps the official 10px margin-top (.fbb737a4._8271fc3).
+  await expect(page.locator('.turn.user .bubble.has-files').last()).toHaveCSS('margin-top', '10px')
   await saveShot(page, 'attachments-03-sent-user-message-cards-waiting-dots.png')
   await saveShot(page, 'attachments-04-answer-summary.png')
 })

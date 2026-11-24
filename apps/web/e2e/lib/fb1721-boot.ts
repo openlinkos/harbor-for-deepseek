@@ -25,7 +25,7 @@ export const boot = async (page: Page, theme: string, opts: { staged?: boolean; 
   if (process.env.FIX_CSS) await page.addStyleTag({ content: process.env.FIX_CSS })
   if (opts.freezeTransitions !== false) await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
 }
-export const chip = async (page: Page, id: string, on: boolean) => { const c = (await page.getByTestId(id).getAttribute('class')) || ''; if (c.includes('on') !== on) await page.getByTestId(id).click() }
+export const chip = async (page: Page, id: string, on: boolean) => { if ((await page.getByTestId(id).evaluate((node) => node.classList.contains('on'))) !== on) await page.getByTestId(id).click() }
 export const isMobile = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768
 export const drawer = async (page: Page) => { if (isMobile(page) && !(await page.locator('.nav-open').count())) { await page.getByTestId('menu').click(); await page.waitForTimeout(400) } }
 export const openSettings = async (page: Page) => { await drawer(page); await page.getByTestId('user-menu').click(); await page.getByTestId('settings-open').click(); await page.getByTestId('settings-dialog').waitFor(); await page.waitForTimeout(250) }

@@ -13,6 +13,12 @@ export const App = () => {
   const showAdmin = useHarbor((state) => state.showAdmin)
   const serverUser = useHarbor((state) => state.serverUser)
   const serverMode = useHarbor((state) => state.serverMode)
+  const locale = useHarbor((state) => state.settings.locale)
+  useEffect(() => {
+    // SP-GL-013/014: official body class is the locale id. zh and en map to zh_CN and en_US.
+    document.body.classList.remove('zh_CN', 'en_US')
+    document.body.classList.add(locale === 'en' ? 'en_US' : 'zh_CN')
+  }, [locale])
   useEffect(() => {
     void boot()
     if (import.meta.env.PROD && 'serviceWorker' in navigator && !navigator.webdriver) {

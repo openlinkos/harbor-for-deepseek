@@ -1,0 +1,5065 @@
+{
+  "method": "Executed the original rspack factories: vendors module 45368 export Y (micromark) with module 64085 T() and module 63317 C(), the same extension object as main.js id={extensions:[{...T(),disable:{null:[\"codeIndented\"]}}],mdastExtensions:[C()]}. HTML tags follow the verbatim JSX in main.js: p.ds-markdown-paragraph, strong, emphasis guard iZ, delete echoes /^~+/, text lines in span class empty (skip-quote-patch when the line contains U+201E), inline code in code, lists as ul/ol/li, fenced code as md-code-block (zh copy label 复制 from copyCode). See evidence/extract-markdown.mjs.",
+  "offsets": {
+    "attentionConstruct": 580924,
+    "attentionPatch": 582841,
+    "parserExport": 593629,
+    "gfmModule": 611450,
+    "appExtensions": 309697,
+    "emphasisGuard": 325531,
+    "deleteEcho": 351450,
+    "textSpan": 352877,
+    "paragraph": 350433
+  },
+  "rows": [
+    {
+      "id": "md-0001",
+      "input": "_中文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0002",
+      "input": "__中文__",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中文</span></strong></p>",
+      "delimiter": "__",
+      "edge": "open-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0003",
+      "input": "*中文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0004",
+      "input": "**中文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0005",
+      "input": "~~中文~~",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0006",
+      "input": "__33°C__左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">__33°C__左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0007",
+      "input": "__bold__",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">bold</span></strong></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0008",
+      "input": "_33°C_左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_33°C_左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0009",
+      "input": "_b_",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">b</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0010",
+      "input": "「**重点**」",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">「</span><strong><span class=\"\">重点</span></strong><span class=\"\">」</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0011",
+      "input": "* 中 *",
+      "html": "<ul><li><p class=\"ds-markdown-paragraph\"><span class=\"\">中 *</span></p></li></ul>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0012",
+      "input": "** 中文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">** 中文**</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0013",
+      "input": "***bold***",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><strong><span class=\"\">bold</span></strong></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0014",
+      "input": "**33°**C左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">33°</span></strong><span class=\"\">C左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0015",
+      "input": "**33°C**左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">33°C</span></strong><span class=\"\">左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": "昊辰"
+    },
+    {
+      "id": "md-0016",
+      "input": "**50%**左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">50%</span></strong><span class=\"\">左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0017",
+      "input": "**中文 **",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">**中文 **</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0018",
+      "input": "**a*b*c**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">a</span>*<span class=\"\">b</span>*<span class=\"\">c</span></strong></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0019",
+      "input": "*1+2*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">1+2</span>*</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0020",
+      "input": "*3*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">3</span>*</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0021",
+      "input": "*33*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">33</span>*</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0022",
+      "input": "*33°C*左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">33°C</span></em><span class=\"\">左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0023",
+      "input": "*中*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0024",
+      "input": "*a*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">a</span>*</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0025",
+      "input": "*A*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">A</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0026",
+      "input": "*a+b*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">a+b</span>*</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0027",
+      "input": "*ab*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">ab</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0028",
+      "input": "*ab+cd*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">ab+cd</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0029",
+      "input": "~~**中**~~",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<strong><span class=\"\">中</span></strong>~~</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0030",
+      "input": "~~~中文~~~",
+      "html": "<div class=\"md-code-block md-code-block-light\"><div class=\"md-code-block-banner-wrap\"><div class=\"md-code-block-banner\"><div class=\"md-code-block-infostring\">中文~~~</div><div class=\"md-code-block-action\"><div class=\"ds-markdown-code-copy-button\">复制</div></div></div></div><pre></pre></div>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0031",
+      "input": "~~50%~~左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">~~50%~~左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0032",
+      "input": "~50%~左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">~50%~左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0033",
+      "input": "~中文~",
+      "html": "<p class=\"ds-markdown-paragraph\">~<span class=\"\">中文</span>~</p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0034",
+      "input": "约**3小时**。",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">约</span><strong><span class=\"\">3小时</span></strong><span class=\"\">。</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0035",
+      "input": "左~~中文~~右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">左</span>~~<span class=\"\">中文</span>~~<span class=\"\">右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0036",
+      "input": "a_b_c",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">a_b_c</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0037",
+      "input": "a*b*c",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">a</span>*<span class=\"\">b</span>*<span class=\"\">c</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "",
+      "reported_by": null
+    },
+    {
+      "id": "md-0038",
+      "input": "**中 **",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">**中 **</span></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0039",
+      "input": "**中-**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中-</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0040",
+      "input": "**中,**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中,</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0041",
+      "input": "**中，**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中，</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0042",
+      "input": "**中、**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中、</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0043",
+      "input": "**中;**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中;</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0044",
+      "input": "**中；**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中；</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0045",
+      "input": "**中:**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中:</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0046",
+      "input": "**中：**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中：</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0047",
+      "input": "**中!**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中!</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0048",
+      "input": "**中！**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中！</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0049",
+      "input": "**中?**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中?</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0050",
+      "input": "**中？**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中？</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0051",
+      "input": "**中.**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中.</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0052",
+      "input": "**中。**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中。</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0053",
+      "input": "**中'**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中'</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0054",
+      "input": "**中\"**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中\"</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0055",
+      "input": "**中(**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中(</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0056",
+      "input": "**中（**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中（</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0057",
+      "input": "**中)**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中)</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0058",
+      "input": "**中）**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中）</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0059",
+      "input": "**中《**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中《</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0060",
+      "input": "**中》**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中》</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0061",
+      "input": "**中「**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中「</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0062",
+      "input": "**中」**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中」</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0063",
+      "input": "**中『**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中『</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0064",
+      "input": "**中』**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中』</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0065",
+      "input": "**中@**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中@</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0066",
+      "input": "**中/**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中/</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0067",
+      "input": "**中#**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中#</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0068",
+      "input": "**中%**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中%</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0069",
+      "input": "**中°**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中°</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0070",
+      "input": "**中+**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中+</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0071",
+      "input": "**中×**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中×</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0072",
+      "input": "**中~**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中~</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0073",
+      "input": "**中$**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中$</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0074",
+      "input": "**中¥**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中¥</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0075",
+      "input": "**中0**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中0</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0076",
+      "input": "**中1**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中1</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0077",
+      "input": "**中3**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中3</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0078",
+      "input": "**中5**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中5</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0079",
+      "input": "**中9**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中9</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0080",
+      "input": "**中右**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中右</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0081",
+      "input": "**中中**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中中</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0082",
+      "input": "**中左**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中左</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-in",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0083",
+      "input": "**中** ",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0084",
+      "input": "**中**-",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">-</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0085",
+      "input": "**中**,",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">,</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0086",
+      "input": "**中**，",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">，</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0087",
+      "input": "**中**、",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">、</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0088",
+      "input": "**中**;",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">;</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0089",
+      "input": "**中**；",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">；</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0090",
+      "input": "**中**:",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">:</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0091",
+      "input": "**中**：",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">：</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0092",
+      "input": "**中**!",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">!</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0093",
+      "input": "**中**！",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">！</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0094",
+      "input": "**中**?",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">?</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0095",
+      "input": "**中**？",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">？</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0096",
+      "input": "**中**.",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">.</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0097",
+      "input": "**中**。",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">。</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0098",
+      "input": "**中**'",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">'</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0099",
+      "input": "**中**\"",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">\"</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0100",
+      "input": "**中**(",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">(</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0101",
+      "input": "**中**（",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">（</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0102",
+      "input": "**中**)",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">)</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0103",
+      "input": "**中**）",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">）</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0104",
+      "input": "**中**《",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">《</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0105",
+      "input": "**中**》",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">》</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0106",
+      "input": "**中**「",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">「</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0107",
+      "input": "**中**」",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">」</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0108",
+      "input": "**中**『",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">『</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0109",
+      "input": "**中**』",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">』</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0110",
+      "input": "**中**@",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">@</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0111",
+      "input": "**中**/",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">/</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0112",
+      "input": "**中**#",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">#</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0113",
+      "input": "**中**%",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">%</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0114",
+      "input": "**中**°",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">°</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0115",
+      "input": "**中**+",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">+</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0116",
+      "input": "**中**×",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">×</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0117",
+      "input": "**中**~",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">~</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0118",
+      "input": "**中**$",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">$</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0119",
+      "input": "**中**¥",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">¥</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0120",
+      "input": "**中**0",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">0</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0121",
+      "input": "**中**1",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">1</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0122",
+      "input": "**中**3",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">3</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0123",
+      "input": "**中**5",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">5</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0124",
+      "input": "**中**9",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">9</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0125",
+      "input": "**中**文",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">文</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0126",
+      "input": "**中**右",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">右</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0127",
+      "input": "**中**中",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">中</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0128",
+      "input": "**中**左",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">中</span></strong><span class=\"\">左</span></p>",
+      "delimiter": "**",
+      "edge": "close-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0129",
+      "input": "** 文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">** 文**</span></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0130",
+      "input": "**-文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">-文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0131",
+      "input": "**,文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">,文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0132",
+      "input": "**，文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">，文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0133",
+      "input": "**、文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">、文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0134",
+      "input": "**;文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">;文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0135",
+      "input": "**；文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">；文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0136",
+      "input": "**:文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">:文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0137",
+      "input": "**：文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">：文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0138",
+      "input": "**!文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">!文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0139",
+      "input": "**！文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">！文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0140",
+      "input": "**?文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">?文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0141",
+      "input": "**？文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">？文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0142",
+      "input": "**.文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">.文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0143",
+      "input": "**。文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">。文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0144",
+      "input": "**'文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">'文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0145",
+      "input": "**\"文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">\"文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0146",
+      "input": "**(文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">(文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0147",
+      "input": "**（文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">（文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0148",
+      "input": "**)文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">)文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0149",
+      "input": "**）文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">）文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0150",
+      "input": "**《文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">《文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0151",
+      "input": "**》文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">》文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0152",
+      "input": "**「文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">「文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0153",
+      "input": "**」文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">」文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0154",
+      "input": "**『文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">『文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0155",
+      "input": "**』文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">』文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0156",
+      "input": "**@文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">@文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0157",
+      "input": "**/文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">/文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0158",
+      "input": "**#文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">#文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0159",
+      "input": "**%文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">%文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0160",
+      "input": "**°文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">°文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0161",
+      "input": "**+文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">+文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0162",
+      "input": "**×文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">×文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0163",
+      "input": "**~文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">~文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0164",
+      "input": "**$文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">$文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0165",
+      "input": "**¥文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">¥文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0166",
+      "input": "**0文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">0文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0167",
+      "input": "**1文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">1文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0168",
+      "input": "**3文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">3文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0169",
+      "input": "**5文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">5文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0170",
+      "input": "**9文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">9文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0171",
+      "input": "**文文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">文文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0172",
+      "input": "**右文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">右文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0173",
+      "input": "**左文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">左文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-in",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0174",
+      "input": " **文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0175",
+      "input": "-**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">-</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0176",
+      "input": ",**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">,</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0177",
+      "input": "，**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">，</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0178",
+      "input": "、**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">、</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0179",
+      "input": ";**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">;</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0180",
+      "input": "；**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">；</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0181",
+      "input": ":**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">:</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0182",
+      "input": "：**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">：</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0183",
+      "input": "!**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">!</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0184",
+      "input": "！**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">！</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0185",
+      "input": "?**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">?</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0186",
+      "input": "？**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">？</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0187",
+      "input": ".**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">.</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0188",
+      "input": "。**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">。</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0189",
+      "input": "'**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">'</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0190",
+      "input": "\"**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">\"</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0191",
+      "input": "(**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">(</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0192",
+      "input": "（**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">（</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0193",
+      "input": ")**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">)</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0194",
+      "input": "）**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">）</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0195",
+      "input": "《**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">《</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0196",
+      "input": "》**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">》</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0197",
+      "input": "「**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">「</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0198",
+      "input": "」**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">」</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0199",
+      "input": "『**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">『</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0200",
+      "input": "』**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">』</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0201",
+      "input": "@**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">@</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0202",
+      "input": "/**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">/</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0203",
+      "input": "#**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">#</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0204",
+      "input": "%**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">%</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0205",
+      "input": "°**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">°</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0206",
+      "input": "+**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">+</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0207",
+      "input": "×**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">×</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0208",
+      "input": "~**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">~</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0209",
+      "input": "$**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">$</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0210",
+      "input": "¥**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">¥</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0211",
+      "input": "0**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">0</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0212",
+      "input": "1**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">1</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0213",
+      "input": "3**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">3</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0214",
+      "input": "5**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">5</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0215",
+      "input": "9**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">9</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0216",
+      "input": "文**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">文</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0217",
+      "input": "右**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">右</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0218",
+      "input": "中**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">中</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0219",
+      "input": "左**文**",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">左</span><strong><span class=\"\">文</span></strong></p>",
+      "delimiter": "**",
+      "edge": "open-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0220",
+      "input": "_中_ ",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0221",
+      "input": "_中_-",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">-</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0222",
+      "input": "_中_,",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">,</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0223",
+      "input": "_中_，",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">，</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0224",
+      "input": "_中_、",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">、</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0225",
+      "input": "_中_;",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">;</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0226",
+      "input": "_中_；",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">；</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0227",
+      "input": "_中_:",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">:</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0228",
+      "input": "_中_：",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">：</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0229",
+      "input": "_中_!",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">!</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0230",
+      "input": "_中_！",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">！</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0231",
+      "input": "_中_?",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">?</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0232",
+      "input": "_中_？",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">？</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0233",
+      "input": "_中_.",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">.</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0234",
+      "input": "_中_。",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">。</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0235",
+      "input": "_中_'",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">'</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0236",
+      "input": "_中_\"",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">\"</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0237",
+      "input": "_中_(",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">(</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0238",
+      "input": "_中_（",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">（</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0239",
+      "input": "_中_)",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">)</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0240",
+      "input": "_中_）",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">）</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0241",
+      "input": "_中_《",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">《</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0242",
+      "input": "_中_》",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">》</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0243",
+      "input": "_中_「",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">「</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0244",
+      "input": "_中_」",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">」</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0245",
+      "input": "_中_『",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">『</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0246",
+      "input": "_中_』",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">』</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0247",
+      "input": "_中_@",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">@</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0248",
+      "input": "_中_/",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">/</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0249",
+      "input": "_中_#",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">#</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0250",
+      "input": "_中_%",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">%</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0251",
+      "input": "_中_°",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">°</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0252",
+      "input": "_中_+",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">+</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0253",
+      "input": "_中_×",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">×</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0254",
+      "input": "_中_~",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">~</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0255",
+      "input": "_中_$",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">$</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0256",
+      "input": "_中_¥",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">¥</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0257",
+      "input": "_中_0",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_0</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0258",
+      "input": "_中_3",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_3</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0259",
+      "input": "_中_文",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_文</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0260",
+      "input": "_中_右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_右</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0261",
+      "input": "_中_中",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_中</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0262",
+      "input": "_中_左",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">_中_左</span></p>",
+      "delimiter": "_",
+      "edge": "close-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0263",
+      "input": " _文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0264",
+      "input": "-_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">-</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0265",
+      "input": ",_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">,</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0266",
+      "input": "，_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">，</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0267",
+      "input": "、_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">、</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0268",
+      "input": ";_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">;</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0269",
+      "input": "；_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">；</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0270",
+      "input": ":_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">:</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0271",
+      "input": "：_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">：</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0272",
+      "input": "!_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">!</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0273",
+      "input": "！_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">！</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0274",
+      "input": "?_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">?</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0275",
+      "input": "？_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">？</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0276",
+      "input": "._文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">.</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0277",
+      "input": "。_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">。</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0278",
+      "input": "'_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">'</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0279",
+      "input": "\"_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">\"</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0280",
+      "input": "(_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">(</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0281",
+      "input": "（_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">（</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0282",
+      "input": ")_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">)</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0283",
+      "input": "）_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">）</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0284",
+      "input": "《_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">《</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0285",
+      "input": "》_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">》</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0286",
+      "input": "「_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">「</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0287",
+      "input": "」_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">」</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0288",
+      "input": "『_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">『</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0289",
+      "input": "』_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">』</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0290",
+      "input": "@_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">@</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0291",
+      "input": "/_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">/</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0292",
+      "input": "#_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">#</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0293",
+      "input": "%_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">%</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0294",
+      "input": "°_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">°</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0295",
+      "input": "+_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">+</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0296",
+      "input": "×_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">×</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0297",
+      "input": "~_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">~</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0298",
+      "input": "$_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">$</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0299",
+      "input": "¥_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">¥</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0300",
+      "input": "0_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">0_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0301",
+      "input": "3_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">3_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0302",
+      "input": "文_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">文_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0303",
+      "input": "右_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">右_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0304",
+      "input": "中_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">中_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0305",
+      "input": "左_文_",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">左_文_</span></p>",
+      "delimiter": "_",
+      "edge": "open-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0306",
+      "input": "*中中*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中中</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0307",
+      "input": "*文文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">文文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0308",
+      "input": "*左文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">左文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0309",
+      "input": "*中左*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中左</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0310",
+      "input": "*右文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">右文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0311",
+      "input": "*中右*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中右</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0312",
+      "input": "* 文*",
+      "html": "<ul><li><p class=\"ds-markdown-paragraph\"><span class=\"\">文*</span></p></li></ul>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0313",
+      "input": "*中 *",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">*中 *</span></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0314",
+      "input": "*.文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">.文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0315",
+      "input": "*中.*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中.</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0316",
+      "input": "*,文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">,文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0317",
+      "input": "*中,*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中,</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0318",
+      "input": "*:文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">:文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0319",
+      "input": "*中:*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中:</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0320",
+      "input": "*;文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">;文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0321",
+      "input": "*中;*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中;</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0322",
+      "input": "*!文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">!文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0323",
+      "input": "*中!*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中!</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0324",
+      "input": "*?文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">?文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0325",
+      "input": "*中?*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中?</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0326",
+      "input": "*(文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">(文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0327",
+      "input": "*中(*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中(</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0328",
+      "input": "*)文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">)文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0329",
+      "input": "*中)*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中)</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0330",
+      "input": "*\"文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">\"文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0331",
+      "input": "*中\"*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中\"</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0332",
+      "input": "*'文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">'文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0333",
+      "input": "*中'*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中'</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0334",
+      "input": "*0文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">0文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0335",
+      "input": "*中0*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中0</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0336",
+      "input": "*1文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">1文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0337",
+      "input": "*中1*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中1</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0338",
+      "input": "*3文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">3文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0339",
+      "input": "*中3*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中3</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0340",
+      "input": "*5文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">5文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0341",
+      "input": "*中5*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中5</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0342",
+      "input": "*9文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">9文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0343",
+      "input": "*中9*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中9</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0344",
+      "input": "*°文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">°文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0345",
+      "input": "*中°*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中°</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0346",
+      "input": "*%文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">%文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0347",
+      "input": "*中%*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中%</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0348",
+      "input": "*$文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">$文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0349",
+      "input": "*中$*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中$</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0350",
+      "input": "*¥文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">¥文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0351",
+      "input": "*中¥*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中¥</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0352",
+      "input": "*×文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">×文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0353",
+      "input": "*中×*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中×</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0354",
+      "input": "*+文*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">+文</span>*</p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0355",
+      "input": "*中+*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">中+</span>*</p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0356",
+      "input": "*-文*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">-文</span>*</p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0357",
+      "input": "*中-*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">中-</span>*</p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0358",
+      "input": "*/文*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">/文</span>*</p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0359",
+      "input": "*中/*",
+      "html": "<p class=\"ds-markdown-paragraph\">*<span class=\"\">中/</span>*</p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0360",
+      "input": "*~文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">~文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0361",
+      "input": "*中~*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中~</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0362",
+      "input": "*@文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">@文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0363",
+      "input": "*中@*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中@</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0364",
+      "input": "*#文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">#文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0365",
+      "input": "*中#*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中#</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0366",
+      "input": "*，文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">，文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0367",
+      "input": "*中，*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中，</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0368",
+      "input": "*。文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">。文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0369",
+      "input": "*中。*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中。</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0370",
+      "input": "*：文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">：文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0371",
+      "input": "*中：*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中：</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0372",
+      "input": "*；文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">；文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0373",
+      "input": "*中；*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中；</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0374",
+      "input": "*！文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">！文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0375",
+      "input": "*中！*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中！</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0376",
+      "input": "*？文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">？文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0377",
+      "input": "*中？*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中？</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0378",
+      "input": "*「文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">「文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0379",
+      "input": "*中「*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中「</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0380",
+      "input": "*」文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">」文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0381",
+      "input": "*中」*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中」</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0382",
+      "input": "*『文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">『文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0383",
+      "input": "*中『*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中『</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0384",
+      "input": "*』文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">』文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0385",
+      "input": "*中』*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中』</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0386",
+      "input": "*（文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">（文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0387",
+      "input": "*中（*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中（</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0388",
+      "input": "*）文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">）文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0389",
+      "input": "*中）*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中）</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0390",
+      "input": "*《文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">《文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0391",
+      "input": "*中《*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中《</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0392",
+      "input": "*中* ",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0393",
+      "input": "*中*-",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">-</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0394",
+      "input": "*中*,",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">,</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0395",
+      "input": "*中*，",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">，</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0396",
+      "input": "*中*、",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">、</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0397",
+      "input": "*中*;",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">;</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0398",
+      "input": "*中*；",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">；</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0399",
+      "input": "*中*:",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">:</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0400",
+      "input": "*中*：",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">：</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0401",
+      "input": "*中*!",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">!</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0402",
+      "input": "*中*！",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">！</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0403",
+      "input": "*中*?",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">?</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0404",
+      "input": "*中*？",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">？</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0405",
+      "input": "*中*.",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">.</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0406",
+      "input": "*中*。",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">。</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0407",
+      "input": "*中*'",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">'</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0408",
+      "input": "*中*\"",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">\"</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0409",
+      "input": "*中*(",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">(</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0410",
+      "input": "*中*（",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">（</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0411",
+      "input": "*中*)",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">)</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0412",
+      "input": "*中*）",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">）</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0413",
+      "input": "*中*《",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">《</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0414",
+      "input": "*中*》",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">》</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0415",
+      "input": "*中*「",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">「</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0416",
+      "input": "*中*」",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">」</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0417",
+      "input": "*中*『",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">『</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0418",
+      "input": "*中*』",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">』</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0419",
+      "input": "*中*@",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">@</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0420",
+      "input": "*中*/",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">/</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0421",
+      "input": "*中*#",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">#</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0422",
+      "input": "*中*%",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">%</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0423",
+      "input": "*中*°",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">°</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0424",
+      "input": "*中*+",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">+</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0425",
+      "input": "*中*×",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">×</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0426",
+      "input": "*中*~",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">~</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0427",
+      "input": "*中*$",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">$</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0428",
+      "input": "*中*¥",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">¥</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0429",
+      "input": "*中*0",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">0</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0430",
+      "input": "*中*3",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">3</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0431",
+      "input": "*中*文",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">文</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0432",
+      "input": "*中*右",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">右</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0433",
+      "input": "*中*中",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">中</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0434",
+      "input": "*中*左",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">左</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0435",
+      "input": " *文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0436",
+      "input": "-*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">-</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0437",
+      "input": ",*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">,</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0438",
+      "input": "，*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">，</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0439",
+      "input": "、*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">、</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0440",
+      "input": ";*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">;</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0441",
+      "input": "；*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">；</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0442",
+      "input": ":*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">:</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0443",
+      "input": "：*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">：</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0444",
+      "input": "!*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">!</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0445",
+      "input": "！*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">！</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0446",
+      "input": "?*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">?</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0447",
+      "input": "？*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">？</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0448",
+      "input": ".*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">.</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0449",
+      "input": "。*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">。</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0450",
+      "input": "'*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">'</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0451",
+      "input": "\"*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">\"</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0452",
+      "input": "(*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">(</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0453",
+      "input": "（*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">（</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0454",
+      "input": ")*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">)</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0455",
+      "input": "）*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">）</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0456",
+      "input": "《*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">《</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0457",
+      "input": "》*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">》</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0458",
+      "input": "「*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">「</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0459",
+      "input": "」*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">」</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0460",
+      "input": "『*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">『</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0461",
+      "input": "』*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">』</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0462",
+      "input": "@*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">@</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0463",
+      "input": "/*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">/</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0464",
+      "input": "#*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">#</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0465",
+      "input": "%*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">%</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0466",
+      "input": "°*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">°</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0467",
+      "input": "+*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">+</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0468",
+      "input": "×*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">×</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0469",
+      "input": "~*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">~</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "~",
+      "reported_by": null
+    },
+    {
+      "id": "md-0470",
+      "input": "$*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">$</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0471",
+      "input": "¥*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">¥</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0472",
+      "input": "0*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">0</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0473",
+      "input": "3*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">3</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0474",
+      "input": "文*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">文</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0475",
+      "input": "右*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">右</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0476",
+      "input": "中*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">中</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0477",
+      "input": "左*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">左</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0478",
+      "input": "*》文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">》文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0479",
+      "input": "*中》*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中》</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0480",
+      "input": "*、文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">、文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-in",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0481",
+      "input": "*中、*",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中、</span></em></p>",
+      "delimiter": "*",
+      "edge": "close-in",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0482",
+      "input": "1*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">1</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0483",
+      "input": "*中*1",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">1</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "1",
+      "reported_by": null
+    },
+    {
+      "id": "md-0484",
+      "input": "5*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">5</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0485",
+      "input": "*中*5",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">5</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "5",
+      "reported_by": null
+    },
+    {
+      "id": "md-0486",
+      "input": "9*文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">9</span><em><span class=\"\">文</span></em></p>",
+      "delimiter": "*",
+      "edge": "open-out",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0487",
+      "input": "*中*9",
+      "html": "<p class=\"ds-markdown-paragraph\"><em><span class=\"\">中</span></em><span class=\"\">9</span></p>",
+      "delimiter": "*",
+      "edge": "close-out",
+      "neighbour": "9",
+      "reported_by": null
+    },
+    {
+      "id": "md-0488",
+      "input": "\\*33°C\\*左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">*33°C*左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "escape",
+      "reported_by": null
+    },
+    {
+      "id": "md-0489",
+      "input": "\\**33°C**左右",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">**33°C**左右</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "escape-strong",
+      "reported_by": null
+    },
+    {
+      "id": "md-0490",
+      "input": "`**33°C**左右`",
+      "html": "<p class=\"ds-markdown-paragraph\"><code>**33°C**左右</code></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "code-span",
+      "reported_by": null
+    },
+    {
+      "id": "md-0491",
+      "input": "**第一行\n第二行**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">第一行</span><br><span class=\"\">第二行</span></strong></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "multiline",
+      "reported_by": null
+    },
+    {
+      "id": "md-0492",
+      "input": "**未闭合",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">**未闭合</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "unclosed-strong",
+      "reported_by": null
+    },
+    {
+      "id": "md-0493",
+      "input": "*未闭合",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">*未闭合</span></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "unclosed-em",
+      "reported_by": null
+    },
+    {
+      "id": "md-0494",
+      "input": "**中文*",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">*</span><em><span class=\"\">中文</span></em></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "mismatch",
+      "reported_by": null
+    },
+    {
+      "id": "md-0495",
+      "input": "**外*内*外**",
+      "html": "<p class=\"ds-markdown-paragraph\"><strong><span class=\"\">外</span><em><span class=\"\">内</span></em><span class=\"\">外</span></strong></p>",
+      "delimiter": "special",
+      "edge": "special",
+      "neighbour": "nested",
+      "reported_by": null
+    },
+    {
+      "id": "md-0496",
+      "input": "~~中~~（",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">（</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0497",
+      "input": "~~中~~)",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">)</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0498",
+      "input": "~~中~~）",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">）</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0499",
+      "input": "~~中~~《",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">《</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0500",
+      "input": "~~中~~》",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">》</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0501",
+      "input": "~~中~~「",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">「</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0502",
+      "input": "~~中~~」",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">」</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0503",
+      "input": "~~中~~『",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">『</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0504",
+      "input": "~~中~~』",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">』</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0505",
+      "input": "~~中~~@",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">@</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0506",
+      "input": "~~中~~/",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">/</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0507",
+      "input": "~~中~~#",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">#</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0508",
+      "input": "~~中~~%",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">%</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0509",
+      "input": "~~中~~°",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">°</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0510",
+      "input": "~~中~~+",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">+</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0511",
+      "input": "~~中~~×",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">×</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0512",
+      "input": "~~中~~$",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">$</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0513",
+      "input": "~~中~~¥",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">¥</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0514",
+      "input": "~~中~~0",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">0</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0515",
+      "input": "~~中~~3",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">3</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0516",
+      "input": "~~中~~文",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">文</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0517",
+      "input": "~~中~~右",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">右</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0518",
+      "input": "~~中~~中",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">中</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0519",
+      "input": "~~中~~左",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">中</span>~~<span class=\"\">左</span></p>",
+      "delimiter": "~~",
+      "edge": "close-out",
+      "neighbour": "左",
+      "reported_by": null
+    },
+    {
+      "id": "md-0520",
+      "input": " ~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\">~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": " ",
+      "reported_by": null
+    },
+    {
+      "id": "md-0521",
+      "input": "-~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">-</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "-",
+      "reported_by": null
+    },
+    {
+      "id": "md-0522",
+      "input": ",~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">,</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": ",",
+      "reported_by": null
+    },
+    {
+      "id": "md-0523",
+      "input": "，~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">，</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "，",
+      "reported_by": null
+    },
+    {
+      "id": "md-0524",
+      "input": "、~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">、</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "、",
+      "reported_by": null
+    },
+    {
+      "id": "md-0525",
+      "input": ";~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">;</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": ";",
+      "reported_by": null
+    },
+    {
+      "id": "md-0526",
+      "input": "；~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">；</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "；",
+      "reported_by": null
+    },
+    {
+      "id": "md-0527",
+      "input": ":~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">:</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": ":",
+      "reported_by": null
+    },
+    {
+      "id": "md-0528",
+      "input": "：~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">：</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "：",
+      "reported_by": null
+    },
+    {
+      "id": "md-0529",
+      "input": "!~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">!</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "!",
+      "reported_by": null
+    },
+    {
+      "id": "md-0530",
+      "input": "！~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">！</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "！",
+      "reported_by": null
+    },
+    {
+      "id": "md-0531",
+      "input": "?~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">?</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "?",
+      "reported_by": null
+    },
+    {
+      "id": "md-0532",
+      "input": "？~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">？</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "？",
+      "reported_by": null
+    },
+    {
+      "id": "md-0533",
+      "input": ".~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">.</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": ".",
+      "reported_by": null
+    },
+    {
+      "id": "md-0534",
+      "input": "。~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">。</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "。",
+      "reported_by": null
+    },
+    {
+      "id": "md-0535",
+      "input": "'~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">'</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "'",
+      "reported_by": null
+    },
+    {
+      "id": "md-0536",
+      "input": "\"~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">\"</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "\"",
+      "reported_by": null
+    },
+    {
+      "id": "md-0537",
+      "input": "(~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">(</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "(",
+      "reported_by": null
+    },
+    {
+      "id": "md-0538",
+      "input": "（~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">（</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "（",
+      "reported_by": null
+    },
+    {
+      "id": "md-0539",
+      "input": ")~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">)</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": ")",
+      "reported_by": null
+    },
+    {
+      "id": "md-0540",
+      "input": "）~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">）</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "）",
+      "reported_by": null
+    },
+    {
+      "id": "md-0541",
+      "input": "《~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">《</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "《",
+      "reported_by": null
+    },
+    {
+      "id": "md-0542",
+      "input": "》~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">》</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "》",
+      "reported_by": null
+    },
+    {
+      "id": "md-0543",
+      "input": "「~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">「</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "「",
+      "reported_by": null
+    },
+    {
+      "id": "md-0544",
+      "input": "」~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">」</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "」",
+      "reported_by": null
+    },
+    {
+      "id": "md-0545",
+      "input": "『~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">『</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "『",
+      "reported_by": null
+    },
+    {
+      "id": "md-0546",
+      "input": "』~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">』</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "』",
+      "reported_by": null
+    },
+    {
+      "id": "md-0547",
+      "input": "@~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">@</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "@",
+      "reported_by": null
+    },
+    {
+      "id": "md-0548",
+      "input": "/~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">/</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "/",
+      "reported_by": null
+    },
+    {
+      "id": "md-0549",
+      "input": "#~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">#</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "#",
+      "reported_by": null
+    },
+    {
+      "id": "md-0550",
+      "input": "%~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">%</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "%",
+      "reported_by": null
+    },
+    {
+      "id": "md-0551",
+      "input": "°~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">°</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "°",
+      "reported_by": null
+    },
+    {
+      "id": "md-0552",
+      "input": "+~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">+</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "+",
+      "reported_by": null
+    },
+    {
+      "id": "md-0553",
+      "input": "×~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">×</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "×",
+      "reported_by": null
+    },
+    {
+      "id": "md-0554",
+      "input": "$~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">$</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "$",
+      "reported_by": null
+    },
+    {
+      "id": "md-0555",
+      "input": "¥~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">¥</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "¥",
+      "reported_by": null
+    },
+    {
+      "id": "md-0556",
+      "input": "0~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">0</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "0",
+      "reported_by": null
+    },
+    {
+      "id": "md-0557",
+      "input": "3~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">3</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "3",
+      "reported_by": null
+    },
+    {
+      "id": "md-0558",
+      "input": "文~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">文</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "文",
+      "reported_by": null
+    },
+    {
+      "id": "md-0559",
+      "input": "右~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">右</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "右",
+      "reported_by": null
+    },
+    {
+      "id": "md-0560",
+      "input": "中~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">中</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "中",
+      "reported_by": null
+    },
+    {
+      "id": "md-0561",
+      "input": "左~~文~~",
+      "html": "<p class=\"ds-markdown-paragraph\"><span class=\"\">左</span>~~<span class=\"\">文</span>~~</p>",
+      "delimiter": "~~",
+      "edge": "open-out",
+      "neighbour": "左",
+      "reported_by": null
+    }
+  ]
+}

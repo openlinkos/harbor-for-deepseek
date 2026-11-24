@@ -13,13 +13,17 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import 'katex/dist/katex.min.css'
+import { translate, type Locale } from '@deepapi/i18n'
 import type { TextCitation } from '@deepapi/types'
 import { Children, cloneElement, Component, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState, type FocusEvent as ReactFocusEvent, type HTMLAttributes, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchCiteCard } from './blocks.js'
+import { remarkDeepseekAttention } from './attention.js'
 import { citationNumbers, holdDelimitedMath, remarkCitations, stripPartialCitation } from './citations.js'
+import { applyOfficialInline } from './inline-official.js'
 import { MathBlock, MathInline, remarkDeepseekMath } from './math.js'
 import { renderMermaid } from './mermaid-render.js'
+import { failedSiteIcons, LinkMarkIcon } from './site-logo.js'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -50,9 +54,13 @@ const highlight = (language: string | undefined, value: string) => {
   return hljs.highlightAuto(value).value
 }
 
-const label = (zh: string, en: string) => (document.documentElement.lang === 'en' ? en : zh)
+const label = (zh: string, en: string) => (typeof document !== 'undefined' && document.documentElement.lang === 'en' ? en : zh)
+const mdLocale = (): Locale => (typeof document !== 'undefined' && document.documentElement.lang === 'en' ? 'en' : 'zh')
 
 const StreamContext = createContext(false)
+const InPre = createContext(false)
+
+const escapeHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 const BOX = /[┌┐└┘├┤┬┴┼─│╔╗╚╝╠╣╦╩╬═║╭╮╯╰]/
 
@@ -118,6 +126,20 @@ const saveBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url)
 }
 
+/** Mermaid's default useMaxWidth writes width="100%" plus an inline max-width of the intrinsic size. A fit-content plate has no definite containing block, so that percentage width collapses to 0. Pin the viewBox size; the fullscreen CSS caps scale it into the viewport. */
+const fullscreenSvg = (source: string) => {
+  if (typeof DOMParser === 'undefined') return source
+  const doc = new DOMParser().parseFromString(source, 'image/svg+xml')
+  const node = doc.querySelector('svg')
+  if (!node) return source
+  const parts = node.getAttribute('viewBox')?.trim().split(/[\s,]+/).map(Number)
+  if (!parts || parts.length !== 4 || !(parts[2] > 0) || !(parts[3] > 0)) return source
+  node.setAttribute('width', String(parts[2]))
+  node.setAttribute('height', String(parts[3]))
+  node.style.removeProperty('max-width')
+  return new XMLSerializer().serializeToString(doc)
+}
+
 const Mermaid = ({ chart }: { chart: string }) => {
   const streaming = useContext(StreamContext)
   const latest = useRef(chart)
@@ -128,6 +150,15 @@ const Mermaid = ({ chart }: { chart: string }) => {
   const [tab, setTab] = useState<'chart' | 'code'>('chart')
   const [zoom, setZoom] = useState(1)
   const [full, setFull] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
+  useEffect(() => {
+    if (!full) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setFull(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [full])
   useEffect(() => {
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -176,12 +207,25 @@ const Mermaid = ({ chart }: { chart: string }) => {
       clearTimeout(timer)
     }
   }, [settled, streaming])
-  const download = () => {
-    if (tab === 'code' || !svg) {
-      saveBlob(new Blob([chart], { type: 'text/plain' }), 'diagram.mmd')
-      return
-    }
+  const downloadCode = () => saveBlob(new Blob([chart], { type: 'text/plain' }), 'diagram.mmd')
+  const downloadSvg = () => {
+    if (!svg) return
     saveBlob(new Blob([svg], { type: 'image/svg+xml' }), 'diagram.svg')
+  }
+  const downloadPng = () => {
+    if (!svg) return
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
+    const image = new Image()
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = image.naturalWidth || 800
+      canvas.height = image.naturalHeight || 600
+      canvas.getContext('2d')?.drawImage(image, 0, 0)
+      URL.revokeObjectURL(url)
+      canvas.toBlob((blob) => { if (blob) saveBlob(blob, 'diagram.png') })
+    }
+    image.onerror = () => URL.revokeObjectURL(url)
+    image.src = url
   }
   return (
     <div className="diagram-card" data-testid="mermaid-card">
@@ -203,6 +247,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
                   <IconSvg><circle cx="7" cy="7" r="4.2" /><path d="M10.2 10.2 13 13M7 5v4M5 7h4" /></IconSvg>
                 </button>
               </DiagramTip>
+              <span className="diagram-divider" aria-hidden="true" />
             </>
           ) : (
             <button type="button" onClick={() => void navigator.clipboard.writeText(chart)}>
@@ -210,30 +255,41 @@ const Mermaid = ({ chart }: { chart: string }) => {
               <span>{label('复制', 'Copy')}</span>
             </button>
           )}
-          <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
+          <button type="button" aria-haspopup="menu" aria-expanded={downloadOpen} aria-label={label('下载', 'Download')} onClick={() => setDownloadOpen((open) => !open)}>
             <IconSvg><path d="M8 2.5v7M5.5 7 8 9.5 10.5 7M3.5 12.5h9" /></IconSvg>
             <span>{label('下载', 'Download')}</span>
           </button>
+          {downloadOpen ? (
+            <div className="diagram-menu" role="menu">
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadSvg() }}>{label('下载 SVG', 'SVG')}</button>
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadPng() }}>{label('下载 PNG', 'PNG')}</button>
+              <button type="button" role="menuitem" onClick={() => { setDownloadOpen(false); downloadCode() }}>{label('下载代码', 'Code')}</button>
+            </div>
+          ) : null}
           <button type="button" aria-label={label('全屏', 'Full screen')} onClick={() => setFull(true)}>
             <IconSvg><path d="M3 6.5V3.5H6M10 3.5h3V6.5M13 9.5v3h-3M6 12.5H3V9.5" /></IconSvg>
             <span>{label('全屏', 'Full screen')}</span>
           </button>
         </div>
       </div>
-      {failed ? <pre className="diagram-source"><code>{chart}</code></pre> : null}
-      <pre className="diagram-source" hidden={failed || tab !== 'code'}><code>{chart}</code></pre>
-      <div className="diagram-view" hidden={failed || tab !== 'chart'}>
-        <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} />
+      <pre className="diagram-source" hidden={tab !== 'code'}><code>{chart}</code></pre>
+      <div className="diagram-view" hidden={tab !== 'chart'}>
+        {failed ? <p className="diagram-status" data-testid="mermaid-status">{chart.trim() ? translate(mdLocale(), 'mermaidFailed') : translate(mdLocale(), 'mermaidEmpty')}</p> : null}
+        {!failed && !svg ? <p className="diagram-status" data-testid="mermaid-status">{translate(mdLocale(), 'mermaidLoading')}</p> : null}
+        {svg && !failed ? <div className="mermaid" style={{ transform: `scale(${zoom})` }} dangerouslySetInnerHTML={{ __html: svg }} /> : null}
       </div>
       {full ? createPortal(
-        <div className="diagram-modal" role="dialog" aria-modal="true" data-testid="mermaid-modal">
+        <div className="diagram-modal" data-testid="mermaid-modal">
+          <div className="bg-mask" />
           <button type="button" className="diagram-modal-close" aria-label={label('关闭', 'Close')} onClick={() => setFull(false)}>
             <IconSvg><path d="M4 4l8 8M12 4 4 12" /></IconSvg>
           </button>
-          <div className="diagram-modal-card">
-            {tab === 'code' || !svg
-              ? <pre className="diagram-source"><code>{chart}</code></pre>
-              : <div className="mermaid" dangerouslySetInnerHTML={{ __html: svg }} />}
+          <div className="diagram-modal-slide">
+            <div className="diagram-modal-card">
+              {tab === 'code' || !svg
+                ? <pre className="diagram-source"><code>{chart}</code></pre>
+                : <div className="mermaid" dangerouslySetInnerHTML={{ __html: fullscreenSvg(svg) }} />}
+            </div>
           </div>
         </div>,
         document.body,
@@ -242,8 +298,8 @@ const Mermaid = ({ chart }: { chart: string }) => {
   )
 }
 
-const CodeBlock = ({ language, value }: { language?: string; value: string }) => {
-  const html = highlight(language, value)
+const CodeBlock = ({ language, value, plain = false }: { language?: string; value: string; plain?: boolean }) => {
+  const html = plain ? escapeHtml(value) : highlight(language, value)
   const [copied, setCopied] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const long = value.split('\n').length > 18
@@ -257,14 +313,15 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
     URL.revokeObjectURL(url)
   }
   return (
-    <div className="code-card">
-      <div className="code-sticky">
-      <div className="code-head">
+    <div className={`code-card md-code-block ${typeof document !== 'undefined' && document.body.hasAttribute('data-ds-dark-theme') ? 'md-code-block-dark' : 'md-code-block-light'}`}>
+      <div className="code-sticky md-code-block-banner-wrap">
+      <div className="code-head md-code-block-banner">
         <div className="code-bar">
-        <span>{(language || 'text').toLowerCase()}</span>
-        <span className="code-tools">
+        <div className="md-code-block-infostring">{(language || 'text').toLowerCase()}</div>
+        <div className="code-tools md-code-block-action">
           <button
             type="button"
+            className="ds-markdown-code-copy-button"
             onClick={() => {
               void navigator.clipboard.writeText(value).then(() => {
                 setCopied(true)
@@ -273,18 +330,19 @@ const CodeBlock = ({ language, value }: { language?: string; value: string }) =>
             }}
           >
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="4.2" y="3.2" width="7.2" height="9.6" rx="1.2" /><path d="M2.6 11.2V2.8h6.2" /></svg>
-            <span>{copied ? '✓' : label('复制', 'Copy')}</span>
+            {/* SP-MD-982 / SP-MD-983 */}
+            <span>{copied ? label('复制成功', 'Copied') : label('复制', 'Copy')}</span>
           </button>
           <button type="button" aria-label={label('下载', 'Download')} onClick={download}>
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M7 2.5v7.2M4.2 7.2 7 10l2.8-2.8M2.5 13h9" /></svg>
             <span>{label('下载', 'Download')}</span>
           </button>
-        </span>
+        </div>
         </div>
       </div>
       </div>
       <pre className={long && !expanded ? 'collapsed' : ''}>
-        <code dangerouslySetInnerHTML={{ __html: html }} />
+        {value ? <code className={plain ? 'is-plain' : undefined} dangerouslySetInnerHTML={{ __html: html }} /> : null}
       </pre>
       <svg className="code-corner" width="12" height="12" aria-hidden="true" />
       <svg className="code-corner end" width="12" height="12" aria-hidden="true" />
@@ -321,16 +379,28 @@ const hostOf = (url: string) => {
   }
 }
 
-const CiteIcon = ({ label, icon }: { label: string; icon?: string | null }) => {
+// SP-CITE-158. Empty or failed src is the 14px link svg. The same mark is used on panel cards and strips.
+const CiteIcon = ({ icon }: { label: string; icon?: string | null }) => {
   const src = typeof icon === 'string' ? icon.trim() : ''
-  const [failed, setFailed] = useState(false)
-  const letter = (label.trim().slice(0, 1) || '?').toUpperCase()
+  const [failed, setFailed] = useState(() => !src || failedSiteIcons.has(src))
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    setFailed(!src || failedSiteIcons.has(src))
+    setLoaded(false)
+  }, [src])
   if (!src || failed) {
-    return <i className="search-view-card__icon" aria-hidden="true">{letter}</i>
+    return (
+      <i className="search-view-card__icon" aria-hidden="true">
+        <span className="site_logo_loading site_logo_fallback">
+          <LinkMarkIcon />
+        </span>
+      </i>
+    )
   }
   return (
     <i className="search-view-card__icon" aria-hidden="true">
-      <img src={src} alt="" onError={() => setFailed(true)} />
+      {loaded ? null : <span className="site_logo_loading" />}
+      <img src={src} alt="" style={loaded ? undefined : { display: 'none' }} onLoad={() => setLoaded(true)} onError={() => { failedSiteIcons.add(src); setFailed(true) }} />
     </i>
   )
 }
@@ -339,13 +409,9 @@ const CiteCardBody = ({ card }: { card: SearchCiteCard }) => (
   <>
     <span className="search-view-card__meta">
       <CiteIcon label={card.site || card.title} icon={card.icon} />
-      <span className="search-view-card__site">{card.site}</span>
-      {card.date ? (
-        <>
-          <span className="search-view-card__rule" aria-hidden="true" />
-          <span className="search-view-card__date">{card.date}</span>
-        </>
-      ) : null}
+      {card.site ? <span className="search-view-card__site">{card.site}</span> : null}
+      {card.site && card.date ? <span className="search-view-card__rule" aria-hidden="true" /> : null}
+      {card.date ? <span className="search-view-card__date">{card.date}</span> : null}
     </span>
     <span className="search-view-card__title">{card.title}</span>
     {card.snippet ? <span className="search-view-card__snippet">{card.snippet}</span> : null}
@@ -512,7 +578,7 @@ const itemBlocks = (children: ReactNode) => {
     const text = inline.some((node) => typeof node !== 'string' || node.trim() !== '')
     if (text) {
       if (inline.length === 1 && isValidElement(inline[0]) && inline[0].type === 'p') out.push(inline[0])
-      else out.push(<p key={out.length}>{inline}</p>)
+      else out.push(<p className="ds-markdown-paragraph" key={out.length}>{inline}</p>)
     }
     inline = []
   }
@@ -527,13 +593,57 @@ const itemBlocks = (children: ReactNode) => {
   return out
 }
 
+const MarkdownCode = ({ className, children }: { className?: string; children?: ReactNode }) => {
+  const inPre = useContext(InPre)
+  // An empty fence has no children. String(undefined) is the word "undefined" (md-0030).
+  const value = (children == null ? '' : String(children)).replace(/\n$/, '')
+  const language = /language-(\S+)/.exec(className ?? '')?.[1]
+  // A fenced block is pre>code even when the fence has one line and no language (SP-MD-401).
+  const block = inPre || Boolean(className) || value.includes('\n')
+  if (!block) {
+    return <code className="inline-code">{children}</code>
+  }
+  if (language === 'mermaid') {
+    return <Mermaid chart={value} />
+  }
+  if (BOX.test(value)) {
+    return (
+      <div className="code-card">
+        <pre className="box-drawing"><code>{value}</code></pre>
+      </div>
+    )
+  }
+  const plain = !language || language.toLowerCase() === 'text'
+  return <CodeBlock language={language} value={value} plain={plain} />
+}
+
 const components = {
+  p({ children }: { children?: ReactNode }) {
+    return <p className="ds-markdown-paragraph">{children}</p>
+  },
   citation: CitationView,
   'citation-group': CitationGroupView,
   'math-inline': MathInline,
   'math-block': MathBlock,
   li({ children }: { children?: ReactNode }) {
-    return <li>{itemBlocks(children)}</li>
+    // SP-MD-098. remark-gfm hands the li a checkbox component, not a host input, so type === 'input' never matches.
+    const task = Children.toArray(children).some((node) => {
+      if (!isValidElement(node)) return false
+      const props = node.props as { type?: string }
+      return node.type === 'input' || props.type === 'checkbox'
+    })
+    return <li className={task ? 'ds-markdown-task-list-item' : undefined}>{itemBlocks(children)}</li>
+  },
+  input({ type, checked, disabled }: { type?: string; checked?: boolean; disabled?: boolean }) {
+    if (type !== 'checkbox') return <input type={type} />
+    return <input type="checkbox" className="ds-markdown-task-checkbox" checked={Boolean(checked)} disabled={disabled} readOnly />
+  },
+  table({ children }: { children?: ReactNode }) {
+    return (
+      <div className="markdown-table-wrapper">
+        <table>{children}</table>
+      </div>
+    )
   },
   a({ href, children }: { href?: string; children?: ReactNode }) {
     const safe = href && /^https?:\/\//i.test(href) ? href : undefined
@@ -543,24 +653,11 @@ const components = {
       </a>
     )
   },
+  pre({ children }: { children?: ReactNode }) {
+    return <InPre.Provider value={true}>{children}</InPre.Provider>
+  },
   code({ className, children }: { className?: string; children?: ReactNode }) {
-    const value = String(children).replace(/\n$/, '')
-    const language = /language-([\w-]+)/.exec(className ?? '')?.[1]
-    const block = Boolean(className) || value.includes('\n')
-    if (!block) {
-      return <code className="inline-code">{children}</code>
-    }
-    if (language === 'mermaid') {
-      return <Mermaid chart={value} />
-    }
-    if (BOX.test(value)) {
-      return (
-        <div className="code-card">
-          <pre className="box-drawing"><code>{value}</code></pre>
-        </div>
-      )
-    }
-    return <CodeBlock language={language} value={value} />
+    return <MarkdownCode className={className}>{children}</MarkdownCode>
   },
   img({ src, alt }: { src?: string; alt?: string }) {
     const safe = src && (/^https:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) ? src : undefined
@@ -568,14 +665,17 @@ const components = {
   },
 } as unknown as Components
 
-export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => (
+export const Markdown = ({ text, citations, cards, streaming = false }: { text: string; citations?: TextCitation[]; cards?: SearchCiteCard[]; streaming?: boolean }) => {
+  const source = holdDelimitedMath(stripPartialCitation(text, streaming), streaming)
+  return (
   <CiteContext.Provider value={{ citations, cards }}>
     <StreamContext.Provider value={streaming}>
     <Boundary text={text}>
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkCitations(citationNumbers(citations))]} components={components}>
-        {holdDelimitedMath(stripPartialCitation(text, streaming), streaming)}
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkDeepseekMath, remarkDeepseekAttention, () => (tree: unknown) => applyOfficialInline(tree as Parameters<typeof applyOfficialInline>[0], source), remarkCitations(citationNumbers(citations))]} components={components}>
+        {source}
       </ReactMarkdown>
     </Boundary>
     </StreamContext.Provider>
     </CiteContext.Provider>
-)
+  )
+}

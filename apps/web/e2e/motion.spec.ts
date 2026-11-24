@@ -32,6 +32,8 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
     isMobile: mobile,
     hasTouch: mobile,
     deviceScaleFactor: 1,
+    // browser.newContext() does not inherit use.timezoneId. Greeting hours must stay +08:00 under TZ=UTC.
+    timezoneId: 'Asia/Shanghai',
     userAgent: mobile
       ? 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36'
       : devices['Desktop Chrome'].userAgent,
@@ -57,6 +59,7 @@ const openAt = async (browser: Browser, width: number, height: number, mobile: b
   const nextReply = (text: string) => {
     reply = text
   }
+  await page.clock.install({ time: new Date('2026-11-23T08:00:00+08:00') })
   await page.goto('/')
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-input').fill('demo-local-key')
@@ -71,7 +74,7 @@ for (const point of points) {
     const mobile = point.layout === 'mobile'
     const { page } = await openAt(browser, point.width, point.height, mobile)
     try {
-      await expect(page.locator('.greeting')).toContainText('今天有什么可以帮到你？')
+      await expect(page.locator('.greeting')).toContainText('早上好，今天想做点什么？')
       const bar = await page.locator('.transcript').evaluate((node) => getComputedStyle(node).scrollbarWidth)
       expect(bar).toBe('none')
       const max = await page.locator('.transcript').evaluate((node) => getComputedStyle(node).maxWidth)
@@ -100,9 +103,17 @@ for (const point of points) {
         await expect(page.getByTestId('toggle-thinking')).toHaveCSS('height', '34px')
         const pill = await page.getByTestId('toggle-thinking').boundingBox()
         expect(pill?.width ?? 0).toBeGreaterThan(34)
-        await expect(page.locator('.sidebar')).toBeVisible()
-        const width = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
-        expect(width).toBe(261)
+        if (point.width < 1024) {
+          await expect(page.locator('.sidebar')).toBeHidden()
+          const collapsedWidth = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+          expect(collapsedWidth).toBe(0)
+          await page.getByRole('button', { name: '打开边栏' }).click()
+          await expect(page.locator('.sidebar')).toBeVisible()
+        } else {
+          await expect(page.locator('.sidebar')).toBeVisible()
+          const width = await page.locator('.sidebar').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+          expect(width).toBe(261)
+        }
         const motion = await page.locator('.sidebar').evaluate((node) => getComputedStyle(node).transitionDuration)
         expect(motion).toContain('0.3s')
       }
@@ -178,7 +189,7 @@ for (const point of points) {
         await page.keyboard.press('Escape')
         await page.getByTestId('new-chat').click()
         await expect(page.locator('.greeting')).toBeVisible()
-        await page.getByRole('button', { name: '隐藏' }).click()
+        await page.getByRole('button', { name: '收起边栏' }).click()
         await expect(page.locator('.shell')).toHaveClass(/sider-collapsed/)
         await expect(page.locator('.sidebar')).toHaveCSS('width', '0px')
       }

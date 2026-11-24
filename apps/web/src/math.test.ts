@@ -29,8 +29,8 @@ describe('deepseek math delimiters', () => {
     expect(markup).not.toContain('katex-error')
     expect(markup.match(/class="katex-display/g)).toHaveLength(4)
     expect(texOf(markup)).toEqual(order)
-    expect(markup).toMatch(/<li><p>偶数质数只有 ?<span class="katex"/)
-    expect(markup).toMatch(/<li><p>共有 ?<span class="katex"/)
+    expect(markup).toMatch(/<li><p class="ds-markdown-paragraph">偶数质数只有 ?<span class="katex"/)
+    expect(markup).toMatch(/<li><p class="ds-markdown-paragraph">共有 ?<span class="katex"/)
   })
 
   it('turns red if a closing $ before a digit starts math', () => {

@@ -261,7 +261,7 @@ type MdNode = {
 
 const CONTAINERS = new Set(['paragraph', 'heading', 'tableCell'])
 const OPAQUE = new Set(['code', 'inlineCode', 'math', 'inlineMath', 'html', 'yaml'])
-const MARK = /\[(?:citation|reference):(\d+)\]/g
+const MARK = /\[(citation|reference):(\d+)\]/g
 
 const citationNode = (n: number): MdNode => ({
   type: 'citation',
@@ -311,8 +311,11 @@ const replaceDirectMarkers = (node: MdNode, allowed?: ReadonlySet<number>) => {
     let last = 0
     let match: RegExpExecArray | null
     while ((match = re.exec(child.value))) {
-      const n = Number(match[1])
-      const keep = inSpan(spans, match.index) || (allowed && !allowed.has(n))
+      const kind = match[1]
+      const n = Number(match[2])
+      // SP-CITE-147: a reference number other than the unmatched -404 is the badge text.
+      // Citation numbers still have to be in the message citation list.
+      const keep = inSpan(spans, match.index) || (kind === 'citation' && !!allowed && !allowed.has(n))
       if (match.index > last) next.push({ type: 'text', value: child.value.slice(last, match.index) })
       if (keep) next.push({ type: 'text', value: match[0] })
       else next.push(citationNode(n))
@@ -351,7 +354,7 @@ const linearize = (node: MdNode, parent: MdNode | null, out: Piece[]) => {
     out.push({ kind: 'bound', node, parent })
     return
   }
-  if (node.type === 'break' && parent) {
+  if ((node.type === 'break' || node.type === 'officialBreak') && parent) {
     out.push({ kind: 'bound', node, parent })
     return
   }
