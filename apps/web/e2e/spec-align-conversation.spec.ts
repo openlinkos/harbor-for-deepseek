@@ -40,9 +40,35 @@ const openSeed = async (page: Page) => {
   await expect(page.locator('.bubble')).toBeVisible()
 }
 
+// Normal mode must not reserve the share checkbox column. Master a8df8b9
+// (wt-spec-ref) renders the checkbox with the hidden attribute, and
+// input.share-box[hidden] is display:none, so it adds no gap. The in-flow
+// sticky is 13+18+13 = 44px (styles.css .share-sticky). SP-SHARE-033.
+const assertNoShareSticky = async (page: Page) => {
+  await expect(page.locator('.share-col')).toHaveCount(0)
+  await expect(page.locator('.share-sticky')).toHaveCount(0)
+  const spacing = await page.evaluate(() => {
+    const turn = document.querySelector('.turn.user') as HTMLElement
+    const bubble = turn.querySelector('.bubble') as HTMLElement
+    const assistant = document.querySelector('.turn.assistant') as HTMLElement
+    const prose = assistant.querySelector('.prose') as HTMLElement
+    const pad = parseFloat(getComputedStyle(turn).paddingTop)
+    const margin = parseFloat(getComputedStyle(bubble).marginTop)
+    return {
+      userLead: bubble.getBoundingClientRect().top - turn.getBoundingClientRect().top,
+      pad,
+      margin,
+      answerLead: prose.getBoundingClientRect().top - assistant.getBoundingClientRect().top,
+    }
+  })
+  expect(Math.abs(spacing.userLead - (spacing.pad + spacing.margin)), `user bubble lead ${JSON.stringify(spacing)}`).toBeLessThanOrEqual(0.5)
+  expect(spacing.answerLead, `answer lead ${JSON.stringify(spacing)}`).toBeLessThan(20)
+}
+
 test('bubble, column, and action row match the official message styles', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await openSeed(page)
+  await assertNoShareSticky(page)
   const bubble = page.locator('.bubble').first()
   await expect(bubble).toHaveCSS('font-size', '16px')
   await expect(bubble).toHaveCSS('line-height', '24px')
