@@ -4595,24 +4595,6 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   padding-bottom: 13px;
   pointer-events: none;
 }
-/* Desktop transcript padding is 12px and the user port origin is 25px above the turn,
-   so top:0 would clamp the margin box down 13px and move the captured checkbox.
-   The margin keeps that edge on the scrollport; the translate keeps the captured box.
-   On a phone the user port (top: -25px) is no longer the sticky scrollport, so that
-   checkbox sits 25px low. The answer port is only 8px above the turn and already
-   lands on the capture line, so it is left alone. */
-@media (min-width: 768px) {
-  .share-sticky {
-    margin-top: 13px;
-    transform: translateY(-13px);
-  }
-}
-@media (max-width: 767px) {
-  .turn.user .share-sticky { transform: translateY(-25px); }
-  /* The grey block stays 3px above that checkbox. Grow it upward only; the bottom
-     edge still sits 12px above the answer block. */
-  .turn.user.share-on > .share-halo { top: -40px; }
-}
 /* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
 .shell.share-narrow .share-sticky { z-index: 1; }
 .turn.share-on .share-box { position: static; pointer-events: none; }
@@ -4831,7 +4813,11 @@ input.share-box.ds-checkbox:checked::after,
   .share-bar [data-testid="share-cancel"] { display: none; }
 }
 @media (max-width: 767px) {
-  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 28.5px; }
+  /* Chromium insets the sticky area by the scroller's padding, so 28.5px of transcript padding
+     clamped the question checkbox 25px low (SP-SHARE-035/109/111: sticky top 0, padding-top 13px).
+     The official list has no scroller padding, so the gap pads the inner column instead. */
+  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
+  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 28.5px; }
   .turn.share-on > .share-halo {
     left: -20px;
     right: -1px;
