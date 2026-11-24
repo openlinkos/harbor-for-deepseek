@@ -433,7 +433,8 @@ body[data-ds-dark-theme] .diagram-modal-card .mermaid svg { background-color: va
 }
 .side-scroll {
   height: 100%;
-  margin: 0 -2px;
+  /* SP-SB-301's sheet says margin 0 -2px. On this 261px sider (padding 12px, 1px border) that margin paints the row at x=10, width 240. Frozen captures answer-1440, home-with-history-1440, mobile-drawer-390, and answer-dark-1920, and master a8df8b9, measure the row at x=12, width 236: the padding edge, with no horizontal margin. */
+  margin: 0;
   overflow: auto;
   overflow-anchor: none;
 }
@@ -798,8 +799,8 @@ body[data-ds-dark-theme] .chat-link.active::after { --mask-base-color: 53, 54, 5
   cursor: pointer;
 }
 .chat-row > button:not(.more), .chat-row form { min-width: 0; text-align: left; background: none; border: 0; padding: 0; font-size: 14px; cursor: pointer; color: var(--dsw-alias-label-primary); text-decoration: none; }
-/* SP-SB-056. The title text is 18px on a 22px-tall button. The row itself stays 22px. */
-.chat-row > button:not(.more) { flex: 1; height: 22px; line-height: 18px; margin: -2px 35px -2px -10px; border-radius: 11px; }
+/* SP-SB-056. Official ._546d736 .c08e6e93 is line-height 18px and has no margin. The old margin -2px 35px -2px -10px cancelled the row's 10px padding, so the title started on the highlight edge. */
+.chat-row > button:not(.more) { flex: 1; height: 22px; line-height: 18px; border-radius: 11px; }
 .chat-row form { flex: 0 1 auto; max-width: calc(100% - 36px); line-height: 22px; }
 .chat-row form input {
   --dsl-input-text-color: var(--dsw-alias-label-primary);

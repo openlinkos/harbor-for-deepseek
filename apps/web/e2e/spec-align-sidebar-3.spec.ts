@@ -52,8 +52,9 @@ test('sidebar header, list, select bar, and collapsed pill match the inner piece
   await expect(empty).toHaveCSS('color', 'rgb(129, 133, 140)')
   await expect(page.locator('.side-scroll-wrap')).toHaveCSS('margin-top', '24px')
   await expect(page.locator('.side-scroll')).toHaveCSS('margin-top', '0px')
-  await expect(page.locator('.side-scroll')).toHaveCSS('margin-left', '-2px')
-  await expect(page.locator('.side-scroll')).toHaveCSS('margin-right', '-2px')
+  // Frozen captures and master a8df8b9 put the row at x=12, width 236. margin 0 -2px (SP-SB-301's sheet) shifts it to x=10, width 240.
+  await expect(page.locator('.side-scroll')).toHaveCSS('margin-left', '0px')
+  await expect(page.locator('.side-scroll')).toHaveCSS('margin-right', '0px')
   await expect(page.locator('.side-scroll')).toHaveCSS('overflow-x', 'auto')
   await expect(page.locator('.side-scroll')).toHaveCSS('overflow-y', 'auto')
   const avatar = page.locator('.user-bar .avatar')
