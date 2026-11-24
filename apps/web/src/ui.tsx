@@ -1436,6 +1436,7 @@ export const BootSkeleton = () => {
   return (
     <div className="shell boot-skeleton" data-testid="boot-skeleton">
       <aside className="sidebar">
+        <div className="sider-surface">
         <div className="sider-top">
           <span className="brand-name"><Mark /><Wordmark /></span>
           <span className="sider-icons" aria-hidden="true">
@@ -1452,6 +1453,7 @@ export const BootSkeleton = () => {
             <span className="avatar" />
             <span className="user-more" aria-hidden="true"><FillIcon paths={MORE_DOTS} /></span>
           </div>
+        </div>
         </div>
       </aside>
       <section className="stage">
@@ -2021,6 +2023,7 @@ export const Shell = () => {
     <div className={`shell ${state.sidebarOpen ? 'nav-open' : ''} ${collapsed ? 'sider-collapsed' : ''} ${panel ? 'panel-open' : ''} ${selecting ? 'selecting' : ''} ${sharing ? 'sharing' : ''} ${shareNarrow ? 'share-narrow' : ''}`}>
       {offline ? <p className="offline-banner" role="status" data-testid="offline">{t('offline')}</p> : null}
       <aside className="sidebar" data-testid="sidebar">
+        <div className="sider-surface">
         <div className="sider-top">
           <span
             className="brand-name"
@@ -2141,6 +2144,7 @@ export const Shell = () => {
         </div>
         </div>
         )}
+        </div>
       </aside>
       {collapsed ? (
         <>

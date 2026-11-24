@@ -76,7 +76,7 @@ a { color: var(--dsw-alias-brand-text); }
   right: 0;
   bottom: 0;
   left: 0;
-  /* SP-GL-129 / SP-SB-570. In-flow sider at min-width 768px is z-index 8. Phone overrides below. */
+  /* SP-GL-129 / SP-SB-570. The shell at min-width 768px is z-index 8. Phone overrides below. */
   z-index: 8;
   background: var(--dsw-specific-sidebar-fill);
   border-right: 1px solid var(--dsw-alias-border-l1);
@@ -91,6 +91,17 @@ a { color: var(--dsw-alias-brand-text); }
   box-sizing: border-box;
   will-change: transform, max-width;
   transition: box-shadow .3s, flex-basis var(--ds-transition-duration-slow) var(--ds-ease-in-out), width var(--ds-transition-duration-slow) var(--ds-ease-in-out), max-width var(--ds-transition-duration-slow) var(--ds-ease-in-out), opacity .2s var(--ds-ease-in-out), transform var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+}
+/* SP-GL-110. .b8812f16 is the inner surface, z-index 1. The shell above stays 8. */
+.sider-surface {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
 }
 .shell.sider-collapsed .sidebar {
   flex-basis: 0;
@@ -1023,7 +1034,8 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   justify-content: space-between;
 }
 .topbar h2 { margin: 0; font-size: 16px; font-weight: 560; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.stage:not(:has(.home)) .topbar { height: 49px; }
+/* SP-TB-071. Conversation header ._1aa2651.df9f32da padding is 2px 16px 0. */
+.stage:not(:has(.home)) .topbar { height: 49px; padding: calc(2px + env(safe-area-inset-top)) 16px 0; }
 /* SP-TB-108/109. Chat header paints the page background. Home stays transparent. */
 .stage:not(:has(.home)) .topbar { position: relative; z-index: 7; background: var(--dsw-alias-bg-base); }
 .stage:not(:has(.home)) .topbar > :not(.chat-title) { position: relative; z-index: 1; }
@@ -1939,6 +1951,8 @@ a.cite:hover, .cite:hover {
 /* Official .f93f59e4: 34px = 24px line + 8px padding + 2px border, padding 4px 10px 4px 4px, radius 100px, bg-base. */
 .sources-pill {
   box-sizing: border-box;
+  /* SP-CITE-065. The pill row centers its contents. */
+  justify-content: center;
   height: 34px;
   margin: 16px 0 0;
   border: 1px solid var(--dsw-alias-border-l2);
@@ -2140,6 +2154,8 @@ body.rtl .sources-pill-text { margin-left: 0; margin-right: 6px; }
 }
 /* SP-TB-243. Official header padding-bottom is 48px. The column below stays 64px. */
 .home-header { padding-bottom: 48px; }
+/* SP-TB-301. Dark colour sits on the header container. SP-TB-249 keeps the greeting on label-primary. */
+body[data-ds-dark-theme] .home-header { color: #fff; }
 /* SP-TB-248/249, SP-TB-255..257. */
 .greeting {
   display: flex;
@@ -4068,7 +4084,7 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
     z-index: 3;
   }
   .jump-end svg { width: 14px; height: 14px; }
-  .stage:not(:has(.home)) .topbar { height: 60px; padding: 0 10px; }
+  .stage:not(:has(.home)) .topbar { height: 60px; padding: calc(2px + env(safe-area-inset-top)) 16px 0; }
   .stage:not(:has(.home)) .topbar > .chat-title {
     left: 66px;
     top: 22px;
