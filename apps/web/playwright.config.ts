@@ -14,6 +14,8 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1280, height: 820 },
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
     // --mute-audio stops Chromium from pulling a ScriptProcessorNode, so the
     // real recorder never receives samples. Speech tests need the audio thread.
     launchOptions: { ignoreDefaultArgs: ['--mute-audio'] },

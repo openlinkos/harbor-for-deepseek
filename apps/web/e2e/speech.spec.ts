@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { expect, test, type Locator, type Page, type Route } from '@playwright/test'
+import { observeRecorderSamples, waitForRecorderSamples } from './lib/recording-readiness'
 import { installPcmProbe, openPcmServer, type PcmServer } from './lib/speech-pcm'
 
 test.use({ ignoreHTTPSErrors: true })
@@ -21,6 +22,7 @@ const sse = (text: string, title: string) => {
 const pcm = () => Buffer.alloc(4800)
 
 const installMedia = async (page: Page, mode: 'tone' | 'deny' | 'hold') => {
+  await observeRecorderSamples(page)
   await page.addInitScript((kind) => {
     const makeStream = () => {
       const context = new AudioContext()
@@ -157,6 +159,7 @@ test('whole-recording ASR inserts at the selection and does not send', async ({ 
   await expect(page.getByTestId('voice-spectrum')).toBeVisible()
   await page.setViewportSize({ width: 1280, height: 820 })
   await expect(page.getByTestId('voice-timer')).toHaveText(/录音中 [1-9]\d*s/)
+  await waitForRecorderSamples(page)
   await page.getByTestId('voice-input').click()
   await expect(composer).toHaveValue('你好转写结果')
   expect(messagePosts(session.seen)).toHaveLength(0)
@@ -205,13 +208,14 @@ test('a late transcript does not land in another conversation', async ({ page })
   await composer.fill('前缀')
   await page.getByTestId('voice-input').click()
   await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
-  await page.waitForTimeout(700)
+  await waitForRecorderSamples(page)
   await page.getByTestId('voice-input').click()
+  await expect.poll(() => asrPosts(session.seen).length).toBe(1)
   await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
   await page.getByTestId('new-chat').click()
   await expect(page.locator('.greeting')).toBeVisible()
   session.releaseAsr()
-  await page.waitForTimeout(400)
+  await expect.poll(() => session.failed.some((entry) => entry.includes('/v1/tools/asr'))).toBe(true)
   await expect(page.getByTestId('composer')).toHaveValue('')
   await expect(page.getByTestId('composer')).not.toContainText('转写结果')
 })
