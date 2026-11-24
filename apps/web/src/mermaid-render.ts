@@ -57,6 +57,38 @@ const applyThemeStyles = (svg: string) => {
   return new XMLSerializer().serializeToString(doc)
 }
 
+/** Theme font used while Mermaid measures HTML labels. Missing values are not replaced with a guessed size. */
+const themeFont = (mermaid: Mermaid) => {
+  const theme = mermaid.mermaidAPI.getConfig().themeVariables as { fontSize?: unknown; fontFamily?: unknown } | undefined
+  const fontSize = theme?.fontSize
+  const fontFamily = theme?.fontFamily
+  if (
+    typeof fontSize !== 'string' ||
+    fontSize.trim() === '' ||
+    typeof fontFamily !== 'string' ||
+    fontFamily.trim() === ''
+  ) {
+    throw new Error('Mermaid theme is missing a font size or family')
+  }
+  return { fontSize, fontFamily }
+}
+
+/**
+ * Mermaid measures HTML labels before `applyThemeStyles` runs. Its theme CSS is a `<style>` element, which the page CSP blocks, so a temporary tree on `document.body` inherits the 14px body font and the foreignObject is too narrow for the 16px paint. The host carries the theme font into that measurement.
+ */
+const measurementHost = (fontSize: string, fontFamily: string) => {
+  const host = document.createElement('div')
+  host.style.position = 'fixed'
+  host.style.left = '0'
+  host.style.top = '0'
+  host.style.visibility = 'hidden'
+  host.style.pointerEvents = 'none'
+  host.style.fontSize = fontSize
+  host.style.fontFamily = fontFamily
+  document.body.append(host)
+  return host
+}
+
 /** Draw one diagram at a time. A failure does not block the next chart. */
 export const renderMermaid = (
   code: string,
@@ -72,13 +104,17 @@ export const renderMermaid = (
       securityLevel: 'strict',
       startOnLoad: false,
     })
+    const { fontSize, fontFamily } = themeFont(mermaid)
     const id = `deepapi-mermaid-${nextId++}`
+    const host = measurementHost(fontSize, fontFamily)
     try {
-      const { svg } = await mermaid.render(id, sanitizeMermaid(code))
+      const { svg } = await mermaid.render(id, sanitizeMermaid(code), host)
       return isCancelled() ? null : applyThemeStyles(svg)
     } catch (error) {
       document.getElementById(id)?.remove()
       throw error
+    } finally {
+      host.remove()
     }
   })
   renderQueue = result.then(() => {}, () => {})
