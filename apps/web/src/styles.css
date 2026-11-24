@@ -3681,8 +3681,9 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip:hover:not(.on)
   flex: none;
   display: block;
 }
-/* SP-CV-218 / SP-CV-219. Search-step glyph sits 6px off the label. */
-.timeline-search > svg { margin-right: 6px; padding: 1px; box-sizing: content-box; }
+/* SP-CV-218. Search-step glyph sits 6px off the label. SP-CV-219's 1px padding belongs to the official
+   div.ds-icon wrapper around the glyph; padding the svg itself grew the 14px glyph box to 16px. */
+.timeline-search > svg { margin-right: 6px; }
 .timeline-browse { padding: 5px 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-markdown-small); }
 .timeline-browse.is-last { padding-bottom: 0; }
 .timeline-browse > svg:first-of-type { margin-top: 4px; margin-right: 6px; }

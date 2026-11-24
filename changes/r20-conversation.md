@@ -1,1 +1,2 @@
 版本切换改成横排，用户消息上的切换器离编辑按钮 10px、下移 1px。选中回答洗出多选底，网络错误提示右对齐，思考标题下补上淡出条，加载点错开闪动，图片文件名按两行截断。
+- apps/web/src/styles.css:3686 `.timeline-search > svg { margin-right: 6px; padding: 1px; box-sizing: content-box; }` → `.timeline-search > svg { margin-right: 6px; }` — SP-CV-219 (padding belongs to official div.ds-icon wrapper; svg padding made the 14px glyph box 16px, fb1344 search-icon-size regression). Ledger SP-CV-219 → pending-official (wrapper work in steer23). SP-CV-218 kept.
