@@ -68,6 +68,6 @@
 | `share-select.spec.ts:299` 问题气泡右缘（390 浅色、深色） | 354±1 | 370 | 去掉了拟合 `margin-right: 16px`。窄屏行是 `align-items: flex-end`，没有右外边距。列右缘是 370。后面的 :364 / :386 / :392 没跑到。 | 洗底水平伸出是 `hj` 的 16px，不是气泡外边距。SP-CV-102 的面板宽是洗底，不是气泡。 |
 | `share-select.spec.ts:799` 短气泡右缘（浅色、深色） | 354±1 | 370 | 同上。短气泡贴着内容盒右缘。 | 同上 |
 | `share-select.spec.ts:481` 桌面深色洗底 | `tone.block` = `rgb(44, 44, 46)` | `rgb(33, 33, 35)` | 产品用 `--dsw-alias-bg-multi-select`（深色 neutral-850）。裁定只改了手机分支。浅色桌面的 `tone.block` 正好是 `rgb(245, 246, 247)`，所以浅色 1440 通过。 | SP-SHARE-029 |
-| `spec-align-conversation.spec.ts:81` 气泡 `margin-top` | 10px | 0px | 种子消息没有附件。官方 `._8271fc3` 只在有附件时加 10px（SP-CV-340）。普通模式的 16px 下边距断言仍然通过（失败停在这一行之前，该断言已执行）。 | SP-CV-340 |
+| `spec-align-conversation.spec.ts:81` 气泡 `margin-top` | 10px | 0px | 种子消息没有附件。官方 `._8271fc3` 只在有附件时加 10px（SP-CV-340）。失败停在这一行，后面的 `margin-bottom: 16px` 断言没有跑到。普通模式 CSS 仍是 `.turn.user { margin-bottom: 16px }`，分享态才写成 0。 | SP-CV-340 |
 
 没有把 12px 栏间距留在产品里。钉住后勾选框约在标题下 48px，落在已有的 50±4 里，滚动容器保持 `padding-top: 0`。回答洗底的 `bottom: calc(50px - 20px)` 用的是已有行动条高度减去官方垂直伸出。
