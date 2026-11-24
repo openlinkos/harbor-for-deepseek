@@ -198,4 +198,75 @@ describe('selection authorization', () => {
     expect(end.text).toBe('完全不同转写结果')
     expect(end.text.startsWith('完全不同')).toBe(true)
   })
+
+  it('follows historyUndo and historyRedo one adjacent step at a time', () => {
+    let auth: SelectionAuth = arm('abcabc', 0, 3)
+    const deleted = resolveEditSpan('abcabc', 'abc', 0, 3, 'deleteContentBackward')
+    expect(deleted).toEqual({ start: 0, end: 3 })
+    auth = applyObservedEdit(auth, 'abc', deleted?.start ?? 0, deleted?.end ?? 0)
+    for (const [next, at] of [['abca', 3], ['abcab', 4], ['abcabc', 5]] as const) {
+      const before = auth.status === 'live' ? auth.text : ''
+      const span = resolveEditSpan(before, next, at, at, 'insertText')
+      expect(span).toEqual({ start: at, end: at })
+      auth = applyObservedEdit(auth, next, span?.start ?? at, span?.end ?? at)
+    }
+    expect(auth).toMatchObject({ status: 'live', text: 'abcabc', start: 0, end: 0 })
+    for (const next of ['abcab', 'abca', 'abc', 'abcabc']) {
+      expect(historyStepText(auth, 'historyUndo')).toBe(next)
+      auth = applyHistory(auth, 'historyUndo', next)
+      expect(auth).toMatchObject({ status: 'live', text: next })
+    }
+    expect(auth).toMatchObject({ status: 'live', text: 'abcabc', start: 0, end: 3 })
+    for (const next of ['abc', 'abca']) {
+      expect(historyStepText(auth, 'historyRedo')).toBe(next)
+      auth = applyHistory(auth, 'historyRedo', next)
+      expect(auth).toMatchObject({ status: 'live', text: next })
+    }
+    expect(decideDelivery(auth, 'abca', 'c1', 1)).toEqual({ action: 'insert', range: { start: 0, end: 0 } })
+  })
+
+  it('does not walk to an older step just because the undone text repeats it', () => {
+    let auth: SelectionAuth = arm('abcabc', 0, 3)
+    auth = applyObservedEdit(auth, 'abc', 0, 3)
+    auth = applyObservedEdit(auth, 'abca', 3, 3)
+    auth = applyObservedEdit(auth, 'abcab', 4, 4)
+    auth = applyObservedEdit(auth, 'abcabc', 5, 5)
+    expect(auth).toMatchObject({ status: 'live', text: 'abcabc', start: 0, end: 0 })
+    expect(historyStepText(auth, 'historyUndo')).toBe('abcab')
+    const missed = applyHistory(auth, 'historyUndo', 'abcabc')
+    expect(missed).toMatchObject({ status: 'invalid', reason: 'history-mismatch' })
+    expect(decideDelivery(missed, 'abcabc', 'c1', 1)).toEqual({ action: 'recover', reason: 'history-mismatch' })
+    const stepped = applyHistory(auth, 'historyUndo', 'abcab')
+    expect(stepped).toMatchObject({ status: 'live', text: 'abcab', start: 0, end: 0 })
+    expect(decideDelivery(stepped, 'abcab', 'c1', 1)).toEqual({ action: 'insert', range: { start: 0, end: 0 } })
+  })
+
+  it('keeps edits made after invalidation out of the undo snapshot', () => {
+    const initial = 'L TARGET R'
+    let auth: SelectionAuth = arm(initial, 2, 8)
+    const first = resolveEditSpan(initial, 'N', 0, initial.length, 'insertText')
+    expect(first).toEqual({ start: 0, end: initial.length })
+    auth = applyObservedEdit(auth, 'N', first?.start ?? 0, first?.end ?? 0)
+    expect(auth).toMatchObject({ status: 'invalid', reason: 'crossed' })
+    expect(historyStepText(auth, 'historyUndo')).toBeNull()
+    expect(historyStepText(auth, 'historyRedo')).toBeNull()
+    expect(auth.status === 'invalid' && auth.steps[auth.cursor]?.text).toBe(initial)
+    expect(applyObservedEdit(auth, 'NEW-DRAFT', 1, 1)).toBe(auth)
+    expect(noteSelectionMove(auth)).toBe(auth)
+    expect(applyObservedEdit(auth, 'NEW-DRAFXT', 8, 8)).toBe(auth)
+    const undone = applyHistory(auth, 'historyUndo', 'NEW-DRAFT')
+    expect(undone).toBe(auth)
+    const redone = applyHistory(undone, 'historyRedo', 'NEW-DRAFXT')
+    expect(redone).toBe(auth)
+    expect(decideDelivery(redone, 'NEW-DRAFXT', 'c1', 1)).toEqual({ action: 'recover', reason: 'crossed' })
+    const recovered = recoverTranscriptAtCaret('NEW-DRAFXT', '转写结果', 'NEW-DRAFXT'.length)
+    expect(recovered.text).toBe('NEW-DRAFXT转写结果')
+    expect(recovered.text.startsWith('NEW-DRAFXT')).toBe(true)
+    const revived = applyHistory(auth, 'historyUndo', initial)
+    expect(revived).toMatchObject({ status: 'live', text: initial, start: 2, end: 8 })
+    const diverged = applyHistory(revived, 'historyRedo', 'NEW-DRAFXT')
+    expect(diverged).toMatchObject({ status: 'invalid', reason: 'history-mismatch' })
+    expect(decideDelivery(diverged, 'NEW-DRAFXT', 'c1', 1)).toEqual({ action: 'recover', reason: 'history-mismatch' })
+    expect(decideDelivery(diverged, 'NEW-DRAFXT', 'other', 1)).toEqual({ action: 'drop' })
+  })
 })

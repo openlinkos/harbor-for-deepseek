@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs'
-import { expect, test, type Page, type Route } from '@playwright/test'
+import { expect, test, type Locator, type Page, type Route } from '@playwright/test'
 import { installPcmProbe, openPcmServer, type PcmServer } from './lib/speech-pcm'
 
 test.use({ ignoreHTTPSErrors: true })
@@ -52,10 +52,11 @@ const installMedia = async (page: Page, mode: 'tone' | 'deny' | 'hold') => {
           throw new DOMException('denied', 'NotAllowedError')
         }
       : kind === 'hold'
-        ? () => new Promise((resolve) => {
-            const gate = window as unknown as { __releaseMic?: () => void; __micWaits?: number }
+        ? () => new Promise((resolve, reject) => {
+            const gate = window as unknown as { __releaseMic?: () => void; __rejectMic?: () => void; __micWaits?: number }
             gate.__micWaits = (gate.__micWaits ?? 0) + 1
             gate.__releaseMic = () => resolve(makeStream())
+            gate.__rejectMic = () => reject(new DOMException('denied', 'NotAllowedError'))
           })
         : async () => makeStream())
   }, mode)
@@ -892,6 +893,19 @@ const armHeldSelection = async (page: Page, value: string, start: number, end: n
   return { session, composer }
 }
 
+const typeOverThenUndo = async (composer: Locator) => {
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.pressSequentially('NEW-DRAFT')
+  await composer.press('ArrowLeft')
+  await composer.pressSequentially('X')
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue('NEW-DRAFT')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+}
+
 const openHeldRecording = async (page: Page, session: { releaseAsr: () => void }) => {
   await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
   await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
@@ -1133,6 +1147,143 @@ test('cancelling transcription drops a late result with no recovery offer', asyn
   await expect(composer).toHaveValue('abcabc')
   await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
   expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('invalidated history undo keeps the later draft and offers recovery', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'L TARGET R', 2, 8)
+  await openHeldRecording(page, session)
+  await typeOverThenUndo(composer)
+  await composer.blur()
+  await composer.focus()
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue('NEW-DRAFT')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  await expect(page.getByTestId('voice-recovery')).toBeVisible()
+  await expect(page.getByTestId('voice-recovery-transcript')).toHaveText('转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  await page.getByTestId('voice-recovery-dismiss').click()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+})
+
+test('a late microphone grant still does not restore the armed draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'hold')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('L TARGET R')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(1)
+  await typeOverThenUndo(composer)
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  await expect(page.getByTestId('voice-recovery')).toBeVisible()
+  expect(asrPosts(session.seen)).toHaveLength(1)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a late microphone rejection leaves the undone draft untouched', async ({ page }) => {
+  test.setTimeout(90_000)
+  await installMedia(page, 'hold')
+  const session = await unlock(page)
+  const composer = page.getByTestId('composer')
+  await composer.fill('L TARGET R')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(1)
+  await typeOverThenUndo(composer)
+  await page.evaluate(() => (window as unknown as { __rejectMic?: () => void }).__rejectMic?.())
+  await expect(page.getByTestId('speech-notice')).toContainText('无法使用麦克风')
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  expect(asrPosts(session.seen)).toHaveLength(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('blur and refocus keep a valid undo step on the armed span', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'L TARGET R', 2, 8)
+  await openHeldRecording(page, session)
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await composer.pressSequentially('OK')
+  await expect(composer).toHaveValue('L OK R')
+  await composer.blur()
+  await composer.focus()
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue('L O R')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('L OK R')
+  await composer.press('Control+End')
+  await composer.press('Shift+ArrowLeft')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('L 转写结果 R')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('cancelling after invalidated undo does not restore the armed draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'L TARGET R', 2, 8)
+  await openHeldRecording(page, session)
+  await typeOverThenUndo(composer)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('NEW-DRAFXT')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('invalidated undo then switching chats does not insert the late transcript', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  await page.getByTestId('composer').fill('先说一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  const composer = page.getByTestId('composer')
+  await composer.fill('L TARGET R')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await typeOverThenUndo(composer)
+  await page.getByTestId('new-chat').click()
+  await expect(page.locator('.greeting')).toBeVisible()
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  expect(messagePosts(session.seen)).toHaveLength(1)
 })
 
 test('reloading the app closes the playing audio context', async ({ page }) => {

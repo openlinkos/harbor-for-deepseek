@@ -19,7 +19,7 @@ import { ReadingBars } from './speech/ReadingBars.js'
 import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
-import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, historyStepText, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
+import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
 import { bindVoiceInserter, cancelVoiceInput, currentVoiceGeneration, insertTranscript, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
@@ -2157,7 +2157,6 @@ const Composer = () => {
   const editRef = useRef<{ text: string; start: number; end: number; inputType: string } | null>(null)
   const compositionRef = useRef<{ text: string; start: number; end: number } | null>(null)
   const ignoreChangeRef = useRef(false)
-  const historyHandledRef = useRef<string | null>(null)
   const [recovery, setRecovery] = useState<{ transcript: string; conversationId: string | null; generation: number; reason: string } | null>(null)
   textRef.current = text
   activeRef.current = activeId
@@ -2365,19 +2364,9 @@ const Composer = () => {
           if (authRef.current && ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end', 'pageup', 'pagedown'].includes(key)) {
             authRef.current = noteSelectionMove(authRef.current)
           }
-          const auth = authRef.current
-          if ((event.ctrlKey || event.metaKey) && !event.altKey && (key === 'z' || key === 'y') && auth) {
-            const direction = key === 'y' || event.shiftKey ? 'historyRedo' : 'historyUndo'
-            const expected = historyStepText(auth, direction)
-            if (expected !== null) {
-              event.preventDefault()
-              const next = applyHistory(auth, direction, expected)
-              authRef.current = next
-              historyHandledRef.current = next.status === 'live' ? next.text : expected
-              setText(next.status === 'live' ? next.text : expected)
-              return
-            }
-          }
+          // Ctrl+Z / Ctrl+Y stay with the browser. Preventing them and writing an
+          // authorization snapshot drops the draft the user typed after the span
+          // stopped being valid, and it also drops the redo entry for that draft.
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
             event.preventDefault()
@@ -2417,14 +2406,6 @@ const Composer = () => {
             setText(next)
             return
           }
-          if (historyHandledRef.current !== null) {
-            const handled = historyHandledRef.current
-            historyHandledRef.current = null
-            if (next === handled) {
-              setText(next)
-              return
-            }
-          }
           const composing = native instanceof InputEvent && native.isComposing
           if (composing || compositionRef.current) {
             setText(next)
@@ -2432,7 +2413,10 @@ const Composer = () => {
           }
           const auth = authRef.current
           if (auth) {
-            const inputType = pending?.inputType
+            const nativeType = native instanceof InputEvent ? native.inputType : ''
+            const inputType = nativeType || pending?.inputType || ''
+            // Follow the text the browser already produced. Do not write the last
+            // trusted snapshot over it when this step is missing or no longer adjacent.
             if (inputType === 'historyUndo' || inputType === 'historyRedo') authRef.current = applyHistory(auth, inputType, next)
             else if (auth.status === 'live' && pending && pending.text === auth.text) {
               const span = resolveEditSpan(pending.text, next, pending.start, pending.end, pending.inputType)

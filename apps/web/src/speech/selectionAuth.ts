@@ -237,23 +237,28 @@ export const noteUnobserved = (auth: SelectionAuth, nextText: string): Selection
 }
 
 /**
- * Text undo/redo would restore if the browser moved one step on this stack.
- * Returns null when this authorization has no such step, so the caller leaves native editing alone.
+ * Text of the adjacent observed step while this authorization is live.
+ * An invalid draft is not a step. Null tells the caller to leave the browser's
+ * undo or redo result alone. The last live snapshot is not that result, and
+ * text equality with it must not be used to overwrite the draft.
  */
 export const historyStepText = (auth: SelectionAuth, direction: 'historyUndo' | 'historyRedo'): string | null => {
+  if (auth.status !== 'live') return null
   if (direction === 'historyUndo') {
-    if (auth.status === 'invalid') return auth.steps[auth.cursor]?.text ?? null
     if (auth.cursor <= 0) return null
     return auth.steps[auth.cursor - 1]?.text ?? null
   }
-  if (auth.status !== 'live') return null
   return auth.steps[auth.cursor + 1]?.text ?? null
 }
 
 /**
- * Move along the observed stack. The next text must be the adjacent step's text.
- * Searching the stack for any equal string is intentionally not done: a retyped
- * copy of an older draft is a new step, not the old span.
+ * Move along the observed stack when `nextText` is already the browser's undo
+ * or redo result. The caller does not replace the draft with a snapshot.
+ * The next text must be the adjacent step. Searching the stack for any equal
+ * string is intentionally not done: a retyped copy of an older draft is a new
+ * step, not the old span. An invalidated draft becomes live again only when
+ * this undo landed on the step that was left, not when a later draft happens
+ * to contain the same characters.
  */
 export const applyHistory = (
   auth: SelectionAuth,
