@@ -35,3 +35,28 @@
 - 吸顶距标题：期望约 50±4。1440 实测 gap 60（cbTop 74，titleTop 14）。390 实测 gap 65（cbTop 85，titleTop 20）。吸顶 `top` 按 SP-SHARE-109 算出 0；Chromium 再计入滚动区 padding-top 12px。没有官方行把分享态滚动区 padding-top 写成 0。
 
 仍通过、且没有放宽阈值的部分：1440 正文/气泡 x 与宽不变（±1）；勾选框在正文左方 42px（断言允许 41±1）；桌面勾选框不压住洗底；390 正文 x 62、宽 308、右 370，气泡右 354，列 x 20 宽 350，勾选框 x 20 且 18×18；390 点击翻转。其余 37 条用例通过。
+
+## 恢复滚动区内边距（a1dbee0）
+
+分享多选时，滚动区的顶部内边距改加在消息列上：桌面 12px，手机 28.5px，滚动容器 `padding-top` 为 0。Chromium 不再把吸顶勾选框按滚动区内边距下推，长回答钉住时勾选框回到标题下约 50px。
+
+`e2e/share-select.spec.ts`，PW_PORT=4511。恢复前（`changes/r21-share.md` 所记官方行构建，37 passed / 7 failed）。恢复后（dist `index-DjQXg4PS.css`）：**39 passed / 5 failed**。新通过的是 1440 与 390 的 `a pinned checkbox sits about 50px under the title`。阈值未改。
+
+手机未滚动的问题勾选框从 85 变成 101.5（60 + 28.5 + 13）。76.5 那次成立，是因为当时还有 `share-port` 的 `top: -25px`。那个偏移不恢复。
+
+## 仍失败的断言（14:31 CST，未再拟合）
+
+同一轮里 1440 的几何在间距断言处停下，390 在问题勾选框 y 处停下。洗底圆角、颜色、窄列宽度这几条没跑到。它们的节点和规则这次没改，上一轮量到的值仍然成立。行内相对位置也不受列 padding 影响。
+
+| assert | expected (captured) | got | root cause or open question | spec rows |
+|---|---|---|---|---|
+| `apps/web/e2e/share-select.spec.ts:392` grey blocks 12px apart (1440 light and dark; 390 not reached) | gap 12±1 | 15 (abs diff 3) | `.turn.share-on` margin-bottom 55px is from `0acf18a`, not a spec row. Wash extends 20px past each row (`55−20−20=15`). No 52px row. Dropping 55 leaves the user margin 16px and the gap goes to −24. | SP-CV-088, SP-CV-092. User row official padding-bottom is 16px (SP-CV-279), not this margin. |
+| `apps/web/e2e/share-select.spec.ts:396` user checkbox ~3px from grey top (1440 not reached; same relative box as the prior run) | 3±1 | 33 | Wash top is 20px above the row (SP-CV-088, centered). Checkbox is 13px below the row (SP-SHARE-111). `20+13=33`. The 3px figure was the fitted user padding-top 25px. | SP-CV-088, SP-CV-095, SP-SHARE-102, SP-SHARE-111 |
+| `apps/web/e2e/share-select.spec.ts:395` answer checkbox vs first-line center (1440 not reached) | ≤2 | 8 | Assistant row padding is 0 (SP-CV-024). Checkbox center is sticky padding 13 + 9 = 22px from the row top. First line center sits ~14px down. Official column is a sibling of the select wrapper on that same row, so the same sum applies. No row adds 8px. | SP-CV-024, SP-SHARE-108, SP-SHARE-111, SP-SHARE-036 |
+| `apps/web/e2e/share-select.spec.ts:393–394` answer checkbox from grey top | 32–35 | 33 (prior run; not reached this run) | Same 20+13. This one is inside the captured band. | SP-CV-088, SP-SHARE-111 |
+| `apps/web/e2e/share-select.spec.ts:364` question checkbox y (390 light and dark) | 76.5±1 | 101.5 | Phone topbar 60 + column padding-top 28.5 (the restored scroller gap, not a spec row) + sticky padding-top 13. Absolute `top: 0` ignores SP-CV-284's 34px. 76.5 needs the rejected `top: -25px` port (`60+28.5+13−25=76.5`). | SP-SHARE-102, SP-SHARE-111. Open: which official box is 25px above this column. |
+| `apps/web/e2e/share-select.spec.ts:365` answer checkbox follows the question bubble (390 not reached) | `bubble.y + height + 76` | prior absolute 340 vs 332 (delta 8). Column padding moves bubble and checkbox together, so the delta stays. | Same in-flow column as the question box. | SP-SHARE-111, SP-CV-279 |
+| `apps/web/e2e/share-select.spec.ts:898` checkbox inside the message box (1440) | true | false | SP-SHARE-104 `left: -42px` is outside the row border. SP-SHARE-030 padding-left 42px is only `._63c77b1` (panel under 800). At 1440 the list is wider, so `share-narrow` is off. Official `mB` is a child of the row with that same left. Checkbox still receives the click and toggles. | SP-SHARE-104, SP-SHARE-030, SP-SHARE-034 |
+| `apps/web/e2e/share-select.spec.ts:469` halo radius (not reached) | `18px` | 12px at 1440 (SP-CV-093); 0 at 390 (SP-SHARE-099) | Official `._7729a77:before` radius is 12px, and the narrow modifier is 0. The capture's 18px is not that row. | SP-CV-093, SP-SHARE-099, SP-CV-103 |
+| `apps/web/e2e/share-select.spec.ts:468` halo color (not reached) | 1440: `tone.block` (`rgb(245, 246, 247)` / dark `rgb(44, 44, 46)`). 390 light: `rgb(236, 242, 249)`. 390 dark: `rgb(44, 44, 46)` | `rgb(245, 246, 247)` light, `rgb(33, 33, 35)` dark (`--dsw-alias-bg-multi-select` → neutral-850) | 1440 light matches the token. Phone light `rgb(236, 242, 249)` and dark `rgb(44, 44, 46)` are not the alias. | SP-SHARE-028, SP-SHARE-029, SP-CV-104, SP-CV-105 |
+| `apps/web/e2e/share-select.spec.ts:385–388` phone fill (not reached) | left 0, right 371 | left 0, right 390 | Narrow wash width is `var(--panel-width)` (SP-CV-102), centered (SP-CV-096). `--panel-width` is the transcript `offsetWidth` (390). Official `hk()` measures the same panel. No row says 371. | SP-CV-102, SP-CV-096, SP-SHARE-099 |

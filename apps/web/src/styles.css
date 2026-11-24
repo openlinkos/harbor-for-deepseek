@@ -4891,7 +4891,17 @@ input.share-box.ds-checkbox:checked::after,
   }
   .share-bar [data-testid="share-cancel"] { display: none; }
 }
+/* Chromium insets position:sticky by the scroller's padding-top. Official pins the
+   checkbox about 50px under the title (49px topbar + 13px sticky padding − 14px title).
+   The 12px gap moves onto the column so messages stay put and the box can stick to the scrollport.
+   SP-SHARE-035 / 109 / 111. */
+.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
+.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 12px; }
 @media (max-width: 767px) {
+  /* The phone list keeps a taller column gap so the first question box stays at y=76.5.
+     The scroller itself stays unpadded, same as above. */
+  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
+  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 28.5px; }
   /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
      align-items: flex-end. Height stays the text height. The 16px inset is
      `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's
