@@ -160,8 +160,12 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
       }
       stream = await pending
     } catch (error) {
-      if (gen !== generation || isSpeechAbort(error) || abort.signal.aborted) return
-      finishAttempt(gen, abort, current, null, mapTtsError(error))
+      // A newer playback owns the shared player. This attempt must not idle it.
+      if (gen !== generation) return
+      // AbortError only changes the notice. The current attempt still has to
+      // drop its context when this controller did not abort the request itself.
+      const ownAbort = abort.signal.aborted || isSpeechAbort(error)
+      finishAttempt(gen, abort, current, null, ownAbort ? undefined : mapTtsError(error))
       return
     }
     if (gen !== generation || abort.signal.aborted) {

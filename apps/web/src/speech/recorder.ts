@@ -99,6 +99,15 @@ const stopTracks = (stream: MediaStream) => {
   for (const track of stream.getTracks()) track.stop()
 }
 
+/** close() may reject asynchronously. A floating rejection is not a device fault. */
+const closeContext = (context: RecordingContext) => {
+  try {
+    void Promise.resolve(context.close()).catch(() => undefined)
+  } catch {
+    // The context is already closing.
+  }
+}
+
 const aborted = () => new DOMException('aborted', 'AbortError')
 
 /**
@@ -132,11 +141,7 @@ export const startRecording = (onLimit: () => void, host: RecordingHost = browse
       if (released) return
       released = true
       stopTracks(stream)
-      try {
-        void context.close()
-      } catch {
-        // The context is already closing.
-      }
+      closeContext(context)
     }
     releaseNow = () => {
       cancelled = true
@@ -167,11 +172,7 @@ export const startRecording = (onLimit: () => void, host: RecordingHost = browse
       try { analyser?.disconnect() } catch { /* already disconnected */ }
       try { source?.disconnect() } catch { /* already disconnected */ }
       stopTracks(stream)
-      try {
-        void context.close()
-      } catch {
-        // The context is already closing.
-      }
+      closeContext(context)
     }
     releaseNow = () => {
       cancelled = true

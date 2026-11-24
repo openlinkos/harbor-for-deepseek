@@ -556,6 +556,266 @@ test('removing the key while playing stops the player and aborts the request', a
   }
 })
 
+const holdComposerFocus = async (page: Page) => {
+  await page.addInitScript(() => {
+    const queued: FrameRequestCallback[] = []
+    const native = window.requestAnimationFrame.bind(window)
+    let hold = true
+    const mark = window as unknown as { __heldFocusFrames?: number; __releaseFocusFrames?: () => void }
+    mark.__heldFocusFrames = 0
+    window.requestAnimationFrame = (callback) => {
+      if (!hold) return native(callback)
+      queued.push(callback)
+      mark.__heldFocusFrames = queued.length
+      return queued.length
+    }
+    mark.__releaseFocusFrames = () => {
+      hold = false
+      const pending = queued.splice(0)
+      for (const callback of pending) native(callback)
+    }
+  })
+}
+
+const countAudioCallbacks = async (page: Page) => {
+  await page.addInitScript(() => {
+    const proto = window.ScriptProcessorNode?.prototype
+    if (!proto) return
+    const desc = Object.getOwnPropertyDescriptor(proto, 'onaudioprocess')
+    if (!desc?.set || !desc.get) return
+    Object.defineProperty(proto, 'onaudioprocess', {
+      configurable: true,
+      enumerable: desc.enumerable,
+      get() { return desc.get!.call(this) },
+      set(fn: ((this: ScriptProcessorNode, event: AudioProcessingEvent) => void) | null) {
+        const wrapped = typeof fn === 'function'
+          ? function (this: ScriptProcessorNode, event: AudioProcessingEvent) {
+              const mark = window as unknown as { __audioCallbacks?: number }
+              mark.__audioCallbacks = (mark.__audioCallbacks ?? 0) + 1
+              fn.call(this, event)
+            }
+          : fn
+        desc.set!.call(this, wrapped)
+      },
+    })
+  })
+}
+
+const composerRange = (page: Page) => page.getByTestId('composer').evaluate((node) => {
+  const box = node as HTMLTextAreaElement
+  return { start: box.selectionStart, end: box.selectionEnd, value: box.value }
+})
+
+const releaseFocusFrames = (page: Page) => page.evaluate(() => {
+  ;(window as unknown as { __releaseFocusFrames?: () => void }).__releaseFocusFrames?.()
+})
+
+const waitForSamples = (page: Page) => expect.poll(() => page.evaluate(() => (window as unknown as { __audioCallbacks?: number }).__audioCallbacks ?? 0)).toBeGreaterThan(0)
+
+const readUploadedWav = (bytes: Buffer) => {
+  const offset = bytes.indexOf(Buffer.from('RIFF'))
+  expect(offset).toBeGreaterThanOrEqual(0)
+  const data = bytes.subarray(offset)
+  const size = data.readUInt32LE(40)
+  let peak = 0
+  for (let index = 44; index + 1 < 44 + size && index + 1 < data.length; index += 2) {
+    peak = Math.max(peak, Math.abs(data.readInt16LE(index)))
+  }
+  return {
+    format: data.readUInt16LE(20),
+    channels: data.readUInt16LE(22),
+    rate: data.readUInt32LE(24),
+    bits: data.readUInt16LE(34),
+    size,
+    peak,
+    name: bytes.toString('latin1').includes('recording.wav'),
+  }
+}
+
+test('delayed focus, permission, and upload keep a saved selection after an edit before it', async ({ page }) => {
+  test.setTimeout(90_000)
+  await holdComposerFocus(page)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'hold')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __heldFocusFrames?: number }).__heldFocusFrames ?? 0)).toBeGreaterThan(0)
+  expect(await composerRange(page)).toEqual({ start: 2, end: 4, value: '你好世界' })
+  await releaseFocusFrames(page)
+  await expect.poll(async () => composerRange(page)).toEqual({ start: 2, end: 4, value: '你好世界' })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(1)
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, 0)
+  })
+  await page.keyboard.type('啊')
+  await expect(composer).toHaveValue('啊你好世界')
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await expect(composer).toHaveValue('啊你好世界')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('啊你好转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  const upload = asrPosts(session.seen).at(-1)
+  expect(upload, 'ASR upload').toBeTruthy()
+  expect(readUploadedWav(upload!.bytes)).toMatchObject({ format: 1, channels: 1, rate: 16000, bits: 16, name: true })
+  expect(readUploadedWav(upload!.bytes).size).toBeGreaterThan(0)
+  expect(readUploadedWav(upload!.bytes).peak).toBeGreaterThan(0)
+})
+
+test('a saved caret survives delayed permission and upload', async ({ page }) => {
+  test.setTimeout(90_000)
+  await holdComposerFocus(page)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'hold')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 2)
+  })
+  await releaseFocusFrames(page)
+  await expect.poll(async () => composerRange(page)).toEqual({ start: 2, end: 2, value: '你好世界' })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(1)
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('你好转写结果世界')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  expect(readUploadedWav(asrPosts(session.seen).at(-1)!.bytes).peak).toBeGreaterThan(0)
+})
+
+test('an edit of the saved selection is replaced when the delayed transcript arrives', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.keyboard.type('大家')
+  await expect(composer).toHaveValue('你好大家')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('你好转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('an edit on both sides of the saved range keeps the new draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.fill('完全不同')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('完全不同')
+  expect(asrPosts(session.seen).length).toBeGreaterThan(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('refocus while upload is pending does not append over a saved selection', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await page.keyboard.press('Escape')
+  await expect.poll(async () => composerRange(page)).toMatchObject({ start: 4, end: 4, value: '你好世界' })
+  session.releaseAsr()
+  await expect(composer).toHaveValue('你好转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a late transcript does not land in another open conversation', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  await page.getByTestId('composer').fill('先说一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  await page.getByTestId('new-chat').click()
+  await expect(page.locator('.greeting')).toBeVisible()
+  await page.getByTestId('composer').fill('下一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text').last()).toContainText('合成回答。')
+  await page.locator('.chat-link', { hasText: '语音' }).click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  const composer = page.getByTestId('composer')
+  await composer.fill('前缀内容')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await page.locator('.chat-link', { hasText: '下一句' }).click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  session.releaseAsr()
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  await page.locator('.chat-link', { hasText: '语音' }).click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  expect(messagePosts(session.seen)).toHaveLength(2)
+})
+
 test('reloading the app closes the playing audio context', async ({ page }) => {
   test.setTimeout(90_000)
   const pcm = await playOpen(page)

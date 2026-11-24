@@ -19,7 +19,7 @@ import { ReadingBars } from './speech/ReadingBars.js'
 import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
-import { bindVoiceInserter, cancelVoiceInput, insertTranscript, toggleVoiceInput, useVoiceInput } from './speech/voiceSession.js'
+import { bindVoiceInserter, cancelVoiceInput, insertTranscript, resolveVoiceAnchor, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -198,13 +198,34 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
   )
 }
 
+let composerFocusTicket = 0
+
 const focusComposer = () => {
+  const ticket = ++composerFocusTicket
+  const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
+  // Captured at request time. A delayed frame must not move a selection the
+  // user placed after this focus was asked for.
+  const snapshot = box
+    ? { value: box.value, start: box.selectionStart, end: box.selectionEnd, direction: box.selectionDirection }
+    : null
   window.requestAnimationFrame(() => {
-    const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
-    if (!box) return
-    box.focus({ preventScroll: true })
-    const end = box.value.length
-    box.setSelectionRange(end, end)
+    if (ticket !== composerFocusTicket) return
+    const node = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
+    if (!node) return
+    const userMoved = snapshot !== null
+      && node === box
+      && (node.value !== snapshot.value || node.selectionStart !== snapshot.start || node.selectionEnd !== snapshot.end)
+    if (userMoved) {
+      const start = node.selectionStart ?? 0
+      const end = node.selectionEnd ?? start
+      const direction = node.selectionDirection
+      if (document.activeElement !== node) node.focus({ preventScroll: true })
+      node.setSelectionRange(start, end, direction)
+      return
+    }
+    node.focus({ preventScroll: true })
+    const end = node.value.length
+    node.setSelectionRange(end, end)
   })
 }
 
@@ -2130,8 +2151,18 @@ const Composer = () => {
   const textRef = useRef(text)
   const activeRef = useRef(activeId)
   const caretRef = useRef<number | null>(null)
+  const anchorRef = useRef<VoiceAnchor | null>(null)
+  const gestureRef = useRef<VoiceAnchor | null>(null)
   textRef.current = text
   activeRef.current = activeId
+  const readAnchor = (): VoiceAnchor | null => {
+    const node = box.current
+    if (!node) return null
+    const value = node.value
+    const start = node.selectionStart ?? value.length
+    const end = node.selectionEnd ?? start
+    return { conversationId: activeRef.current, text: value, start, end }
+  }
   useEffect(() => {
     focusComposer()
   }, [activeId])
@@ -2147,9 +2178,12 @@ const Composer = () => {
     bindVoiceInserter((transcript, conversationId) => {
       const node = box.current
       if (!node?.isConnected || activeRef.current !== conversationId) return
-      const start = node.selectionStart ?? textRef.current.length
-      const end = node.selectionEnd ?? start
-      const next = insertTranscript(textRef.current, transcript, { start, end })
+      const anchor = anchorRef.current
+      anchorRef.current = null
+      if (!anchor || anchor.conversationId !== conversationId) return
+      const range = resolveVoiceAnchor(textRef.current, anchor)
+      if (!range) return
+      const next = insertTranscript(textRef.current, transcript, range)
       caretRef.current = next.caret
       setText(next.text)
     })
@@ -2269,7 +2303,21 @@ const Composer = () => {
             data-testid="voice-input"
             aria-label={voiceLabel}
             aria-pressed={voice.phase === 'recording'}
-            onClick={() => toggleVoiceInput()}
+            onPointerDown={() => {
+              if (voice.phase !== 'idle') {
+                gestureRef.current = null
+                return
+              }
+              gestureRef.current = readAnchor()
+            }}
+            onClick={(event) => {
+              if (voice.phase === 'idle') {
+                const fromPointer = event.detail > 0
+                anchorRef.current = fromPointer && gestureRef.current ? gestureRef.current : readAnchor()
+              }
+              gestureRef.current = null
+              toggleVoiceInput()
+            }}
           >
             {voice.phase === 'recording' ? (
               <span className="voice-active">

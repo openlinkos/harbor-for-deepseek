@@ -17,11 +17,63 @@ export type VoiceSnapshot = {
 
 export type SelectionRange = { start: number; end: number }
 
+export type VoiceAnchor = {
+  conversationId: string | null
+  text: string
+  start: number
+  end: number
+}
+
 export const insertTranscript = (text: string, transcript: string, selection: SelectionRange): { text: string; caret: number } => {
   const start = Math.max(0, Math.min(selection.start, selection.end, text.length))
   const end = Math.min(text.length, Math.max(selection.start, selection.end, 0))
   const next = `${text.slice(0, start)}${transcript}${text.slice(end)}`
   return { text: next, caret: start + transcript.length }
+}
+
+/**
+ * Map a range captured when voice input was armed onto the draft as it is now.
+ * An unchanged draft keeps that range, including a collapsed caret.
+ * Text inserted or removed only before the saved draft shifts the range with it.
+ * A change only before the saved tail, or only after the saved head, keeps the
+ * anchored span. Replacing just the selected middle keeps the text outside it.
+ * A pure append after a range that already reached the end is not treated as
+ * a middle edit. Anything else is ambiguous: return null so the caller leaves
+ * the new draft untouched instead of applying stale indexes.
+ */
+export const resolveVoiceAnchor = (current: string, anchor: Pick<VoiceAnchor, 'text' | 'start' | 'end'>): SelectionRange | null => {
+  const length = anchor.text.length
+  const rawStart = Number.isFinite(anchor.start) ? anchor.start : length
+  const rawEnd = Number.isFinite(anchor.end) ? anchor.end : rawStart
+  const start = Math.max(0, Math.min(rawStart, rawEnd, length))
+  const end = Math.min(length, Math.max(rawStart, rawEnd, 0))
+  if (current === anchor.text) return { start, end }
+  // The armed draft was empty, so every character the user added was typed at
+  // that caret. The caret now sits after that new text.
+  if (length === 0) return { start: current.length, end: current.length }
+  const before = anchor.text.slice(0, start)
+  const selected = anchor.text.slice(start, end)
+  const after = anchor.text.slice(end)
+  const tail = `${selected}${after}`
+  const head = `${before}${selected}`
+  if (current.endsWith(anchor.text)) {
+    const delta = current.length - length
+    return { start: start + delta, end: end + delta }
+  }
+  if (tail.length > 0 && current.endsWith(tail)) {
+    const nextStart = current.length - tail.length
+    return { start: nextStart, end: nextStart + selected.length }
+  }
+  if (head.length > 0 && current.startsWith(head)) return { start, end }
+  if (start === 0 && end === 0 && after.length > 0 && current.startsWith(after)) return { start: 0, end: 0 }
+  if (after.length > 0 && current.startsWith(before) && current.endsWith(after)) {
+    const middleEnd = current.length - after.length
+    if (middleEnd >= before.length) return { start: before.length, end: middleEnd }
+  }
+  if (after.length === 0 && before.length > 0 && current.startsWith(before) && !current.startsWith(head)) {
+    return { start: before.length, end: current.length }
+  }
+  return null
 }
 
 const IDLE: VoiceSnapshot = { phase: 'idle', elapsedMs: 0, analyser: null, conversationId: null }
@@ -58,7 +110,9 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
   let pendingLimit = false
   let startedAt = 0
   let timer: ReturnType<typeof setInterval> | null = null
-  let armingCancel: (() => void) | null = null
+  // The handle is owned by the operation that armed it. A late reject or
+  // resolve from an older start must not clear the handle a newer start stored.
+  let armingCancel: { op: number; run: () => void } | null = null
   let snap = IDLE
   const listeners = new Set<() => void>()
 
@@ -95,7 +149,7 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     abort?.abort()
     recording?.cancel()
     // Resume may still be pending, so the Recording object does not exist yet.
-    armingCancel?.()
+    armingCancel?.run()
     armingCancel = null
     idle()
   }
@@ -183,7 +237,10 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     conversationId = deps.activeConversationId()
     emit()
     const pending = deps.startRecording(() => hitLimit(op)) as Promise<Recording> & { cancel?: () => void }
-    armingCancel = typeof pending.cancel === 'function' ? () => pending.cancel?.() : null
+    armingCancel = typeof pending.cancel === 'function' ? { op, run: () => pending.cancel?.() } : null
+    const releaseArming = () => {
+      if (armingCancel?.op === op) armingCancel = null
+    }
     void (async () => {
       try {
         const rec = await pending
@@ -191,7 +248,7 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
           rec.cancel()
           return
         }
-        armingCancel = null
+        releaseArming()
         recording = rec
         analyser = rec.analyser
         arming = false
@@ -202,7 +259,10 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
         emit()
         if (pendingLimit) hitLimit(op)
       } catch (error) {
-        armingCancel = null
+        // A superseded start can reject or abort after the next one has stored
+        // its own cancel handle. Leaving that handle in place is what lets the
+        // newer pending recorder still be cancelled.
+        releaseArming()
         if (op !== operation) return
         arming = false
         fail(mapVoiceError(error), op)

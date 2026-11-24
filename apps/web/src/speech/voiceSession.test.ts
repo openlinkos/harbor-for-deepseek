@@ -2,7 +2,7 @@ import { ApiClientError } from '@deepapi/api-client'
 import { ASR_SAMPLE_RATE } from '@deepapi/types'
 import { describe, expect, it } from 'vitest'
 import { startRecording, type Recording, type RecordingHost } from './recorder.js'
-import { createVoiceInput, insertTranscript, type VoiceDeps } from './voiceSession.js'
+import { createVoiceInput, insertTranscript, resolveVoiceAnchor, type VoiceDeps } from './voiceSession.js'
 
 const flush = async () => {
   for (let i = 0; i < 8; i += 1) await Promise.resolve()
@@ -48,6 +48,27 @@ describe('transcript insertion', () => {
     expect(insertTranscript('hello world', 'there', { start: 6, end: 11 })).toEqual({ text: 'hello there', caret: 11 })
     expect(insertTranscript('abcd', 'X', { start: 3, end: 1 })).toEqual({ text: 'aXd', caret: 2 })
     expect(insertTranscript('ab', 'Z', { start: 9, end: 12 })).toEqual({ text: 'abZ', caret: 3 })
+  })
+
+  it('keeps a saved range through edits that have one anchor and refuses a stale index', () => {
+    expect(resolveVoiceAnchor('你好世界', { text: '你好世界', start: 2, end: 4 })).toEqual({ start: 2, end: 4 })
+    expect(resolveVoiceAnchor('你好世界', { text: '你好世界', start: 2, end: 2 })).toEqual({ start: 2, end: 2 })
+    expect(resolveVoiceAnchor('你好世界', { text: '你好世界', start: 4, end: 2 })).toEqual({ start: 2, end: 4 })
+    expect(resolveVoiceAnchor('啊你好世界', { text: '你好世界', start: 2, end: 4 })).toEqual({ start: 3, end: 5 })
+    expect(resolveVoiceAnchor('好世界', { text: '你好世界', start: 2, end: 4 })).toEqual({ start: 1, end: 3 })
+    expect(resolveVoiceAnchor('你好世界!', { text: '你好世界', start: 0, end: 2 })).toEqual({ start: 0, end: 2 })
+    expect(resolveVoiceAnchor('你好大家', { text: '你好世界', start: 2, end: 4 })).toEqual({ start: 2, end: 4 })
+    expect(resolveVoiceAnchor('abZZcd', { text: 'abXYcd', start: 2, end: 4 })).toEqual({ start: 2, end: 4 })
+    expect(resolveVoiceAnchor('你好啊世界', { text: '你好世界', start: 2, end: 2 })).toEqual({ start: 3, end: 3 })
+    expect(resolveVoiceAnchor('你好世界!', { text: '你好世界', start: 4, end: 4 })).toEqual({ start: 4, end: 4 })
+    expect(resolveVoiceAnchor('啊你好世界', { text: '你好世界', start: 4, end: 4 })).toEqual({ start: 5, end: 5 })
+    expect(resolveVoiceAnchor('你好世啊界', { text: '你好世界', start: 2, end: 2 })).toEqual({ start: 2, end: 2 })
+    expect(resolveVoiceAnchor('已输入', { text: '', start: 0, end: 0 })).toEqual({ start: 3, end: 3 })
+    expect(resolveVoiceAnchor('啊你好大家', { text: '你好世界', start: 2, end: 4 })).toBeNull()
+    expect(resolveVoiceAnchor('完全不同', { text: '你好世界', start: 2, end: 4 })).toBeNull()
+    const shifted = resolveVoiceAnchor('啊你好世界', { text: '你好世界', start: 2, end: 4 })
+    expect(shifted).toEqual({ start: 3, end: 5 })
+    expect(insertTranscript('啊你好世界', '转写结果', shifted!)).toEqual({ text: '啊你好转写结果', caret: 7 })
   })
 })
 
