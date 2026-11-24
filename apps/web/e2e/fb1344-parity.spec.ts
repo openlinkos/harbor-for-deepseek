@@ -99,7 +99,14 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       expect(c.pill.border.color).toBe(cell.pillBorder); expect(Math.abs(c.pill.contentOff.dx)).toBeLessThanOrEqual(1); expect(Math.abs(c.pill.contentOff.dy)).toBeLessThanOrEqual(1) })
     test('pill-bg', async ({ page }) => { if (theme === 'dark') knownFailure('pill-bg-dark'); await boot(page, theme); await ask(page); const c = await comp(page); expect(c.pill.bg).toBe(cell.pillBg) })
     test('action-icons', async ({ page }) => { if (theme === 'dark') knownFailure('action-color-dark'); await boot(page, theme); await ask(page); const c = await comp(page)
-      expect(c.actions.buttons.map((b: any) => b.color)).toEqual(Array(c.actions.n).fill(cell.actionColor)); expect(c.actions.buttons.map((b: any) => b.svg.dHash)).toEqual(cell.actionHashes) })
+      expect(c.actions.buttons.map((b: any) => b.color)).toEqual(Array(c.actions.n).fill(cell.actionColor))
+      // V05/V06 read-aloud inserts IconPlayMediaOutline16 (d886c2b) between 不喜欢 and 分享.
+      // The other five hashes stay on the frozen official list. official-fb1344.json is unchanged.
+      const labels = c.actions.buttons.map((b: { label: string }) => b.label)
+      expect(labels).toEqual(['复制', '重新生成', '喜欢', '不喜欢', '朗读', '分享'])
+      const hashes = c.actions.buttons.map((b: { svg: { dHash: string } }) => b.svg.dHash)
+      expect(hashes.filter((_: string, index: number) => labels[index] !== '朗读')).toEqual(cell.actionHashes)
+      expect(hashes[labels.indexOf('朗读')]).toBe('d886c2b') })
     test('share-tooltip', async ({ page }) => { test.skip(w < 768, 'hover tooltip is desktop only'); knownFailure('share-tooltip'); await boot(page, theme); await ask(page)
       const b = page.locator('.action-row button[aria-label="分享"]').last(); await b.hover(); await page.waitForTimeout(400)
       const tip = page.getByRole('tooltip').filter({ hasText: '分享' }); const bb = (await b.boundingBox())!
@@ -678,8 +685,18 @@ for (const theme of ['light', 'dark']) for (const [w, h] of [[1440, 900], [390, 
       await page.getByTestId('stop').click()
       await expect(page.getByTestId('continue')).toHaveCount(1)
       await page.getByTestId('composer').fill('追问')
+      const followUpsBefore = await page.evaluate(() => (window as unknown as { __sse: { requests: unknown[] } }).__sse.requests.length)
       await page.getByTestId('send').click()
-      await page.waitForFunction(() => (window as unknown as { __sse: { requests: Array<{ messages?: Array<{ content?: unknown }> }> } }).__sse.requests.some((item) => JSON.stringify(item).includes('追问')))
+      // The previous prompt "先停再追问" contains "追问", and the follow-up body keeps that history.
+      // Wait until a new request exists whose newest message is this send, then push into that stream.
+      await page.waitForFunction((start) => {
+        const requests = (window as unknown as { __sse: { requests: Array<{ messages?: Array<{ role?: string; content?: unknown }> }> } }).__sse.requests
+        if (requests.length <= start) return false
+        const messages = requests[requests.length - 1]?.messages ?? []
+        const newest = messages[messages.length - 1]
+        const content = JSON.stringify(newest?.content ?? '')
+        return newest?.role === 'user' && content.includes('追问') && !content.includes('先停再追问')
+      }, followUpsBefore)
       await push(page, [
         { type: 'message_start', message: { id: 'child-done', model: 'deepseek-flash' } },
         { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },

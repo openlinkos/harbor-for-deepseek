@@ -78,7 +78,7 @@ export const browserRecordingHost = (): RecordingHost => ({
   createContext(sampleRate) {
     const context = new AudioContext({ sampleRate })
     context.addEventListener('statechange', () => {
-      if (context.state === 'suspended') void context.resume()
+      if (context.state === 'suspended') void context.resume().catch(() => undefined)
     })
     return {
       get sampleRate() {
@@ -99,82 +99,133 @@ const stopTracks = (stream: MediaStream) => {
   for (const track of stream.getTracks()) track.stop()
 }
 
+const aborted = () => new DOMException('aborted', 'AbortError')
+
 /**
  * Records mono float audio and encodes a 16 kHz WAV.
  * The processor stays connected so the callback runs, and its output is left silent.
+ * `cancel` on the returned promise releases any stream or context acquired before
+ * the promise settles, including a resume that has not finished.
  */
-export const startRecording = async (onLimit: () => void, host: RecordingHost = browserRecordingHost()): Promise<Recording> => {
-  const stream = await host.getUserMedia({
-    audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
-  })
-  let context: RecordingContext
-  try {
-    context = host.createContext(ASR_SAMPLE_RATE)
-  } catch (error) {
-    stopTracks(stream)
-    throw error
+export const startRecording = (onLimit: () => void, host: RecordingHost = browserRecordingHost()): Promise<Recording> & { cancel(): void } => {
+  let cancelled = false
+  let releaseNow = () => {
+    cancelled = true
   }
-  try {
-    await context.resume?.()
-  } catch (error) {
-    stopTracks(stream)
-    void context.close()
-    throw error
-  }
-  const source = context.createMediaStreamSource(stream)
-  const analyser = context.createAnalyser()
-  analyser.fftSize = 512
-  analyser.smoothingTimeConstant = 0.2
-  const processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1)
-  const chunks: Float32Array[] = []
-  let length = 0
-  let limited = false
-  let released = false
-  const actualRate = context.sampleRate || ASR_SAMPLE_RATE
-
-  const release = () => {
-    if (released) return
-    released = true
-    processor.onaudioprocess = null
-    try { processor.disconnect() } catch { /* already disconnected */ }
-    try { analyser.disconnect() } catch { /* already disconnected */ }
-    try { source.disconnect() } catch { /* already disconnected */ }
-    stopTracks(stream)
-    void context.close()
-  }
-
-  processor.onaudioprocess = (event) => {
-    if (released || limited) return
-    const input = event.inputBuffer.getChannelData(0)
-    const copy = new Float32Array(input.length)
-    copy.set(input)
-    chunks.push(copy)
-    length += copy.length
-    if (length / actualRate >= ASR_MAX_SECONDS) {
-      limited = true
-      onLimit()
+  const promise = (async (): Promise<Recording> => {
+    const stream = await host.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+    })
+    if (cancelled) {
+      stopTracks(stream)
+      throw aborted()
     }
-  }
-  source.connect(analyser)
-  analyser.connect(processor.input ?? processor)
-  processor.connect(context.destination)
-
-  return {
-    analyser,
-    async stop() {
-      release()
-      if (length === 0) return null
-      const merged = new Float32Array(length)
-      let offset = 0
-      for (const chunk of chunks) {
-        merged.set(chunk, offset)
-        offset += chunk.length
+    let context: RecordingContext
+    try {
+      context = host.createContext(ASR_SAMPLE_RATE)
+    } catch (error) {
+      stopTracks(stream)
+      throw error
+    }
+    let released = false
+    const releaseHeld = () => {
+      if (released) return
+      released = true
+      stopTracks(stream)
+      try {
+        void context.close()
+      } catch {
+        // The context is already closing.
       }
-      const resampled = actualRate === ASR_SAMPLE_RATE ? merged : resampleLinear(merged, actualRate, ASR_SAMPLE_RATE)
-      return encodeWav(resampled, ASR_SAMPLE_RATE)
-    },
-    cancel() {
+    }
+    releaseNow = () => {
+      cancelled = true
+      releaseHeld()
+    }
+    if (cancelled) {
+      releaseHeld()
+      throw aborted()
+    }
+    try {
+      await context.resume?.()
+    } catch (error) {
+      releaseHeld()
+      throw error
+    }
+    if (cancelled) {
+      releaseHeld()
+      throw aborted()
+    }
+    let source: NodeLike | null = null
+    let analyser: (LevelAnalyser & NodeLike) | null = null
+    let processor: ProcessorLike | null = null
+    const release = () => {
+      if (released) return
+      released = true
+      if (processor) processor.onaudioprocess = null
+      try { processor?.disconnect() } catch { /* already disconnected */ }
+      try { analyser?.disconnect() } catch { /* already disconnected */ }
+      try { source?.disconnect() } catch { /* already disconnected */ }
+      stopTracks(stream)
+      try {
+        void context.close()
+      } catch {
+        // The context is already closing.
+      }
+    }
+    releaseNow = () => {
+      cancelled = true
       release()
-    },
-  }
+    }
+    try {
+      source = context.createMediaStreamSource(stream)
+      analyser = context.createAnalyser()
+      analyser.fftSize = 512
+      analyser.smoothingTimeConstant = 0.2
+      processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1)
+      const chunks: Float32Array[] = []
+      let length = 0
+      let limited = false
+      const actualRate = context.sampleRate || ASR_SAMPLE_RATE
+      processor.onaudioprocess = (event) => {
+        if (released || limited) return
+        const input = event.inputBuffer.getChannelData(0)
+        const copy = new Float32Array(input.length)
+        copy.set(input)
+        chunks.push(copy)
+        length += copy.length
+        if (length / actualRate >= ASR_MAX_SECONDS) {
+          limited = true
+          onLimit()
+        }
+      }
+      source.connect(analyser)
+      analyser.connect(processor.input ?? processor)
+      processor.connect(context.destination)
+      return {
+        analyser,
+        async stop() {
+          release()
+          if (length === 0) return null
+          const merged = new Float32Array(length)
+          let offset = 0
+          for (const chunk of chunks) {
+            merged.set(chunk, offset)
+            offset += chunk.length
+          }
+          const resampled = actualRate === ASR_SAMPLE_RATE ? merged : resampleLinear(merged, actualRate, ASR_SAMPLE_RATE)
+          return encodeWav(resampled, ASR_SAMPLE_RATE)
+        },
+        cancel() {
+          release()
+        },
+      }
+    } catch (error) {
+      release()
+      throw error
+    }
+  })()
+  const handle = promise as Promise<Recording> & { cancel(): void }
+  handle.cancel = () => releaseNow()
+  return handle
 }

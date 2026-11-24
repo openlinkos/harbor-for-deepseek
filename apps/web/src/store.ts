@@ -25,7 +25,7 @@ import {
   type Usage,
 } from '@deepapi/types'
 import { create } from 'zustand'
-import { stopReadAloud } from './speech/readAloud.js'
+import { readAloudSnapshot, stopReadAloud } from './speech/readAloud.js'
 import { cancelVoiceInput } from './speech/voiceSession.js'
 
 const haltSpeech = () => {
@@ -667,6 +667,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async removeChat(id) {
+    if (get().activeId === id) haltSpeech()
     if (get().serverMode) {
       await api(`/api/conversations/${id}`, { method: 'DELETE' })
       const wasActive = get().activeId === id
@@ -698,6 +699,10 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const leaf = leafUnder(messages, siblingId)
+    const playing = readAloudSnapshot()
+    if (playing.status !== 'idle' && playing.messageId && !activePath(messages, leaf).some((item) => item.id === playing.messageId)) {
+      stopReadAloud()
+    }
     const conversation = get().conversations.find((item) => item.id === get().activeId)
     if (!conversation) {
       return

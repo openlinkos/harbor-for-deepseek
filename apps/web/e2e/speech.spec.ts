@@ -1,4 +1,10 @@
+import { readFileSync, writeFileSync } from 'node:fs'
 import { expect, test, type Page, type Route } from '@playwright/test'
+import { installPcmProbe, openPcmServer, type PcmServer } from './lib/speech-pcm'
+
+test.use({ ignoreHTTPSErrors: true })
+
+const SSE = readFileSync(new URL('./lib/fb1344-sse.js', import.meta.url), 'utf8')
 
 const sse = (text: string, title: string) => {
   const events = [
@@ -55,7 +61,7 @@ const installMedia = async (page: Page, mode: 'tone' | 'deny' | 'hold') => {
   }, mode)
 }
 
-const unlock = async (page: Page, options?: { asrText?: string; holdAsr?: boolean; holdTts?: boolean }) => {
+const unlock = async (page: Page, options?: { asrText?: string; holdAsr?: boolean; holdTts?: boolean; ttsPort?: number }) => {
   const asrText = options?.asrText ?? '转写结果'
   let releaseAsr: (() => void) | null = null
   let releaseTts: (() => void) | null = null
@@ -82,6 +88,14 @@ const unlock = async (page: Page, options?: { asrText?: string; holdAsr?: boolea
       return
     }
     if (url.includes('/v1/tools/tts')) {
+      if (options?.ttsPort) {
+        try {
+          await route.continue({ url: `https://127.0.0.1:${options.ttsPort}/v1/tools/tts` })
+        } catch {
+          /* The page aborted playback before the body was redirected. */
+        }
+        return
+      }
       if (ttsGate) await ttsGate
       try {
         await route.fulfill({ status: 200, headers: { 'content-type': 'application/octet-stream' }, body: pcm() })
@@ -249,4 +263,309 @@ test('the public voice survives reload and 贝壳 stays unlisted', async ({ page
   await page.getByTestId('voice-select').click()
   await expect(page.getByTestId('voice-select-menu')).not.toContainText('贝壳')
   await expect(page.getByTestId('voice-select-menu')).not.toContainText('白浪')
+})
+
+const answer = async (page: Page, text: string) => {
+  await page.getByTestId('composer').fill(text)
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text').last()).toContainText('合成回答。')
+}
+
+const selectTide = async (page: Page) => {
+  await page.getByTestId('user-menu').click()
+  await page.getByTestId('settings-open').click()
+  await page.getByTestId('voice-select').click()
+  await page.getByRole('option', { name: '暗潮（男声）', exact: true }).click()
+  await page.getByTestId('settings-close').click()
+  await expect(page.getByTestId('settings-dialog')).toBeHidden()
+}
+
+/** Production UI plus the real AudioContext are both in the playing state. */
+const expectPlaying = async (page: Page) => {
+  await expect.poll(() => page.evaluate(() => {
+    const probe = (window as unknown as { __pcm: { starts: number; destinationConnects: number; peak: number; bufferRates: number[]; bufferFrames: number[] } }).__pcm
+    const live = (window as unknown as { __pcmLive: AudioContext[] }).__pcmLive
+    const button = document.querySelector('[data-testid="read-aloud"][aria-label="停止朗读"]')
+    const bars = button?.querySelector('[data-testid="reading-bars"]')
+    return Boolean(
+      button
+      && bars?.getAttribute('data-mode') === 'playing'
+      && probe.starts >= 1
+      && probe.destinationConnects >= 1
+      && probe.peak > 0.05
+      && probe.bufferRates.at(-1) === 24000
+      && (probe.bufferFrames.at(-1) ?? 0) > 0
+      && live.some((context) => context.state === 'running'),
+    )
+  })).toBe(true)
+}
+
+const expectAudibleCleanup = async (page: Page) => {
+  await expect.poll(() => page.evaluate(() => {
+    const probe = (window as unknown as { __pcm: { closes: number; stops: number; disconnects: number; starts: number } }).__pcm
+    const live = (window as unknown as { __pcmLive: AudioContext[] }).__pcmLive
+    const playing = document.querySelector('[data-testid="read-aloud"][aria-label="停止朗读"]')
+    return probe.closes >= 1
+      && probe.stops >= probe.starts
+      && probe.starts >= 1
+      && probe.disconnects >= 1
+      && live.every((context) => context.state === 'closed')
+      && !playing
+  })).toBe(true)
+}
+
+const voiceOf = (raw: string) => JSON.parse(raw) as { text: string; voice_id: string; format: string; filter_markdown: boolean }
+
+test('playback reaches WebAudio playing for stella and cleans up on EOF', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await openPcmServer('eof', 24000)
+  try {
+    await installPcmProbe(page)
+    await unlock(page, { ttsPort: pcm.port })
+    await answer(page, '请朗读海星')
+    await page.getByTestId('read-aloud').click()
+    await expectPlaying(page)
+    await expect.poll(() => pcm.bodies.length).toBe(1)
+    expect(voiceOf(pcm.bodies[0]!)).toMatchObject({ text: '合成回答。', voice_id: 'stella', format: 'pcm', filter_markdown: true })
+    await expectAudibleCleanup(page)
+    await expect.poll(() => pcm.finished[0] === true && pcm.aborted[0] === false).toBe(true)
+    await expect(page.getByTestId('read-aloud')).toHaveAttribute('aria-label', '朗读')
+    await expect(page.getByTestId('speech-notice')).toHaveCount(0)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('playback stop for tide closes queued sources, the context, and the open request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await openPcmServer('open', 24000 * 4)
+  try {
+    await installPcmProbe(page)
+    await unlock(page, { ttsPort: pcm.port })
+    await selectTide(page)
+    await answer(page, '请朗读暗潮')
+    const read = page.getByTestId('read-aloud')
+    await read.click()
+    await expectPlaying(page)
+    await expect.poll(() => pcm.bodies.length).toBe(1)
+    expect(voiceOf(pcm.bodies[0]!)).toMatchObject({ text: '合成回答。', voice_id: 'tide', format: 'pcm', filter_markdown: true })
+    await read.click()
+    await expectAudibleCleanup(page)
+    await expect.poll(() => pcm.aborted[0]).toBe(true)
+    await expect(read).toHaveAttribute('aria-label', '朗读')
+    await expect(page.getByTestId('speech-notice')).toHaveCount(0)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('a second read-aloud replaces the one that is playing', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await openPcmServer('open', 24000 * 4)
+  try {
+    await installPcmProbe(page)
+    await unlock(page, { ttsPort: pcm.port })
+    await answer(page, '第一段')
+    await answer(page, '下一句')
+    await page.getByTestId('read-aloud').first().click()
+    await expectPlaying(page)
+    await selectTide(page)
+    await page.getByTestId('read-aloud').nth(1).click()
+    await expect.poll(() => page.evaluate(() => {
+      const probe = (window as unknown as { __pcm: { closes: number } }).__pcm
+      const live = (window as unknown as { __pcmLive: AudioContext[] }).__pcmLive
+      const labels = [...document.querySelectorAll('[data-testid="read-aloud"]')].map((node) => node.getAttribute('aria-label'))
+      const bars = document.querySelector('[data-testid="read-aloud"][aria-label="停止朗读"] [data-testid="reading-bars"]')
+      return probe.closes >= 1
+        && live.filter((context) => context.state === 'running').length === 1
+        && live.filter((context) => context.state === 'closed').length >= 1
+        && labels.join(',') === '朗读,停止朗读'
+        && bars?.getAttribute('data-mode') === 'playing'
+    })).toBe(true)
+    await expect.poll(() => pcm.bodies.length).toBeGreaterThanOrEqual(2)
+    expect(voiceOf(pcm.bodies[0]!).voice_id).toBe('stella')
+    expect(voiceOf(pcm.bodies[1]!).voice_id).toBe('tide')
+    await expect.poll(() => pcm.aborted[0]).toBe(true)
+    expect(pcm.aborted[1]).toBe(false)
+  } finally {
+    await pcm.close()
+  }
+})
+
+const playOpen = async (page: Page, frames = 24000 * 5) => {
+  const pcm = await openPcmServer('open', frames)
+  await installPcmProbe(page)
+  await unlock(page, { ttsPort: pcm.port })
+  await answer(page, '生命周期')
+  await page.getByTestId('read-aloud').click()
+  await expectPlaying(page)
+  return pcm
+}
+
+const expectPlaybackHalted = async (page: Page, pcm: PcmServer) => {
+  await expect.poll(() => pcm.aborted[0]).toBe(true)
+  await expect.poll(() => page.evaluate(() => {
+    const probe = (window as unknown as { __pcm: { closes: number; stops: number; disconnects: number } }).__pcm
+    const live = (window as unknown as { __pcmLive: AudioContext[] }).__pcmLive
+    return probe.closes >= 1 && probe.stops >= 1 && probe.disconnects >= 1 && live.every((context) => context.state === 'closed')
+  })).toBe(true)
+  await expect(page.locator('[data-testid="read-aloud"][aria-label="停止朗读"]')).toHaveCount(0)
+}
+
+test('send while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    await page.getByTestId('composer').fill('下一句')
+    await page.getByTestId('send').click()
+    await expect(page.getByTestId('assistant-text').last()).toContainText('合成回答。')
+    await expectPlaybackHalted(page, pcm)
+    await expect(page.getByTestId('read-aloud').first()).toHaveAttribute('aria-label', '朗读')
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('regenerate while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    await page.getByTestId('regenerate').click()
+    await expect(page.getByTestId('assistant-text').last()).toContainText('合成回答。')
+    await expectPlaybackHalted(page, pcm)
+    await expect(page.getByTestId('read-aloud')).toHaveAttribute('aria-label', '朗读')
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('continue while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await openPcmServer('open', 24000 * 5)
+  try {
+    await installPcmProbe(page)
+    await page.addInitScript(SSE)
+    await unlock(page, { ttsPort: pcm.port })
+    await page.getByTestId('composer').fill('先停')
+    await page.getByTestId('send').click()
+    await page.waitForFunction(() => (window as unknown as { __sse: { count: () => number } }).__sse.count() > 0)
+    await page.evaluate((events) => (window as unknown as { __sse: { push: (value: unknown[]) => void } }).__sse.push(events), [
+      { type: 'message_start', message: { id: 'c1', model: 'deepseek-flash' } },
+      { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '半句。' } },
+    ])
+    await expect(page.getByTestId('assistant-text')).toContainText('半句')
+    await page.getByTestId('stop').click()
+    await expect(page.getByTestId('continue')).toBeVisible()
+    await page.getByTestId('read-aloud').click()
+    await expectPlaying(page)
+    await page.getByTestId('continue').click()
+    await expectPlaybackHalted(page, pcm)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('switching conversation while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await openPcmServer('open', 24000 * 5)
+  try {
+    await installPcmProbe(page)
+    await unlock(page, { ttsPort: pcm.port })
+    await answer(page, '第一段')
+    await page.getByTestId('new-chat').click()
+    await answer(page, '下一句')
+    await page.getByTestId('read-aloud').click()
+    await expectPlaying(page)
+    await page.locator('.chat-link', { hasText: '语音' }).click()
+    await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+    await expectPlaybackHalted(page, pcm)
+    await expect(page.getByTestId('read-aloud')).toHaveAttribute('aria-label', '朗读')
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('import while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    const archive = {
+      format: 'deepapi',
+      version: 1,
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      app: 'deepapi',
+      conversations: [{
+        id: 'conv-import-speech',
+        title: '导入的会话',
+        titleSource: 'user',
+        model: 'deepseek-flash',
+        thinking: false,
+        search: false,
+        readLink: false,
+        effort: 'high',
+        pinned: false,
+        archived: false,
+        activeLeafId: null,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        rev: 1,
+        deletedAt: null,
+        messages: [],
+      }],
+    }
+    const path = '/tmp/speech-import-archive.json'
+    writeFileSync(path, JSON.stringify(archive))
+    await page.getByTestId('user-menu').click()
+    await page.getByTestId('settings-open').click()
+    await page.getByRole('button', { name: '数据管理' }).click()
+    await page.getByTestId('import-json').setInputFiles(path)
+    await expect(page.getByTestId('import-toast')).toContainText('已导入')
+    await expectPlaybackHalted(page, pcm)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('deleting the active chat while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    await page.locator('.chat-link.active').getByRole('button', { name: '菜单' }).click()
+    await page.getByTestId('chat-item-menu').getByRole('menuitem', { name: '删除' }).click()
+    await page.getByTestId('confirm-delete').click()
+    await expect(page.locator('.greeting')).toBeVisible()
+    await expectPlaybackHalted(page, pcm)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('removing the key while playing stops the player and aborts the request', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    await page.getByTestId('user-menu').click()
+    await page.getByTestId('settings-open').click()
+    await page.getByTestId('settings-nav-account').click()
+    await page.getByTestId('settings-dialog').getByRole('button', { name: '移除 Key' }).click()
+    await expect(page.getByTestId('landing')).toBeVisible()
+    await expectPlaybackHalted(page, pcm)
+  } finally {
+    await pcm.close()
+  }
+})
+
+test('reloading the app closes the playing audio context', async ({ page }) => {
+  test.setTimeout(90_000)
+  const pcm = await playOpen(page)
+  try {
+    await page.reload()
+    await expect(page.getByTestId('composer')).toBeVisible()
+    const closed = await page.evaluate(() => sessionStorage.getItem('deepapi-pcm-closed'))
+    expect(closed).not.toBeNull()
+    await expect(page.getByTestId('read-aloud')).toHaveAttribute('aria-label', '朗读')
+  } finally {
+    await pcm.close()
+  }
 })

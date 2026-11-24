@@ -16,7 +16,7 @@ import { useHarbor } from './store.js'
 import { IconMicFill16, IconMicOutline16, IconPlayMediaOutline16 } from './speech/icons.js'
 import { useSpeechNotice } from './speech/notice.js'
 import { ReadingBars } from './speech/ReadingBars.js'
-import { stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
+import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
 import { bindVoiceInserter, cancelVoiceInput, insertTranscript, toggleVoiceInput, useVoiceInput } from './speech/voiceSession.js'
@@ -1133,6 +1133,12 @@ const ReadAloudButton = ({ messageId, conversationId, text }: { messageId: strin
   const speech = useReadAloud()
   const active = speech.messageId === messageId && speech.status !== 'idle'
   const label = active ? t('ttsStop') : t('ttsPlay')
+  // Version and branch switches unmount the answer that was on screen. Stop
+  // only that session so a playback that already moved to another message stays up.
+  useEffect(() => () => {
+    const current = readAloudSnapshot()
+    if (current.messageId === messageId && current.status !== 'idle') stopReadAloud()
+  }, [messageId])
   return (
     <HoverTip text={label}>
       <button type="button" data-testid="read-aloud" data-tip={label} aria-label={label} aria-pressed={active} onClick={() => toggleReadAloud(messageId, conversationId, text)}>

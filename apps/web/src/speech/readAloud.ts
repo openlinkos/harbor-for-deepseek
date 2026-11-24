@@ -52,6 +52,38 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
     emit(IDLE)
   }
 
+  const closeHost = (host: PcmAudioHost) => {
+    try {
+      void Promise.resolve(host.close()).catch(() => undefined)
+    } catch {
+      // The host is already closed.
+    }
+  }
+
+  const dropStream = (stream: ReadableStream<Uint8Array> | null) => {
+    if (!stream) return
+    void stream.cancel().catch(() => undefined)
+  }
+
+  /** Stops this attempt's audio and aborts its request without touching a newer generation. */
+  const finishAttempt = (
+    gen: number,
+    abort: AbortController,
+    current: ReturnType<typeof createPcmPlayer>,
+    stream: ReadableStream<Uint8Array> | null,
+    errorKey?: MessageKey,
+  ) => {
+    const ownsPlayer = player === current
+    if (ownsPlayer && controller === abort) controller = null
+    if (!abort.signal.aborted) abort.abort()
+    current.stop()
+    if (ownsPlayer) player = null
+    dropStream(stream)
+    if (gen !== generation) return
+    if (errorKey) deps.onError(errorKey)
+    emit(IDLE)
+  }
+
   const toggle = (messageId: string, conversationId: string, text: string) => {
     const same = snapshot.messageId === messageId && snapshot.status !== 'idle'
     stop()
@@ -69,8 +101,15 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
     let host: PcmAudioHost
     try {
       host = deps.createContext()
-      host.resume()
     } catch {
+      deps.onError('ttsFailed')
+      return
+    }
+    let resumed: void | Promise<void>
+    try {
+      resumed = host.resume()
+    } catch {
+      closeHost(host)
       deps.onError('ttsFailed')
       return
     }
@@ -83,6 +122,15 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
     // observe a voice mutation that the first request makes while it starts.
     const voice = deps.getVoice()
     emit({ status: 'loading', messageId, conversationId })
+    if (resumed && typeof resumed.then === 'function') {
+      void resumed.then(() => undefined, () => {
+        // Closing the context rejects a resume that is still pending. That is
+        // not a device failure when this attempt already left the controller.
+        if (gen !== generation || controller !== abort) return
+        stop()
+        deps.onError('ttsFailed')
+      })
+    }
     queueMicrotask(() => {
       void runPlayback(gen, abort, current, voice, readable, messageId, conversationId)
     })
@@ -103,7 +151,7 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
         () => undefined,
       )
     }
-    let stream: ReadableStream<Uint8Array>
+    let stream: ReadableStream<Uint8Array> | null = null
     try {
       const pending = deps.synthesize(readable, voice, abort.signal)
       if (gen !== generation || abort.signal.aborted) {
@@ -113,46 +161,49 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
       stream = await pending
     } catch (error) {
       if (gen !== generation || isSpeechAbort(error) || abort.signal.aborted) return
-      current.stop()
-      deps.onError(mapTtsError(error))
-      if (gen === generation) emit(IDLE)
+      finishAttempt(gen, abort, current, null, mapTtsError(error))
       return
     }
     if (gen !== generation || abort.signal.aborted) {
-      await stream.cancel().catch(() => undefined)
+      dropStream(stream)
+      if (player === current) current.stop()
       return
     }
     try {
       let played = false
       for await (const frame of consumePcm(stream, abort.signal)) {
-        if (gen !== generation) return
-        if (frame.kind === 'aborted') return
+        if (gen !== generation || frame.kind === 'aborted') {
+          finishAttempt(gen, abort, current, stream)
+          return
+        }
         if (frame.kind === 'dangling-byte') {
-          current.stop()
-          deps.onError('ttsDangling')
-          if (gen === generation) emit(IDLE)
+          finishAttempt(gen, abort, current, stream, 'ttsDangling')
           return
         }
         if (frame.kind === 'error') {
-          current.stop()
-          deps.onError('ttsStreamError')
-          if (gen === generation) emit(IDLE)
+          finishAttempt(gen, abort, current, stream, 'ttsStreamError')
           return
         }
         if (frame.kind === 'eof') {
           if (!played) {
-            current.stop()
-            if (gen === generation) emit(IDLE)
+            finishAttempt(gen, abort, current, stream)
             return
           }
           current.endStream()
           await current.whenDrained()
           if (gen !== generation) return
+          if (controller === abort) controller = null
           current.stop()
+          if (player === current) player = null
           emit(IDLE)
           return
         }
-        current.schedule(frame.samples)
+        try {
+          current.schedule(frame.samples)
+        } catch (error) {
+          finishAttempt(gen, abort, current, stream, mapTtsError(error))
+          return
+        }
         played = true
         if (gen === generation && snapshot.status === 'loading') {
           emit({ status: 'playing', messageId, conversationId })
@@ -160,12 +211,10 @@ export const createReadAloud = (deps: ReadAloudDeps): ReadAloud => {
       }
     } catch (error) {
       if (gen !== generation || isSpeechAbort(error) || abort.signal.aborted) {
-        current.stop()
+        finishAttempt(gen, abort, current, stream)
         return
       }
-      current.stop()
-      deps.onError(mapTtsError(error))
-      if (gen === generation) emit(IDLE)
+      finishAttempt(gen, abort, current, stream, mapTtsError(error))
     }
   }
 

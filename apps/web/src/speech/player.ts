@@ -10,8 +10,9 @@ export type ScheduledClip = {
 
 export type PcmAudioHost = {
   readonly currentTime: number
-  resume(): void
-  close(): void
+  /** Sync throw or a rejected promise means the device did not start. */
+  resume(): void | Promise<void>
+  close(): void | Promise<void>
   play(samples: Float32Array, when: number): ScheduledClip
 }
 
@@ -88,10 +89,16 @@ export const hostFromAudioContext = (context: AudioContext): PcmAudioHost => ({
     return context.currentTime
   },
   resume() {
-    void context.resume()
+    return context.resume()
   },
   close() {
-    void context.close()
+    try {
+      const pending = context.close()
+      void Promise.resolve(pending).catch(() => undefined)
+      return pending
+    } catch {
+      return undefined
+    }
   },
   play(samples, when) {
     const buffer = context.createBuffer(1, samples.length, TTS_SAMPLE_RATE)

@@ -1,7 +1,10 @@
 import type { MessageKey } from '@deepapi/i18n'
+import { ASR_MAX_SECONDS } from '@deepapi/types'
 import { useSyncExternalStore } from 'react'
 import { isSpeechAbort, mapVoiceError } from './mapError.js'
 import type { LevelAnalyser, Recording } from './recorder.js'
+
+const WALL_MS = ASR_MAX_SECONDS * 1000
 
 export type VoicePhase = 'idle' | 'recording' | 'transcribing'
 
@@ -55,6 +58,7 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
   let pendingLimit = false
   let startedAt = 0
   let timer: ReturnType<typeof setInterval> | null = null
+  let armingCancel: (() => void) | null = null
   let snap = IDLE
   const listeners = new Set<() => void>()
 
@@ -90,6 +94,9 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     operation += 1
     abort?.abort()
     recording?.cancel()
+    // Resume may still be pending, so the Recording object does not exist yet.
+    armingCancel?.()
+    armingCancel = null
     idle()
   }
 
@@ -97,6 +104,9 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     if (phase !== 'recording') return
     elapsedMs = Math.max(0, deps.now() - startedAt)
     emit()
+    // Sample callbacks can stall while the device stays open. The wall clock
+    // is independent of onaudioprocess.
+    if (elapsedMs >= WALL_MS) hitLimit(operation)
   }
 
   const fail = (key: MessageKey, op: number) => {
@@ -172,13 +182,16 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     arming = true
     conversationId = deps.activeConversationId()
     emit()
+    const pending = deps.startRecording(() => hitLimit(op)) as Promise<Recording> & { cancel?: () => void }
+    armingCancel = typeof pending.cancel === 'function' ? () => pending.cancel?.() : null
     void (async () => {
       try {
-        const rec = await deps.startRecording(() => hitLimit(op))
+        const rec = await pending
         if (op !== operation) {
           rec.cancel()
           return
         }
+        armingCancel = null
         recording = rec
         analyser = rec.analyser
         arming = false
@@ -189,6 +202,7 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
         emit()
         if (pendingLimit) hitLimit(op)
       } catch (error) {
+        armingCancel = null
         if (op !== operation) return
         arming = false
         fail(mapVoiceError(error), op)

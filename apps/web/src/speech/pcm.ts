@@ -28,12 +28,30 @@ export const takePcm = (pending: Uint8Array, chunk: Uint8Array): { samples: Floa
  * Progressive PCM. A clean EOF has no length marker, so completeness stays unproven.
  * A final odd byte and a read error are failures. Abort is not an error.
  */
+const abortError = () => new DOMException('aborted', 'AbortError')
+
 export async function* consumePcm(stream: ReadableStream<Uint8Array>, signal?: AbortSignal): AsyncGenerator<PcmRead> {
   const reader = stream.getReader()
   let rest = new Uint8Array(0)
+  let cancelled = false
+  // reader.read() does not wake when the signal aborts unless the source
+  // observes it. Cancelling the reader rejects the pending read and cancels
+  // the underlying stream once.
+  const cancelReader = () => {
+    if (cancelled) return
+    cancelled = true
+    void reader.cancel(abortError()).catch(() => undefined)
+  }
+  if (signal?.aborted) cancelReader()
+  else signal?.addEventListener('abort', cancelReader, { once: true })
   try {
+    if (signal?.aborted) {
+      yield { kind: 'aborted' }
+      return
+    }
     for (;;) {
       if (signal?.aborted) {
+        cancelReader()
         yield { kind: 'aborted' }
         return
       }
@@ -48,6 +66,10 @@ export async function* consumePcm(stream: ReadableStream<Uint8Array>, signal?: A
         yield { kind: 'error', error }
         return
       }
+      if (signal?.aborted) {
+        yield { kind: 'aborted' }
+        return
+      }
       if (next.done) {
         if (rest.length > 0) yield { kind: 'dangling-byte' }
         else yield { kind: 'eof', danglingByte: false, completeness: 'unproven' }
@@ -59,10 +81,11 @@ export async function* consumePcm(stream: ReadableStream<Uint8Array>, signal?: A
       if (frame.samples.length > 0) yield { kind: 'samples', samples: frame.samples }
     }
   } finally {
+    signal?.removeEventListener('abort', cancelReader)
     try {
       reader.releaseLock()
     } catch {
-      // The lock is already gone when the read failed.
+      // cancel() already released the lock.
     }
   }
 }
