@@ -208,8 +208,7 @@ for (const viewport of [
     await page.keyboard.press('Shift+Tab')
     await expect(page.getByRole('button', { name: '取消' })).toBeFocused()
     await page.keyboard.press('Escape')
-    await expect(dialog).toBeVisible()
-    await page.getByRole('button', { name: '取消' }).click()
+    // 昊辰 fb1132-5. Escape cancels. Master's gaps.spec.ts expects the dialog to hide. SP-MOD-572's capture does not; that conflict stays open.
     await expect(dialog).toBeHidden()
     await chatStillNamed(page, '对照', '不该保存的名字')
 

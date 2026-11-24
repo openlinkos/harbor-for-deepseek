@@ -472,7 +472,7 @@ const useScrollLock = (open: boolean) => {
 const ConfirmDialog = ({ label, body, confirm, onCancel, onConfirm }: { label: string; body: string; confirm: string; onCancel: () => void; onConfirm: () => void }) => {
   const t = useT()
   const panel = useRef<HTMLDivElement>(null)
-  // SP-MOD-572. Back closes the confirm. Escape does not.
+  // Back closes the confirm. Escape cancels too (昊辰 fb1132-5). SP-MOD-572's capture has no Esc-cancel; that conflict stays open.
   useOverlayHistory(true, () => onCancel())
   useScrollLock(true)
   const onCancelRef = useRef(onCancel)
@@ -491,10 +491,10 @@ const ConfirmDialog = ({ label, body, confirm, onCancel, onConfirm }: { label: s
     const nodes = focusables()
     nodes[0]?.focus()
     const onKey = (event: KeyboardEvent) => {
-      // SP-MOD-572. Escape leaves the confirm open. Mask click and Back close it.
+      // Escape cancels (昊辰 fb1132-5). Mask click and Back still close it. SP-MOD-572's capture does not, and that conflict stays open.
       if (event.key === 'Escape') {
-        event.preventDefault()
         event.stopPropagation()
+        onCancelRef.current()
         return
       }
       if (event.key !== 'Tab') return

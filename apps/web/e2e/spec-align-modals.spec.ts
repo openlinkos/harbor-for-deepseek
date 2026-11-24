@@ -1,5 +1,5 @@
 // SP-MOD-572 delete confirm. SP-MOD-635 search-chats dialog.
-// Escape leaves the delete confirm open. Mask click and Back close it.
+// Mask click and Back close the delete confirm. Escape also cancels (昊辰 fb1132-5). The capture has no Esc-cancel; that conflict stays open.
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const sse = (events: unknown[]) => events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')

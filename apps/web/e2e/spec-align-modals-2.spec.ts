@@ -1,5 +1,5 @@
 // Computed modal styles. Confirm cards use the 24px surface. The toast uses the official padding and layer.
-// Escape still leaves the delete confirm open (SP-MOD-572). Modal stack starts at 1024.
+// Escape cancels the delete confirm (昊辰 fb1132-5). SP-MOD-572's capture has no Esc-cancel; that conflict stays open. Modal stack starts at 1024.
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const install = async (page: Page) => {
@@ -109,8 +109,7 @@ test('confirm card, menu, and toast follow the official dialog field', async ({ 
   await expect(title).toHaveCSS('min-height', '28px')
   await expect(page.locator('.modal.confirm-modal')).toHaveCSS('z-index', '1024')
   await page.keyboard.press('Escape')
-  await expect(page.getByTestId('confirm-dialog')).toBeVisible()
-  await page.getByRole('button', { name: '取消' }).click()
+  await expect(page.getByTestId('confirm-dialog')).toBeHidden()
 
   await page.evaluate(() => document.body.setAttribute('data-ds-dark-theme', ''))
   await page.locator('a.chat-link', { hasText: '弹层会话' }).hover()

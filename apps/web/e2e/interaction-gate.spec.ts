@@ -117,13 +117,7 @@ for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
         if (way === 'esc') await page.keyboard.press('Escape')
         else if (way === 'outside') await page.mouse.click(vp.width - 8, vp.height / 2) // 弹层/对话框外的遮罩或页面
         else await page.locator('.chat-link .more').first().click({ timeout: 5_000 })
-        // SP-MOD-572. Escape leaves the delete confirm open. Mask click still closes it.
-        if (name === 'delete confirm' && way === 'esc') {
-          await expect(t, '删除确认按 Esc 仍留在页面上').toBeVisible()
-          await sidebar(page)
-          for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)
-          return
-        }
+        // 昊辰 fb1132-5. Escape cancels the delete confirm again. SP-MOD-572's capture has no Esc-cancel; that conflict stays open.
         await expect(t, `${name} 必须能用 ${way} 取消`).toBeHidden()
         await sidebar(page)
         for (const title of TITLES) await expect(row(page, title), '取消不得删除/改名').toHaveCount(1)

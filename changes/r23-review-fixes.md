@@ -27,3 +27,9 @@ b5a225c 的 svg 板是整屏高：浅色宽图 1440 为 [556, 0, 329, 900]，390
 - 深色四组板色 rgb(44, 44, 46)，盒子与浅色相同
 
 宽图 A→T（viewBox 2352×95）和长图（viewBox 89×2546）在 1440 与 390、浅色与深色：卡片高小于视口，四边落在幻灯片内边距里，svg 相对卡片缩进 24/28，并且小于自身 viewBox。Esc 关掉弹层。
+
+## 3. 删除确认的 Esc
+
+OPEN CONFLICT，不解决。SP-MOD-572 的官方捕获没有 Esc 取消。昊辰 fb1132-5 要求 Esc 取消，master `interaction-gate.spec.ts`「delete confirm cancels on esc」在 1440 和 390 都要再通过。早先去掉 Esc 的那次 steer 没有他的决定。
+
+ConfirmDialog 恢复 master 的行为：Escape 时 stopPropagation 并 onCancel。遮罩点击和 Back 仍取消。`interaction-gate`、`gaps.spec.ts`、`spec-align-modals-2` 重新期望对话框在 Esc 后隐藏。ledger `modals.json` 的 SP-MOD-572 改为 action conflict，备注写明未解决。
