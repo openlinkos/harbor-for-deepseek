@@ -2511,13 +2511,17 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
 .file-card:hover .file-card-remove { opacity: 1; }
 .file-card-remove {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 6px;
+  right: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
+  margin-bottom: auto;
+  margin-left: auto;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -2525,8 +2529,10 @@ body[data-ds-dark-theme] .chip.on:hover:not(:disabled) { background: var(--dsw-a
   background: var(--dsw-alias-button-contrast-fill);
   cursor: pointer;
   opacity: 0;
+  will-change: opacity;
   transition: opacity 0.2s ease-in-out;
 }
+body.rtl .file-card-remove { left: 6px; right: auto; }
 .file-card-remove.is-invalid {
   opacity: 1;
   color: var(--dsw-alias-label-primary-foreground);
@@ -2600,7 +2606,12 @@ body[data-ds-dark-theme] .image-card {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
-body[data-ds-dark-theme] .image-card-remove { background: #f9fafb; color: #353638; }
+body[data-ds-dark-theme] .image-card-remove {
+  background: #f9fafb;
+  color: #353638;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 8px rgba(0, 0, 0, 0.16);
+}
+body.rtl .image-card-remove { left: 4px; right: auto; }
 .image-card:hover .image-card-remove,
 .image-card.is-failed .image-card-remove { opacity: 1; }
 .image-card.is-failed .image-card-shade { box-shadow: inset 0 0 0 1px var(--dsw-alias-state-error-primary); }
