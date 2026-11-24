@@ -2093,11 +2093,11 @@ export const Shell = () => {
         </div>
         {selecting ? (
           <div className="select-foot">
-            <button type="button" aria-disabled={!picked.length} className={picked.length ? '' : 'off'} onClick={() => { if (picked.length) void state.pinMany(picked) }}>
+            <button type="button" disabled={!picked.length} aria-disabled={!picked.length} className={picked.length ? '' : 'off'} onClick={() => { if (picked.length) void state.pinMany(picked) }}>
               <Icon d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" />
               <span>{t('pin')}</span>
             </button>
-            <button type="button" aria-disabled={!picked.length} className={picked.length ? 'danger' : 'off'} onClick={() => { if (!picked.length) return; for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>
+            <button type="button" disabled={!picked.length} aria-disabled={!picked.length} className={picked.length ? 'danger' : 'off'} onClick={() => { if (!picked.length) return; for (const id of picked) void state.removeChat(id); setPicked([]); setSelecting(false) }}>
               <Icon d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13" />
               <span>{t('delete')}</span>
             </button>

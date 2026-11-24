@@ -250,7 +250,8 @@ body[data-ds-dark-theme] .new-chat:hover {
 .select-foot { display: flex; align-items: center; height: 62px; margin: 0 -12px; border-top: 1px solid var(--dsw-alias-border-l1); box-sizing: border-box; }
 .select-foot button { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; padding: 0; outline: none; position: relative; font-size: 14px; font-weight: 500; line-height: 22px; color: var(--dsw-alias-label-primary); cursor: pointer; }
 .select-foot button + button { box-shadow: inset 1px 0 0 var(--dsw-alias-border-l1); }
-.select-foot button.off { color: var(--dsw-alias-label-caption); cursor: default; }
+.select-foot button.off,
+.select-foot button:disabled { color: var(--dsw-alias-label-caption); cursor: default; opacity: 1; }
 .select-foot button.danger { color: var(--dsw-alias-state-error-primary); }
 .select-foot svg { width: 16px; height: 16px; }
 .chat-link .pick { width: 20px; height: 20px; margin: 0 10px 0 0; border: 0; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.12); display: grid; place-items: center; flex: none; color: #fff; padding: 0; }
