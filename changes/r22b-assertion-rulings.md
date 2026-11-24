@@ -11,3 +11,11 @@ Source: `/workspace/deepapi-verify/pr68/round4/ADJUDICATION-share.md` (official 
 | attachment-cards.spec.ts (sent message with files) | — | `.bubble.has-files` margin-top 10px | existing fixture with attachments; same rule, no new tolerance |
 
 Citation pair (fb1554-markdown cite-style light/dark 1440, 2 vs 0.5) is not waived. It fails identically on master a8df8b9 in both zones, so it is not a regression for the staged release.
+
+## r22c (owner 筑衡, 2026-11-25 01:36 CST, approved)
+
+| test | old | new | basis |
+|---|---|---|---|
+| share-select.spec.ts:367 answer checkbox vs question bubble (390) | bubble.bottom + 76 ±1 | bubble.bottom + 63 ±1 | ADJUDICATION-share.md:172: 76 has no official structural basis; +63 = official CSS structure (row 50 + sticky 13), consistent with the approved phone y=73 ruling. CSS-derived, no official 390 select-mode capture; re-pin if one is captured. |
+
+Citation pair: confirmed pre-existing on master a8df8b9; not a staged-release blocker, still unwaived (stays FAIL), tracked as a follow-up.

@@ -364,7 +364,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
         // changes/r22-share-rulings.md. No official 390 select capture. Topbar 60 + sticky pad 13.
         near(firstQuestion.y, 73, 'question checkbox y')
-        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 76, 'answer checkbox follows the question bubble')
+        // changes/r22b-assertion-rulings.md r22c: row 50 + sticky pad 13 = +63. CSS-derived, no official 390 select-mode capture; re-pin if one is captured.
+        near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 63, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
           return { margin: style.margin, padding: style.padding }
