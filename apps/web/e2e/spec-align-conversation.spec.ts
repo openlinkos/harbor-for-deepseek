@@ -78,7 +78,9 @@ test('bubble, column, and action row match the official message styles', async (
   await expect(bubble).toHaveCSS('white-space', 'pre-wrap')
   await expect(bubble).toHaveCSS('background-color', 'rgb(237, 243, 254)')
   await expect(bubble).toHaveCSS('color', 'rgb(15, 17, 21)')
-  await expect(bubble).toHaveCSS('margin-top', '10px')
+  // changes/r22b-assertion-rulings.md ruling 3: .fbb737a4._8271fc3 adds 10px only after files; the seed message has none.
+  await expect(bubble).not.toHaveClass(/has-files/)
+  await expect(bubble).toHaveCSS('margin-top', '0px')
   await expect(page.locator('.turn.user')).toHaveCSS('margin-bottom', '16px')
   const widths = await page.evaluate(() => {
     const turn = document.querySelector('.turn.user') as HTMLElement

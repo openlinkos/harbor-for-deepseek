@@ -296,7 +296,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(proseAfter.width, 308, 'answer text area width')
         near(proseAfter.x + proseAfter.width, 370, 'answer text area right')
         near(bubbleAfter.height, bubbleBefore.height, 'question bubble height follows its text')
-        near(bubbleAfter.x + bubbleAfter.width, 354, 'question bubble right')
+        // changes/r22b-assertion-rulings.md ruling 1: official wrapper align-items:flex-end puts the bubble right at 370.
+        near(bubbleAfter.x + bubbleAfter.width, 370, 'question bubble right')
       }
       await expect(page.locator('.action-row:visible')).toHaveCount(0)
       await expect(page.locator('.user-actions:visible')).toHaveCount(0)
@@ -478,7 +479,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         return { bg: style.backgroundColor, radius: style.borderTopLeftRadius }
       })
       // changes/r22-share-rulings.md. Phone wash is the alias, not rgb(236,242,249) / tone.block.
-      expect(block.bg).toBe(w < 768 ? (theme === 'light' ? 'rgb(245, 246, 247)' : 'rgb(33, 33, 35)') : tone.block)
+      // changes/r22b-assertion-rulings.md ruling 2: desktop dark uses the same alias token neutral-850 #212123.
+      expect(block.bg).toBe(w < 768 || theme === 'dark' ? (theme === 'light' ? 'rgb(245, 246, 247)' : 'rgb(33, 33, 35)') : tone.block)
       // changes/r22-share-rulings.md. Desktop radius is 12px (SP-CV-093). Narrow stays 0 (SP-SHARE-099).
       expect(block.radius).toBe(w < 800 ? '0px' : '12px')
 
@@ -796,7 +798,8 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(page.locator('.share-bar')).toBeVisible()
       const bubble = (await page.locator('.turn.user', { hasText: '第二问' }).locator('.bubble').boundingBox())!
       expect(bubble.width, `short bubble width ${bubble.width}`).toBeLessThan(208)
-      near(bubble.x + bubble.width, 354, 'short bubble right')
+      // changes/r22b-assertion-rulings.md ruling 1: official wrapper align-items:flex-end puts the bubble right at 370.
+      near(bubble.x + bubble.width, 370, 'short bubble right')
     })
     test('create button and select-all label use natural width', async ({ page }) => {
       test.setTimeout(90_000)
