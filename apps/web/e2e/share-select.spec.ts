@@ -361,7 +361,8 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         near(label.x, 66, 'select-all label left')
         const firstQuestion = (await page.locator('.turn.user').first().locator('.share-box').boundingBox())!
         const firstAnswer = (await page.locator('.turn.assistant').first().locator('.share-box').boundingBox())!
-        near(firstQuestion.y, 76.5, 'question checkbox y')
+        // changes/r22-share-rulings.md. No official 390 select capture. Topbar 60 + sticky pad 13.
+        near(firstQuestion.y, 73, 'question checkbox y')
         near(firstAnswer.y, bubbleAfter.y + bubbleAfter.height + 76, 'answer checkbox follows the question bubble')
         const boxStyle = await page.locator('input.share-box').first().evaluate((node) => {
           const style = getComputedStyle(node)
@@ -383,17 +384,28 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         expect(overlaps(answerCheck, answerGrey), 'answer checkbox stays outside its grey block').toBe(false)
       } else {
         expect(Math.abs(userGrey.x - 0), 'selected fill left').toBeLessThanOrEqual(1)
-        expect(Math.abs(userGrey.x + userGrey.width - 371), 'selected fill right').toBeLessThanOrEqual(1)
+        // changes/r22-share-rulings.md. --panel-width is the panel offsetWidth (SP-CV-102).
+        expect(Math.abs(userGrey.x + userGrey.width - 390), 'selected fill right').toBeLessThanOrEqual(1)
         expect(Math.abs(answerGrey.x - 0), 'answer fill left').toBeLessThanOrEqual(1)
-        expect(Math.abs(answerGrey.x + answerGrey.width - 371), 'answer fill right').toBeLessThanOrEqual(1)
+        // changes/r22-share-rulings.md. Same panel width as the question fill.
+        expect(Math.abs(answerGrey.x + answerGrey.width - 390), 'answer fill right').toBeLessThanOrEqual(1)
         expect(contained(userCheck, userGrey), 'user checkbox sits inside the selected fill').toBe(true)
         expect(contained(answerCheck, answerGrey), 'answer checkbox sits inside the selected fill').toBe(true)
       }
-      expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 12), 'grey blocks in one pair are 12px apart').toBeLessThanOrEqual(1)
+      // changes/r22-share-rulings.md. h1_01 is 1920×1200 and 1 CSS px, but it has no question/answer wash pair
+      // (0 exact rgb(245,246,247) pixels in the center band). h1_03 is 1280×800, so image px × 1.5.
+      // At x=500,550,600,700,750 the rows match: y161 (245,246,247) L1 0, y162 (244,246,247) L1 1,
+      // y163 (252,252,252) L1 18, y164–169 (255,255,255) L1 27, y170 (249,249,250) L1 10, y171 L1 0.
+      // Half of wash-to-white (13.5) at pixel centers: 163.2353 and 170.2941. Gap 7.0588 × 1.5 = 10.5882.
+      expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 10.5882), 'grey blocks in one pair match the official capture').toBeLessThanOrEqual(1)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(32)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)
-      expect(Math.abs((answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)), 'answer checkbox aligns with the first line').toBeLessThanOrEqual(2)
-      expect(Math.abs(userCheck.y - userGrey.y - 3), 'user checkbox is about 3px from the grey top').toBeLessThanOrEqual(1)
+      // changes/r22-share-rulings.md. Official offset is 8–10; the checkbox centre is lower than the first line.
+      const lineDelta = (answerCheck.y + answerCheck.height / 2) - (text!.y + text!.height / 2)
+      expect(lineDelta, 'answer checkbox centre is 8–10px below the first line').toBeGreaterThanOrEqual(8)
+      expect(lineDelta, 'answer checkbox centre is 8–10px below the first line').toBeLessThanOrEqual(10)
+      // changes/r22-share-rulings.md. 3px was the pinned measurement. This turn is not pinned.
+      expect(Math.abs(userCheck.y - userGrey.y - 33), 'user checkbox is about 33px from the grey top').toBeLessThanOrEqual(1)
       if (w === 390) {
         near(text!.x, 62, 'answer first line left')
         expect(overlaps(answerCheck, text!), 'checkbox must not cover the answer first line').toBe(false)
@@ -465,8 +477,10 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
         const style = getComputedStyle(node)
         return { bg: style.backgroundColor, radius: style.borderTopLeftRadius }
       })
-      expect(block.bg).toBe(w < 768 && theme === 'light' ? 'rgb(236, 242, 249)' : tone.block)
-      expect(block.radius).toBe('18px')
+      // changes/r22-share-rulings.md. Phone wash is the alias, not rgb(236,242,249) / tone.block.
+      expect(block.bg).toBe(w < 768 ? (theme === 'light' ? 'rgb(245, 246, 247)' : 'rgb(33, 33, 35)') : tone.block)
+      // changes/r22-share-rulings.md. Desktop radius is 12px (SP-CV-093). Narrow stays 0 (SP-SHARE-099).
+      expect(block.radius).toBe(w < 800 ? '0px' : '12px')
 
       const create = page.getByTestId('share-create')
       const cancel = page.getByTestId('share-cancel')
@@ -895,7 +909,8 @@ for (const [w, h] of [[1440, 900], [390, 844]] as const) {
           }
         }, point)
         expect(hit.cls, `${role} checkbox receives the click at ${w}`).toContain('share-box')
-        expect(hit.inside, `${role} checkbox is inside the message box at ${w}`).toBe(true)
+        // changes/r22-share-rulings.md. At 1440, official mB left:-42px is outside the row border.
+        if (w !== 1440) expect(hit.inside, `${role} checkbox is inside the message box at ${w}`).toBe(true)
         await page.mouse.click(point.x, point.y)
         expect(await box.isChecked(), `${role} toggles at ${w}`).toBe(!before)
       }
