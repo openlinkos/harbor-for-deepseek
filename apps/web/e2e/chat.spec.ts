@@ -635,7 +635,7 @@ test('dark landing matches the light landing', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('deepapi-theme', 'system'))
     await page.goto('/')
     const thinking = page.getByTestId('landing-thinking')
-    if (!((await thinking.getAttribute('class')) ?? '').includes('on')) await thinking.click()
+    if (!(await thinking.evaluate((node) => node.classList.contains('on')))) await thinking.click()
     await page.mouse.move(0, 0)
     await expect(thinking).toHaveCSS('background-color', 'rgb(237, 243, 254)')
     const chip = page.locator('.landing .chip.on').first()

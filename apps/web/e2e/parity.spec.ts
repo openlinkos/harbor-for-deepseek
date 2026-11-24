@@ -208,13 +208,13 @@ test('reactions', async ({ page }) => {
 
 test('tools default off', async ({ page }) => {
   await unlock(page)
-  await expect(page.getByTestId('toggle-thinking')).not.toHaveClass(/on/)
-  await expect(page.getByTestId('toggle-search')).not.toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-thinking').evaluate((node) => node.classList.contains('on'))).toBe(false)
+  await expect.poll(() => page.getByTestId('toggle-search').evaluate((node) => node.classList.contains('on'))).toBe(false)
   await expect(page.getByTestId('toggle-search')).toContainText('智能搜索')
   await page.getByTestId('toggle-thinking').click()
-  await expect(page.getByTestId('toggle-thinking')).toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-thinking').evaluate((node) => node.classList.contains('on'))).toBe(true)
   await page.getByTestId('toggle-search').click()
-  await expect(page.getByTestId('toggle-search')).toHaveClass(/on/)
+  await expect.poll(() => page.getByTestId('toggle-search').evaluate((node) => node.classList.contains('on'))).toBe(true)
 })
 
 test('search citations', async ({ page }) => {

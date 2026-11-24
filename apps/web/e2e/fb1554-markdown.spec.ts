@@ -51,7 +51,7 @@ const boot = async (page: Page, theme: string, opts: { split?: boolean; staged?:
   await page.getByTestId('landing-send').click(); await page.getByTestId('key-input').fill('demo-local-key'); await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
-  for (const id of ['toggle-thinking', 'toggle-search']) { const c = (await page.getByTestId(id).getAttribute('class')) || ''; if (!c.includes('on')) await page.getByTestId(id).click() }
+  for (const id of ['toggle-thinking', 'toggle-search']) { if (!(await page.getByTestId(id).evaluate((node) => node.classList.contains('on')))) await page.getByTestId(id).click() }
 }
 const ask = async (page: Page, text = '[筑衡测试] 长回答语料') => { await page.getByTestId('composer').fill(text); await page.getByTestId('send').click(); await page.getByTestId('assistant-text').first().waitFor(); await page.waitForTimeout(500) }
 const md = async (page: Page, expectAll = true) => { await page.evaluate(LIB); return page.evaluate((x) => (window as any).__md('ours', x), expectAll ? EXPECT : null) }

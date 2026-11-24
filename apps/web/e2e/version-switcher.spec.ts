@@ -52,7 +52,7 @@ const boot = async (page: Page) => {
   await expect(page.getByTestId('composer')).toBeVisible()
   for (const id of ['toggle-thinking', 'toggle-search']) {
     const chip = page.getByTestId(id)
-    if ((await chip.getAttribute('class'))?.includes('on')) await chip.click()
+    if (await chip.evaluate((node) => node.classList.contains('on'))) await chip.click()
   }
 }
 

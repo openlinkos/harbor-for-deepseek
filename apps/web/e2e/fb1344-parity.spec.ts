@@ -59,7 +59,7 @@ const boot = async (page: Page, theme: string, staged = false) => {
   await expect(page.getByTestId('composer')).toBeVisible()
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
 }
-const chip = async (page: Page, id: string, on: boolean) => { const c = (await page.getByTestId(id).getAttribute('class')) || ''; if (c.includes('on') !== on) await page.getByTestId(id).click() }
+const chip = async (page: Page, id: string, on: boolean) => { if ((await page.getByTestId(id).evaluate((node) => node.classList.contains('on'))) !== on) await page.getByTestId(id).click() }
 const ask = async (page: Page) => { await chip(page, 'toggle-thinking', true); await chip(page, 'toggle-search', true); await page.getByTestId('composer').fill('[筑衡测试] 上海天气'); await page.getByTestId('send').click(); await page.getByTestId('assistant-text').last().waitFor(); await page.waitForTimeout(300) }
 const comp = async (page: Page) => { await page.evaluate(LIB); return page.evaluate(() => (window as any).__comp('ours')) }
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768

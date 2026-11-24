@@ -71,7 +71,7 @@ const boot = async (page: Page, theme: string) => {
   await page.addStyleTag({ content: '*{transition-duration:0s!important;transition-delay:0s!important}' })
   for (const id of ['toggle-thinking', 'toggle-search']) {
     const c = (await page.getByTestId(id).getAttribute('class')) || ''
-    if (!c.includes('on')) await page.getByTestId(id).click()
+    if (!(await page.getByTestId(id).evaluate((node) => node.classList.contains('on')))) await page.getByTestId(id).click()
   }
   await page.getByTestId('composer').fill('[筑衡测试] 浏览链接换行')
   await page.getByTestId('send').click()
