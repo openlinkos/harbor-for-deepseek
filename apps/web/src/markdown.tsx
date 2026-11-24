@@ -266,6 +266,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
       </div>
       {full ? createPortal(
         <div className="diagram-modal" data-testid="mermaid-modal">
+          <div className="bg-mask" />
           <button type="button" className="diagram-modal-close" aria-label={label('关闭', 'Close')} onClick={() => setFull(false)}>
             <IconSvg><path d="M4 4l8 8M12 4 4 12" /></IconSvg>
           </button>

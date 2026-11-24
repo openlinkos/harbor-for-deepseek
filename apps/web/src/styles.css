@@ -346,20 +346,32 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
 }
 .diagram-tools button { display: inline-flex; align-items: center; gap: 4px; }
 .diagram-tools svg { width: 16px; height: 16px; flex: none; }
+/* SP-MOD-597. .ds-fancy-box is the fullscreen stage: 100% by 100%, absolute, top 0, left 0. */
 .diagram-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  background: rgb(31, 31, 31);
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
+/* SP-MOD-265 / SP-MOD-266. The mask is translucent black plus a 2px blur, so the page shows through. */
+.diagram-modal .bg-mask {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.88);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+/* SP-MOD-141 / SP-MOD-348 / SP-MOD-349. Close sits with the top toolbar. */
 .diagram-modal-close {
   position: absolute;
-  top: 16px;
-  right: 20px;
+  top: 12px;
+  right: 12px;
+  z-index: 2001;
   width: 32px;
   height: 32px;
   padding: 0;
@@ -370,21 +382,19 @@ body[data-ds-dark-theme] .edit-card { background-color: var(--dsw-alias-bg-base)
   display: grid;
   place-items: center;
 }
-/* SP-MD-981. Fullscreen panel is #f9fafb, about 906×965 and centered at 1920×1072. */
+/* SP-MOD-520. The slide fills the fancy box. No 906×965 card. */
 .diagram-modal-card {
-  width: min(906px, calc(100vw - 96px));
-  height: min(965px, calc(100vh - 107px));
-  max-height: none;
-  overflow: hidden;
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 40px 46px;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
 }
-body[data-ds-dark-theme] .diagram-modal-card { background: #1b1b1c; }
 .diagram-modal-card .mermaid {
   width: 100%;
   height: 100%;
@@ -392,7 +402,15 @@ body[data-ds-dark-theme] .diagram-modal-card { background: #1b1b1c; }
   align-items: center;
   justify-content: center;
 }
-.diagram-modal-card .mermaid svg { width: auto; height: 100%; max-width: 100%; max-height: 100%; }
+/* SP-MOD-074 / SP-MOD-178. The svg plate uses the theme tokens. The mask stays visible around it. */
+.diagram-modal-card .mermaid svg {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  background-color: var(--dsw-static-neutral-bluish-50);
+}
+body[data-ds-dark-theme] .diagram-modal-card .mermaid svg { background-color: var(--dsw-static-neutral-bluish-850); }
 .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: ds-spin 0.6s linear infinite; }
 @keyframes ds-spin { to { transform: rotate(360deg); } }
 .side-scroll-wrap {

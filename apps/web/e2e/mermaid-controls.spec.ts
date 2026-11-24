@@ -81,8 +81,10 @@ test('diagram fullscreen is a modal, zoom has a tooltip, download opens the form
   await expect(page.locator('.diagram-modal-card')).toBeVisible()
   const shell = await page.locator('.diagram-modal-card').boundingBox()
   const view = page.viewportSize()
-  expect(shell && view && shell.y).toBeGreaterThan(8)
-  expect(shell && view && shell.y + shell.height).toBeLessThan(view.height - 8)
+  // SP-MOD-520 / .ds-fancy-box. The slide fills the viewport. The old inset check expected a floating card.
+  expect(shell && view && shell.y).toBeLessThanOrEqual(1)
+  expect(shell && view && Math.abs(shell.width - view.width)).toBeLessThanOrEqual(1)
+  expect(shell && view && Math.abs(shell.height - view.height)).toBeLessThanOrEqual(1)
   await saveShot(page, 'mermaid-03-diagram-fullscreen-modal.png')
   await modal.getByRole('button', { name: '关闭' }).click()
   await expect(modal).toHaveCount(0)
@@ -153,6 +155,36 @@ test('dark theme mermaid nodes stay readable', async ({ page }) => {
   expect(paint.fill).not.toBe('rgb(0, 0, 0)')
   expect(paint.stroke).not.toBe('none')
   expect(contrast(paint.fill, paint.color)).toBeGreaterThan(3)
+})
+
+// SP-MOD-597 / the .ds-fancy-box rule (width/height 100%) and SP-MOD-265/266.
+// The fullscreen stage tracks the viewport. The mask is rgba(0,0,0,.88) plus blur(2px),
+// so the page shows through. A fixed 906×965 card and an opaque rgb(31,31,31) scrim fail this.
+test('mermaid fullscreen tracks the viewport and the mask is not opaque', async ({ page }) => {
+  test.setTimeout(90_000)
+  await boot(page, 1440, 900)
+  await ask(page)
+  for (const [w, h] of [[1440, 900], [1100, 700]] as const) {
+    await page.setViewportSize({ width: w, height: h })
+    await page.getByTestId('mermaid-card').getByRole('button', { name: '全屏' }).click()
+    const panel = await page.locator('.diagram-modal-card').boundingBox()
+    expect.soft(panel, `panel box at ${w}x${h}`).not.toBeNull()
+    expect.soft(Math.abs((panel?.width ?? 0) - w), `panel width tracks ${w}, got ${panel?.width}`).toBeLessThanOrEqual(1)
+    expect.soft(Math.abs((panel?.height ?? 0) - h), `panel height tracks ${h}, got ${panel?.height}`).toBeLessThanOrEqual(1)
+    expect.soft(panel?.x ?? 99, `panel x at ${w}`).toBeLessThanOrEqual(1)
+    expect.soft(panel?.y ?? 99, `panel y at ${h}`).toBeLessThanOrEqual(1)
+    const mask = page.locator('.diagram-modal .bg-mask')
+    expect.soft(await mask.count(), 'official .bg-mask is present').toBe(1)
+    if (await mask.count()) {
+      const paint = await mask.evaluate((node) => {
+        const style = getComputedStyle(node)
+        return { bg: style.backgroundColor, filter: style.backdropFilter }
+      })
+      expect.soft(paint.bg, 'mask is rgba(0,0,0,.88)').toBe('rgba(0, 0, 0, 0.88)')
+      expect.soft(paint.filter, 'mask blurs 2px').toBe('blur(2px)')
+    }
+    await page.getByTestId('mermaid-modal').getByRole('button', { name: '关闭' }).click()
+  }
 })
 
 test('a wide diagram stays inside the card at 390px', async ({ page }) => {
