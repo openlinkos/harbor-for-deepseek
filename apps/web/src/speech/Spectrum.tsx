@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LevelAnalyser } from './recorder.js'
-import { bandTargets, BAR_MIN, barCountFor, barHeight, buildRanges, tiltFor } from './spectrum.js'
+import { bandTargets, BAR_MIN, barCountFor, barHeight, buildRanges, tiltFor } from './spectrumBands.js'
 
 /** Live levels from the recording analyser. Heights are the signal, not a fixed loop. */
 export const Spectrum = ({ analyser }: { analyser: LevelAnalyser | null }) => {

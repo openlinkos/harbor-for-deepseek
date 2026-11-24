@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bandTargets, barCountFor, barHeight, buildRanges, DB_FLOOR, tiltFor, type FrequencyRange } from './spectrum.js'
+import { bandTargets, barCountFor, barHeight, buildRanges, DB_FLOOR, tiltFor, type FrequencyRange } from './spectrumBands.js'
 
 /** Paint the bins a band actually reads, including a narrow band's interpolation pair. */
 const paintBand = (data: Float32Array, range: FrequencyRange, value: number) => {
