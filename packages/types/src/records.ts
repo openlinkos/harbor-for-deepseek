@@ -1,4 +1,5 @@
 import type { ChatModel, ContentBlock, Effort, Usage } from './api.js'
+import type { TtsVoice } from './speech.js'
 
 export type MessageStatus = 'complete' | 'streaming' | 'error' | 'aborted' | 'refused'
 
@@ -60,6 +61,8 @@ export type Settings = {
   safetyLevel: 'high' | 'low'
   acknowledgedKeyRisk: boolean
   deviceId: string
+  /** Public TTS id. Absent stored rows are resolved from legacy before this default is written. */
+  ttsVoice: TtsVoice
 }
 
 export const defaultSettings = (deviceId: string): Settings => ({
@@ -67,6 +70,7 @@ export const defaultSettings = (deviceId: string): Settings => ({
   safetyLevel: 'high',
   acknowledgedKeyRisk: false,
   deviceId,
+  ttsVoice: 'stella',
 })
 
 export type SealedSecret =

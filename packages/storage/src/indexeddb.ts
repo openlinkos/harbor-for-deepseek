@@ -1,7 +1,20 @@
 import { openDB } from 'idb'
-import { defaultSettings } from '@deepapi/types'
+import { defaultSettings, legacyVoiceCandidates, resolveTtsVoice } from '@deepapi/types'
 import type { Conversation, Message, SealedSecret, Settings, Tombstone } from '@deepapi/types'
 import type { Repository } from './memory.js'
+
+const readLegacyVoices = (): unknown[] => {
+  if (typeof localStorage === 'undefined') return []
+  return legacyVoiceCandidates({
+    getItem: (key) => {
+      try {
+        return localStorage.getItem(key)
+      } catch {
+        return null
+      }
+    },
+  })
+}
 
 const DATA = 'deepapi'
 const SECRETS = 'deepapi-secrets'
@@ -91,19 +104,30 @@ export const openIndexedRepository = async (): Promise<Repository> => {
   return {
     async loadSettings() {
       const stored = (await data.get('kv', 'settings')) as
-        | (Partial<Settings> & { documentPurpose?: unknown; fileExpireDays?: unknown; deviceId?: string })
+        | (Omit<Partial<Settings>, 'ttsVoice'> & {
+            documentPurpose?: unknown
+            fileExpireDays?: unknown
+            deviceId?: string
+            ttsVoice?: unknown
+          })
         | undefined
+      const legacy = readLegacyVoices()
       if (stored && typeof stored === 'object') {
-        const { documentPurpose: _legacyPurpose, fileExpireDays: _legacyFileExpireDays, ...rest } = stored
+        const { documentPurpose: _legacyPurpose, fileExpireDays: _legacyFileExpireDays, ttsVoice: rawVoice, ...rest } = stored
         void _legacyPurpose
         void _legacyFileExpireDays
+        const hadVoice = Object.prototype.hasOwnProperty.call(stored, 'ttsVoice')
         return {
           ...defaultSettings(stored.deviceId || crypto.randomUUID()),
           ...rest,
           safetyLevel: stored.safetyLevel || 'high',
+          ttsVoice: resolveTtsVoice(rawVoice, legacy, hadVoice),
         }
       }
-      const created = defaultSettings(crypto.randomUUID())
+      const created = {
+        ...defaultSettings(crypto.randomUUID()),
+        ttsVoice: resolveTtsVoice(undefined, legacy, false),
+      }
       await data.put('kv', created, 'settings')
       return created
     },
