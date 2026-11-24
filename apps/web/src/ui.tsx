@@ -1163,10 +1163,11 @@ const AssistantTurn = ({ message }: { message: Message }) => {
     const last = index === steps.length - 1 ? 'is-last' : ''
     if (step.type === 'think') {
       return (
-        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ds-markdown ${last}${phase === 'thinking' && last ? ' is-live' : ''}`}>
+        <div key={index} className={`timeline-step timeline-think think-copy ds-think-content ${last}${phase === 'thinking' && last ? ' is-live' : ''}`}>
           <span className="timeline-dot" aria-hidden="true" />
           <span className="timeline-line" aria-hidden="true" />
-          <Markdown text={step.text} streaming={answerStreaming} />
+          {/* The paragraph must be :first-child of .ds-markdown so margin-top resets to 0. */}
+          <div className="ds-markdown"><Markdown text={step.text} streaming={answerStreaming} /></div>
         </div>
       )
     }

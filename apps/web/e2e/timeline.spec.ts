@@ -201,10 +201,23 @@ test('thinking timeline matches the official rhythm', async ({ page }) => {
       expect(area, viewport.name).not.toBeNull()
       const gaps = inkGaps(png, Math.floor(area!.x + 48), Math.floor(area!.x + Math.min(area!.width, 420)), Math.floor(area!.y), Math.ceil(area!.y + area!.height))
       expect(gaps.length, `${viewport.name} ${gaps.join(',')}`).toBeGreaterThanOrEqual(3)
-      // SP-MD-022. Think paragraphs use margin 12px 0. The title-to-body and second-step gaps grow by that margin.
-      expect(Math.abs(gaps[0] - 33), `${viewport.name} title ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
+      // Official t4_00: the dot and the first line share a line, and the title-to-first-line ink gap is 21±3.
+      // The step used to carry ds-markdown, so the paragraph was not :first-child and kept margin-top 12px (gap ~34).
+      const line = await page.evaluate(() => {
+        const step = document.querySelector('.timeline-think')!
+        const dot = step.querySelector('.timeline-dot')!.getBoundingClientRect()
+        const text = step.querySelector('.ds-markdown-paragraph')!
+        const box = text.getBoundingClientRect()
+        return {
+          marginTop: getComputedStyle(text).marginTop,
+          centers: Math.abs((dot.top + dot.height / 2) - (box.top + box.height / 2)),
+        }
+      })
+      expect(line.marginTop, `${viewport.name} first paragraph margin-top`).toBe('0px')
+      expect(line.centers, `${viewport.name} dot and first line`).toBeLessThanOrEqual(4)
+      expect(Math.abs(gaps[0] - 21), `${viewport.name} title ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
       expect(Math.abs(gaps[1] - 24), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
-      expect(Math.abs(gaps[2] - 36), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
+      expect(Math.abs(gaps[2] - 24), `${viewport.name} step ink ${gaps.join(',')}`).toBeLessThanOrEqual(3)
     }
   }
 })
