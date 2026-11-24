@@ -399,6 +399,7 @@ for (const theme of ['light', 'dark'] as const) for (const [w, h] of [[1440, 900
       // At x=500,550,600,700,750 the rows match: y161 (245,246,247) L1 0, y162 (244,246,247) L1 1,
       // y163 (252,252,252) L1 18, y164–169 (255,255,255) L1 27, y170 (249,249,250) L1 10, y171 L1 0.
       // Half of wash-to-white (13.5) at pixel centers: 163.2353 and 170.2941. Gap 7.0588 × 1.5 = 10.5882.
+      // Diagnostic-derived value inside the existing ±1, to be re-pinned with a true 1440 capture.
       expect(Math.abs(answerGrey.y - (userGrey.y + userGrey.height) - 10.5882), 'grey blocks in one pair match the official capture').toBeLessThanOrEqual(1)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeGreaterThanOrEqual(32)
       expect(answerCheck.y - answerGrey.y, 'answer checkbox from grey top').toBeLessThanOrEqual(35)

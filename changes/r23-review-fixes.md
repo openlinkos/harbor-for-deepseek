@@ -33,3 +33,9 @@ b5a225c 的 svg 板是整屏高：浅色宽图 1440 为 [556, 0, 329, 900]，390
 OPEN CONFLICT，不解决。SP-MOD-572 的官方捕获没有 Esc 取消。昊辰 fb1132-5 要求 Esc 取消，master `interaction-gate.spec.ts`「delete confirm cancels on esc」在 1440 和 390 都要再通过。早先去掉 Esc 的那次 steer 没有他的决定。
 
 ConfirmDialog 恢复 master 的行为：Escape 时 stopPropagation 并 onCancel。遮罩点击和 Back 仍取消。`interaction-gate`、`gaps.spec.ts`、`spec-align-modals-2` 重新期望对话框在 Esc 后隐藏。ledger `modals.json` 的 SP-MOD-572 改为 action conflict，备注写明未解决。
+
+## 4. 不动的两处
+
+`scripts/check-specimen.mjs` 的 `console.log('check-specimen ok')` 保留，这是 CLI 输出。
+
+`share-select.spec.ts` 的 10.5882 不改数值，也不改 ±1。只加一行注释：这是诊断得出的值，落在现有 ±1 里，等有真正的 1440 捕获再重新钉。share-select 的 44 条断言都还在。r22 / r22b / r22c 的其余裁定不动。
