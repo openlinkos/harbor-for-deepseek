@@ -1286,6 +1286,250 @@ test('invalidated undo then switching chats does not insert the late transcript'
   expect(messagePosts(session.seen)).toHaveLength(1)
 })
 
+const retypeOriginalThenUndo = async (composer: Locator, initial: string) => {
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.pressSequentially('NEW-DRAFT')
+  await expect(composer).toHaveValue('NEW-DRAFT')
+  await composer.press('Control+a')
+  await composer.pressSequentially(initial)
+  await composer.press('Control+End')
+  await composer.pressSequentially('X')
+  await expect(composer).toHaveValue(`${initial}X`)
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue(initial)
+}
+
+const dispatchDraft = async (composer: Locator, next: string, inputType: string) => {
+  await composer.evaluate((node, change) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, box.value.length)
+    box.dispatchEvent(new InputEvent('beforeinput', {
+      bubbles: true,
+      cancelable: true,
+      inputType: change.inputType,
+      data: change.next,
+    }))
+    const proto = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')
+    proto?.set?.call(box, change.next)
+    box.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      inputType: change.inputType,
+      data: change.next,
+    }))
+    box.setSelectionRange(change.next.length, change.next.length)
+  }, { next, inputType })
+  await expect(composer).toHaveValue(next)
+}
+
+const expectRecoveredDraft = async (page: Page, composer: Locator, value: string) => {
+  await expect(composer).toHaveValue(value)
+  await expect(page.getByTestId('voice-recovery')).toBeVisible()
+  await expect(page.getByTestId('voice-recovery-transcript')).toHaveText('转写结果')
+  expect(await composer.inputValue()).toBe(value)
+}
+
+test('retyping the armed literal and undoing the tail does not restore the old span', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await retypeOriginalThenUndo(composer, initial)
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('repeated undo and redo after retyping keep the browser draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await retypeOriginalThenUndo(composer, initial)
+  for (let cycle = 0; cycle < 3; cycle += 1) {
+    await composer.press('Control+y')
+    await expect(composer).toHaveValue(`${initial}X`)
+    await composer.press('Control+z')
+    await expect(composer).toHaveValue(initial)
+  }
+  await composer.blur()
+  await composer.focus()
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a pending microphone grant does not revive a retyped literal', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await retypeOriginalThenUndo(composer, initial)
+  await openHeldRecording(page, session)
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(asrPosts(session.seen)).toHaveLength(1)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('cancelling the invalidated attempt cannot insert into the next recording', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await retypeOriginalThenUndo(composer, initial)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await composer.fill('QQ WW')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(3, 5)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(2)
+  const seenCallbacks = await page.evaluate(() => (window as unknown as { __audioCallbacks?: number }).__audioCallbacks ?? 0)
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __audioCallbacks?: number }).__audioCallbacks ?? 0)).toBeGreaterThan(seenCallbacks)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('QQ 转写结果')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a retyped undo dropped by a new chat does not insert on return', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  await page.getByTestId('composer').fill('先说一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  const composer = page.getByTestId('composer')
+  await composer.fill('L TARGET R')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await retypeOriginalThenUndo(composer, 'L TARGET R')
+  await page.getByTestId('new-chat').click()
+  await expect(page.locator('.greeting')).toBeVisible()
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  await page.locator('.chat-link', { hasText: '语音' }).click()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  expect(messagePosts(session.seen)).toHaveLength(1)
+})
+
+test('cut and paste of the same literal stay on recovery after undo', async ({ page, context }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.press('Control+x')
+  await expect(composer).toHaveValue('')
+  await page.evaluate(async (text) => { await navigator.clipboard.writeText(text) }, initial)
+  await composer.press('Control+v')
+  await expect(composer).toHaveValue(initial)
+  await composer.press('Control+End')
+  await composer.pressSequentially('X')
+  await expect(composer).toHaveValue(`${initial}X`)
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue(initial)
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a composition that restores the armed literal does not revive the span', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+a')
+  await composer.pressSequentially('NEW-DRAFT')
+  await expect(composer).toHaveValue('NEW-DRAFT')
+  await composer.evaluate((node, next) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, box.value.length)
+    box.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+    const proto = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')
+    proto?.set?.call(box, next)
+    box.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: next }))
+    box.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertCompositionText', data: next }))
+  }, initial)
+  await expect(composer).toHaveValue(initial)
+  await composer.press('Control+End')
+  await composer.pressSequentially('X')
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue(initial)
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('synthetic history events cannot revive an invalidated span', async ({ page }) => {
+  test.setTimeout(90_000)
+  const initial = 'L TARGET R'
+  const { session, composer } = await armHeldSelection(page, initial, 2, 8)
+  await openHeldRecording(page, session)
+  await dispatchDraft(composer, 'NEW-DRAFT', 'insertText')
+  await dispatchDraft(composer, initial, 'historyUndo')
+  await dispatchDraft(composer, 'NEW-DRAFT', 'historyRedo')
+  await dispatchDraft(composer, initial, 'historyUndo')
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('retyping spaces and a surrogate after invalidation keeps that draft', async ({ page }) => {
+  test.setTimeout(90_000)
+  const emoji = '😀'
+  const initial = `aa  ${emoji}  aa`
+  const emojiAt = initial.indexOf(emoji)
+  const { session, composer } = await armHeldSelection(page, initial, emojiAt, emojiAt + emoji.length)
+  await openHeldRecording(page, session)
+  await retypeOriginalThenUndo(composer, initial)
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, initial)
+  expect(await composer.inputValue()).not.toContain('转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('invalidating after an in-span edit does not return to that span on undo', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'L TARGET R', 2, 8)
+  await openHeldRecording(page, session)
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 8)
+  })
+  await composer.pressSequentially('OK')
+  await expect(composer).toHaveValue('L OK R')
+  await retypeOriginalThenUndo(composer, 'L OK R')
+  session.releaseAsr()
+  await expectRecoveredDraft(page, composer, 'L OK R')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
 test('reloading the app closes the playing audio context', async ({ page }) => {
   test.setTimeout(90_000)
   const pcm = await playOpen(page)

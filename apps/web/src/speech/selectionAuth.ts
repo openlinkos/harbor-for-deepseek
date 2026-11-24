@@ -2,9 +2,11 @@ import { applyVoiceEdit, insertTranscript, type VoiceAnchor } from './voiceSessi
 
 /**
  * Authorization for one voice-input attempt.
- * The span is an identity carried through observed edits. A later draft that
- * happens to equal an older string is a different step unless undo/redo moves
- * the cursor on this stack. String equality never revives a deleted span.
+ * The span is an identity carried through observed edits while this attempt
+ * is still valid. Once an edit or a history step invalidates it, that same
+ * attempt stays invalid. A later draft, including one produced by native
+ * undo or redo, does not restore the span just because its text equals a
+ * stored snapshot. A new attempt is a new authorization.
  */
 export type AuthStep = { text: string; start: number; end: number; extendAtEnd: boolean }
 
@@ -254,29 +256,23 @@ export const historyStepText = (auth: SelectionAuth, direction: 'historyUndo' | 
 /**
  * Move along the observed stack when `nextText` is already the browser's undo
  * or redo result. The caller does not replace the draft with a snapshot.
- * The next text must be the adjacent step. Searching the stack for any equal
- * string is intentionally not done: a retyped copy of an older draft is a new
- * step, not the old span. An invalidated draft becomes live again only when
- * this undo landed on the step that was left, not when a later draft happens
- * to contain the same characters.
+ * While the attempt is still valid, the next text must be the adjacent step.
+ * Searching the stack for any equal string is intentionally not done.
+ * An invalidated attempt stays invalid. Undo and redo keep the browser text
+ * and do not turn a matching snapshot back into a selected-range insert.
  */
 export const applyHistory = (
   auth: SelectionAuth,
   direction: 'historyUndo' | 'historyRedo',
   nextText: string,
 ): SelectionAuth => {
+  if (auth.status !== 'live') return auth
   if (direction === 'historyUndo') {
-    if (auth.status === 'invalid') {
-      const step = auth.steps[auth.cursor]
-      if (step && step.text === nextText) return liveAt(auth, auth.cursor)
-      return auth
-    }
     if (auth.cursor <= 0) return nextText === auth.text ? auth : invalidate(auth, 'history-mismatch')
     const step = auth.steps[auth.cursor - 1]
     if (!step || step.text !== nextText) return invalidate(auth, 'history-mismatch')
     return liveAt(auth, auth.cursor - 1)
   }
-  if (auth.status !== 'live') return auth
   const step = auth.steps[auth.cursor + 1]
   if (!step || step.text !== nextText) return invalidate(auth, 'history-mismatch')
   return liveAt(auth, auth.cursor + 1)
