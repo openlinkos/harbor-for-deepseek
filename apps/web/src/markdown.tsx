@@ -126,6 +126,20 @@ const saveBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url)
 }
 
+/** Mermaid's default useMaxWidth writes width="100%" plus an inline max-width of the intrinsic size. A fit-content plate has no definite containing block, so that percentage width collapses to 0. Pin the viewBox size; the fullscreen CSS caps scale it into the viewport. */
+const fullscreenSvg = (source: string) => {
+  if (typeof DOMParser === 'undefined') return source
+  const doc = new DOMParser().parseFromString(source, 'image/svg+xml')
+  const node = doc.querySelector('svg')
+  if (!node) return source
+  const parts = node.getAttribute('viewBox')?.trim().split(/[\s,]+/).map(Number)
+  if (!parts || parts.length !== 4 || !(parts[2] > 0) || !(parts[3] > 0)) return source
+  node.setAttribute('width', String(parts[2]))
+  node.setAttribute('height', String(parts[3]))
+  node.style.removeProperty('max-width')
+  return new XMLSerializer().serializeToString(doc)
+}
+
 const Mermaid = ({ chart }: { chart: string }) => {
   const streaming = useContext(StreamContext)
   const latest = useRef(chart)
@@ -270,10 +284,12 @@ const Mermaid = ({ chart }: { chart: string }) => {
           <button type="button" className="diagram-modal-close" aria-label={label('关闭', 'Close')} onClick={() => setFull(false)}>
             <IconSvg><path d="M4 4l8 8M12 4 4 12" /></IconSvg>
           </button>
-          <div className="diagram-modal-card">
-            {tab === 'code' || !svg
-              ? <pre className="diagram-source"><code>{chart}</code></pre>
-              : <div className="mermaid" dangerouslySetInnerHTML={{ __html: svg }} />}
+          <div className="diagram-modal-slide">
+            <div className="diagram-modal-card">
+              {tab === 'code' || !svg
+                ? <pre className="diagram-source"><code>{chart}</code></pre>
+                : <div className="mermaid" dangerouslySetInnerHTML={{ __html: fullscreenSvg(svg) }} />}
+            </div>
           </div>
         </div>,
         document.body,
