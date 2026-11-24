@@ -1329,51 +1329,57 @@ const MessageRow = ({ message }: { message: Message }) => {
           </span>
         </span>
       ) : null}
-      <div className="share-halo" aria-hidden="true" />
-      {message.role === 'user' && fileBlocks.length ? (
-        <div className="message-files" data-testid="message-files">
-          {fileBlocks.map((block, blockIndex) => (
-            <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
-          ))}
+      {/* Assistant wash is a sibling of .prose so article > .prose stays direct. It is sized to the body, not the action row. */}
+      {message.role === 'assistant' && share?.on ? <div className="share-halo" aria-hidden="true" /> : null}
+      {message.role === 'user' ? (
+        <div className="message-body">
+          {share?.on ? <div className="share-halo" aria-hidden="true" /> : null}
+          {fileBlocks.length ? (
+            <div className="message-files" data-testid="message-files">
+              {fileBlocks.map((block, blockIndex) => (
+                <BlockView key={`${message.id}-f-${blockIndex}`} block={block} />
+              ))}
+            </div>
+          ) : null}
+          {editing ? (
+            <form className="edit-card" onSubmit={(event) => { event.preventDefault(); sources.close(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
+              <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
+              <div className="edit-actions">
+                <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
+                <button className="primary" type="submit">{t('send')}</button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <div className={`bubble${fileBlocks.length ? ' has-files' : ''}`}>
+                {textOf}
+                {message.errorMessage === HINT_NETWORK ? (
+                  <HoverTip text={t('retry')}>
+                    <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
+                      <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
+                    </button>
+                  </HoverTip>
+                ) : null}
+              </div>
+              {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
+            </>
+          )}
         </div>
       ) : null}
-      {message.role === 'user' ? (
-        editing ? (
-          <form className="edit-card" onSubmit={(event) => { event.preventDefault(); sources.close(); void editUser(message.id, draft).then(() => setEditing(false)) }}>
-            <textarea aria-label={t('edit')} value={draft} onChange={(event) => setDraft(event.target.value)} />
-            <div className="edit-actions">
-              <button type="button" onClick={() => { setDraft(textOf); setEditing(false) }}>{t('cancel')}</button>
-              <button className="primary" type="submit">{t('send')}</button>
-            </div>
-          </form>
-        ) : (
-        <>
-          <div className="bubble">
-            {textOf}
-            {message.errorMessage === HINT_NETWORK ? (
-              <HoverTip text={t('retry')}>
-                <button type="button" className="hint-retry" data-testid="hint-retry" aria-label={t('retry')} onClick={() => void resend(message.id)}>
-                  <FillIcon paths={[...ACTION_ICONS.regen]} size={14} />
-                </button>
-              </HoverTip>
-            ) : null}
-          </div>
-          {message.errorMessage === HINT_NETWORK ? <p className="user-hint" data-testid="user-hint">{t('hintNetworkError')}</p> : null}
-          <div className="user-actions">
-            <HoverTip text={t('copy')}>
-              <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
-                <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
-              </button>
-            </HoverTip>
-            <HoverTip text={t('editMessageTooltip')}>
-              <button type="button" data-tip={t('editMessageTooltip')} aria-label={t('editMessageTooltip')} onClick={() => { setDraft(textOf); setEditing(true) }}>
-                <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
-              </button>
-            </HoverTip>
-            <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
-          </div>
-        </>
-        )
+      {message.role === 'user' && !editing ? (
+        <div className="user-actions">
+          <HoverTip text={t('copy')}>
+            <button type="button" data-tip={t('copy')} aria-label={t('copy')} onClick={() => void navigator.clipboard.writeText(textOf)}>
+              <Icon size={20} d="M8 8h10v12H8zM6 16H5a1 1 0 0 1-1-1V4h11" />
+            </button>
+          </HoverTip>
+          <HoverTip text={t('editMessageTooltip')}>
+            <button type="button" data-tip={t('editMessageTooltip')} aria-label={t('editMessageTooltip')} onClick={() => { setDraft(textOf); setEditing(true) }}>
+              <Icon size={20} d="M4 20h4l10-10-4-4L4 16v4zM13 7l4 4" />
+            </button>
+          </HoverTip>
+          <BranchSwitcher ids={siblings} current={message.id} disabled={generatingHere} holdTip={generatingHere ? t('waitUntilGenerated') : undefined} onStep={stepVersion} />
+        </div>
       ) : null}
       {message.status === 'refused' ? <p className="refused">{t('refused')}</p> : null}
       {message.role === 'assistant' && message.status === 'streaming' && phaseOf(message) === 'pending' ? (

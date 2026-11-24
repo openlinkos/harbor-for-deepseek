@@ -1157,8 +1157,8 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
 .turn.user.is-first::before { top: 22px; }
 .turn.user.is-highlight::before { opacity: 1; }
 .bubble {
-  /* SP-CV-340. */
-  margin-top: 10px;
+  /* ._8271fc3 / SP-CV-340. margin-top 10px only when the bubble follows attachments. */
+  margin-top: 0;
   max-width: calc(100% - 88px);
   background: var(--dsw-specific-bubble);
   border-radius: 22px;
@@ -1170,6 +1170,7 @@ body[data-ds-dark-theme] .top-fill { background: rgb(21, 21, 23); }
   word-break: break-word;
   transition: background 0.3s;
 }
+.bubble.has-files { margin-top: 10px; }
 .hint-retry {
   position: absolute;
   bottom: 10px;
@@ -4613,10 +4614,12 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 .turn.share-on {
   position: relative;
   content-visibility: visible;
-  margin-bottom: 55px;
   /* SP-CV-084. A selectable share row is a click target. Locked rows override this. */
   cursor: pointer;
 }
+/* Official screen rows add no margin under the question. Normal mode keeps the 16px
+   margin on .turn.user (SP-CV-279). The fitted 55px margin is not an official value. */
+.turn.user.share-on { margin-bottom: 0; }
 /* SP-SHARE-031 / SP-SHARE-101 / SP-CV-108 / SP-CV-109. Error, refused, and streaming turns are not selectable. */
 .turn.share-on.share-locked {
   opacity: 0.4;
@@ -4655,16 +4658,28 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
 /* SP-SHARE-107. Narrow sticky box is z-index 1 inside the column. */
 .shell.share-narrow .share-sticky { z-index: 1; }
 .turn.share-on .share-box { position: static; pointer-events: auto; }
+/* Official .fa1bcf13. Share mode keeps the action row's box and hides it. */
 .turn.share-on .action-row,
-.turn.share-on .user-actions { display: none; }
+.turn.share-on .user-actions { visibility: hidden; }
 .turn.share-on { isolation: isolate; }
 .turn.share-on > :not(.share-box):not(.share-halo):not(.share-col) { position: relative; z-index: 1; }
 /* SP-SHARE-149. Direct children pass the click through. The checkbox is the hit
    target (pointer-events auto), matching the official sibling input, so one click toggles once. */
 .turn.share-on > * { pointer-events: none; }
 .bubble { position: relative; }
+/* Official hj / ._7729a77. The wash is this box, so the row's 34px padding-top and
+   16px padding-bottom stay outside it. Width 100% keeps the box on the row, not the bubble. */
+.turn.user > .message-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  box-sizing: border-box;
+}
 /* SP-CV-088–097 / SP-SHARE-028 / SP-SHARE-029. Selected wash matches ._7729a77:before.
-   Radius is the official 12px (SP-CV-093). Fill is --dsw-alias-bg-multi-select. */
+   Radius is the official 12px (SP-CV-093). Fill is --dsw-alias-bg-multi-select.
+   z-index -1 stays under the body text inside the row's stacking context. */
 .share-halo {
   display: none;
   position: absolute;
@@ -4675,23 +4690,39 @@ button.ghost:hover { background: var(--dsl-button-color-hover); color: var(--dsl
   border-radius: 12px;
   background: var(--dsw-alias-bg-multi-select);
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+/* The assistant wash is a sibling of .prose (article > .prose stays direct). The row
+   also holds the 50px action row (padding 12px 0 10px, 28px button). The wash covers
+   the body and overhangs 20px, so its bottom is 50px − 20px above the row bottom. */
+.turn.assistant.share-on > .share-halo {
+  top: calc(-1 * var(--padding-vertical));
+  bottom: calc(50px - var(--padding-vertical));
+  height: auto;
+  transform: translateX(-50%);
+}
 /* SP-CV-102 / SP-SHARE-099. Narrow select wash uses the panel width and no radius. */
 .shell.share-narrow .share-halo { width: var(--panel-width); border-radius: 0; }
-.turn.share-picked > .share-halo { display: block; }
+.turn.share-picked .share-halo { display: block; }
 /* SP-CV-098 / SP-CV-099 / SP-SHARE-030. Padding-left 42px only while the panel is under 800px.
-   --share-pad-left is that same 42px. Desktop rows do not take this padding. */
+   --share-pad-left is that same 42px. Desktop rows do not take this padding.
+   The user wash is centered on the row border box, so the 42px lives on .message-body
+   (border-box, width 100%). The article itself stays unpadded and the checkbox left: 0
+   stays on the column edge. The assistant keeps the padding on the article. */
 .shell.share-narrow .turn.share-on {
   --share-pad-left: 42px;
   box-sizing: border-box;
   padding-left: var(--share-pad-left);
 }
+.shell.share-narrow .turn.user.share-on { padding-left: 0; }
+.shell.share-narrow .turn.user.share-on > .message-body { padding-left: var(--share-pad-left); }
 /* SP-SHARE-100 / SP-CV-100 / SP-CV-101. rtl padding moves to the right. */
 body.rtl .shell.share-narrow .turn.share-on { padding-left: 0; padding-right: var(--share-pad-left, 42px); }
+body.rtl .shell.share-narrow .turn.user.share-on { padding-right: 0; }
+body.rtl .shell.share-narrow .turn.user.share-on > .message-body { padding-left: 0; padding-right: var(--share-pad-left, 42px); }
 /* SP-CV-112 / SP-CV-113. Selected message tokens inherit into the code block and sources pill. */
 .turn.share-picked {
   --search-sites-summary-bg-color: transparent;
@@ -4703,22 +4734,9 @@ body.rtl .shell.share-narrow .turn.share-on { padding-left: 0; padding-right: va
 .turn.share-picked .code-card { --code-bottom-color: var(--dsw-alias-bg-multi-select); }
 /* SP-CV-110 / SP-CV-111. Selected message code banner uses the same wash. */
 .turn.share-picked .code-head { background-color: var(--dsw-alias-bg-multi-select); }
-/* SP-SHARE-029 / SP-CV-059. Selected wash is visible. The halo keeps the measured box. */
-.turn.share-on.share-picked::before {
-  content: "";
-  position: absolute;
-  background-color: var(--dsw-alias-bg-multi-select);
-  opacity: 1;
-  pointer-events: none;
-}
-/* SP-SHARE-099. Narrow select ::before drops the radius and uses the measured panel width. */
-.shell.share-narrow .turn.share-on::before {
-  content: "";
-  position: absolute;
-  width: var(--panel-width);
-  border-radius: 0;
-  pointer-events: none;
-}
+/* The selection wash is .share-halo (official hj :before), not the row highlight ::before. */
+.turn.share-on::before,
+.shell.share-narrow .turn.share-on::before { content: none; }
 input.share-box.ds-checkbox,
 .share-bar input.ds-checkbox {
   /* Official .ds-checkbox tokens. The checked fill stays #5686fe below. */
@@ -4891,22 +4909,13 @@ input.share-box.ds-checkbox:checked::after,
   }
   .share-bar [data-testid="share-cancel"] { display: none; }
 }
-/* Chromium insets position:sticky by the scroller's padding-top. Official pins the
-   checkbox about 50px under the title (49px topbar + 13px sticky padding − 14px title).
-   The 12px gap moves onto the column so messages stay put and the box can stick to the scrollport.
-   SP-SHARE-035 / 109 / 111. */
+/* Chromium insets position:sticky by the scroller's padding-top. Official list
+   padding-top is 0 (SP-SHARE-035 / 109 / 111). The checkbox then sticks at the
+   scrollport: desktop topbar 49 + sticky pad 13 is about 48px under the title
+   top (14), inside the 50±4 pin. Phone topbar 60 + pad 13 is y=73. The a1dbee0
+   12px column gap and the 28.5px phone gap are not official row values. */
 .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
-.shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 12px; }
 @media (max-width: 767px) {
-  /* The phone list keeps a taller column gap so the first question box stays at y=76.5.
-     The scroller itself stays unpadded, same as above. */
-  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll { padding-top: 0; }
-  .shell.sharing .stage:not(:has(.home)) .transcript.chat-scroll > .chat-column { padding-top: 28.5px; }
-  /* Official `.fbb737a4` has no width, only max-width, and `._9663006` is
-     align-items: flex-end. Height stays the text height. The 16px inset is
-     `._7729a77:before { --padding-horizontal: 16px }`, which puts the bubble's
-     right edge at column right 370 − 16 = 354. */
-  .turn.user.share-on > .bubble { margin-right: 16px; }
   /* Official `._9f86274` padding is `0 calc(var(--message-list-padding-horizontal) - 16px)`.
      Below 1024px that variable is 36px, so the right padding is 20px and the
      create button's right edge is 370. The button is `.ds-button.ds-button--m`
