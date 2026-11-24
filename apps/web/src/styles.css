@@ -3384,6 +3384,25 @@ body[data-ds-dark-theme] .read-bars.loading .read-bar { fill: var(--dsw-static-n
 .read-bars .read-sweep-2 { animation-delay: -1.15s; }
 .read-bars .read-sweep-3 { animation-delay: -0.75s; }
 .read-bars .read-sweep-4 { animation-delay: -0.35s; }
+.voice-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 12px 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+}
+.voice-recovery p {
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .speech-notice {
   position: fixed;
   left: 50%;

@@ -19,7 +19,8 @@ import { ReadingBars } from './speech/ReadingBars.js'
 import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
 import { installSpeech } from './speech/runtime.js'
 import { Spectrum } from './speech/Spectrum.js'
-import { applyVoiceEdit, bindVoiceInserter, cancelVoiceInput, insertTranscript, resolveVoiceAnchor, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
+import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, historyStepText, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
+import { bindVoiceInserter, cancelVoiceInput, currentVoiceGeneration, insertTranscript, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -2151,10 +2152,13 @@ const Composer = () => {
   const textRef = useRef(text)
   const activeRef = useRef(activeId)
   const caretRef = useRef<number | null>(null)
-  const anchorRef = useRef<VoiceAnchor | null>(null)
   const gestureRef = useRef<VoiceAnchor | null>(null)
-  const trackedRef = useRef<VoiceAnchor | null>(null)
-  const editRef = useRef<{ text: string; start: number; end: number } | null>(null)
+  const authRef = useRef<SelectionAuth | null>(null)
+  const editRef = useRef<{ text: string; start: number; end: number; inputType: string } | null>(null)
+  const compositionRef = useRef<{ text: string; start: number; end: number } | null>(null)
+  const ignoreChangeRef = useRef(false)
+  const historyHandledRef = useRef<string | null>(null)
+  const [recovery, setRecovery] = useState<{ transcript: string; conversationId: string | null; generation: number; reason: string } | null>(null)
   textRef.current = text
   activeRef.current = activeId
   const readAnchor = (): VoiceAnchor | null => {
@@ -2166,33 +2170,19 @@ const Composer = () => {
     return { conversationId: activeRef.current, text: value, start, end }
   }
   const armAnchor = (anchor: VoiceAnchor | null) => {
-    anchorRef.current = anchor
-    trackedRef.current = anchor
+    authRef.current = anchor ? armSelectionAuth(anchor, currentVoiceGeneration()) : null
     editRef.current = null
+    compositionRef.current = null
+    setRecovery(null)
   }
-  const noteEdit = (before: string, editStart: number, editEnd: number, next: string) => {
-    const tracked = trackedRef.current
-    if (!tracked || tracked.text !== before || next === before) return
-    const mapped = applyVoiceEdit(tracked, next, editStart, editEnd)
-    trackedRef.current = mapped.status === 'applied'
-      ? { conversationId: tracked.conversationId, text: mapped.text, start: mapped.start, end: mapped.end }
-      : null
-  }
-  const rememberEditRange = () => {
-    const node = box.current
-    const tracked = trackedRef.current
-    if (!node || !tracked || node.value !== tracked.text) {
-      editRef.current = null
-      return
-    }
-    editRef.current = {
-      text: node.value,
-      start: node.selectionStart ?? 0,
-      end: node.selectionEnd ?? node.selectionStart ?? 0,
-    }
+  const applyAuthEdit = (next: string, editStart: number, editEnd: number) => {
+    const auth = authRef.current
+    if (!auth) return
+    authRef.current = applyObservedEdit(auth, next, editStart, editEnd)
   }
   useEffect(() => {
     focusComposer()
+    setRecovery((current) => (current && current.conversationId === activeId ? current : null))
   }, [activeId])
   useLayoutEffect(() => {
     const node = box.current
@@ -2203,23 +2193,45 @@ const Composer = () => {
     node.setSelectionRange(caret, caret)
   })
   useEffect(() => {
-    bindVoiceInserter((transcript, conversationId) => {
+    const node = box.current
+    if (!node) return
+    // React's onBeforeInput is a keypress/textInput polyfill. It does not run
+    // for Backspace, Delete, or cut, so a deletion would look unobserved and
+    // the transcript would never be inserted. The native event still carries
+    // the pre-edit selection. The span itself is resolved when the value changes.
+    const onNativeBeforeInput = (event: Event) => {
+      if (compositionRef.current) return
+      const input = event as InputEvent
+      if (input.isComposing) return
+      editRef.current = {
+        text: node.value,
+        start: node.selectionStart ?? 0,
+        end: node.selectionEnd ?? node.selectionStart ?? 0,
+        inputType: input.inputType ?? '',
+      }
+    }
+    node.addEventListener('beforeinput', onNativeBeforeInput)
+    return () => node.removeEventListener('beforeinput', onNativeBeforeInput)
+  }, [])
+  useEffect(() => {
+    bindVoiceInserter((transcript, conversationId, generation) => {
       const node = box.current
-      if (!node?.isConnected || activeRef.current !== conversationId) return
-      const anchor = anchorRef.current
-      const tracked = trackedRef.current
-      anchorRef.current = null
-      trackedRef.current = null
+      const auth = authRef.current
+      authRef.current = null
       editRef.current = null
-      if (!anchor || anchor.conversationId !== conversationId) return
-      const byString = resolveVoiceAnchor(textRef.current, anchor)
-      const range = byString ?? (tracked && tracked.text === textRef.current && tracked.conversationId === conversationId
-        ? { start: tracked.start, end: tracked.end }
-        : null)
-      if (!range) return
-      const next = insertTranscript(textRef.current, transcript, range)
-      caretRef.current = next.caret
-      setText(next.text)
+      if (!node?.isConnected || activeRef.current !== conversationId) return
+      // Observed steps own the span. A terminal-string guess must not replace them
+      // or revive a span the user already deleted.
+      const decision = decideDelivery(auth, textRef.current, conversationId, generation)
+      if (decision.action === 'insert') {
+        const next = insertTranscript(textRef.current, transcript, decision.range)
+        caretRef.current = next.caret
+        setText(next.text)
+        return
+      }
+      if (decision.action === 'recover') {
+        setRecovery({ transcript, conversationId, generation, reason: decision.reason })
+      }
     })
     return () => bindVoiceInserter(null)
   }, [])
@@ -2252,7 +2264,10 @@ const Composer = () => {
   }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
-      setText((event as CustomEvent<string>).detail)
+      const detail = (event as CustomEvent<string>).detail
+      const auth = authRef.current
+      if (auth) authRef.current = noteUnobserved(auth, detail)
+      setText(detail)
       box.current?.focus()
     }
     window.addEventListener('deepapi-prefill', onPrefill)
@@ -2267,9 +2282,27 @@ const Composer = () => {
   const submit = () => {
     if (!canSend) return
     const value = text
+    authRef.current = null
+    setRecovery(null)
     setText('')
     void send(value)
     focusComposer()
+  }
+  const acceptRecovery = () => {
+    const offer = recovery
+    if (!offer || offer.conversationId !== activeRef.current) return
+    const node = box.current
+    const length = textRef.current.length
+    const caret = node ? Math.min(node.selectionStart ?? length, node.selectionEnd ?? length) : length
+    const next = recoverTranscriptAtCaret(textRef.current, offer.transcript, caret)
+    caretRef.current = next.caret
+    setText(next.text)
+    setRecovery(null)
+  }
+  const copyRecovery = () => {
+    const offer = recovery
+    if (!offer || offer.conversationId !== activeRef.current) return
+    void navigator.clipboard?.writeText(offer.transcript).catch(() => undefined)
   }
   return (
     <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
@@ -2290,15 +2323,61 @@ const Composer = () => {
           ))}
         </div>
       ) : null}
+      {recovery && recovery.conversationId === activeId ? (
+        <div className="voice-recovery" role="status" data-testid="voice-recovery" data-reason={recovery.reason}>
+          <p data-testid="voice-recovery-transcript">{recovery.transcript}</p>
+          <p>{t('voiceRecoveryOffer')}</p>
+          <DsButton type="button" size="s" data-testid="voice-recovery-insert" onClick={acceptRecovery}>{t('voiceRecoveryInsert')}</DsButton>
+          <DsButton type="button" size="s" data-testid="voice-recovery-copy" onClick={copyRecovery}>{t('voiceRecoveryCopy')}</DsButton>
+          <DsButton type="button" size="s" data-testid="voice-recovery-dismiss" onClick={() => setRecovery(null)}>{t('voiceRecoveryDismiss')}</DsButton>
+        </div>
+      ) : null}
       <textarea
         ref={box}
         data-testid="composer"
         rows={2}
         placeholder={t('composerPlaceholder')}
         value={text}
-        onSelect={rememberEditRange}
+        onCompositionStart={(event) => {
+          const node = event.currentTarget
+          compositionRef.current = {
+            text: node.value,
+            start: node.selectionStart ?? 0,
+            end: node.selectionEnd ?? node.selectionStart ?? 0,
+          }
+        }}
+        onCompositionEnd={(event) => {
+          const base = compositionRef.current
+          compositionRef.current = null
+          ignoreChangeRef.current = true
+          editRef.current = null
+          const auth = authRef.current
+          const next = event.currentTarget.value
+          if (!auth || !base) return
+          if (auth.status === 'live' && base.text === auth.text) authRef.current = applyObservedEdit(auth, next, base.start, base.end)
+          else if (auth.status === 'live' && next !== auth.text) authRef.current = noteUnobserved(auth, next)
+        }}
+        onPointerUp={() => {
+          if (authRef.current) authRef.current = noteSelectionMove(authRef.current)
+        }}
         onKeyDown={(event) => {
-          rememberEditRange()
+          const key = event.key.toLowerCase()
+          if (authRef.current && ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end', 'pageup', 'pagedown'].includes(key)) {
+            authRef.current = noteSelectionMove(authRef.current)
+          }
+          const auth = authRef.current
+          if ((event.ctrlKey || event.metaKey) && !event.altKey && (key === 'z' || key === 'y') && auth) {
+            const direction = key === 'y' || event.shiftKey ? 'historyRedo' : 'historyUndo'
+            const expected = historyStepText(auth, direction)
+            if (expected !== null) {
+              event.preventDefault()
+              const next = applyHistory(auth, direction, expected)
+              authRef.current = next
+              historyHandledRef.current = next.status === 'live' ? next.text : expected
+              setText(next.status === 'live' ? next.text : expected)
+              return
+            }
+          }
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
             event.preventDefault()
@@ -2310,19 +2389,59 @@ const Composer = () => {
           const start = node.selectionStart ?? text.length
           const end = node.selectionEnd ?? start
           const next = `${text.slice(0, start)}\n${text.slice(end)}`
-          noteEdit(text, start, end, next)
+          applyAuthEdit(next, start, end)
           setText(next)
           window.requestAnimationFrame(() => {
             node.selectionStart = start + 1
             node.selectionEnd = start + 1
           })
         }}
-        onBeforeInput={rememberEditRange}
+        onBeforeInput={(event) => {
+          if (compositionRef.current) return
+          const native = event.nativeEvent
+          const node = event.currentTarget
+          editRef.current = {
+            text: node.value,
+            start: node.selectionStart ?? 0,
+            end: node.selectionEnd ?? node.selectionStart ?? 0,
+            inputType: 'inputType' in native ? String(native.inputType) : '',
+          }
+        }}
         onChange={(event) => {
           const next = event.target.value
           const pending = editRef.current
           editRef.current = null
-          if (pending) noteEdit(pending.text, pending.start, pending.end, next)
+          const native = event.nativeEvent
+          if (ignoreChangeRef.current) {
+            ignoreChangeRef.current = false
+            setText(next)
+            return
+          }
+          if (historyHandledRef.current !== null) {
+            const handled = historyHandledRef.current
+            historyHandledRef.current = null
+            if (next === handled) {
+              setText(next)
+              return
+            }
+          }
+          const composing = native instanceof InputEvent && native.isComposing
+          if (composing || compositionRef.current) {
+            setText(next)
+            return
+          }
+          const auth = authRef.current
+          if (auth) {
+            const inputType = pending?.inputType
+            if (inputType === 'historyUndo' || inputType === 'historyRedo') authRef.current = applyHistory(auth, inputType, next)
+            else if (auth.status === 'live' && pending && pending.text === auth.text) {
+              const span = resolveEditSpan(pending.text, next, pending.start, pending.end, pending.inputType)
+              authRef.current = span
+                ? applyObservedEdit(auth, next, span.start, span.end)
+                : applyObservedEdit(auth, next, pending.start, pending.end)
+            }
+            else if (auth.status === 'live' && next !== auth.text) authRef.current = noteUnobserved(auth, next)
+          }
           setText(next)
         }}
       />
@@ -2358,6 +2477,9 @@ const Composer = () => {
               if (voice.phase === 'idle') {
                 const fromPointer = event.detail > 0
                 armAnchor(fromPointer && gestureRef.current ? gestureRef.current : readAnchor())
+              } else if (voice.phase === 'transcribing') {
+                authRef.current = null
+                setRecovery(null)
               }
               gestureRef.current = null
               toggleVoiceInput()

@@ -106,6 +106,9 @@ const normalizeRange = (text: string, start: number, end: number) => {
  * make a prepend and an append the same string; those disagree and return null.
  * The caller then leaves the new draft untouched instead of using a stale index.
  * A splice that crosses the saved range also returns null.
+ * Equality with the armed string is not an authorization identity. A deleted span
+ * that was typed again must not be restored from this function. Delivery uses the
+ * observed edit stack in selectionAuth.ts and does not call this as a fallback.
  */
 export const resolveVoiceAnchor = (current: string, anchor: Pick<VoiceAnchor, 'text' | 'start' | 'end'>): SelectionRange | null => {
   const length = anchor.text.length
@@ -161,6 +164,7 @@ export type VoiceController = {
   toggle: () => void
   cancel: () => void
   tick: () => void
+  generation: () => number
 }
 
 export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
@@ -355,6 +359,7 @@ export const createVoiceInput = (deps: VoiceDeps): VoiceController => {
     },
     cancel,
     tick,
+    generation: () => operation,
   }
 }
 
@@ -374,6 +379,8 @@ export const cancelVoiceInput = () => active?.cancel()
 export const toggleVoiceInput = () => active?.toggle()
 
 export const voiceSnapshot = (): VoiceSnapshot => active?.getSnapshot() ?? IDLE
+
+export const currentVoiceGeneration = (): number => active?.generation() ?? 0
 
 export const useVoiceInput = (): VoiceSnapshot =>
   useSyncExternalStore(

@@ -876,6 +876,265 @@ test('an observed insert of a repeated token before the saved selection shifts i
   expect(readUploadedWav(asrPosts(session.seen).at(-1)!.bytes).peak).toBeGreaterThan(0)
 })
 
+const armHeldSelection = async (page: Page, value: string, start: number, end: number) => {
+  await countAudioCallbacks(page)
+  await installMedia(page, 'hold')
+  const session = await unlock(page, { holdAsr: true })
+  const composer = page.getByTestId('composer')
+  await composer.fill(value)
+  await composer.evaluate((node, range) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(range.start, range.end)
+  }, { start, end })
+  await page.getByTestId('voice-input').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __micWaits?: number }).__micWaits ?? 0)).toBe(1)
+  return { session, composer }
+}
+
+const openHeldRecording = async (page: Page, session: { releaseAsr: () => void }) => {
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  return session
+}
+
+const expectOutsideKept = (after: string, before: string, start: number, end: number, transcript: string) => {
+  const prefix = before.slice(0, start)
+  const suffix = before.slice(end)
+  expect(after.startsWith(prefix)).toBe(true)
+  expect(after.endsWith(suffix)).toBe(true)
+  expect(after).toBe(`${prefix}${transcript}${suffix}`)
+}
+
+test('an observed suffix and a repeated prepend keep both unselected copies', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'abcabc', 0, 3)
+  await composer.focus()
+  await composer.press('Control+End')
+  await composer.pressSequentially('X')
+  await expect(composer).toHaveValue('abcabcX')
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+Home')
+  await composer.pressSequentially('abc')
+  await expect(composer).toHaveValue('abcabcabcX')
+  const before = 'abcabcabcX'
+  session.releaseAsr()
+  await expect(composer).toHaveValue('abc转写结果abcX')
+  expectOutsideKept(await composer.inputValue(), before, 3, 6, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+  expect(readUploadedWav(asrPosts(session.seen).at(-1)!.bytes).peak).toBeGreaterThan(0)
+})
+
+test('deleting the selection and retyping the same draft does not delete the survivor', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'abcabc', 0, 3)
+  await composer.focus()
+  await composer.press('Backspace')
+  await expect(composer).toHaveValue('abc')
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+End')
+  await composer.pressSequentially('abc')
+  await expect(composer).toHaveValue('abcabc')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('转写结果abcabc')
+  expectOutsideKept(await composer.inputValue(), 'abcabc', 0, 0, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('edits before, inside, and after the range keep every outside character', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, '0123456789', 4, 6)
+  await openHeldRecording(page, session)
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(4, 6)
+  })
+  await page.keyboard.type('ZZ')
+  await expect(composer).toHaveValue('0123ZZ6789')
+  await composer.press('Control+Home')
+  await composer.pressSequentially('A')
+  await composer.press('Control+End')
+  await composer.pressSequentially('B')
+  await expect(composer).toHaveValue('A0123ZZ6789B')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('A0123转写结果6789B')
+  expectOutsideKept(await composer.inputValue(), 'A0123ZZ6789B', 5, 7, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('undo and redo follow the edit step and not the restored letters', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'abcabc', 0, 3)
+  await openHeldRecording(page, session)
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(0, 3)
+  })
+  await composer.press('Backspace')
+  await expect(composer).toHaveValue('abc')
+  await composer.press('Control+End')
+  await composer.pressSequentially('abc')
+  await expect(composer).toHaveValue('abcabc')
+  for (const value of ['abcab', 'abca', 'abc', 'abcabc']) {
+    await composer.press('Control+z')
+    await expect(composer).toHaveValue(value)
+  }
+  await composer.press('Control+Shift+Z')
+  await expect(composer).toHaveValue('abc')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('abca')
+  await composer.press('Control+z')
+  await expect(composer).toHaveValue('abc')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('abca')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('abcab')
+  await composer.press('Control+y')
+  await expect(composer).toHaveValue('abcabc')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('转写结果abcabc')
+  expectOutsideKept(await composer.inputValue(), 'abcabc', 0, 0, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('spaces and a surrogate pair outside the replaced span survive', async ({ page }) => {
+  test.setTimeout(90_000)
+  const emoji = '😀'
+  const initial = `a b ${emoji} c`
+  const emojiAt = initial.indexOf(emoji)
+  const { session, composer } = await armHeldSelection(page, initial, emojiAt, emojiAt + emoji.length)
+  await openHeldRecording(page, session)
+  await composer.focus()
+  await composer.press('Control+Home')
+  await composer.pressSequentially('前')
+  await composer.press('Control+End')
+  await composer.pressSequentially('后')
+  const before = `前${initial}后`
+  await expect(composer).toHaveValue(before)
+  session.releaseAsr()
+  const prefix = before.slice(0, before.indexOf(emoji))
+  const suffix = before.slice(before.indexOf(emoji) + emoji.length)
+  await expect(composer).toHaveValue(`${prefix}转写结果${suffix}`)
+  expectOutsideKept(await composer.inputValue(), before, before.indexOf(emoji), before.indexOf(emoji) + emoji.length, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('moving the caret while recording does not retarget the saved span', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'abcabc', 0, 3)
+  await page.evaluate(() => (window as unknown as { __releaseMic?: () => void }).__releaseMic?.())
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await composer.focus()
+  await composer.press('Control+End')
+  expect(await composerRange(page)).toMatchObject({ start: 6, end: 6, value: 'abcabc' })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('转写结果abc')
+  expectOutsideKept(await composer.inputValue(), 'abcabc', 0, 3, '转写结果')
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('an unobserved edit keeps the draft until the recovery actions run', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  await page.evaluate(() => {
+    const mark = window as unknown as { __copied?: string[] }
+    mark.__copied = []
+    const clipboard = navigator.clipboard
+    clipboard.writeText = async (value: string) => {
+      mark.__copied?.push(value)
+    }
+  })
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.fill('完全不同')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('完全不同')
+  const offer = page.getByTestId('voice-recovery')
+  await expect(offer).toBeVisible()
+  await expect(page.getByTestId('voice-recovery-transcript')).toHaveText('转写结果')
+  expect(await page.evaluate(() => (window as unknown as { __copied?: string[] }).__copied ?? [])).toEqual([])
+  await page.getByTestId('voice-recovery-copy').click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __copied?: string[] }).__copied ?? [])).toEqual(['转写结果'])
+  await expect(composer).toHaveValue('完全不同')
+  await page.getByTestId('voice-recovery-insert').click()
+  await expect(composer).toHaveValue('完全不同转写结果')
+  expect((await composer.inputValue()).startsWith('完全不同')).toBe(true)
+  await expect(offer).toHaveCount(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
+test('a transcript for another conversation is not offered or inserted', async ({ page }) => {
+  test.setTimeout(90_000)
+  await countAudioCallbacks(page)
+  await installMedia(page, 'tone')
+  const session = await unlock(page, { holdAsr: true })
+  await page.getByTestId('composer').fill('先说一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text')).toContainText('合成回答。')
+  await page.getByTestId('new-chat').click()
+  await expect(page.locator('.greeting')).toBeVisible()
+  await page.getByTestId('composer').fill('下一句')
+  await page.getByTestId('send').click()
+  await expect(page.getByTestId('assistant-text').last()).toContainText('合成回答。')
+  await page.locator('.chat-link', { hasText: '语音' }).click()
+  const composer = page.getByTestId('composer')
+  await composer.fill('你好世界')
+  await composer.evaluate((node) => {
+    const box = node as HTMLTextAreaElement
+    box.focus()
+    box.setSelectionRange(2, 4)
+  })
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '结束录音并转写')
+  await waitForSamples(page)
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '正在转写，点击取消')
+  await composer.fill('完全不同')
+  await page.locator('.chat-link', { hasText: '下一句' }).click()
+  session.releaseAsr()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  await page.locator('.chat-link', { hasText: '语音' }).click()
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  await expect(page.getByTestId('composer')).not.toHaveValue(/转写结果/)
+  expect(messagePosts(session.seen)).toHaveLength(2)
+})
+
+test('cancelling transcription drops a late result with no recovery offer', async ({ page }) => {
+  test.setTimeout(90_000)
+  const { session, composer } = await armHeldSelection(page, 'abcabc', 0, 3)
+  await openHeldRecording(page, session)
+  await expect(composer).toHaveValue('abcabc')
+  await page.getByTestId('voice-input').click()
+  await expect(page.getByTestId('voice-input')).toHaveAttribute('aria-label', '语音输入')
+  session.releaseAsr()
+  await expect(composer).toHaveValue('abcabc')
+  await expect(page.getByTestId('voice-recovery')).toHaveCount(0)
+  expect(messagePosts(session.seen)).toHaveLength(0)
+})
+
 test('reloading the app closes the playing audio context', async ({ page }) => {
   test.setTimeout(90_000)
   const pcm = await playOpen(page)
