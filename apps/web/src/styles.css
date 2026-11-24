@@ -2544,6 +2544,10 @@ body[data-ds-dark-theme] .settings-shell .theme-cards button.chip.on {
   .greeting .mark { width: 30px; height: 22px; margin-top: -1px; }
   .send, .tool-right .icon-btn { width: 34px; height: 34px; }
   .tool-right .icon-btn svg, .send svg { width: 16px; height: 16px; }
+  /* The microphone is one more 34px control. Tighten this row so the
+     thinking and search labels still fit inside the 326px composer. */
+  .composer-tools { padding-left: 4px; padding-right: 4px; }
+  .composer .tool-right { gap: 4px; }
   .item-menu-scrim {
     display: block;
     position: fixed;
@@ -3283,4 +3287,140 @@ input.share-box.ds-checkbox:checked::after,
 @media (max-width: 639px) {
   .share-bar .share-split,
   .share-bar .share-count { display: none; }
+}
+
+/* Speech. The microphone and the read-aloud control keep the existing 34px and 28px slots. */
+.voice-timer {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--dsw-alias-label-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media not all and (min-width: 768px) {
+  .voice-timer { display: none; }
+}
+.voice-input { cursor: pointer; }
+.voice-input.recording,
+.voice-input.recording:hover { background: transparent; }
+.voice-active {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+}
+.voice-halo,
+.voice-core {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--dsw-alias-brand-primary);
+}
+.voice-halo {
+  inset: 0;
+  opacity: 0.2;
+  animation: voice-halo-enter 0.15s ease-out both, voice-halo-breath 1.8s ease-in-out 0.15s infinite;
+}
+.voice-core {
+  inset: 2px;
+  opacity: 0.75;
+  animation: voice-core-enter 0.2s ease-out 0.14s both;
+}
+.voice-outline,
+.voice-glyph {
+  position: absolute;
+  display: flex;
+}
+.voice-outline { color: var(--dsw-alias-brand-primary); animation: voice-fade-out 0.12s ease-out 0.14s both; }
+.voice-glyph { color: var(--dsw-static-neutral-bluish-00); animation: voice-fade-in 0.1s ease-out 0.26s both; }
+.voice-loading {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid var(--dsw-alias-border-l2);
+  border-top-color: var(--dsw-alias-label-tertiary);
+  animation: voice-spin 0.8s linear infinite;
+}
+.voice-spectrum {
+  position: absolute;
+  top: calc(50% + 8px);
+  translate: 0 -50%;
+  left: 16px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 36px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.voice-bar {
+  display: block;
+  flex-shrink: 0;
+  width: 2px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--dsw-alias-brand-primary);
+  transform-origin: center;
+  font-style: normal;
+}
+.read-bars { display: block; width: 16px; height: 16px; }
+.read-bars.loading .read-bar { fill: var(--dsw-static-neutral-300); }
+body[data-ds-dark-theme] .read-bars.loading .read-bar { fill: var(--dsw-static-neutral-550); }
+.read-bars.playing .read-bar { fill: var(--dsw-alias-brand-primary); }
+.read-bars.playing { animation: voice-bars-settle 0.15s cubic-bezier(0.22, 1, 0.36, 1); }
+.read-bars .read-sweep {
+  fill: #000;
+  fill-opacity: 0;
+  animation: voice-read-sweep 1.5s linear infinite;
+}
+.read-bars .read-sweep-2 { animation-delay: -1.15s; }
+.read-bars .read-sweep-3 { animation-delay: -0.75s; }
+.read-bars .read-sweep-4 { animation-delay: -0.35s; }
+.speech-notice {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 80;
+  translate: -50% 0;
+  margin: 0;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv3);
+  font-size: 14px;
+  line-height: 22px;
+  pointer-events: none;
+}
+@keyframes voice-halo-enter {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 0.2; }
+}
+@keyframes voice-halo-breath {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.1; }
+}
+@keyframes voice-core-enter {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 0.75; }
+}
+@keyframes voice-fade-out { to { opacity: 0; } }
+@keyframes voice-fade-in { from { opacity: 0; } }
+@keyframes voice-spin { to { transform: rotate(360deg); } }
+@keyframes voice-bars-settle {
+  from { transform: scaleY(0.2857); }
+  to { transform: scaleY(1); }
+}
+@keyframes voice-read-sweep {
+  0%, 55%, 100% { fill-opacity: 0; }
+  18% { fill-opacity: 0.4; }
 }

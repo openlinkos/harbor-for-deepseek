@@ -121,9 +121,9 @@ test('settings dropdowns close outside, on Escape, and on an item, without closi
   const dropdowns = [
     { id: 'language-trigger', option: '简体中文', shot: 'language' },
     { id: 'safety-select', option: '高（公开站点默认）', shot: 'safety' },
+    { id: 'voice-select', option: '海星（女声）', shot: 'voice' },
   ]
   await expect(page.getByTestId('purpose-select')).toHaveCount(0)
-  await expect(page.getByTestId('voice-select')).toHaveCount(0)
   await expect(page.getByTestId('model-select')).toHaveCount(0)
   await expect(page.getByTestId('effort-select')).toHaveCount(0)
 

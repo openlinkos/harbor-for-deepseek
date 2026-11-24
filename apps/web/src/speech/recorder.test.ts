@@ -80,6 +80,41 @@ describe('recorder lifecycle', () => {
     expect(highView.getUint32(40, true) / 2).toBe(ASR_SAMPLE_RATE)
   })
 
+  it('connects the analyser to the underlying processor node', async () => {
+    const node = { kind: 'processor-node' }
+    const seen: object[] = []
+    const host: RecordingHost = {
+      async getUserMedia() {
+        return { getTracks: () => [{ stop() {} }] } as unknown as MediaStream
+      },
+      createContext(): RecordingContext {
+        return {
+          sampleRate: ASR_SAMPLE_RATE,
+          destination: {} as AudioNode,
+          createMediaStreamSource: () => ({ connect() {}, disconnect() {} }),
+          createAnalyser: () => ({
+            fftSize: 0,
+            smoothingTimeConstant: 0,
+            frequencyBinCount: 8,
+            getFloatFrequencyData() {},
+            connect(destination: object) { seen.push(destination) },
+            disconnect() {},
+          }),
+          createScriptProcessor: () => ({
+            input: node,
+            onaudioprocess: null,
+            connect() {},
+            disconnect() {},
+          }),
+          close() {},
+        }
+      },
+    }
+    const recording = await startRecording(() => undefined, host)
+    expect(seen).toEqual([node])
+    recording.cancel()
+  })
+
   it('returns null for silence of zero length and cancel closes the capture', async () => {
     const fake = hostWith(ASR_SAMPLE_RATE)
     const empty = await startRecording(() => undefined, fake.host)

@@ -13,7 +13,7 @@ const PILL_BORDER = { light: 'rgba(0, 0, 0, 0.1)', dark: 'rgba(255, 255, 255, 0.
 const HOVER_BG = { light: 'rgba(38, 49, 72, 0.06)', dark: 'rgba(255, 255, 255, 0.08)' }
 const TIP_BG = { light: 'rgb(44, 44, 46)', dark: 'rgb(67, 69, 74)' }
 const TIP_COLOR = { light: 'rgb(255, 255, 255)', dark: 'rgb(249, 250, 251)' }
-const ACTION_LABELS = ['复制', '重新生成', '喜欢', '不喜欢', '分享']
+const ACTION_LABELS = ['复制', '重新生成', '喜欢', '不喜欢', '朗读', '分享']
 const USER_LABELS = ['复制', '编辑']
 
 const sse = (events: unknown[]) => events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')

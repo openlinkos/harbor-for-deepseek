@@ -202,7 +202,7 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await row.getByRole('button', { name: '不喜欢', exact: true }).click()
   await expect(row.getByRole('button', { name: '不喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
+  await expect(row.getByRole('button', { name: '朗读', exact: true })).toBeVisible()
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
@@ -747,7 +747,7 @@ test('sidebar motion', async ({ page }) => {
 test('action row', async ({ page }) => {
   await unlock(page)
   await send(page, '动作')
-  await expect(page.locator('.action-row button')).toHaveCount(5)
+  await expect(page.locator('.action-row button')).toHaveCount(6)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
   await page.screenshot({ path: join(shots, 'actions-light.png') })
   await page.getByTestId('user-menu').click()

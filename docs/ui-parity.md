@@ -9,7 +9,7 @@ Side-by-side frames for the logged-in stills are in `docs/parity/compare/`. Ours
 | Home, dark, both tools on | Centered mark and greeting, grey composer, outlined chips, round send | Same layout. Empty history says 「今天有什么可以帮到你？」. A new chat with history picks 「欢迎回来，随时开始吧」, 「欢迎回来，想从哪里开始？」, or 「你好，有什么我能帮你的吗？」 |
 | Home, light | White page, pale composer, blue selected chips | Same tokens: bubble `#edf3fe`, page white, sidebar `#f9fafb` |
 | Composer focus | No inner blue rectangle | Textarea outline removed |
-| Settings general | Centered ~860px, radius 24px, left nav, three theme tiles, language and voice pills | Same shell. Language is 简体中文 / English. Voice is 默认 plus the Web Speech voices |
+| Settings general | Centered ~860px, radius 24px, left nav, three theme tiles, language and voice pills | Same shell. Language is 简体中文 / English. Read-aloud offers only the public voices 海星 (stella) and 暗潮 (tide). The website shows two further visual labels that are not public voice ids; they stay a review item and are not selectable. |
 | Settings account / data / agreement | Left nav switches the pane | 账号管理, 数据管理, 服务协议. Legal footer lives here and on the key gate, not in the sidebar |
 | User menu | 下载手机应用, 系统设置, 帮助与反馈, 退出登录 | 下载应用 (GitHub releases), 系统设置, 帮助与反馈 (GitHub issues). Local mode uses 从本机移除 Key instead of 退出登录. Server mode keeps 退出登录 |
 | Search | Centered pill 「搜索对话内容...」 | Same pill, opened from the sidebar search icon or Ctrl/Cmd+K |

@@ -21,6 +21,11 @@ type ProcessorLike = {
   onaudioprocess: ((event: ProcessorEvent) => void) | null
   connect(destination: GraphNode): void
   disconnect(): void
+  /**
+   * The real node other AudioNodes must connect into. A plain wrapper is not
+   * an AudioNode, and AnalyserNode.connect rejects it.
+   */
+  input?: GraphNode
 }
 
 type NodeLike = {
@@ -35,6 +40,8 @@ export type RecordingContext = {
   createAnalyser(): LevelAnalyser & NodeLike
   createScriptProcessor(bufferSize: number, inputs: number, outputs: number): ProcessorLike
   close(): void | Promise<void>
+  /** The microphone permission await leaves the user-gesture turn, so the context may start suspended. */
+  resume?(): void | Promise<void>
 }
 
 export type RecordingHost = {
@@ -51,6 +58,7 @@ export type Recording = {
 const BUFFER_SIZE = 4096
 
 const wrapProcessor = (node: ScriptProcessorNode): ProcessorLike => ({
+  input: node,
   get onaudioprocess() {
     return node.onaudioprocess as ProcessorLike['onaudioprocess']
   },
@@ -69,6 +77,9 @@ export const browserRecordingHost = (): RecordingHost => ({
   getUserMedia: (constraints) => navigator.mediaDevices.getUserMedia(constraints),
   createContext(sampleRate) {
     const context = new AudioContext({ sampleRate })
+    context.addEventListener('statechange', () => {
+      if (context.state === 'suspended') void context.resume()
+    })
     return {
       get sampleRate() {
         return context.sampleRate
@@ -79,6 +90,7 @@ export const browserRecordingHost = (): RecordingHost => ({
       createScriptProcessor: (bufferSize, inputs, outputs) =>
         wrapProcessor(context.createScriptProcessor(bufferSize, inputs, outputs)),
       close: () => context.close(),
+      resume: () => context.resume(),
     }
   },
 })
@@ -100,6 +112,13 @@ export const startRecording = async (onLimit: () => void, host: RecordingHost = 
     context = host.createContext(ASR_SAMPLE_RATE)
   } catch (error) {
     stopTracks(stream)
+    throw error
+  }
+  try {
+    await context.resume?.()
+  } catch (error) {
+    stopTracks(stream)
+    void context.close()
     throw error
   }
   const source = context.createMediaStreamSource(stream)
@@ -137,7 +156,7 @@ export const startRecording = async (onLimit: () => void, host: RecordingHost = 
     }
   }
   source.connect(analyser)
-  analyser.connect(processor)
+  analyser.connect(processor.input ?? processor)
   processor.connect(context.destination)
 
   return {

@@ -13,6 +13,13 @@ import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
 import { FileCard } from './file-card.js'
 import { useHarbor } from './store.js'
+import { IconMicFill16, IconMicOutline16, IconPlayMediaOutline16 } from './speech/icons.js'
+import { useSpeechNotice } from './speech/notice.js'
+import { ReadingBars } from './speech/ReadingBars.js'
+import { stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
+import { installSpeech } from './speech/runtime.js'
+import { Spectrum } from './speech/Spectrum.js'
+import { bindVoiceInserter, cancelVoiceInput, insertTranscript, toggleVoiceInput, useVoiceInput } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -442,6 +449,18 @@ const useT = () => {
   const locale = useHarbor((state) => state.settings.locale)
   return (key: Parameters<typeof translate>[1], vars?: Record<string, string | number>) =>
     translate(locale, key, vars)
+}
+
+const SpeechNotice = () => {
+  const notice = useSpeechNotice((state) => state.notice)
+  const clear = useSpeechNotice((state) => state.clear)
+  useEffect(() => {
+    if (!notice) return undefined
+    const timer = window.setTimeout(() => clear(), 4000)
+    return () => window.clearTimeout(timer)
+  }, [notice, clear])
+  if (!notice) return null
+  return <p className="speech-notice" role="status" data-testid="speech-notice">{notice.text}</p>
 }
 
 type TurnGroup = { id: string; messageIds: string[] }
@@ -1109,6 +1128,20 @@ const BranchSwitcher = ({ ids, current, disabled, onStep }: { ids: string[]; cur
   )
 }
 
+const ReadAloudButton = ({ messageId, conversationId, text }: { messageId: string; conversationId: string; text: string }) => {
+  const t = useT()
+  const speech = useReadAloud()
+  const active = speech.messageId === messageId && speech.status !== 'idle'
+  const label = active ? t('ttsStop') : t('ttsPlay')
+  return (
+    <HoverTip text={label}>
+      <button type="button" data-testid="read-aloud" data-tip={label} aria-label={label} aria-pressed={active} onClick={() => toggleReadAloud(messageId, conversationId, text)}>
+        {active ? <ReadingBars mode={speech.status === 'playing' ? 'playing' : 'loading'} /> : <IconPlayMediaOutline16 />}
+      </button>
+    </HoverTip>
+  )
+}
+
 const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
@@ -1225,6 +1258,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('dislike')}>
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
+          <ReadAloudButton messageId={message.id} conversationId={message.conversationId} text={textOf} />
           <HoverTip text={t('share')}>
             <button type="button" data-tip={t('share')} aria-label={t('share')} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
@@ -1289,6 +1323,13 @@ export const Shell = () => {
     const onTheme = () => loadSkin()
     window.addEventListener('deepapi-theme', onTheme)
     return () => window.removeEventListener('deepapi-theme', onTheme)
+  }, [])
+  useEffect(() => {
+    installSpeech()
+    return () => {
+      cancelVoiceInput()
+      stopReadAloud()
+    }
   }, [])
   const state = useHarbor()
   const conversation = state.conversations.find((item) => item.id === state.activeId) ?? null
@@ -1940,6 +1981,7 @@ export const Shell = () => {
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
+      <SpeechNotice />
       {shareSoon ? (
         <div className="modal share-modal" role="dialog" aria-modal="true" aria-labelledby="share-soon-title" data-testid="share-soon" onClick={exitShare}>
           <div className="share-soon-card" onClick={(event) => event.stopPropagation()}>
@@ -2078,9 +2120,35 @@ const Composer = () => {
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const activeId = useHarbor((state) => state.activeId)
+  const voice = useVoiceInput()
+  const textRef = useRef(text)
+  const activeRef = useRef(activeId)
+  const caretRef = useRef<number | null>(null)
+  textRef.current = text
+  activeRef.current = activeId
   useEffect(() => {
     focusComposer()
   }, [activeId])
+  useLayoutEffect(() => {
+    const node = box.current
+    const caret = caretRef.current
+    if (!node || caret == null) return
+    caretRef.current = null
+    node.focus()
+    node.setSelectionRange(caret, caret)
+  })
+  useEffect(() => {
+    bindVoiceInserter((transcript, conversationId) => {
+      const node = box.current
+      if (!node?.isConnected || activeRef.current !== conversationId) return
+      const start = node.selectionStart ?? textRef.current.length
+      const end = node.selectionEnd ?? start
+      const next = insertTranscript(textRef.current, transcript, { start, end })
+      caretRef.current = next.caret
+      setText(next.text)
+    })
+    return () => bindVoiceInserter(null)
+  }, [])
   useEffect(() => {
     const row = chips.current
     if (!row) {
@@ -2119,7 +2187,9 @@ const Composer = () => {
   const trimmed = text.trim()
   const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
   const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
-  const canSend = !filesBlocking && (trimmed.length > 0 || hasFile)
+  const canSend = voice.phase === 'idle' && !filesBlocking && (trimmed.length > 0 || hasFile)
+  const voiceLabel = voice.phase === 'recording' ? t('voiceInputStop') : voice.phase === 'transcribing' ? t('voiceInputCancel') : t('voiceInput')
+  const voiceSeconds = Math.floor(voice.elapsedMs / 1000)
   const submit = () => {
     if (!canSend) return
     const value = text
@@ -2129,6 +2199,7 @@ const Composer = () => {
   }
   return (
     <div className={`composer ${iconOnly ? 'icon-only' : ''}`}>
+      {voice.phase === 'recording' ? <Spectrum analyser={voice.analyser} /> : null}
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
       {drafts.length ? (
@@ -2185,6 +2256,28 @@ const Composer = () => {
           </button>
         </div>
         <div className="tool-right">
+          {voice.phase === 'recording' ? <span className="voice-timer" data-testid="voice-timer">{t('voiceInputTimer', { seconds: voiceSeconds })}</span> : null}
+          <button
+            type="button"
+            className={`icon-btn voice-input${voice.phase === 'recording' ? ' recording' : ''}`}
+            data-testid="voice-input"
+            aria-label={voiceLabel}
+            aria-pressed={voice.phase === 'recording'}
+            onClick={() => toggleVoiceInput()}
+          >
+            {voice.phase === 'recording' ? (
+              <span className="voice-active">
+                <span className="voice-halo" />
+                <span className="voice-core" />
+                <span className="voice-outline"><IconMicOutline16 /></span>
+                <span className="voice-glyph"><IconMicFill16 /></span>
+              </span>
+            ) : voice.phase === 'transcribing' ? (
+              <span className="voice-loading" />
+            ) : (
+              <IconMicOutline16 />
+            )}
+          </button>
           <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => fileRef.current?.click()}>
             <Glyph name="attach" size={16} />
           </button>
@@ -2341,6 +2434,17 @@ const Settings = () => {
             >
               <span className="knob" />
             </button>
+          </div>
+          <div className="settings-line">
+            <span>{t('settingsTtsVoice')}</span>
+            <AnchoredMenu
+              dismiss
+              testId="voice-select"
+              label={settings.ttsVoice === 'tide' ? t('settingsTtsVoiceTide') : t('settingsTtsVoiceStella')}
+              selected={settings.ttsVoice === 'tide' ? t('settingsTtsVoiceTide') : t('settingsTtsVoiceStella')}
+              options={[t('settingsTtsVoiceStella'), t('settingsTtsVoiceTide')]}
+              onPick={(value) => void patchSettings({ ttsVoice: value === t('settingsTtsVoiceTide') ? 'tide' : 'stella' })}
+            />
           </div>
         </section>
         <section className="settings-account">

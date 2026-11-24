@@ -14,6 +14,9 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1280, height: 820 },
+    // --mute-audio stops Chromium from pulling a ScriptProcessorNode, so the
+    // real recorder never receives samples. Speech tests need the audio thread.
+    launchOptions: { ignoreDefaultArgs: ['--mute-audio'] },
   },
   webServer: {
     command: `pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
