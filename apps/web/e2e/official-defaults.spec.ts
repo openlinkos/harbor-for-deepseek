@@ -7,8 +7,9 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { inflateSync } from 'node:zlib'
 
-type Capture = { file: string; sha256: string; theme: 'light' | 'dark'; x: number; y: number; on: [number, number, number] }
-type Entry = { id: string; prefKey: string; spec: string[]; testIds: string[]; official: boolean | null; noOfficial?: string; captures: Capture[] }
+type Capture = { file: string; sha256: string; theme: 'light' | 'dark'; x: number; y: number; on: [number, number, number]; off: [number, number, number] }
+type Control = { role: 'button'; name: string; color: string }
+type Entry = { id: string; prefKey: string | null; spec: string[]; testIds: string[]; control?: Control; official: boolean | null; noOfficial?: string; captures: Capture[] }
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const root = join(HERE, '..', '..', '..')
@@ -64,7 +65,7 @@ test('every defaultPrefs key has an official-defaults entry', () => {
   expect(body, 'defaultPrefs literal not found in store.ts').toBeTruthy()
   const keys = [...(body ?? '').matchAll(/^\s*(\w+):/gm)].map((m) => m[1]).sort()
   expect(keys.length).toBeGreaterThan(0)
-  expect(registry.entries.map((entry) => entry.prefKey).sort()).toEqual(keys)
+  expect(registry.entries.flatMap((entry) => (entry.prefKey ? [entry.prefKey] : [])).sort()).toEqual(keys)
   for (const entry of registry.entries) {
     if (entry.official === null) expect(entry.noOfficial, `${entry.id} needs a reason when there is no official default`).toBeTruthy()
     else expect(entry.captures.length, `${entry.id} needs at least one official capture`).toBeGreaterThan(0)
@@ -76,8 +77,11 @@ for (const entry of registry.entries.filter((item) => item.official !== null)) {
     for (const capture of entry.captures) {
       const file = join(root, capture.file)
       expect(createHash('sha256').update(readFileSync(file)).digest('hex'), `${capture.file} changed`).toBe(capture.sha256)
-      const seen = near(pixel(file, capture.x, capture.y), capture.on)
-      expect(seen, `${entry.id} ${capture.theme} ${capture.file}@${capture.x},${capture.y} shows ${seen ? 'on' : 'off'}, registry says ${entry.official ? 'on' : 'off'}`).toBe(entry.official)
+      const rgb = pixel(file, capture.x, capture.y)
+      const isOn = near(rgb, capture.on)
+      const isOff = near(rgb, capture.off)
+      expect(isOn !== isOff, `${entry.id} ${capture.theme} ${capture.file}@${capture.x},${capture.y} rgb(${rgb.join(', ')}) matches neither or both of on/off`).toBe(true)
+      expect(isOn, `${entry.id} ${capture.theme} ${capture.file}@${capture.x},${capture.y} shows ${isOn ? 'on' : 'off'}, registry says ${entry.official ? 'on' : 'off'}`).toBe(entry.official)
     }
   })
 
@@ -92,6 +96,21 @@ for (const entry of registry.entries.filter((item) => item.official !== null)) {
     await expect(page.getByTestId('composer')).toBeVisible()
     for (const id of entry.testIds.filter((item) => !item.startsWith('landing-'))) {
       await expect(page.getByTestId(id)).toHaveAttribute('aria-pressed', String(entry.official))
+    }
+    if (entry.control) {
+      // Enabled means: not disabled, the official enabled colour, and a real click reaches the action.
+      const control = page.locator('.tool-right').getByRole(entry.control.role, { name: entry.control.name, exact: true })
+      await page.mouse.move(0, 0)
+      if (entry.official) {
+        await expect(control).toBeEnabled()
+        await expect(control).not.toHaveAttribute('aria-disabled', 'true')
+        await expect(control).toHaveCSS('color', entry.control.color)
+        const chooser = page.waitForEvent('filechooser', { timeout: 5_000 })
+        await control.click()
+        await chooser
+      } else {
+        await expect(control).toBeDisabled()
+      }
     }
   })
 }

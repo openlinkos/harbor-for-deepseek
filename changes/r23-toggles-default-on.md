@@ -77,3 +77,12 @@ apps/web/e2e/spec-align-composer.spec.ts:64 旧直接 setInputFiles 新先 click
 - 搜索开时仍不能挂附件（addFiles → filesNeedNoSearch，已有文件时 toggle-search aria-disabled）。本 PR 不改这条产品规则。官方在智能搜索打开时能否挂文件，没有对照，记为后续。
 - packages/archive-v3/src/index.ts 导入 v3 会话时仍把会话行写成 thinking: true、search: false。这是存进会话的值，不是作曲条默认。服务端 schema 和 API 语义未改，服务端仍只收客户端显式布尔。续写在会话行存在时仍用该行的 thinking/search；行缺失时的兜底改为 defaultPrefs()（两个都开）。会话行上的偏好除此之外不变。
 - 没有 store 单测。没有新增测试框架。
+
+## r23b 搜索打开时可以上传文件（PR #73 独立复验 BLOCK 后补）
+
+理由：独立复验（deepapi-verify/pr73/REPORT.md）指出搜索默认打开后新用户无法挂附件，比线上差。官方 bundle 只有在远程配置 file_feature.conflict_with_search === true 时才互斥；官方截图 docs/parity/compare/home-light.png 两个开关都打开时，回形针是可用色 rgb(15, 17, 21)。
+
+新增检查（先于修复提交，在 7b30151 上失败）：
+- apps/web/e2e/attach-with-search.spec.ts：默认搜索打开时回形针能打开文件选择并挂上文件；挂了文件后搜索开关仍可切换；请求同时带文件和联网搜索工具。
+- fixtures/official-defaults.json 新增 composer.attach.enabled-with-search：按 sha256 固定官方截图回形针像素（可用色），我们首次加载时回形针必须可用、颜色一致、真实点击能打开文件选择。
+- 每个截图采样同时登记开和关两种颜色，像素两者都不像就失败；composer-defaults.spec.ts 关闭状态也断言官方未选中颜色。

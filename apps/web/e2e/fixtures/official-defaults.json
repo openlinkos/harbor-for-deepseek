@@ -1,28 +1,102 @@
 {
-  "about": "Fresh-load default of every user-facing composer preference (keys of defaultPrefs in apps/web/src/store.ts). Each entry with an official counterpart must name an official capture that is already in the repo, a pixel to sample, and the colours that mean on and off. official-defaults.spec.ts decodes the capture and fails when the recorded default disagrees with the capture, when a defaultPrefs key has no entry, or when our fresh-load render disagrees.",
+  "about": "Fresh-load default of every user-facing composer preference (keys of defaultPrefs in apps/web/src/store.ts). Each entry with an official counterpart must name an official capture that is already in the repo, a pixel to sample, and the colours that mean on and off. A pixel that matches neither colour fails as unclassified. Entries with prefKey null are composer controls whose default state is pinned the same way. official-defaults.spec.ts decodes the capture and fails when the recorded default disagrees with the capture, when a defaultPrefs key has no entry, or when our fresh-load render disagrees.",
   "entries": [
     {
       "id": "composer.thinking.default",
       "prefKey": "thinking",
-      "spec": ["SP-CMP-255"],
-      "testIds": ["landing-thinking", "toggle-thinking"],
+      "spec": [
+        "SP-CMP-255"
+      ],
+      "testIds": [
+        "landing-thinking",
+        "toggle-thinking"
+      ],
       "official": true,
       "changed": "2026-11-26 off -> on. Reason: owner screenshot evidence 11/26 00:30 CST (昊辰: chat.deepseek.com home shows 深度思考 and 智能搜索 on, and still on after refresh). Approved by 筑衡 for 昊辰. The 11/23 off record came from the bundle fallback create(\"thinkingEnabled\", false) with capture null; the captures below already showed on.",
       "captures": [
-        { "file": "docs/parity/compare/home-light.png", "sha256": "4cbee3f0f3bd874ccd388d9a4076a0f10229b2cae190ae7baafc6fe7fdf4b7ee", "theme": "light", "x": 722, "y": 587, "on": [237, 243, 254] },
-        { "file": "docs/parity/compare/home.png", "sha256": "56e2ceabdb39b29c3efc57d693cc44ce57bf181bf7a005fcaea7a19866d9aa00", "theme": "dark", "x": 722, "y": 587, "on": [40, 49, 66] }
+        {
+          "file": "docs/parity/compare/home-light.png",
+          "sha256": "4cbee3f0f3bd874ccd388d9a4076a0f10229b2cae190ae7baafc6fe7fdf4b7ee",
+          "theme": "light",
+          "x": 722,
+          "y": 587,
+          "on": [
+            237,
+            243,
+            254
+          ],
+          "off": [
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "file": "docs/parity/compare/home.png",
+          "sha256": "56e2ceabdb39b29c3efc57d693cc44ce57bf181bf7a005fcaea7a19866d9aa00",
+          "theme": "dark",
+          "x": 722,
+          "y": 587,
+          "on": [
+            40,
+            49,
+            66
+          ],
+          "off": [
+            44,
+            44,
+            46
+          ]
+        }
       ]
     },
     {
       "id": "composer.search.default",
       "prefKey": "search",
-      "spec": ["SP-CMP-256"],
-      "testIds": ["landing-search", "toggle-search"],
+      "spec": [
+        "SP-CMP-256"
+      ],
+      "testIds": [
+        "landing-search",
+        "toggle-search"
+      ],
       "official": true,
       "changed": "2026-11-26 off -> on. Reason: owner screenshot evidence 11/26 00:30 CST (昊辰). Approved by 筑衡 for 昊辰. The 11/23 off record read only the client fallback searchEnabled=false and search_state_on_launch=\"keep\"; the live value comes from a remote frozen feature the bundle cannot show. The captures below already showed on.",
       "captures": [
-        { "file": "docs/parity/compare/home-light.png", "sha256": "4cbee3f0f3bd874ccd388d9a4076a0f10229b2cae190ae7baafc6fe7fdf4b7ee", "theme": "light", "x": 902, "y": 587, "on": [237, 243, 254] },
-        { "file": "docs/parity/compare/home.png", "sha256": "56e2ceabdb39b29c3efc57d693cc44ce57bf181bf7a005fcaea7a19866d9aa00", "theme": "dark", "x": 902, "y": 587, "on": [40, 49, 66] }
+        {
+          "file": "docs/parity/compare/home-light.png",
+          "sha256": "4cbee3f0f3bd874ccd388d9a4076a0f10229b2cae190ae7baafc6fe7fdf4b7ee",
+          "theme": "light",
+          "x": 902,
+          "y": 587,
+          "on": [
+            237,
+            243,
+            254
+          ],
+          "off": [
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "file": "docs/parity/compare/home.png",
+          "sha256": "56e2ceabdb39b29c3efc57d693cc44ce57bf181bf7a005fcaea7a19866d9aa00",
+          "theme": "dark",
+          "x": 902,
+          "y": 587,
+          "on": [
+            40,
+            49,
+            66
+          ],
+          "off": [
+            44,
+            44,
+            46
+          ]
+        }
       ]
     },
     {
@@ -33,6 +107,41 @@
       "official": null,
       "noOfficial": "DeepAPI-only setting (打开网页). chat.deepseek.com has no such control, so there is no official default to compare. Default stays off.",
       "captures": []
+    },
+    {
+      "id": "composer.attach.enabled-with-search",
+      "prefKey": null,
+      "spec": [
+        "SP-CMP-253"
+      ],
+      "testIds": [],
+      "control": {
+        "role": "button",
+        "name": "添加文件",
+        "color": "rgb(15, 17, 21)"
+      },
+      "official": true,
+      "changed": "2026-11-26 added. Independent review of PR #73 (deepapi-verify/pr73/REPORT.md): official blocks attaching only when file_feature.conflict_with_search===true (remote, default absent); the official capture with both toggles on draws the paperclip in label-primary rgb(15,17,21), i.e. enabled.",
+      "captures": [
+        {
+          "file": "docs/parity/compare/home-light.png",
+          "sha256": "4cbee3f0f3bd874ccd388d9a4076a0f10229b2cae190ae7baafc6fe7fdf4b7ee",
+          "theme": "light",
+          "x": 1404,
+          "y": 591,
+          "on": [
+            15,
+            17,
+            21
+          ],
+          "off": [
+            173,
+            178,
+            184
+          ],
+          "meaning": "on = paperclip in the enabled label-primary colour while search is on; off = grey caption colour (disabled)"
+        }
+      ]
     }
   ]
 }

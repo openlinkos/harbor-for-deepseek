@@ -40,6 +40,12 @@ const ACTIVE = {
   dark: { bg: 'rgb(40, 49, 66)', color: 'rgb(103, 158, 254)', border: 'rgb(72, 104, 178)' },
 }
 
+// Official unselected toggle: white fill (light) or transparent over the composer (dark), label-primary text.
+const OFF = {
+  light: { bg: 'rgb(255, 255, 255)', color: 'rgb(15, 17, 21)' },
+  dark: { bg: 'rgba(0, 0, 0, 0)', color: 'rgb(249, 250, 251)' },
+}
+
 const expectOn = async (page: Page, testId: string, on: boolean, theme: 'light' | 'dark' = 'light') => {
   const chip = page.getByTestId(testId)
   await expect(chip).toHaveAttribute('aria-pressed', String(on))
@@ -50,6 +56,8 @@ const expectOn = async (page: Page, testId: string, on: boolean, theme: 'light' 
     await expect(chip).toHaveCSS('border-top-color', ACTIVE[theme].border)
   } else {
     await expect(chip).not.toHaveClass(/\bon\b/)
+    await expect(chip).toHaveCSS('background-color', OFF[theme].bg)
+    await expect(chip).toHaveCSS('color', OFF[theme].color)
   }
 }
 
