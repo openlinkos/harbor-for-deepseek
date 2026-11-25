@@ -1,0 +1,1 @@
+关闭设置后立刻再开用户菜单时，菜单不再被关掉。关闭钮（ui.tsx 2942）先给对话框加上 closing，100ms 后 setSettingsOpen(false) 并 focusComposer()。设置卸载时 useOverlayHistory（438–457 行）调用 history.back()。用户在这一窗口点开菜单后，这次 popstate 打到 SP-SB-669（1991 行）会 setUserMenu(false)，settings-open 从文档卸下；接着 focusComposer 的动画帧把焦点抢到作曲框，user-bar 的 onBlur（2148 行）再关一次。用户栏节点本身没有重挂。这次弹层自己的 history.back 不再关之后打开的菜单，焦点已经移走时也不再抢回作曲框。
