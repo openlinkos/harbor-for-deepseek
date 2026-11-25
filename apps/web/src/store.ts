@@ -1,5 +1,6 @@
 import { ApiClientError, buildRequest, continuationBlocks, createClient, messageUsedWebTool, purposeForFile } from '@deepapi/api-client'
 import { HINT_NETWORK, classifyApiError, replyErrorCode } from './errors.js'
+import { fileSearchDecision } from './fileSearch.js'
 import { exportNative, planNativeImport, readNative } from '@deepapi/archive-native'
 import { exportV3, importV3 } from '@deepapi/archive-v3'
 import { estimateCost, sumUsage } from '@deepapi/pricing'
@@ -1000,7 +1001,9 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async addFiles(files) {
-    if (get().prefs.search) {
+    const hasFile = get().drafts.some((file) => file.fileId && !file.busy && !file.error)
+    // Official main.5a15ff2247.js blocks this only when file_feature.conflict_with_search === true.
+    if (fileSearchDecision({ searchEnabled: get().prefs.search, hasFile }).blockAttach) {
       set({ statusToast: 'filesNeedNoSearch' })
       return
     }

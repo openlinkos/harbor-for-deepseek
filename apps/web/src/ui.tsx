@@ -12,6 +12,7 @@ import { Markdown } from './markdown.js'
 import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
 import { FileCard, ImageCard } from './file-card.js'
+import { fileSearchDecision } from './fileSearch.js'
 import { imagePreview, useHarbor, type StatusToastCode } from './store.js'
 import { IconMicFill16, IconMicOutline16, IconPlayMediaOutline16 } from './speech/icons.js'
 import { useSpeechNotice } from './speech/notice.js'
@@ -2819,6 +2820,8 @@ const Composer = () => {
   const trimmed = text.trim()
   const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
   const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
+  // Official main.5a15ff2247.js: allowFileWithSearch unless file_feature.conflict_with_search === true.
+  const fileSearch = fileSearchDecision({ searchEnabled: prefs.search, hasFile })
   const canSend = voice.phase === 'idle' && !filesBlocking && (trimmed.length > 0 || hasFile)
   const voiceLabel = voice.phase === 'recording' ? t('voiceInputStop') : voice.phase === 'transcribing' ? t('voiceInputCancel') : t('voiceInput')
   const voiceSeconds = Math.floor(voice.elapsedMs / 1000)
@@ -3083,8 +3086,8 @@ const Composer = () => {
               </button>
             </HoverTip>
           </span>
-          <HoverTip text={hasFile ? t('searchNeedsNoFiles') : t('searchTip')}>
-            <button type="button" data-testid="toggle-search" className={`ds-toggle-button ${prefs.search ? 'chip on' : 'chip'}`} aria-pressed={prefs.search} aria-disabled={hasFile} onClick={() => { if (hasFile) return; void setPrefs({ search: !prefs.search }) }}>
+          <HoverTip text={fileSearch.searchToggleDisabled ? t('searchNeedsNoFiles') : t('searchTip')}>
+            <button type="button" data-testid="toggle-search" className={`ds-toggle-button ${prefs.search ? 'chip on' : 'chip'}`} aria-pressed={prefs.search} aria-disabled={fileSearch.searchToggleDisabled} onClick={() => { if (fileSearch.searchToggleDisabled) return; void setPrefs({ search: !prefs.search }) }}>
               <Glyph name="search" size={14} />
               <span className="chip-label">{t('search')}</span>
             </button>
@@ -3130,8 +3133,8 @@ const Composer = () => {
               <IconMicOutline16 />
             )}
           </button>
-          <HoverTip text={prefs.search ? t('filesNeedNoSearch') : t('attachTip')}>
-            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => { if (prefs.search) return; fileRef.current?.click() }}>
+          <HoverTip text={fileSearch.blockAttach ? t('filesNeedNoSearch') : t('attachTip')}>
+            <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => { if (fileSearch.blockAttach) return; fileRef.current?.click() }}>
               <Glyph name="attach" size={16} />
             </button>
           </HoverTip>
