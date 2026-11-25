@@ -265,15 +265,23 @@ const TOGGLE_KEY = 'deepapi-toggles'
 type Toggles = Pick<Prefs, 'thinking' | 'search'>
 
 const defaultPrefs = (): Prefs => ({
-  thinking: false,
-  search: false,
+  thinking: true,
+  search: true,
   readLink: false,
 })
 
-// SP-CMP-255 / SP-CMP-256. 昊辰 11/23 12:51: both default off.
-// Search stays in this page session (New chat keeps it) and a reload resets it to the default.
-// Thinking still persists through localStorage.
-let sessionSearch = defaultPrefs().search
+// SP-CMP-255 / SP-CMP-256. 昊辰 11/26 00:30: both default on.
+// A change stays in this page session (New chat, shortcut, other chats, route changes)
+// and a reload returns both to on. Older builds wrote deepapi-toggles; that key must not override the default.
+let sessionToggles: Toggles = { thinking: defaultPrefs().thinking, search: defaultPrefs().search }
+
+const dropStaleToggles = () => {
+  try {
+    localStorage.removeItem(TOGGLE_KEY)
+  } catch {
+    // Private mode can reject localStorage. The in-memory prefs still apply.
+  }
+}
 
 const withFixedModel = (prefs: Prefs) => ({
   ...prefs,
@@ -282,27 +290,13 @@ const withFixedModel = (prefs: Prefs) => ({
 })
 
 const readToggles = (): Toggles => {
-  const fallback: Toggles = { thinking: false, search: sessionSearch }
-  try {
-    const raw = localStorage.getItem(TOGGLE_KEY)
-    if (!raw) return fallback
-    const parsed = JSON.parse(raw) as Partial<Toggles>
-    return {
-      thinking: typeof parsed.thinking === 'boolean' ? parsed.thinking : fallback.thinking,
-      search: sessionSearch,
-    }
-  } catch {
-    return fallback
-  }
+  dropStaleToggles()
+  return { thinking: sessionToggles.thinking, search: sessionToggles.search }
 }
 
 const writeToggles = (toggles: Toggles) => {
-  sessionSearch = toggles.search
-  try {
-    localStorage.setItem(TOGGLE_KEY, JSON.stringify({ thinking: toggles.thinking }))
-  } catch {
-    // Storage can be unavailable in private mode. The in-memory prefs still apply for this tab.
-  }
+  sessionToggles = { thinking: toggles.thinking, search: toggles.search }
+  dropStaleToggles()
 }
 
 const withToggles = (base: Prefs): Prefs => ({ ...base, ...readToggles() })
@@ -1330,8 +1324,8 @@ const runContinuation = async (assistantId: string) => {
   const attempt = async (dropThinking: boolean) => {
     const body = buildRequest({
       model: DEFAULT_CHAT_MODEL,
-      thinking: conversation?.thinking ?? true,
-      search: conversation?.search ?? false,
+      thinking: conversation?.thinking ?? defaultPrefs().thinking,
+      search: conversation?.search ?? defaultPrefs().search,
       dropWebSearch: usedWeb,
       readLink: conversation?.readLink ?? false,
       effort: DEFAULT_EFFORT,
