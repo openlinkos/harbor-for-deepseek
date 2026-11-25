@@ -87,6 +87,7 @@ test.use({ viewport: { width: 1920, height: 1072 } })
 
 test('attachment cards show uploading then the official size, and the sent message reuses the card', async ({ page }) => {
   await unlock(page)
+  await page.getByTestId('toggle-search').click()
   const samples = mkdtempSync(join(tmpdir(), 'attach-'))
   writeFileSync(join(samples, 'zhuheng-test.pdf'), Buffer.alloc(1383))
   writeFileSync(join(samples, 'zhuheng-test.txt'), Buffer.alloc(65))
