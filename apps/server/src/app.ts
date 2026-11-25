@@ -10,6 +10,7 @@ import { extname, join, sep } from 'node:path'
 import { Readable } from 'node:stream'
 import postgres from 'postgres'
 import { hashPassword, openSecret, randomToken, redactText, sealSecret, sha256, tokenEquals, verifyPassword } from './crypto.js'
+import { pumpRunEvents } from './event-stream.js'
 import { log } from './log.js'
 import { applyMigrations } from './schema.js'
 
@@ -1339,11 +1340,12 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     if (owned.length === 0) {
       return c.json({ error: { message: 'not found' } }, 404)
     }
-    let cursor = Number(c.req.query('after') ?? '0')
+    const cursor = Number(c.req.query('after') ?? '0')
     const encoder = new TextEncoder()
     const signal = c.req.raw.signal
     const pingMs = options.eventPingMs ?? 15000
     let closed = false
+    let cancelWake: (() => void) | null = null
     const stream = new ReadableStream({
       async start(controller) {
         const send = (chunk: string) => {
@@ -1369,51 +1371,45 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
           }
         }
         try {
-          while (!signal.aborted && !closed) {
-            const rows = await sql<{ seq: number; payload: unknown }[]>`
-              select seq, payload from run_events where run_id = ${runId} and seq > ${cursor} order by seq
-            `
-            for (const row of rows) {
-              cursor = row.seq
-              send(`id: ${row.seq}\ndata: ${JSON.stringify(row.payload)}\n\n`)
-            }
-            const current = await sql<{ status: string }[]>`select status from chat_runs where id = ${runId}`
-            if (current[0]?.status !== 'streaming') {
+          await pumpRunEvents({
+            initialCursor: cursor,
+            pingMs,
+            signal,
+            send,
+            isClosed: () => closed,
+            close,
+            onCancel: (wake) => {
+              cancelWake = wake
+              if (closed) {
+                wake()
+              }
+            },
+            subscribe: (wake) => {
+              const set = waiters.get(runId) ?? new Set()
+              set.add(wake)
+              waiters.set(runId, set)
+              return () => {
+                set.delete(wake)
+                if (set.size === 0) {
+                  waiters.delete(runId)
+                }
+              }
+            },
+            readEvents: async (after) =>
+              sql<{ seq: number; payload: unknown }[]>`
+                select seq, payload from run_events where run_id = ${runId} and seq > ${after} order by seq
+              `,
+            readStatus: async () => {
+              const current = await sql<{ status: string }[]>`select status from chat_runs where id = ${runId}`
+              return current[0]?.status
+            },
+            readThinkingSeconds: async () => {
               const thought = await sql<{ thinking_seconds: number | null }[]>`
                 select thinking_seconds from messages where id = (select message_id from chat_runs where id = ${runId})
               `
-              send(`event: end\ndata: ${JSON.stringify({ status: current[0]?.status ?? 'error', thinkingSeconds: thought[0]?.thinking_seconds ?? undefined })}\n\n`)
-              close()
-              return
-            }
-            await new Promise<void>((resolve) => {
-              const set = waiters.get(runId) ?? new Set()
-              let settled = false
-              let timer: ReturnType<typeof setTimeout> | undefined
-              const finish = () => {
-                if (settled) {
-                  return
-                }
-                settled = true
-                if (timer) {
-                  clearTimeout(timer)
-                }
-                signal.removeEventListener('abort', onAbort)
-                set.delete(wake)
-                resolve()
-              }
-              const wake = () => finish()
-              set.add(wake)
-              waiters.set(runId, set)
-              timer = setTimeout(() => {
-                send(`: ping\n\n`)
-                finish()
-              }, pingMs)
-              const onAbort = () => finish()
-              signal.addEventListener('abort', onAbort, { once: true })
-            })
-          }
-          close()
+              return thought[0]?.thinking_seconds
+            },
+          })
         } catch (error) {
           log('warn', 'event stream closed', { runId, error: error instanceof Error ? error.name : 'error' })
           close()
@@ -1421,6 +1417,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
       },
       cancel() {
         closed = true
+        cancelWake?.()
       },
     })
     return new Response(stream, {
