@@ -163,7 +163,6 @@ test('a legacy text_recognition preference still uploads pdf as rich layout', as
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await page.getByTestId('toggle-search').click()
 
   const files = [
     { name: 'probe.pdf', mimeType: 'application/pdf', purpose: 'rich_layout_recognition' },

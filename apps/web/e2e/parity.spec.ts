@@ -617,7 +617,6 @@ test('errors', async ({ page }) => {
 
 test('attachment', async ({ page }) => {
   await unlock(page)
-  await page.getByTestId('toggle-search').click()
   await page.getByTestId('file-input').setInputFiles({ name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hi') })
   await expect(page.locator('.drafts')).toContainText('note.txt')
 })

@@ -86,3 +86,16 @@ apps/web/e2e/spec-align-composer.spec.ts:64 旧直接 setInputFiles 新先 click
 - apps/web/e2e/attach-with-search.spec.ts：默认搜索打开时回形针能打开文件选择并挂上文件；挂了文件后搜索开关仍可切换；请求同时带文件和联网搜索工具。
 - fixtures/official-defaults.json 新增 composer.attach.enabled-with-search：按 sha256 固定官方截图回形针像素（可用色），我们首次加载时回形针必须可用、颜色一致、真实点击能打开文件选择。
 - 每个截图采样同时登记开和关两种颜色，像素两者都不像就失败；composer-defaults.spec.ts 关闭状态也断言官方未选中颜色。
+
+产品：`conflictWithSearch` 默认 false（`apps/web/src/fileSearch.ts`，注释引用 bundle `main.5a15ff2247.js` 的 `file_feature.conflict_with_search`）。关时可以同时挂文件和开搜索，请求两者都带。开时仍是原来的 toast、回形针点击直接返回、有文件时搜索开关 aria-disabled。i18n 字符串保留。没有 localStorage / URL 测试开关：默认就是关。两种取值由 `fileSearch.test.ts` 覆盖。
+
+旧测试里没有断言互斥本身的用例。grep `filesNeedNoSearch` / `searchNeedsNoFiles` / `联网搜索不支持上传文件` / `请先删除文件再开启联网搜索`，命中的只有 i18n、实现，以及新的 attach-with-search.spec.ts（断言这些提示不出现）。`search-switch.spec.ts` 测的是会话搜索框，不是这条互斥。因此没有为打开 conflict 旗而改旧测试。
+
+旧测试改动（只撤回 7b30151 里为了绕过互斥而加的 setup click）：
+
+apps/web/e2e/chat.spec.ts:275 旧 click toggle-search 再 setInputFiles 新直接 setInputFiles，理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。
+apps/web/e2e/chat.spec.ts:701 旧 click toggle-search 再 waitForRequest 新直接 waitForRequest（setInputFiles 在 702），理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。
+apps/web/e2e/parity.spec.ts:620 旧 click toggle-search 再 setInputFiles 新直接 setInputFiles，理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。
+apps/web/e2e/file-purpose.spec.ts:166 旧 click toggle-search 再进入上传循环 新删除该点击（setInputFiles 现于 176），理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。
+apps/web/e2e/attachment-cards.spec.ts:90 旧 click toggle-search 再准备样本 新直接准备样本（setInputFiles 现于 94），理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。
+apps/web/e2e/spec-align-composer.spec.ts:64 旧 click toggle-search 再 setInputFiles 新直接 setInputFiles，理由：PR #73 复验 BLOCK，官方 file_feature.conflict_with_search 默认关。

@@ -272,7 +272,6 @@ test('uploads a file and keeps safety review on', async ({ page }) => {
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
-  await page.getByTestId('toggle-search').click()
   await page.getByTestId('file-input').setInputFiles({ name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hello harbor') })
   await expect(page.locator('.drafts')).toContainText('note.txt')
   await page.getByTestId('composer').fill('what is in the file?')
@@ -699,7 +698,6 @@ test('settings no longer show an upload file expiry row', async ({ page }) => {
 test('a local upload does not send expires_after', async ({ page }) => {
   await install(page)
   await enterChat(page)
-  await page.getByTestId('toggle-search').click()
   const req = page.waitForRequest((request) => request.method() === 'POST' && request.url().endsWith('/files'))
   await page.getByTestId('file-input').setInputFiles({
     name: 'note.txt',

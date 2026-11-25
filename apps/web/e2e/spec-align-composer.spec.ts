@@ -61,7 +61,6 @@ test('SP-CMP-296 and SP-CMP-297 drafts stay per chat and disappear on reload', a
   await seed(page)
   await openChat(page, '草稿甲会话')
   await page.getByTestId('composer').fill('草稿甲')
-  await page.getByTestId('toggle-search').click()
   await page.getByTestId('file-input').setInputFiles({ name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') })
   await expect(page.locator('.drafts')).toContainText('note.txt')
 
