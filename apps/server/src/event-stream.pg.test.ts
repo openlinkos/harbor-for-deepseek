@@ -1,5 +1,6 @@
 import { createServer as createHttp, type Server } from 'node:http'
 import net from 'node:net'
+import { randomUUID } from 'node:crypto'
 import postgres from 'postgres'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createServer as createHarbor, type HarborServer } from './app.js'
@@ -7,11 +8,10 @@ import { pumpRunEvents } from './event-stream.js'
 import { applyMigrations } from './schema.js'
 
 const configuredUrl = process.env.DATABASE_URL
-const databaseUrl = configuredUrl ?? 'postgres://harbor:harbor@127.0.0.1:5432/harbor'
-const directUrl = 'postgres://box@127.0.0.1:55439/synthetic_fix239'
+const baseUrl = configuredUrl ?? 'postgres://harbor:harbor@127.0.0.1:5432/harbor'
 
 const postgresReady = await (async () => {
-  const sql = postgres(databaseUrl, { max: 1, connect_timeout: 2 })
+  const sql = postgres(baseUrl, { max: 1, connect_timeout: 2 })
   try {
     await sql`select 1`
     return true
@@ -24,6 +24,24 @@ const postgresReady = await (async () => {
     await sql.end({ timeout: 1 }).catch(() => undefined)
   }
 })()
+
+// This file runs alongside server.test.ts, which truncates its own schema.
+// Keep every barrier fixture in a uniquely-owned schema, on the configured DB.
+const schemaName = `event_stream_${randomUUID().replaceAll('-', '')}`
+const ownerSql = postgres(baseUrl, { max: 1, connect_timeout: 2, onnotice: () => undefined })
+if (postgresReady) await ownerSql`create schema ${ownerSql(schemaName)}`
+const scopedUrl = new URL(baseUrl)
+scopedUrl.searchParams.set('search_path', schemaName)
+const databaseUrl = scopedUrl.toString()
+const directUrl = databaseUrl
+
+afterAll(async () => {
+  try {
+    if (postgresReady) await ownerSql`drop schema ${ownerSql(schemaName)} cascade`
+  } finally {
+    await ownerSql.end({ timeout: 1 })
+  }
+})
 
 const deferred = () => {
   let resolve!: () => void
@@ -70,12 +88,12 @@ type HoldProxy = {
 const streamingStatusRow = (frame: Buffer): boolean =>
   frame[0] === 0x44 && frame.length === 20 && frame.readInt16BE(5) === 1 && frame.subarray(11).toString() === 'streaming'
 
-const startHoldProxy = async (targetPort: number): Promise<HoldProxy> => {
+const startHoldProxy = async (targetPort: number, targetHost: string): Promise<HoldProxy> => {
   const trace: string[] = []
   let armed: { runId: string; held: () => void; release: Promise<void> } | null = null
   const server = net.createServer((client) => {
     client.setNoDelay(true)
-    const upstream = net.connect(targetPort, '127.0.0.1')
+    const upstream = net.connect(targetPort, targetHost)
     upstream.setNoDelay(true)
     let bindId = ''
     let buf = Buffer.alloc(0)
@@ -372,7 +390,8 @@ describe.skipIf(!postgresReady)('GET /api/runs/:id/events through a held status 
   let csrf = ''
 
   beforeAll(async () => {
-    proxy = await startHoldProxy(55439)
+    const target = new URL(databaseUrl)
+    proxy = await startHoldProxy(Number(target.port || '5432'), target.hostname)
     mock = createHttp((request, response) => {
       request.resume()
       if (!request.url?.includes('/messages')) {
@@ -399,7 +418,12 @@ describe.skipIf(!postgresReady)('GET /api/runs/:id/events through a held status 
     const address = mock.address()
     const port = address && typeof address === 'object' ? address.port : 0
     harbor = await createHarbor({
-      databaseUrl: `postgres://box@127.0.0.1:${proxy.port}/synthetic_fix239`,
+      databaseUrl: (() => {
+        const viaProxy = new URL(databaseUrl)
+        viaProxy.hostname = '127.0.0.1'
+        viaProxy.port = String(proxy.port)
+        return viaProxy.toString()
+      })(),
       masterKey: Buffer.alloc(32, 9),
       upstream: `http://127.0.0.1:${port}`,
       eventPingMs: 15_000,
