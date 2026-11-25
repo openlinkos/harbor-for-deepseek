@@ -87,20 +87,24 @@ export const pumpRunEvents = async (input: PumpInput): Promise<void> => {
       }
       if (status !== 'streaming') {
         const tail = await input.readEvents(cursor)
+        if (input.signal.aborted || input.isClosed()) {
+          input.close()
+          return
+        }
         for (const row of tail) {
-          if (input.isClosed()) {
+          if (input.signal.aborted || input.isClosed()) {
             break
           }
           cursor = row.seq
           input.send(formatRunEvent(row.seq, row.payload))
         }
-        if (!input.isClosed()) {
+        if (!input.signal.aborted && !input.isClosed()) {
           const thinkingSeconds = await input.readThinkingSeconds()
-          if (!input.isClosed()) {
+          if (!input.signal.aborted && !input.isClosed()) {
             input.send(formatRunEnd(status, thinkingSeconds))
-            input.close()
           }
         }
+        input.close()
         return
       }
       if (pending) {
