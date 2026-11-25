@@ -7,7 +7,7 @@ const shots = existsSync('/opt/cursor/artifacts')
   : join(process.cwd(), '../../tmp/read-aloud-shots')
 mkdirSync(shots, { recursive: true })
 
-const READ_ALOUD = /朗读|音色|贝壳|白浪|海星|暗潮|Read aloud|Read-aloud|speechSynthesis|SpeechSynthesis/
+const UNSUPPORTED_VOICE = /贝壳|白浪/
 
 const sse = (events: unknown[]) =>
   `${events.map((event) => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')}: keep-alive\n\n`
@@ -29,6 +29,11 @@ const fulfill = async (route: Route) => {
   }
   if (url.endsWith('/models')) {
     await route.fulfill({ json: { data: [{ id: 'deepseek-flash' }] } })
+    return
+  }
+  if (url.includes('/v1/tools/tts')) {
+    const pcm = Buffer.alloc(4800)
+    await route.fulfill({ status: 200, headers: { 'content-type': 'application/octet-stream' }, body: pcm })
     return
   }
   if (!url.includes('/messages')) {
@@ -110,7 +115,7 @@ test('served app bundle has no speechSynthesis', async ({ page }) => {
   expect(blob.includes('SpeechSynthesisUtterance'), 'served javascript still references SpeechSynthesisUtterance').toBe(false)
 })
 
-test('settings tabs have no read-aloud copy and keep official row rhythm', async ({ page }) => {
+test('settings voice row keeps the two public voices and the official row rhythm', async ({ page }) => {
   test.setTimeout(90_000)
   await unlock(page)
   const viewports = [
@@ -131,6 +136,7 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
         '界面包',
         '安全审核',
         '打开网页',
+        '朗读音色',
       ])
       expect(labels).not.toContain('模型')
       expect(labels).not.toContain('思考强度')
@@ -149,24 +155,37 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
         expect(row.boxShadow).toBe(index === 0 ? 'none' : divider)
       }
       await expect(page.getByTestId('file-expiry')).toHaveCount(0)
+      await page.getByTestId('voice-select').click()
+      const voiceMenu = page.getByTestId('voice-select-menu')
+      await expect(voiceMenu.getByRole('option')).toHaveCount(2)
+      await expect(voiceMenu.getByRole('option', { name: '海星（女声）', exact: true })).toBeVisible()
+      await expect(voiceMenu.getByRole('option', { name: '暗潮（男声）', exact: true })).toBeVisible()
+      await expect(voiceMenu).not.toContainText('贝壳')
+      await expect(voiceMenu).not.toContainText('白浪')
+      await page.keyboard.press('Escape')
+      await expect(voiceMenu).toBeHidden()
       await page.locator('.settings-main').evaluate((node) => { node.scrollTop = 0 })
       await page.locator('.settings-shell').screenshot({ path: join(shots, `settings-${theme === '浅色' ? 'light' : 'dark'}-${viewport.name}.png`) })
       for (const tab of ['通用设置', '账号管理', '数据管理', '服务协议']) {
         await page.getByRole('button', { name: tab }).click()
         const text = await page.getByTestId('settings-dialog').innerText()
-        expect(text, `${viewport.name} ${theme} ${tab}`).not.toMatch(READ_ALOUD)
+        expect(text, `${viewport.name} ${theme} ${tab}`).not.toMatch(UNSUPPORTED_VOICE)
+        expect(text, `${viewport.name} ${theme} ${tab}`).not.toMatch(/speechSynthesis|SpeechSynthesis/)
       }
-      const hidden = await page.getByTestId('settings-dialog').evaluate((node) => node.textContent ?? '')
-      expect(hidden).not.toMatch(READ_ALOUD)
       await page.getByRole('button', { name: '通用设置' }).click()
+      await expect(page.getByTestId('settings-dialog')).toContainText('朗读音色')
       await page.getByTestId('language-trigger').click()
       await page.getByRole('option', { name: 'English', exact: true }).click()
       await expect(page.getByRole('button', { name: 'General' })).toBeVisible()
+      await expect(page.getByTestId('voice-select')).toContainText('Stella (female)')
       for (const tab of ['General', 'Account', 'Data', 'Terms']) {
         await page.getByRole('button', { name: tab, exact: true }).click()
         const text = await page.getByTestId('settings-dialog').innerText()
-        expect(text, `${viewport.name} ${theme} en ${tab}`).not.toMatch(READ_ALOUD)
+        expect(text, `${viewport.name} ${theme} en ${tab}`).not.toMatch(UNSUPPORTED_VOICE)
+        expect(text, `${viewport.name} ${theme} en ${tab}`).not.toMatch(/speechSynthesis|SpeechSynthesis/)
       }
+      await page.getByRole('button', { name: 'General', exact: true }).click()
+      await expect(page.getByTestId('settings-dialog')).toContainText('Read-aloud voice')
       await page.getByRole('button', { name: 'General', exact: true }).click()
       await page.getByTestId('language-trigger').click()
       await page.getByRole('option', { name: '简体中文', exact: true }).click()
@@ -176,7 +195,7 @@ test('settings tabs have no read-aloud copy and keep official row rhythm', async
   }
 })
 
-test('answer action row has the five official buttons at a 38px pitch', async ({ page }) => {
+test('answer action row reads aloud from the public service at a 38px pitch', async ({ page }) => {
   test.setTimeout(90_000)
   await unlock(page)
   await page.getByTestId('composer').fill('请回答')
@@ -194,11 +213,10 @@ test('answer action row has the five official buttons at a 38px pitch', async ({
       await closeSettings(page)
       const row = page.locator('.action-row')
       await row.scrollIntoViewIfNeeded()
-      await expect(row.getByRole('button')).toHaveCount(5)
-      await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
-      await expect(row.getByRole('button', { name: 'Read aloud' })).toHaveCount(0)
+      await expect(row.getByRole('button')).toHaveCount(6)
+      await expect(row.getByRole('button', { name: '朗读', exact: true })).toBeVisible()
       const labels = await row.locator(':scope > button').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('aria-label')))
-      expect(labels).toEqual(['复制', '重新生成', '喜欢', '不喜欢', '分享'])
+      expect(labels).toEqual(['复制', '重新生成', '喜欢', '不喜欢', '朗读', '分享'])
       const metrics = await row.evaluate((node) => {
         const buttons = [...node.querySelectorAll(':scope > button')].map((button) => {
           const box = button.getBoundingClientRect()
@@ -207,7 +225,7 @@ test('answer action row has the five official buttons at a 38px pitch', async ({
         return { gap: getComputedStyle(node).gap, buttons }
       })
       expect(metrics.gap).toBe('10px')
-      expect(metrics.buttons).toHaveLength(5)
+      expect(metrics.buttons).toHaveLength(6)
       for (let index = 0; index < metrics.buttons.length; index += 1) {
         const button = metrics.buttons[index]
         expect(Math.round(button.w)).toBe(28)
@@ -230,6 +248,13 @@ test('answer action row has the five official buttons at a 38px pitch', async ({
       await row.screenshot({ path: join(shots, `action-row-${theme === '浅色' ? 'light' : 'dark'}-${viewport.name}.png`) })
     }
   }
+  const read = page.getByTestId('read-aloud')
+  await read.click()
+  await expect(read).toHaveAttribute('aria-label', '停止朗读')
+  await expect(read).toHaveAttribute('aria-pressed', 'true')
+  await read.click()
+  await expect(read).toHaveAttribute('aria-label', '朗读')
+  await expect(read).toHaveAttribute('aria-pressed', 'false')
 })
 
 test('legacy read-aloud localStorage does not throw', async ({ page }) => {
@@ -261,6 +286,9 @@ test('legacy read-aloud localStorage does not throw', async ({ page }) => {
   await expect(page.getByTestId('composer')).toBeVisible()
   expect(pageErrors, pageErrors.join('\n')).toEqual([])
   await openSettings(page)
+  await expect(page.getByTestId('voice-select')).toContainText('暗潮（男声）')
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('贝壳')
+  await expect(page.getByTestId('settings-dialog')).not.toContainText('白浪')
   for (const tab of ['通用设置', '账号管理', '数据管理', '服务协议']) {
     await page.getByRole('button', { name: tab }).click()
     await expect(page.getByTestId('settings-dialog')).toBeVisible()

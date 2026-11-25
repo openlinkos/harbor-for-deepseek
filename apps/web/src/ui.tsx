@@ -13,6 +13,14 @@ import { readProfile, saveProfile, type LocalProfile } from './profile.js'
 import { HINT_NETWORK, replyErrorKey } from './errors.js'
 import { FileCard, ImageCard } from './file-card.js'
 import { imagePreview, useHarbor, type StatusToastCode } from './store.js'
+import { IconMicFill16, IconMicOutline16, IconPlayMediaOutline16 } from './speech/icons.js'
+import { useSpeechNotice } from './speech/notice.js'
+import { ReadingBars } from './speech/ReadingBars.js'
+import { readAloudSnapshot, stopReadAloud, toggleReadAloud, useReadAloud } from './speech/readAloud.js'
+import { installSpeech } from './speech/runtime.js'
+import { Spectrum } from './speech/Spectrum.js'
+import { applyHistory, applyObservedEdit, armSelectionAuth, decideDelivery, judgeCompositionUpdate, noteSelectionMove, noteUnobserved, recoverTranscriptAtCaret, resolveEditSpan, type SelectionAuth } from './speech/selectionAuth.js'
+import { bindVoiceInserter, cancelVoiceInput, currentVoiceGeneration, insertTranscript, toggleVoiceInput, useVoiceInput, type VoiceAnchor } from './speech/voiceSession.js'
 import { ACTION_ICONS } from './official-icons.js'
 import { GLYPHS, type GlyphName } from './glyphs.js'
 import { livePhase, phaseOf, stoppedInTitle, type ThinkPhase } from './phase.js'
@@ -192,11 +200,21 @@ const Icon = ({ d, size = 16, stroke }: { d: string; size?: number; stroke?: num
   )
 }
 
+let composerFocusTicket = 0
+
 const focusComposer = () => {
+  const ticket = ++composerFocusTicket
+  const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
+  // Captured at request time. A delayed frame must not move a selection the
+  // user placed after this focus was asked for.
+  const snapshot = box
+    ? { value: box.value, start: box.selectionStart, end: box.selectionEnd, direction: box.selectionDirection }
+    : null
   // The caller may run while a dialog still holds focus. A click in the next frame
   // (the user menu, after settings has closed) must keep that focus.
   const atSchedule = document.activeElement
   window.requestAnimationFrame(() => {
+    if (ticket !== composerFocusTicket) return
     // SP-MOD-635. A frame queued before the search dialog opened must not take the input.
     if (document.querySelector('.search-dialog')) return
     const now = document.activeElement
@@ -206,11 +224,22 @@ const focusComposer = () => {
       && now.isConnected
       && now !== atSchedule
     ) return
-    const box = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
-    if (!box) return
-    box.focus({ preventScroll: true })
-    const end = box.value.length
-    box.setSelectionRange(end, end)
+    const node = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
+    if (!node) return
+    const userMoved = snapshot !== null
+      && node === box
+      && (node.value !== snapshot.value || node.selectionStart !== snapshot.start || node.selectionEnd !== snapshot.end)
+    if (userMoved) {
+      const start = node.selectionStart ?? 0
+      const end = node.selectionEnd ?? start
+      const direction = node.selectionDirection
+      if (document.activeElement !== node) node.focus({ preventScroll: true })
+      node.setSelectionRange(start, end, direction)
+      return
+    }
+    node.focus({ preventScroll: true })
+    const end = node.value.length
+    node.setSelectionRange(end, end)
   })
 }
 
@@ -573,6 +602,18 @@ const useT = () => {
   const locale = useHarbor((state) => state.settings.locale)
   return (key: Parameters<typeof translate>[1], vars?: Record<string, string | number>) =>
     translate(locale, key, vars)
+}
+
+const SpeechNotice = () => {
+  const notice = useSpeechNotice((state) => state.notice)
+  const clear = useSpeechNotice((state) => state.clear)
+  useEffect(() => {
+    if (!notice) return undefined
+    const timer = window.setTimeout(() => clear(), 4000)
+    return () => window.clearTimeout(timer)
+  }, [notice, clear])
+  if (!notice) return null
+  return <p className="speech-notice" role="status" data-testid="speech-notice">{notice.text}</p>
 }
 
 type TurnGroup = { id: string; messageIds: string[] }
@@ -1282,6 +1323,26 @@ const BranchSwitcher = ({ ids, current, disabled, onStep, holdTip }: { ids: stri
   )
 }
 
+const ReadAloudButton = ({ messageId, conversationId, text }: { messageId: string; conversationId: string; text: string }) => {
+  const t = useT()
+  const speech = useReadAloud()
+  const active = speech.messageId === messageId && speech.status !== 'idle'
+  const label = active ? t('ttsStop') : t('ttsPlay')
+  // Version and branch switches unmount the answer that was on screen. Stop
+  // only that session so a playback that already moved to another message stays up.
+  useEffect(() => () => {
+    const current = readAloudSnapshot()
+    if (current.messageId === messageId && current.status !== 'idle') stopReadAloud()
+  }, [messageId])
+  return (
+    <HoverTip text={label}>
+      <button type="button" data-testid="read-aloud" data-tip={label} aria-label={label} aria-pressed={active} onClick={() => toggleReadAloud(messageId, conversationId, text)}>
+        {active ? <ReadingBars mode={speech.status === 'playing' ? 'playing' : 'loading'} /> : <IconPlayMediaOutline16 />}
+      </button>
+    </HoverTip>
+  )
+}
+
 const MessageRow = ({ message }: { message: Message }) => {
   const t = useT()
   const share = useContext(ShareMode)
@@ -1421,6 +1482,7 @@ const MessageRow = ({ message }: { message: Message }) => {
           <HoverTip text={t('dislike')}>
             <button type="button" data-tip={t('dislike')} className={vote === 'down' ? 'on' : ''} aria-label={t('dislike')} aria-pressed={vote === 'down'} onClick={() => { choose('down'); setFeedbackOpen(true) }}><FillIcon paths={[...ACTION_ICONS.dislike]} /></button>
           </HoverTip>
+          <ReadAloudButton messageId={message.id} conversationId={message.conversationId} text={textOf} />
           <HoverTip text={message.status === 'complete' ? t('share') : t('shareUnsupported')}>
             <button type="button" data-tip={message.status === 'complete' ? t('share') : t('shareUnsupported')} aria-label={t('share')} disabled={message.status !== 'complete' && message.status !== 'aborted'} onClick={() => share?.enter(message.id)}><FillIcon paths={[...ACTION_ICONS.share]} /></button>
           </HoverTip>
@@ -1489,6 +1551,13 @@ export const Shell = () => {
     const onTheme = () => loadSkin()
     window.addEventListener('deepapi-theme', onTheme)
     return () => window.removeEventListener('deepapi-theme', onTheme)
+  }, [])
+  useEffect(() => {
+    installSpeech()
+    return () => {
+      cancelVoiceInput()
+      stopReadAloud()
+    }
   }, [])
   const state = useHarbor()
   const conversation = state.conversations.find((item) => item.id === state.activeId) ?? null
@@ -2410,6 +2479,7 @@ export const Shell = () => {
       {state.sidebarOpen ? <button className="scrim" type="button" aria-label={t('close')} onClick={() => state.setSidebarOpen(false)} /> : null}
       {state.settingsOpen ? <Settings /> : null}
       {state.notice ? <ImportToast notice={state.notice} /> : null}
+      <SpeechNotice />
       {state.statusToast ? <StatusToast code={state.statusToast} /> : null}
       {shareToast ? (
         <div className="toast-layer">
@@ -2614,9 +2684,98 @@ const Composer = () => {
   const box = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const dragDepth = useRef(0)
+  const voice = useVoiceInput()
+  const textRef = useRef(text)
+  const activeRef = useRef(activeId)
+  const caretRef = useRef<number | null>(null)
+  const gestureRef = useRef<VoiceAnchor | null>(null)
+  const authRef = useRef<SelectionAuth | null>(null)
+  const editRef = useRef<{ text: string; start: number; end: number; inputType: string } | null>(null)
+  const compositionRef = useRef<{ text: string; start: number; end: number } | null>(null)
+  const compositionOpenRef = useRef(false)
+  const ignoreChangeRef = useRef(false)
+  const [recovery, setRecovery] = useState<{ transcript: string; conversationId: string | null; generation: number; reason: string } | null>(null)
+  textRef.current = text
+  activeRef.current = activeId
+  const readAnchor = (): VoiceAnchor | null => {
+    const node = box.current
+    if (!node) return null
+    const value = node.value
+    const start = node.selectionStart ?? value.length
+    const end = node.selectionEnd ?? start
+    return { conversationId: activeRef.current, text: value, start, end }
+  }
+  const armAnchor = (anchor: VoiceAnchor | null) => {
+    authRef.current = anchor ? armSelectionAuth(anchor, currentVoiceGeneration()) : null
+    editRef.current = null
+    compositionRef.current = null
+    compositionOpenRef.current = false
+    setRecovery(null)
+  }
+  const applyAuthEdit = (next: string, editStart: number, editEnd: number) => {
+    const auth = authRef.current
+    if (!auth) return
+    authRef.current = applyObservedEdit(auth, next, editStart, editEnd)
+  }
   useEffect(() => {
     focusComposer()
+    setRecovery((current) => (current && current.conversationId === activeId ? current : null))
   }, [activeId])
+  useLayoutEffect(() => {
+    const node = box.current
+    const caret = caretRef.current
+    if (!node || caret == null) return
+    caretRef.current = null
+    node.focus()
+    node.setSelectionRange(caret, caret)
+  })
+  useEffect(() => {
+    const node = box.current
+    if (!node) return
+    // React's onBeforeInput is a keypress/textInput polyfill. It does not run
+    // for Backspace, Delete, or cut, so a deletion would look unobserved and
+    // the transcript would never be inserted. The native event still carries
+    // the pre-edit selection. The span itself is resolved when the value changes.
+    const onNativeBeforeInput = (event: Event) => {
+      if (compositionRef.current) return
+      const input = event as InputEvent
+      if (input.isComposing) return
+      editRef.current = {
+        text: node.value,
+        start: node.selectionStart ?? 0,
+        end: node.selectionEnd ?? node.selectionStart ?? 0,
+        inputType: input.inputType ?? '',
+      }
+    }
+    node.addEventListener('beforeinput', onNativeBeforeInput)
+    return () => node.removeEventListener('beforeinput', onNativeBeforeInput)
+  }, [])
+  useEffect(() => {
+    bindVoiceInserter((transcript, conversationId, generation) => {
+      const node = box.current
+      const auth = authRef.current
+      authRef.current = null
+      editRef.current = null
+      if (!node?.isConnected || activeRef.current !== conversationId) return
+      // Observed steps own the span. A terminal-string guess must not replace them
+      // or revive a span the user already deleted.
+      // An open composition has not been committed. Matching text must not
+      // authorize the span that was saved before those keystrokes.
+      const decision = decideDelivery(auth, textRef.current, conversationId, generation, {
+        composing: compositionOpenRef.current || compositionRef.current != null,
+      })
+      if (decision.action === 'insert') {
+        const next = insertTranscript(textRef.current, transcript, decision.range)
+        caretRef.current = next.caret
+        useHarbor.getState().setComposerText(conversationId, next.text)
+        return
+      }
+      if (decision.action === 'recover') {
+        setRecovery({ transcript, conversationId, generation, reason: decision.reason })
+      }
+    })
+    return () => bindVoiceInserter(null)
+  }, [])
   useEffect(() => {
     const row = chips.current
     if (!row) {
@@ -2646,8 +2805,12 @@ const Composer = () => {
   }, [])
   useEffect(() => {
     const onPrefill = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail
+      const auth = authRef.current
+      if (auth) authRef.current = noteUnobserved(auth, detail)
+      // Read the store inside the handler so the empty dependency list stays valid.
       const state = useHarbor.getState()
-      state.setComposerText(state.activeId, (event as CustomEvent<string>).detail)
+      state.setComposerText(state.activeId, detail)
       box.current?.focus()
     }
     window.addEventListener('deepapi-prefill', onPrefill)
@@ -2656,7 +2819,9 @@ const Composer = () => {
   const trimmed = text.trim()
   const filesBlocking = drafts.some((file) => file.busy || file.error || !file.fileId)
   const hasFile = drafts.some((file) => file.fileId && !file.busy && !file.error)
-  const canSend = !filesBlocking && (trimmed.length > 0 || hasFile)
+  const canSend = voice.phase === 'idle' && !filesBlocking && (trimmed.length > 0 || hasFile)
+  const voiceLabel = voice.phase === 'recording' ? t('voiceInputStop') : voice.phase === 'transcribing' ? t('voiceInputCancel') : t('voiceInput')
+  const voiceSeconds = Math.floor(voice.elapsedMs / 1000)
   const sendTip = drafts.some((file) => file.error) ? t('removeBadFiles') : !trimmed && !hasFile ? t('emptyQuestion') : text.length > 100_000 ? t('overCharLimit') : ''
   const submit = () => {
     if (!trimmed && !hasFile) {
@@ -2673,9 +2838,27 @@ const Composer = () => {
     }
     if (!canSend) return
     const value = text
+    authRef.current = null
+    setRecovery(null)
     setText('')
     void send(value)
     focusComposer()
+  }
+  const acceptRecovery = () => {
+    const offer = recovery
+    if (!offer || offer.conversationId !== activeRef.current) return
+    const node = box.current
+    const length = textRef.current.length
+    const caret = node ? Math.min(node.selectionStart ?? length, node.selectionEnd ?? length) : length
+    const next = recoverTranscriptAtCaret(textRef.current, offer.transcript, caret)
+    caretRef.current = next.caret
+    setText(next.text)
+    setRecovery(null)
+  }
+  const copyRecovery = () => {
+    const offer = recovery
+    if (!offer || offer.conversationId !== activeRef.current) return
+    void navigator.clipboard?.writeText(offer.transcript).catch(() => undefined)
   }
   return (
     <div
@@ -2706,6 +2889,7 @@ const Composer = () => {
         if (list.length) void addFiles(list)
       }}
     >
+      {voice.phase === 'recording' ? <Spectrum analyser={voice.analyser} /> : null}
       <div className="composer-fill" aria-hidden="true" />
       <div className="composer-fill-alt" aria-hidden="true" />
       {dragOver ? (
@@ -2742,11 +2926,26 @@ const Composer = () => {
                 status={file.busy ? 'uploading' : file.error ? 'error' : 'done'}
                 error={file.error}
                 pasteText={file.pasteText}
-                onPasteBack={file.pasteText ? () => { setText(file.pasteText ?? ''); removeDraft(file.localId) } : undefined}
+                onPasteBack={file.pasteText ? () => {
+                  const next = file.pasteText ?? ''
+                  const auth = authRef.current
+                  if (auth) authRef.current = noteUnobserved(auth, next)
+                  setText(next)
+                  removeDraft(file.localId)
+                } : undefined}
                 onRemove={() => removeDraft(file.localId)}
               />
             )
           ))}
+        </div>
+      ) : null}
+      {recovery && recovery.conversationId === activeId ? (
+        <div className="voice-recovery" role="status" data-testid="voice-recovery" data-reason={recovery.reason}>
+          <p data-testid="voice-recovery-transcript">{recovery.transcript}</p>
+          <p>{t('voiceRecoveryOffer')}</p>
+          <DsButton type="button" size="s" data-testid="voice-recovery-insert" onClick={acceptRecovery}>{t('voiceRecoveryInsert')}</DsButton>
+          <DsButton type="button" size="s" data-testid="voice-recovery-copy" onClick={copyRecovery}>{t('voiceRecoveryCopy')}</DsButton>
+          <DsButton type="button" size="s" data-testid="voice-recovery-dismiss" onClick={() => setRecovery(null)}>{t('voiceRecoveryDismiss')}</DsButton>
         </div>
       ) : null}
       <div className="composer-field ds-textarea">
@@ -2757,7 +2956,30 @@ const Composer = () => {
         rows={2}
         placeholder={t('composerPlaceholder')}
         value={text}
-        onChange={(event) => setText(event.target.value)}
+        onCompositionStart={(event) => {
+          const node = event.currentTarget
+          compositionOpenRef.current = true
+          compositionRef.current = {
+            text: node.value,
+            start: node.selectionStart ?? 0,
+            end: node.selectionEnd ?? node.selectionStart ?? 0,
+          }
+        }}
+        onCompositionEnd={(event) => {
+          const base = compositionRef.current
+          compositionRef.current = null
+          compositionOpenRef.current = false
+          ignoreChangeRef.current = true
+          editRef.current = null
+          const auth = authRef.current
+          const next = event.currentTarget.value
+          if (!auth || !base) return
+          if (auth.status === 'live' && base.text === auth.text) authRef.current = applyObservedEdit(auth, next, base.start, base.end)
+          else if (auth.status === 'live' && next !== auth.text) authRef.current = noteUnobserved(auth, next)
+        }}
+        onPointerUp={() => {
+          if (authRef.current) authRef.current = noteSelectionMove(authRef.current)
+        }}
         onPaste={(event) => {
           const data = event.clipboardData.getData('text/plain')
           if (data.length > 100_000) {
@@ -2773,6 +2995,13 @@ const Composer = () => {
           }
         }}
         onKeyDown={(event) => {
+          const key = event.key.toLowerCase()
+          if (authRef.current && ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end', 'pageup', 'pagedown'].includes(key)) {
+            authRef.current = noteSelectionMove(authRef.current)
+          }
+          // Ctrl+Z / Ctrl+Y stay with the browser. Preventing them and writing an
+          // authorization snapshot drops the draft the user typed after the span
+          // stopped being valid, and it also drops the redo entry for that draft.
           if (event.key !== 'Enter') return
           if (!event.shiftKey) {
             event.preventDefault()
@@ -2784,11 +3013,63 @@ const Composer = () => {
           const start = node.selectionStart ?? text.length
           const end = node.selectionEnd ?? start
           const next = `${text.slice(0, start)}\n${text.slice(end)}`
+          applyAuthEdit(next, start, end)
           setText(next)
           window.requestAnimationFrame(() => {
             node.selectionStart = start + 1
             node.selectionEnd = start + 1
           })
+        }}
+        onBeforeInput={(event) => {
+          if (compositionRef.current) return
+          const native = event.nativeEvent
+          const node = event.currentTarget
+          editRef.current = {
+            text: node.value,
+            start: node.selectionStart ?? 0,
+            end: node.selectionEnd ?? node.selectionStart ?? 0,
+            inputType: 'inputType' in native ? String(native.inputType) : '',
+          }
+        }}
+        onChange={(event) => {
+          const next = event.target.value
+          const pending = editRef.current
+          editRef.current = null
+          const native = event.nativeEvent
+          if (ignoreChangeRef.current) {
+            ignoreChangeRef.current = false
+            setText(next)
+            return
+          }
+          const composing = native instanceof InputEvent && native.isComposing
+          if (composing) compositionOpenRef.current = true
+          // A composition stays uncommitted until compositionend. A crossing or
+          // unobserved intermediate invalidates now, so a later string that
+          // matches the armed draft cannot revive that same attempt. A still-valid
+          // intermediate is committed once, at compositionend.
+          if (composing || compositionRef.current || compositionOpenRef.current) {
+            editRef.current = null
+            const auth = authRef.current
+            if (auth) authRef.current = judgeCompositionUpdate(auth, next, compositionRef.current)
+            setText(next)
+            return
+          }
+          const auth = authRef.current
+          if (auth) {
+            const nativeType = native instanceof InputEvent ? native.inputType : ''
+            const inputType = nativeType || pending?.inputType || ''
+            // Follow the text the browser already produced. Do not write the last
+            // trusted snapshot over it when this step is missing or no longer adjacent.
+            if (inputType === 'historyUndo' || inputType === 'historyRedo') authRef.current = applyHistory(auth, inputType, next)
+            else if (auth.status === 'live' && pending && pending.text === auth.text) {
+              const span = resolveEditSpan(pending.text, next, pending.start, pending.end, pending.inputType)
+              authRef.current = span
+                ? applyObservedEdit(auth, next, span.start, span.end)
+                : applyObservedEdit(auth, next, pending.start, pending.end)
+            }
+            else if (auth.status === 'live' && next !== auth.text) authRef.current = noteUnobserved(auth, next)
+          }
+          setText(next)
         }}
       />
       </div>
@@ -2810,6 +3091,45 @@ const Composer = () => {
           </HoverTip>
         </div>
         <div className="tool-right">
+          {voice.phase === 'recording' ? <span className="voice-timer" data-testid="voice-timer">{t('voiceInputTimer', { seconds: voiceSeconds })}</span> : null}
+          <button
+            type="button"
+            className={`icon-btn voice-input${voice.phase === 'recording' ? ' recording' : ''}`}
+            data-testid="voice-input"
+            aria-label={voiceLabel}
+            aria-pressed={voice.phase === 'recording'}
+            onPointerDown={() => {
+              if (voice.phase !== 'idle') {
+                gestureRef.current = null
+                return
+              }
+              gestureRef.current = readAnchor()
+            }}
+            onClick={(event) => {
+              if (voice.phase === 'idle') {
+                const fromPointer = event.detail > 0
+                armAnchor(fromPointer && gestureRef.current ? gestureRef.current : readAnchor())
+              } else if (voice.phase === 'transcribing') {
+                authRef.current = null
+                setRecovery(null)
+              }
+              gestureRef.current = null
+              toggleVoiceInput()
+            }}
+          >
+            {voice.phase === 'recording' ? (
+              <span className="voice-active">
+                <span className="voice-halo" />
+                <span className="voice-core" />
+                <span className="voice-outline"><IconMicOutline16 /></span>
+                <span className="voice-glyph"><IconMicFill16 /></span>
+              </span>
+            ) : voice.phase === 'transcribing' ? (
+              <span className="voice-loading" />
+            ) : (
+              <IconMicOutline16 />
+            )}
+          </button>
           <HoverTip text={prefs.search ? t('filesNeedNoSearch') : t('attachTip')}>
             <button type="button" className="icon-btn" aria-label={t('attach')} onClick={() => { if (prefs.search) return; fileRef.current?.click() }}>
               <Glyph name="attach" size={16} />
@@ -3012,6 +3332,17 @@ const Settings = () => {
             >
               <span className="knob" />
             </button>
+          </div>
+          <div className="settings-line">
+            <span>{t('settingsTtsVoice')}</span>
+            <AnchoredMenu
+              dismiss
+              testId="voice-select"
+              label={settings.ttsVoice === 'tide' ? t('settingsTtsVoiceTide') : t('settingsTtsVoiceStella')}
+              selected={settings.ttsVoice === 'tide' ? t('settingsTtsVoiceTide') : t('settingsTtsVoiceStella')}
+              options={[t('settingsTtsVoiceStella'), t('settingsTtsVoiceTide')]}
+              onPick={(value) => void patchSettings({ ttsVoice: value === t('settingsTtsVoiceTide') ? 'tide' : 'stella' })}
+            />
           </div>
         </section>
         <section className="settings-account">

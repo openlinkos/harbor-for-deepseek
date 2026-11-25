@@ -58,6 +58,18 @@ const rich = [
 let mode: 'ok' | 'delay' | 'bad' | 'down' | 'limited' | 'alt' = 'ok'
 let richText = false
 
+// The cancellation fixture owns a response latch; screenshot duration does not release it.
+let delayedResponse: ReturnType<typeof holdDelayedResponse> | null = null
+const holdDelayedResponse = () => {
+  let release!: () => void
+  let markStarted!: () => void
+  const gate = new Promise<void>((resolve) => { release = resolve })
+  const started = new Promise<void>((resolve) => { markStarted = resolve })
+  const held = { gate, started, markStarted, release }
+  delayedResponse = held
+  return held
+}
+
 const fulfill = async (route: Route) => {
   const url = route.request().url()
   if (url.endsWith('/user/balance')) {
@@ -73,7 +85,10 @@ const fulfill = async (route: Route) => {
     return
   }
   if (mode === 'delay') {
-    await new Promise((resolve) => setTimeout(resolve, 400))
+    const held = delayedResponse
+    if (!held) throw new Error('delay fixture requires an explicit response latch')
+    held.markStarted()
+    await held.gate
   }
   if (mode === 'bad') {
     await route.fulfill({ status: 401, headers: { 'content-type': 'application/json' }, body: '{"error":{"message":"bad key"}}' })
@@ -155,10 +170,16 @@ test('send', async ({ page }) => {
 
 test('stream and stop', async ({ page }) => {
   await unlock(page)
+  const held = holdDelayedResponse()
   mode = 'delay'
-  await send(page, '慢一点')
-  await expect(page.getByTestId('stop')).toBeVisible()
-  await page.getByTestId('stop').click()
+  try {
+    await send(page, '慢一点')
+    await held.started
+    await expect(page.getByTestId('stop')).toBeVisible()
+    await page.getByTestId('stop').click()
+  } finally {
+    held.release()
+  }
   await expect(page.getByTestId('stop')).toBeHidden()
   await expect(page.getByTestId('send')).toBeVisible()
   await expect(page.locator('.form-error')).toHaveCount(0)
@@ -202,7 +223,7 @@ test('reactions', async ({ page }) => {
   await expect(row.getByRole('button', { name: '喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await row.getByRole('button', { name: '不喜欢', exact: true }).click()
   await expect(row.getByRole('button', { name: '不喜欢', exact: true })).toHaveAttribute('aria-pressed', 'true')
-  await expect(row.getByRole('button', { name: '朗读' })).toHaveCount(0)
+  await expect(row.getByRole('button', { name: '朗读', exact: true })).toBeVisible()
   await expect(row.getByRole('button', { name: '分享' })).toBeVisible()
 })
 
@@ -749,7 +770,7 @@ test('sidebar motion', async ({ page }) => {
 test('action row', async ({ page }) => {
   await unlock(page)
   await send(page, '动作')
-  await expect(page.locator('.action-row button')).toHaveCount(5)
+  await expect(page.locator('.action-row button')).toHaveCount(6)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
   await page.screenshot({ path: join(shots, 'actions-light.png') })
   await page.getByTestId('user-menu').click()
@@ -803,11 +824,17 @@ test('official states', async ({ page }) => {
   await page.getByTestId('settings-open').click()
   await page.getByRole('button', { name: '深色' }).click()
   await page.getByRole('button', { name: '关闭' }).click()
+  const held = holdDelayedResponse()
   mode = 'delay'
-  await send(page, '停一下')
-  await expect(page.getByTestId('stop')).toBeVisible()
-  await page.screenshot({ path: join(dir, 'streaming-stop-button.png') })
-  await page.getByTestId('stop').click()
+  try {
+    await send(page, '停一下')
+    await held.started
+    await expect(page.getByTestId('stop')).toBeVisible()
+    await page.screenshot({ path: join(dir, 'streaming-stop-button.png') })
+    await page.getByTestId('stop').click()
+  } finally {
+    held.release()
+  }
   mode = 'ok'
   richText = true
   await send(page, '排版对照')

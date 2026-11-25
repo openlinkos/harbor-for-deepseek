@@ -197,5 +197,66 @@ describe('indexeddb repository', () => {
     expect(settings.deviceId).toBe('legacy-device')
     expect(settings).not.toHaveProperty('fileExpireDays')
     expect(settings).not.toHaveProperty('documentPurpose')
+    expect(settings.ttsVoice).toBe('stella')
+  })
+
+  it('normalizes a stored voice without dropping other settings or legacy keys', async () => {
+    const db = await openDB('deepapi', 2)
+    await db.put(
+      'kv',
+      {
+        locale: 'en',
+        safetyLevel: 'low',
+        acknowledgedKeyRisk: true,
+        deviceId: 'voice-device',
+        ttsVoice: '贝壳',
+        kept: 'yes',
+      },
+      'settings',
+    )
+    db.close()
+    const invalid = await (await openIndexedRepository()).loadSettings()
+    expect(invalid.ttsVoice).toBe('stella')
+    expect(invalid.locale).toBe('en')
+    expect(invalid.deviceId).toBe('voice-device')
+    expect(invalid.safetyLevel).toBe('low')
+
+    const memory = new Map<string, string>([
+      ['deepapi-read-aloud', JSON.stringify({ voice: '暗潮' })],
+      ['deepapi-voice', '海星'],
+      ['harbor-voice', '贝壳'],
+      ['deepapi-profile', JSON.stringify({ nickname: '旧', voice: '白浪' })],
+    ])
+    const previous = globalThis.localStorage
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (key: string) => memory.get(key) ?? null,
+        setItem: (key: string, value: string) => memory.set(key, value),
+        removeItem: (key: string) => memory.delete(key),
+        key: (index: number) => [...memory.keys()][index] ?? null,
+        get length() {
+          return memory.size
+        },
+      },
+    })
+    try {
+      const opened = await openDB('deepapi', 2)
+      await opened.delete('kv', 'settings')
+      opened.close()
+      const created = await (await openIndexedRepository()).loadSettings()
+      expect(created.ttsVoice).toBe('tide')
+      expect(memory.get('deepapi-voice')).toBe('海星')
+      expect(memory.get('harbor-voice')).toBe('贝壳')
+      expect(memory.get('deepapi-profile')).toContain('白浪')
+      const again = await (await openIndexedRepository()).loadSettings()
+      expect(again.ttsVoice).toBe('tide')
+    } finally {
+      if (previous) {
+        Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: previous })
+      } else {
+        delete (globalThis as { localStorage?: unknown }).localStorage
+      }
+    }
   })
 })

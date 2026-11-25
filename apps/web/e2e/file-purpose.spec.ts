@@ -105,7 +105,7 @@ const assertNoPurposeRow = async (page: Page, locale: 'zh' | 'en') => {
   await expect(page.getByTestId('file-expiry')).toHaveCount(0)
   if (locale === 'zh') {
     const labels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
-    expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+    expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页', '朗读音色'])
   }
   const blanks = await page.locator('.settings-general').evaluate((node) => {
     const lines = [...node.querySelectorAll(':scope > .settings-line')]

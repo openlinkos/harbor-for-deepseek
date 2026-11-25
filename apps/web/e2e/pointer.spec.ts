@@ -193,7 +193,7 @@ test('settings theme cards and general dropdown triggers use a pointer', async (
     expect(report.textCursor?.name).toContain(name)
     expect(report.svgCursor).not.toBeNull()
   }
-  for (const testId of ['language-trigger', 'safety-select']) {
+  for (const testId of ['language-trigger', 'safety-select', 'voice-select']) {
     const trigger = dialog.getByTestId(testId)
     const report = await expectPointer(trigger, testId)
     expect(report.svgCursor, testId).not.toBeNull()
@@ -201,9 +201,9 @@ test('settings theme cards and general dropdown triggers use a pointer', async (
   }
   await expect(dialog.getByTestId('model-select')).toHaveCount(0)
   await expect(dialog.getByTestId('effort-select')).toHaveCount(0)
-  await expect(dialog.getByTestId('voice-select')).toHaveCount(0)
+  await expect(dialog.getByTestId('voice-select')).toContainText('海星（女声）')
   await expect(dialog.getByTestId('purpose-select')).toHaveCount(0)
-  await expect(dialog).not.toContainText('朗读音色')
+  await expect(dialog).toContainText('朗读音色')
   await expect(dialog).not.toContainText('思考强度')
   await expect(dialog).not.toContainText('PDF / Office 解析')
   await expect(dialog.getByTestId('file-expiry')).toHaveCount(0)

@@ -25,6 +25,13 @@ import {
   type Usage,
 } from '@deepapi/types'
 import { create } from 'zustand'
+import { readAloudSnapshot, stopReadAloud } from './speech/readAloud.js'
+import { cancelVoiceInput } from './speech/voiceSession.js'
+
+const haltSpeech = () => {
+  cancelVoiceInput()
+  stopReadAloud()
+}
 
 const client = createClient()
 let repo: Repository | null = null
@@ -621,6 +628,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async clearKey() {
+    haltSpeech()
     const store = await repository()
     await store.writeSecret(null)
     set({ key: null, locked: false, balance: null })
@@ -666,12 +674,17 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async newChat() {
     // SP-SB-630. Already on an empty new chat: say so, don't reset again.
+    // A recording or an in-flight transcription on that landing is still a live
+    // attempt. Stop it the same way as the path below: no transcript inserted,
+    // microphone tracks released, voice back to idle. The toast stays.
     const idle = get()
     const idleText = (idle.textDrafts[draftKey(idle.activeId)] ?? '').trim()
     if (!idle.activeId && idle.messages.length === 0 && idle.drafts.length === 0 && !idleText) {
+      haltSpeech()
       set({ statusToast: 'alreadyLatest' })
       return
     }
+    haltSpeech()
     // SP-CMP-296 / SP-CMP-297. Keep the chat we left. The landing composer starts empty.
     stashFiles(get().activeId, get().drafts)
     fileDrafts.delete('')
@@ -687,6 +700,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async openChat(id) {
+    haltSpeech()
     const leaving = get().activeId
     // Re-opening the chat already on screen keeps the cards added since the last stash.
     if (leaving !== id) stashFiles(leaving, get().drafts)
@@ -794,6 +808,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async removeChat(id) {
+    if (get().activeId === id) haltSpeech()
     if (get().serverMode) {
       await api(`/api/conversations/${id}`, { method: 'DELETE' })
       const wasActive = get().activeId === id
@@ -833,6 +848,10 @@ export const useHarbor = create<HarborState>((set, get) => ({
       return
     }
     const leaf = leafUnder(messages, siblingId)
+    const playing = readAloudSnapshot()
+    if (playing.status !== 'idle' && playing.messageId && !activePath(messages, leaf).some((item) => item.id === playing.messageId)) {
+      stopReadAloud()
+    }
     const conversation = get().conversations.find((item) => item.id === get().activeId)
     if (!conversation) {
       return
@@ -854,6 +873,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async send(text) {
+    haltSpeech()
     if (get().serverMode) {
       await runServerTurn(text.trim(), null)
       return
@@ -886,6 +906,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async regenerate(assistantId) {
+    haltSpeech()
     const assistant = get().messages.find((item) => item.id === assistantId)
     if (!assistant || get().streaming) {
       return
@@ -901,6 +922,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async resend(userId) {
+    haltSpeech()
     const user = get().messages.find((item) => item.id === userId)
     if (!user || user.role !== 'user' || get().streaming) return
     if (get().serverMode) {
@@ -915,6 +937,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async continueReply(assistantId) {
+    haltSpeech()
     const assistant = get().messages.find((item) => item.id === assistantId)
     if (!assistant || assistant.role !== 'assistant' || get().streaming) return
     const snapshot = {
@@ -944,6 +967,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async editUser(messageId, text) {
+    haltSpeech()
     const message = get().messages.find((item) => item.id === messageId)
     const trimmed = text.trim()
     if (!message || message.role !== 'user' || !trimmed || get().streaming) {
@@ -960,6 +984,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   stop() {
+    haltSpeech()
     abort?.abort()
     serverAbort?.abort()
     if (serverRunId) {
@@ -1082,11 +1107,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async importJson(file, asCopy) {
+    haltSpeech()
     const archive = readNative(JSON.parse(await file.text()) as unknown)
     await applyImport(archive.conversations, asCopy)
   },
 
   async importZip(file, asCopy) {
+    haltSpeech()
     const imported = importV3(new Uint8Array(await file.arrayBuffer()))
     await applyImport(imported.conversations, asCopy)
   },
@@ -1134,6 +1161,7 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async logoutServer() {
+    haltSpeech()
     await api('/api/auth/logout', { method: 'POST' }).catch(() => undefined)
     setCsrf('')
     clearRemoteSession()
@@ -1146,12 +1174,14 @@ export const useHarbor = create<HarborState>((set, get) => ({
   },
 
   async enterServerMode() {
+    haltSpeech()
     sessionStorage.setItem('deepapi-mode', 'server')
     set({ serverMode: true })
     await loadServerChats(set)
   },
 
   async enterLocalMode() {
+    haltSpeech()
     sessionStorage.setItem('deepapi-mode', 'local')
     set({ serverMode: false, showAdmin: false })
     await reloadLocal(set)

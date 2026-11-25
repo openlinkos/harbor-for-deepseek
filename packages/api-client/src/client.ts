@@ -1,5 +1,6 @@
 import { readApiError, readStreamEvent, ServerSentEventDecoder } from '@deepapi/sse'
-import type { Balance, CreateMessageBody, ModelInfo, StreamEvent, UploadedFile } from '@deepapi/types'
+import type { Balance, CreateMessageBody, ModelInfo, StreamEvent, TtsVoice, UploadedFile } from '@deepapi/types'
+import { ASR_MAX_BYTES, exceedsTtsJson, isTtsVoice, TTS_MAX_BILLING_CHARS, ttsBillingLength, ttsRequestJson } from '@deepapi/types'
 import { API_ORIGIN, FILES_BETA } from './request.js'
 
 export class ApiClientError extends Error {
@@ -118,6 +119,58 @@ export const createClient = (options: ClientOptions = {}) => {
         headers: authHeaders(apiKey),
         signal,
       })
+    },
+
+    /**
+     * Whole-file ASR. Bearer comes from the caller (the device key). The browser sets the multipart boundary.
+     */
+    async transcribe(apiKey: string, file: Blob, signal?: AbortSignal): Promise<string> {
+      if (file.size > ASR_MAX_BYTES) {
+        throw new ApiClientError('http', 'recording exceeds 8 MiB', 413)
+      }
+      const form = new FormData()
+      form.append('file', file, 'recording.wav')
+      const response = await request(fetchImpl, `${origin}/v1/tools/asr`, {
+        method: 'POST',
+        headers: authHeaders(apiKey),
+        body: form,
+        signal,
+      })
+      let parsed: unknown
+      try {
+        parsed = await response.json()
+      } catch {
+        throw new ApiClientError('protocol', 'asr response is not json', response.status)
+      }
+      const text = parsed && typeof parsed === 'object' ? (parsed as { text?: unknown }).text : undefined
+      if (typeof text !== 'string') {
+        throw new ApiClientError('protocol', 'asr response missing text', response.status)
+      }
+      return text
+    },
+
+    /**
+     * Full-text TTS. Returns the response body for progressive PCM playback.
+     * Over-limit text is rejected before any network call.
+     */
+    async synthesize(apiKey: string, text: string, voiceId: TtsVoice, signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+      if (!isTtsVoice(voiceId)) {
+        throw new ApiClientError('protocol', 'unsupported voice')
+      }
+      const body = ttsRequestJson(text, voiceId)
+      if (ttsBillingLength(text) > TTS_MAX_BILLING_CHARS || exceedsTtsJson(body)) {
+        throw new ApiClientError('http', 'tts payload is too large', 413)
+      }
+      const response = await request(fetchImpl, `${origin}/v1/tools/tts`, {
+        method: 'POST',
+        headers: authHeaders(apiKey, { 'Content-Type': 'application/json', Accept: 'application/octet-stream' }),
+        body,
+        signal,
+      })
+      if (!response.body) {
+        throw new ApiClientError('protocol', 'tts response has no body', response.status)
+      }
+      return response.body
     },
 
     async *streamMessage(

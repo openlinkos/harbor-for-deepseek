@@ -121,7 +121,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await expect(page.getByTestId('sidebar')).toContainText('简单加法')
   await page.screenshot({ path: join(shots, '03-reasoning.png') })
   await page.screenshot({ path: join(process.cwd(), '../../submission/awesome-deepseek-integration/docs/harbor/assets/chat.png') })
-  await expect(page.locator('.action-row button')).toHaveCount(5)
+  await expect(page.locator('.action-row button')).toHaveCount(6)
   await expect(page.getByTestId('message-list')).not.toContainText('输入')
 
   await page.getByTestId('user-menu').click()
@@ -416,7 +416,7 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(light.serverHint).toMatchObject({ fs: '12px', lh: '18px', fits: true })
   await page.getByRole('button', { name: '通用设置' }).click()
   const generalLabels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
-  expect(generalLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+  expect(generalLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页', '朗读音色'])
   await page.getByRole('button', { name: '深色' }).click()
   await page.getByRole('button', { name: '数据管理' }).click()
   const dark = await measure()
@@ -429,7 +429,7 @@ test('kept settings rows use the official 60px line and 36px controls', async ({
   expect(dark.save.h).toBe(36)
   await page.getByRole('button', { name: '通用设置' }).click()
   const darkLabels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
-  expect(darkLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+  expect(darkLabels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页', '朗读音色'])
 })
 
 test('390 balance label stays on one line', async ({ page }) => {
@@ -688,7 +688,7 @@ test('settings no longer show an upload file expiry row', async ({ page }) => {
   await expect(page.getByTestId('settings-dialog')).not.toContainText('上传文件过期')
   await expect(page.getByTestId('settings-dialog')).not.toContainText('PDF / Office')
   const labels = await page.locator('.settings-general .settings-line > span:first-child').allTextContents()
-  expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页'])
+  expect(labels.map((label) => label.trim()).filter(Boolean)).toEqual(['语言', '界面包', '安全审核', '打开网页', '朗读音色'])
   await page.getByTestId('language-trigger').click()
   await page.getByRole('option', { name: 'English' }).click()
   await expect(page.getByTestId('settings-dialog')).not.toContainText('Uploaded files expire')
