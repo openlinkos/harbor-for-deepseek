@@ -1119,6 +1119,55 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     expect(payload).not.toHaveProperty('defaultExpireSeconds')
   })
 
+  it('sends the file reference and the web search tool on the same upstream request', async () => {
+    const setup = await harbor.app.request('/api/setup/admin', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'ada', password: 'correct-horse' }),
+    })
+    const created = (await setup.json()) as { csrf: string }
+    const session = sessionOf(setup)
+    const headers = { 'content-type': 'application/json', ...authed(session, created.csrf, true) }
+    await harbor.app.request('/api/admin/keys', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ secret: 'good-pool-key', accountGroup: 'healthy' }),
+    })
+    const conversation = await harbor.app.request('/api/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id: 'file-search', model: 'deepseek-flash' }),
+    })
+    expect(conversation.status).toBe(200)
+    const fileId = 'file-api-00000000-0000-4000-8000-0000000000a1'
+    const run = await harbor.app.request('/api/conversations/file-search/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        text: '文件里写了什么？顺便搜一下',
+        thinking: true,
+        search: true,
+        files: [{ fileId, filename: 'note.txt', media: 'document', purpose: 'user_data', bytes: 12, expiresAt: null }],
+      }),
+    })
+    expect(run.status).toBe(200)
+    const started = (await run.json()) as { runId: string }
+    const events = await harbor.app.request(`/api/runs/${started.runId}/events?after=0`, {
+      headers: authed(session, created.csrf),
+    })
+    expect(await events.text()).toContain('message_stop')
+    expect(bodies).toHaveLength(1)
+    const sent = JSON.parse(bodies[0] ?? '{}') as {
+      tools?: Array<{ type?: string; name?: string }>
+      messages?: Array<{ content?: unknown }>
+    }
+    expect(sent.tools).toEqual([{ type: 'deepseek_web_search', name: 'deepseek_web_search' }])
+    const content = JSON.stringify(sent.messages ?? [])
+    expect(content).toContain(fileId)
+    expect(content).toContain('"type":"document"')
+    expect(content).toContain('"file_id"')
+  })
+
   it('applies migrations once and serves health checks', async () => {
     const before = await harbor.sql<{ id: string }[]>`select id from schema_migrations order by id`
     expect(before.map((row) => row.id)).toEqual(['001_init', '002_invite_expiry', '003_thinking_seconds', '004_thinking_started'])

@@ -148,7 +148,7 @@ test('chats with mocks, switches tools, and round-trips an export', async ({ pag
   await expect(page.getByTestId('settings-dialog')).toBeHidden()
 
   await page.getByTestId('new-chat').click()
-  await page.getByTestId('toggle-search').click()
+  await page.getByTestId('toggle-thinking').click()
   await page.getByTestId('composer').fill('冰岛现在大约多少人口？')
   await page.getByTestId('send').click()
   await page.getByTestId('search-results').click()
@@ -239,7 +239,7 @@ test('phone layout matches the docked chat, drawer, and sheets', async ({ page }
   await expect(page.getByTestId('thinking')).toContainText('已思考')
   await page.screenshot({ path: join(shots, 'm-thinking.png') })
   await page.getByTestId('top-new').click()
-  await page.getByTestId('toggle-search').click()
+  await page.getByTestId('toggle-thinking').click()
   await page.getByTestId('composer').fill('冰岛现在大约多少人口？')
   await page.getByTestId('send').click()
   await expect(page.getByTestId('assistant-text')).toContainText('394,000')

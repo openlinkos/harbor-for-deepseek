@@ -57,6 +57,44 @@ describe('buildRequest', () => {
     expect(body.title).toBeUndefined()
   })
 
+  it('keeps a file reference when web search is also on', () => {
+    const attached: Message = {
+      ...user('u', '文件里写了什么'),
+      blocks: [
+        { type: 'text', text: '文件里写了什么' },
+        {
+          type: 'file_ref',
+          fileId: 'file-api-00000000-0000-4000-8000-0000000000a1',
+          filename: 'note.txt',
+          media: 'document',
+          purpose: 'user_data',
+          bytes: 12,
+          expiresAt: null,
+        },
+      ],
+    }
+    const body = buildRequest({
+      model: 'deepseek-flash',
+      thinking: true,
+      search: true,
+      readLink: false,
+      effort: 'high',
+      safetyLevel: 'high',
+      requestTitle: false,
+      messages: [attached],
+    })
+    expect(body.tools).toEqual([{ type: 'deepseek_web_search', name: 'deepseek_web_search' }])
+    expect(body.messages).toEqual([
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: '文件里写了什么' },
+          { type: 'document', source: { type: 'file', file_id: 'file-api-00000000-0000-4000-8000-0000000000a1' } },
+        ],
+      },
+    ])
+  })
+
   it('keeps read-link signatures and drops refusals', () => {
     const assistant: Message = {
       ...user('a', ''),

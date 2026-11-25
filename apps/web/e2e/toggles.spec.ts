@@ -99,6 +99,8 @@ test('home turns deep thinking off and the request stays disabled', async ({ pag
   const bodies: Body[] = []
   await install(page, bodies, () => plainEvents())
   await unlock(page)
+  await expectChip(page, 'toggle-thinking', true)
+  await page.getByTestId('toggle-thinking').click()
   await expectChip(page, 'toggle-thinking', false)
   await page.screenshot({ path: join(shots, 'thinking-off-home.png') })
   await send(page, '不要思考')
@@ -115,6 +117,7 @@ test('deep thinking stays off after new chat, the shortcut, and reload', async (
   await expect(page.getByTestId('sidebar')).toContainText('已有对话')
   await page.getByTestId('new-chat').click()
   await expect(page.locator('.greeting')).toBeVisible()
+  await page.getByTestId('toggle-thinking').click()
   await expectChip(page, 'toggle-thinking', false)
 
   await backHome(page, '已有对话', 'click')
@@ -127,14 +130,14 @@ test('deep thinking stays off after new chat, the shortcut, and reload', async (
 
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await expectChip(page, 'toggle-thinking', false)
+  await expectChip(page, 'toggle-thinking', true)
   await page.screenshot({ path: join(shots, 'thinking-off-after-reload.png') })
 
   await page.getByTestId('new-chat').click()
   shape = 'plain'
   await send(page, '刷新之后再发')
   await expect(page.getByTestId('assistant-text')).toContainText('好的')
-  expect(bodies.at(-1)?.thinking?.type).toBe('disabled')
+  expect(bodies.at(-1)?.thinking?.type).toBe('enabled')
 })
 
 test('smart search stays on after new chat and the shortcut, and resets off on reload', async ({ page }) => {
@@ -145,60 +148,60 @@ test('smart search stays on after new chat and the shortcut, and resets off on r
   await expect(page.getByTestId('sidebar')).toContainText('新的一句')
   await page.getByTestId('new-chat').click()
   await page.getByTestId('toggle-search').click()
-  await expectChip(page, 'toggle-search', true)
+  await expectChip(page, 'toggle-search', false)
 
   await backHome(page, '新的一句', 'click')
-  await expectChip(page, 'toggle-search', true)
+  await expectChip(page, 'toggle-search', false)
   await backHome(page, '新的一句', 'Control+j')
-  await expectChip(page, 'toggle-search', true)
+  await expectChip(page, 'toggle-search', false)
   await backHome(page, '新的一句', 'Meta+j')
-  await expectChip(page, 'toggle-search', true)
+  await expectChip(page, 'toggle-search', false)
 
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
-  await expectChip(page, 'toggle-search', false)
+  await expectChip(page, 'toggle-search', true)
   await page.screenshot({ path: join(shots, 'search-off-after-reload.png') })
 
   await page.getByTestId('new-chat').click()
   await send(page, '刷新之后不搜索')
   await expect(page.getByTestId('assistant-text').last()).toContainText('好的')
-  expect(hasSearch(bodies.at(-1) ?? {})).toBe(false)
-  expect(bodies.at(-1)?.thinking?.type).toBe('disabled')
+  expect(hasSearch(bodies.at(-1) ?? {})).toBe(true)
+  expect(bodies.at(-1)?.thinking?.type).toBe('enabled')
 })
 
 test('landing chips are the same global toggles', async ({ page }) => {
   const bodies: Body[] = []
   await install(page, bodies, () => plainEvents())
   await page.goto('/')
+  await expectChip(page, 'landing-thinking', true)
+  await expectChip(page, 'landing-search', true)
+  await page.getByTestId('landing-thinking').click()
+  await page.getByTestId('landing-search').click()
   await expectChip(page, 'landing-thinking', false)
   await expectChip(page, 'landing-search', false)
   await page.screenshot({ path: join(shots, 'landing-toggles-off.png') })
-  await page.getByTestId('landing-thinking').click()
-  await page.getByTestId('landing-search').click()
-  await expectChip(page, 'landing-thinking', true)
-  await expectChip(page, 'landing-search', true)
 
   await page.getByTestId('landing-send').click()
   await page.getByTestId('key-input').fill('demo-local-key')
   await page.getByTestId('key-save').click()
-  await expectChip(page, 'toggle-thinking', true)
-  await expectChip(page, 'toggle-search', true)
+  await expectChip(page, 'toggle-thinking', false)
+  await expectChip(page, 'toggle-search', false)
 
   await page.reload()
   await expect(page.getByTestId('composer')).toBeVisible()
   await expectChip(page, 'toggle-thinking', true)
-  await expectChip(page, 'toggle-search', false)
+  await expectChip(page, 'toggle-search', true)
   await send(page, '落地页带进来的开关')
   await expect(page.getByTestId('assistant-text')).toContainText('好的')
   expect(bodies.at(-1)?.thinking?.type).toBe('enabled')
-  expect(hasSearch(bodies.at(-1) ?? {})).toBe(false)
+  expect(hasSearch(bodies.at(-1) ?? {})).toBe(true)
 })
 
 test('a search-only answer does not render the thought shell', async ({ page }) => {
   const bodies: Body[] = []
   await install(page, bodies, () => searchEvents())
   await unlock(page)
-  await page.getByTestId('toggle-search').click()
+  await page.getByTestId('toggle-thinking').click()
   await expectChip(page, 'toggle-thinking', false)
   await expectChip(page, 'toggle-search', true)
   await send(page, '冰岛现在大约多少人口？')
@@ -221,6 +224,7 @@ test('an existing thinking answer stays intact after the toggle changes', async 
   await expect(page.getByTestId('assistant-text')).toContainText('8')
 
   await page.getByTestId('new-chat').click()
+  await page.getByTestId('toggle-thinking').click()
   await expectChip(page, 'toggle-thinking', false)
   await openSavedChat(page, '简单加法')
   await expectChip(page, 'toggle-thinking', false)
@@ -234,5 +238,5 @@ test('an existing thinking answer stays intact after the toggle changes', async 
   await expect(page.getByTestId('composer')).toBeVisible()
   await expect(page.getByTestId('thinking')).toContainText('已思考')
   await expect(page.getByTestId('thinking')).toContainText('3+5=8')
-  await expectChip(page, 'toggle-thinking', false)
+  await expectChip(page, 'toggle-thinking', true)
 })

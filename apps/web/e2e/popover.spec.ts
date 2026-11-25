@@ -176,10 +176,8 @@ test('thinking and search chips toggle on Enter and Space', async ({ page }) => 
   await unlock(page)
   const thinking = page.getByTestId('toggle-thinking')
   const search = page.getByTestId('toggle-search')
-  await expect.poll(() => thinking.evaluate((node) => node.classList.contains('on'))).toBe(false)
-  await expect.poll(() => search.evaluate((node) => node.classList.contains('on'))).toBe(false)
-  await thinking.click()
-  await search.click()
+  await expect.poll(() => thinking.evaluate((node) => node.classList.contains('on'))).toBe(true)
+  await expect.poll(() => search.evaluate((node) => node.classList.contains('on'))).toBe(true)
 
   await tabTo(page, thinking)
   await expect(thinking).toBeFocused()
