@@ -203,7 +203,7 @@ const startHoldProxy = async (targetPort: number, targetHost: string): Promise<H
   }
 }
 
-describe.skipIf(!postgresReady)('run event pump against postgres', () => {
+describe('run event pump against postgres', () => {
   const sql = postgres(databaseUrl, { max: 4, onnotice: () => undefined })
 
   beforeAll(async () => {
@@ -374,7 +374,7 @@ describe.skipIf(!postgresReady)('run event pump against postgres', () => {
   })
 })
 
-describe.skipIf(!postgresReady)('GET /api/runs/:id/events through a held status row', () => {
+describe('GET /api/runs/:id/events through a held status row', () => {
   let proxy: HoldProxy | undefined
   let mock: Server | undefined
   let harbor: HarborServer | undefined
