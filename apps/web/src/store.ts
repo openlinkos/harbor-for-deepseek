@@ -674,13 +674,13 @@ export const useHarbor = create<HarborState>((set, get) => ({
 
   async newChat() {
     // SP-SB-630. Already on an empty new chat: say so, don't reset again.
-    // Speech tests that click 开启新对话 all have messages or draft text, so they
-    // take the path below. This early return is only the empty landing. No speech
-    // test expects a recording or read-aloud to stop there, and the toast says the
-    // chat did not change, so a landing recording keeps running.
+    // A recording or an in-flight transcription on that landing is still a live
+    // attempt. Stop it the same way as the path below: no transcript inserted,
+    // microphone tracks released, voice back to idle. The toast stays.
     const idle = get()
     const idleText = (idle.textDrafts[draftKey(idle.activeId)] ?? '').trim()
     if (!idle.activeId && idle.messages.length === 0 && idle.drafts.length === 0 && !idleText) {
+      haltSpeech()
       set({ statusToast: 'alreadyLatest' })
       return
     }
