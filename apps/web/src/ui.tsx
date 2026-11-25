@@ -210,10 +210,20 @@ const focusComposer = () => {
   const snapshot = box
     ? { value: box.value, start: box.selectionStart, end: box.selectionEnd, direction: box.selectionDirection }
     : null
+  // The caller may run while a dialog still holds focus. A click in the next frame
+  // (the user menu, after settings has closed) must keep that focus.
+  const atSchedule = document.activeElement
   window.requestAnimationFrame(() => {
     if (ticket !== composerFocusTicket) return
     // SP-MOD-635. A frame queued before the search dialog opened must not take the input.
     if (document.querySelector('.search-dialog')) return
+    const now = document.activeElement
+    if (
+      now instanceof HTMLElement
+      && now !== document.body
+      && now.isConnected
+      && now !== atSchedule
+    ) return
     const node = document.querySelector<HTMLTextAreaElement>('[data-testid="composer"]')
     if (!node) return
     const userMoved = snapshot !== null
@@ -2044,8 +2054,13 @@ export const Shell = () => {
     return () => document.removeEventListener('pointerdown', onPointerDown, true)
   }, [userMenu])
   // SP-SB-669: a history pop closes the user menu. Reload already drops it.
+  // The overlay's own history.back() sets suppressEmptyRestore for that one pop.
+  // A menu opened after the overlay closed must survive it.
   useEffect(() => {
-    const onPop = () => setUserMenu(false)
+    const onPop = () => {
+      if (suppressEmptyRestore) return
+      setUserMenu(false)
+    }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])

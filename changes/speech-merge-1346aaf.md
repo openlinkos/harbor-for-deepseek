@@ -1,0 +1,1 @@
+合并 master 1346aaf（#71，设置关闭后立刻打开用户菜单不再被关掉）。唯一冲突在 apps/web/src/ui.tsx 的 focusComposer：保留语音分支的 composerFocusTicket（只让最后一次请求生效）和请求时的选区快照（用户在延迟帧前移动的选区不被改写），同时加入 master 的判断：动画帧执行时焦点已移到另一个仍在文档里的控件（如刚打开的用户菜单）就不再抢回作曲框。SP-SB-669 的 popstate 忽略弹层自身 history.back 的改动无冲突，按 master 合入。
