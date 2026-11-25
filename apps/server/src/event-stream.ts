@@ -18,7 +18,7 @@ export type PumpInput = {
   close: () => void
   /**
    * The caller invokes the registered function when the reader cancels.
-   * The previous loop did not wake on cancel; it only noticed `closed` on the next iteration.
+   * Cancel wakes the pump so the listener and heartbeat timer are dropped.
    */
   onCancel: (wake: () => void) => void
 }
@@ -32,50 +32,110 @@ export const formatRunEnd = (status: string | undefined, thinkingSeconds: number
 export const formatRunPing = (): string => `: ping\n\n`
 
 /**
- * Previous wait protocol, extracted unchanged: both reads finish before the
- * wake listener exists. A notify during either read is dropped.
+ * Register one latched wake before either read. A notify during a query, or
+ * after the query returns and before the wait is armed, sets `pending` and
+ * cannot be lost. After a terminal status, events are read again: that read
+ * starts only once the terminal commit is visible, and every append for the
+ * run is committed before finishRun.
  */
 export const pumpRunEvents = async (input: PumpInput): Promise<void> => {
   let cursor = input.initialCursor
-  input.onCancel(() => undefined)
-  while (!input.signal.aborted && !input.isClosed()) {
-    const rows = await input.readEvents(cursor)
-    for (const row of rows) {
-      cursor = row.seq
-      input.send(formatRunEvent(row.seq, row.payload))
+  let pending = false
+  let resolveWait: (() => void) | null = null
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const clearTimer = () => {
+    if (timer !== undefined) {
+      clearTimeout(timer)
+      timer = undefined
     }
-    const status = await input.readStatus()
-    if (status !== 'streaming') {
-      const thinkingSeconds = await input.readThinkingSeconds()
-      input.send(formatRunEnd(status, thinkingSeconds))
+  }
+  const wake = () => {
+    pending = true
+    resolveWait?.()
+  }
+  const unsubscribe = input.subscribe(wake)
+  const onAbort = () => {
+    resolveWait?.()
+  }
+  input.signal.addEventListener('abort', onAbort)
+  input.onCancel(() => {
+    resolveWait?.()
+  })
+  try {
+    if (input.signal.aborted || input.isClosed()) {
       input.close()
       return
     }
-    await new Promise<void>((resolve) => {
-      let settled = false
-      let timer: ReturnType<typeof setTimeout> | undefined
-      let unsubscribe = () => {}
-      const finish = () => {
-        if (settled) {
-          return
-        }
-        settled = true
-        if (timer) {
-          clearTimeout(timer)
-        }
-        input.signal.removeEventListener('abort', onAbort)
-        unsubscribe()
-        resolve()
+    while (!input.signal.aborted && !input.isClosed()) {
+      const rows = await input.readEvents(cursor)
+      if (input.signal.aborted || input.isClosed()) {
+        break
       }
-      const wake = () => finish()
-      unsubscribe = input.subscribe(wake)
-      timer = setTimeout(() => {
-        input.send(formatRunPing())
-        finish()
-      }, input.pingMs)
-      const onAbort = () => finish()
-      input.signal.addEventListener('abort', onAbort, { once: true })
-    })
+      for (const row of rows) {
+        cursor = row.seq
+        input.send(formatRunEvent(row.seq, row.payload))
+        if (input.isClosed()) {
+          break
+        }
+      }
+      if (input.signal.aborted || input.isClosed()) {
+        break
+      }
+      const status = await input.readStatus()
+      if (input.signal.aborted || input.isClosed()) {
+        break
+      }
+      if (status !== 'streaming') {
+        const tail = await input.readEvents(cursor)
+        for (const row of tail) {
+          if (input.isClosed()) {
+            break
+          }
+          cursor = row.seq
+          input.send(formatRunEvent(row.seq, row.payload))
+        }
+        if (!input.isClosed()) {
+          const thinkingSeconds = await input.readThinkingSeconds()
+          if (!input.isClosed()) {
+            input.send(formatRunEnd(status, thinkingSeconds))
+            input.close()
+          }
+        }
+        return
+      }
+      if (pending) {
+        pending = false
+        continue
+      }
+      await new Promise<void>((resolve) => {
+        let settled = false
+        const finish = () => {
+          if (settled) {
+            return
+          }
+          settled = true
+          clearTimer()
+          resolveWait = null
+          resolve()
+        }
+        timer = setTimeout(() => {
+          if (!input.isClosed()) {
+            input.send(formatRunPing())
+          }
+          finish()
+        }, input.pingMs)
+        resolveWait = finish
+        if (pending || input.signal.aborted || input.isClosed()) {
+          finish()
+        }
+      })
+      pending = false
+    }
+    input.close()
+  } finally {
+    clearTimer()
+    resolveWait = null
+    input.signal.removeEventListener('abort', onAbort)
+    unsubscribe()
   }
-  input.close()
 }
