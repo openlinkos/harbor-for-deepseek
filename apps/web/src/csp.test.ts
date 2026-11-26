@@ -25,7 +25,7 @@ describe('content security policy', () => {
     expect(headers).toContain('X-Content-Type-Options: nosniff')
     expect(headers).toContain('Referrer-Policy: no-referrer')
     expect(headers).toContain('X-Frame-Options: DENY')
-    expect(headers).toContain('Permissions-Policy: camera=(), microphone=(), geolocation=()')
+    expect(headers).toContain('Permissions-Policy: camera=(), microphone=(self), geolocation=()')
     expect(headers).toContain(`Content-Security-Policy: ${CONTENT_SECURITY_POLICY}`)
     expect(headers).not.toContain('unsafe-eval')
   })

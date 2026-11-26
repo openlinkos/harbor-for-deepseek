@@ -28,7 +28,9 @@ Publish the checksums next to the files, or attach `apps/web/dist` from the **St
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: no-referrer`
 - `X-Frame-Options: DENY`
-- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- `Permissions-Policy: camera=(), microphone=(self), geolocation=()`
+
+`microphone=(self)` is required by voice input: with `microphone=()` the browser rejects `getUserMedia` without showing a permission prompt, and users only see 「无法使用麦克风」. Camera and geolocation are not used and stay off. Every copy of this header (nginx, Caddy, `_headers`, the server, `scripts/postbuild.mjs`) must match; `node scripts/check-permissions-policy.mjs` checks that, and checks that no browser API the app calls is switched off.
 
 Serve only the files in `dist`. Access logs on the host will see page loads, not keys and not chat bodies.
 

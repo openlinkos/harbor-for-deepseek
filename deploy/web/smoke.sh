@@ -16,6 +16,8 @@ printf '%s' "$headers" | grep -qi 'content-security-policy:.*api.deepseek.com'
 printf '%s' "$headers" | grep -qi 'x-content-type-options: nosniff'
 printf '%s' "$headers" | grep -qi 'x-frame-options: DENY'
 printf '%s' "$headers" | grep -qi 'referrer-policy: no-referrer'
+# Voice input needs the microphone on this origin; microphone=() blocks it with no prompt.
+printf '%s' "$headers" | grep -qiF 'permissions-policy: camera=(), microphone=(self), geolocation=()'
 printf '%s' "$headers" | grep -qi 'cache-control: no-cache'
 
 index_headers="$(curl -fsSI "$base/index.html")"

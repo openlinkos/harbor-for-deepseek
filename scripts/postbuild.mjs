@@ -47,7 +47,7 @@ for (const line of [
   'X-Content-Type-Options: nosniff',
   'Referrer-Policy: no-referrer',
   'X-Frame-Options: DENY',
-  'Permissions-Policy: camera=(), microphone=(), geolocation=()',
+  'Permissions-Policy: camera=(), microphone=(self), geolocation=()',
   "connect-src 'self' https://api.deepseek.com",
 ]) {
   if (!headers.includes(line)) {

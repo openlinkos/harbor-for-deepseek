@@ -375,7 +375,7 @@ export const createServer = async (options: ServerOptions): Promise<HarborServer
     c.header('X-Content-Type-Options', 'nosniff')
     c.header('Referrer-Policy', 'no-referrer')
     c.header('X-Frame-Options', 'DENY')
-    c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    c.header('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()')
     c.header('Content-Security-Policy', CONTENT_SECURITY_POLICY)
     if (wantsHsts(c.req.url, c.req.header('x-forwarded-proto'), options.trustProxy === true, options.hsts === true)) {
       c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
