@@ -14,13 +14,14 @@
     "build": "turbo run build --filter=@deepapi/web",
     "preview": "pnpm --filter @deepapi/web preview",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test && node --experimental-strip-types --test tools/style-audit/bookmarklet.test.ts && node --test scripts/check-version.test.mjs scripts/check-css.test.mjs scripts/check-brand.test.mjs scripts/check-specimen.test.mjs",
+    "test": "turbo run test && node --experimental-strip-types --test tools/style-audit/bookmarklet.test.ts && node --test scripts/check-version.test.mjs scripts/check-css.test.mjs scripts/check-brand.test.mjs scripts/check-specimen.test.mjs scripts/check-permissions-policy.test.mjs",
     "check-version": "node scripts/check-version.mjs",
-    "lint": "turbo run lint && node scripts/check-brand.mjs",
+    "lint": "turbo run lint && node scripts/check-brand.mjs && node scripts/check-permissions-policy.mjs",
     "e2e": "pnpm --filter @deepapi/web e2e",
     "style:audit": "node --experimental-strip-types tools/style-audit/run.ts",
     "e2e:server": "pnpm --filter @deepapi/web exec playwright test -c playwright.server.config.ts",
     "scan-secrets": "node scripts/scan-secrets.mjs",
+    "check-permissions-policy": "node scripts/check-permissions-policy.mjs",
     "check-css": "node scripts/check-css.mjs apps/web/src/styles.css apps/web/src/theme.css && node scripts/check-specimen.mjs apps/web/src packages"
   },
   "devDependencies": {

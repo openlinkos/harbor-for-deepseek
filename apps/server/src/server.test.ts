@@ -419,6 +419,7 @@ describe.skipIf(!postgresReady)('harbor server', () => {
     const health = await harbor.app.request('http://127.0.0.1/api/health')
     expect(health.headers.get('x-content-type-options')).toBe('nosniff')
     expect(health.headers.get('x-frame-options')).toBe('DENY')
+    expect(health.headers.get('permissions-policy')).toBe('camera=(), microphone=(self), geolocation=()')
     expect(health.headers.get('content-security-policy')).toContain("frame-ancestors 'none'")
     expect(health.headers.get('strict-transport-security')).toBeNull()
     const secure = await harbor.app.request('https://harbor.example/api/health')
